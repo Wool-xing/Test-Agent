@@ -1,0 +1,95 @@
+# ===== 测试框架核心 =====
+pytest==7.4.3
+pytest-xdist==3.5.0          # 并行执行
+pytest-rerunfailures==13.0   # 失败重试（默认关，命令行显式开启）
+pytest-timeout==2.2.0        # 用例超时
+pytest-cov==4.1.0            # 代码覆盖率
+pytest-mock==3.12.0          # Mock 工具（unittest.mock 包装）
+pytest-playwright==0.4.4     # Playwright 官方 pytest 插件
+allure-pytest==2.13.2        # Allure 报告（注：还需手动安装 allure CLI，见部署说明）
+
+# ===== UI 自动化 =====
+playwright==1.40.0
+
+# ===== API 测试 =====
+requests==2.31.0
+
+# ===== 性能测试 =====
+# 主：JMeter 5.6.3（Java 工具，需单独安装。见 01-快速开始/部署说明.md "JMeter 安装"）
+# 备：Locust（Python，开发期快速压测）
+locust==2.25.0
+
+# ===== 测试数据工厂 =====
+faker==20.1.0
+factory-boy==3.3.0
+
+# ===== 数据库 =====
+psycopg2-binary==2.9.9       # PostgreSQL（按实际数据库选其一）
+pymysql==1.1.0               # MySQL
+SQLAlchemy==2.0.25           # ORM（data_factory 通用插入/删除依赖）
+
+# ===== 配置 =====
+PyYAML==6.0.1                # regression_modules.yaml 解析
+
+# ===== Excel/文档（PRD 多格式加载也用）=====
+openpyxl==3.1.2
+python-docx==1.1.0
+pdfplumber==0.10.3                # PDF 解析（主）
+PyPDF2==3.0.1                     # PDF 解析（备）
+beautifulsoup4==4.12.2            # HTML/URL PRD 解析
+
+# ===== 工具 =====
+python-dotenv==1.0.0         # .env 加载
+tenacity==8.2.3              # 重试库（call_with_retry 主用方案 + tenacity 装饰器备选）
+loguru==0.7.2                # 增强日志
+
+# ===== 通知（直连 SDK/curl 方式，无需额外包；MCP 通道当前关闭，参考 .mcp.json）=====
+# 企业微信/飞书/钉钉 通知通过 utils/generate_report.py 中 requests.post 直连 webhook 实现
+
+# ===== 扩展平台（按需启用，注释掉即不装）=====
+
+# 移动端（10-移动测试）
+Appium-Python-Client==4.0.0
+selenium==4.15.0
+websocket-client==1.7.0           # 同步 WebSocket（小程序协议 + EXE WS 测试）
+websockets==12.0                  # 异步 WebSocket（高并发性能测试）
+
+# 桌面（11-桌面测试）
+# pywinauto==0.6.8                # 仅 Windows
+# uiautomation==2.0.20            # 仅 Windows
+pyautogui==0.9.54                 # 跨平台键鼠 + 截图
+mss==9.0.1                        # 跨平台高速截图
+psutil==5.9.6                     # 进程性能采集
+
+# 视觉/游戏（12-视觉游戏测试）
+airtest==1.3.5
+opencv-python==4.8.1.78
+scikit-image==0.22.0
+imagehash==4.3.1
+pytesseract==0.3.10               # OCR（外部需装 tesseract 二进制）
+Pillow==10.1.0
+# paddleocr==2.7.0.3              # 备选 OCR（重，按需启用）
+
+# 系统集成（13-系统集成测试）
+paramiko==3.4.0                   # SSH
+pyserial==3.5                     # 串口
+paho-mqtt==1.6.1                  # MQTT
+# pymodbus==3.5.4                 # Modbus（按需启用）
+ffmpeg-python==0.2.0              # FFmpeg 命令封装（外部需装 ffmpeg 二进制）
+kafka-python==2.0.2               # Kafka（或 confluent-kafka）
+pika==1.3.2                       # RabbitMQ
+
+# AI/ML（14-AI模型测试）
+scikit-learn==1.4.0
+scipy==1.11.4
+# alibi-detect==0.12.0            # 漂移高级检测（按需启用，依赖较重）
+# deepeval==0.20.50               # LLM 评估（按需启用）
+
+# ===== 注意：以下为外部工具，需独立安装（见部署说明）=====
+# - JMeter 5.6.3（Java 8+ 必装）
+# - Allure CLI 2.x
+# - Java JRE 8+（JMeter / Allure 均依赖）
+# - tesseract（OCR 二进制，apt/brew/scoop 安装）
+# - ffmpeg + ffprobe（音视频处理）
+# - Appium server（npm install -g appium，移动端必装）
+# - 微信开发者工具（小程序测试，单独下载 dmg/exe）

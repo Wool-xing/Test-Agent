@@ -1,0 +1,440 @@
+name: 自动化测试流程
+
+on:
+  push:
+    branches: [main, develop, release/*]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: '测试级别'
+        required: true
+        default: 'regression'
+        type: choice
+        options: [smoke, regression, full]
+      environment:
+        description: '测试环境'
+        required: true
+        default: 'test'
+        type: choice
+        options: [test, staging]
+      perf_mode:
+        description: 'JMeter 性能模式'
+        required: true
+        default: 'ci_quick'
+        type: choice
+        options: [ci_quick, full]
+
+env:
+  PYTHON_VERSION: '3.11'
+  JMETER_VERSION: '5.6.3'
+  TEST_ENV: ${{ github.event.inputs.environment || 'test' }}
+  # release 分支默认 full 模式，其它默认 ci_quick
+  PERF_MODE: ${{ github.event.inputs.perf_mode || (startsWith(github.ref, 'refs/heads/release/') && 'full' || 'ci_quick') }}
+  APP_SRC_PATH: ${{ secrets.APP_SRC_PATH || './src' }}
+
+jobs:
+  # ===== 0. 检查 secrets 是否配置（解决 if 表达式不能引用 secrets 的问题） =====
+  preflight:
+    name: 检查 Secrets / 派发参数
+    runs-on: ubuntu-latest
+    outputs:
+      wechat_enabled:   ${{ steps.check.outputs.wechat_enabled }}
+      feishu_enabled:   ${{ steps.check.outputs.feishu_enabled }}
+      dingtalk_enabled: ${{ steps.check.outputs.dingtalk_enabled }}
+      codecov_enabled:  ${{ steps.check.outputs.codecov_enabled }}
+    steps:
+      - id: check
+        env:
+          WECHAT:   ${{ secrets.WECHAT_WEBHOOK_URL }}
+          FEISHU:   ${{ secrets.FEISHU_WEBHOOK }}
+          DINGTALK: ${{ secrets.DINGTALK_WEBHOOK }}
+          CODECOV:  ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          [ -n "$WECHAT" ]   && echo "wechat_enabled=true"   >> "$GITHUB_OUTPUT" || echo "wechat_enabled=false"   >> "$GITHUB_OUTPUT"
+          [ -n "$FEISHU" ]   && echo "feishu_enabled=true"   >> "$GITHUB_OUTPUT" || echo "feishu_enabled=false"   >> "$GITHUB_OUTPUT"
+          [ -n "$DINGTALK" ] && echo "dingtalk_enabled=true" >> "$GITHUB_OUTPUT" || echo "dingtalk_enabled=false" >> "$GITHUB_OUTPUT"
+          [ -n "$CODECOV" ]  && echo "codecov_enabled=true"  >> "$GITHUB_OUTPUT" || echo "codecov_enabled=false"  >> "$GITHUB_OUTPUT"
+
+  # ===== 1. 代码质量检查 =====
+  code-quality:
+    name: 代码质量检查
+    runs-on: ubuntu-latest
+    needs: preflight
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: Ruff 代码检查
+        run: |
+          pip install ruff
+          ruff check workspace/自动化脚本/python/ utils/ --select E,F,W --ignore E501
+
+      - name: 类型检查
+        run: |
+          pip install mypy
+          mypy workspace/自动化脚本/python/ utils/ --ignore-missing-imports || true
+
+  # ===== 2. 冒烟测试（P0，必过） =====
+  smoke-test:
+    name: 冒烟测试（P0）
+    runs-on: ubuntu-latest
+    needs: code-quality
+    timeout-minutes: 15
+    env:
+      TEST_APP_URL:     ${{ secrets.TEST_APP_URL }}
+      TEST_API_URL:     ${{ secrets.TEST_API_URL }}
+      TEST_DB_HOST:     ${{ secrets.TEST_DB_HOST }}
+      TEST_DB_PORT:     ${{ secrets.TEST_DB_PORT }}
+      TEST_DB_USER:     ${{ secrets.TEST_DB_USER }}
+      TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+      TEST_USER:        ${{ secrets.TEST_USER }}
+      TEST_PASS:        ${{ secrets.TEST_PASS }}
+      ADMIN_USER:       ${{ secrets.ADMIN_USER }}
+      ADMIN_PASS:       ${{ secrets.ADMIN_PASS }}
+      ZENTAO_BASE_URL:  ${{ secrets.ZENTAO_BASE_URL }}
+      ZENTAO_ACCOUNT:   ${{ secrets.ZENTAO_ACCOUNT }}
+      ZENTAO_PASSWORD:  ${{ secrets.ZENTAO_PASSWORD }}
+      MOCK_SERVER_URL:  ${{ secrets.MOCK_SERVER_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: 安装依赖
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium --with-deps
+
+      - name: 创建工作目录
+        run: |
+          mkdir -p workspace/执行日志/allure-results
+          mkdir -p workspace/执行日志/截图
+          mkdir -p workspace/测试数据
+
+      - name: 执行冒烟测试（P0）
+        run: |
+          pytest -m "p0" \
+            -n 2 \
+            --timeout=60 \
+            --tb=short \
+            --alluredir=workspace/执行日志/allure-results \
+            --junitxml=workspace/执行日志/smoke-results.xml \
+            -v
+        env:
+          HEADLESS: 'true'
+
+      - name: 检查冒烟门禁
+        if: always()
+        run: |
+          python -m utils.ci_quality_gate \
+            --smoke-xml workspace/执行日志/smoke-results.xml \
+            --output-json workspace/执行日志/smoke_gate_result.json
+
+      - name: 上传冒烟产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: workspace/执行日志/
+          retention-days: 7
+
+  # ===== 3. 回归测试（P0+P1） =====
+  regression-test:
+    name: 回归测试（P0+P1）
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    timeout-minutes: 90
+    if: |
+      github.event.inputs.test_level != 'smoke' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    env:
+      TEST_APP_URL:     ${{ secrets.TEST_APP_URL }}
+      TEST_API_URL:     ${{ secrets.TEST_API_URL }}
+      TEST_DB_HOST:     ${{ secrets.TEST_DB_HOST }}
+      TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+      TEST_USER:        ${{ secrets.TEST_USER }}
+      TEST_PASS:        ${{ secrets.TEST_PASS }}
+      ADMIN_USER:       ${{ secrets.ADMIN_USER }}
+      ADMIN_PASS:       ${{ secrets.ADMIN_PASS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: 安装依赖
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium --with-deps
+
+      - name: 创建工作目录
+        run: |
+          mkdir -p workspace/执行日志/allure-results
+          mkdir -p workspace/执行日志/截图
+          mkdir -p workspace/执行日志/coverage-report
+
+      - name: 执行回归测试（并行 4 进程）
+        run: |
+          pytest -m "p0 or p1" \
+            -n 4 \
+            --reruns=2 \
+            --reruns-delay=5 \
+            --timeout=120 \
+            --cov="${APP_SRC_PATH}" \
+            --cov-report=xml:workspace/执行日志/coverage.xml \
+            --cov-report=html:workspace/执行日志/coverage-report \
+            --cov-fail-under=80 \
+            --alluredir=workspace/执行日志/allure-results \
+            --junitxml=workspace/执行日志/regression-results.xml \
+            -v
+        env:
+          HEADLESS: 'true'
+
+      - name: 检查回归 + 覆盖率门禁
+        if: always()
+        run: |
+          python -m utils.ci_quality_gate \
+            --regression-xml workspace/执行日志/regression-results.xml \
+            --coverage-xml workspace/执行日志/coverage.xml \
+            --coverage-threshold 80 \
+            --output-json workspace/执行日志/regression_gate_result.json
+
+      - name: 上传覆盖率到 Codecov
+        if: always() && needs.preflight.outputs.codecov_enabled == 'true'
+        uses: codecov/codecov-action@v4
+        with:
+          file: workspace/执行日志/coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+      - name: 上传回归产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-results
+          path: workspace/执行日志/
+          retention-days: 14
+
+  # ===== 4. JMeter 性能测试 =====
+  performance-test:
+    name: JMeter 性能测试
+    runs-on: ubuntu-latest
+    needs: regression-test
+    timeout-minutes: 30
+    if: |
+      github.event.inputs.test_level != 'smoke' &&
+      needs.regression-test.result == 'success'
+    env:
+      TEST_API_URL:     ${{ secrets.TEST_API_URL }}
+      PERF_TEST_USER:   ${{ secrets.PERF_TEST_USER }}
+      PERF_TEST_PASS:   ${{ secrets.PERF_TEST_PASS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: 安装 Java（JMeter 依赖）
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: 安装 JMeter（含 archive 兜底）
+        run: |
+          set -e
+          # 主链接：downloads（仅最新若干版本）
+          if ! wget -q "https://downloads.apache.org/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz" -O /tmp/jmeter.tgz; then
+            # 兜底：archive（永久保留所有版本）
+            wget -q "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz" -O /tmp/jmeter.tgz
+          fi
+          tar -xzf /tmp/jmeter.tgz -C /opt/
+          echo "/opt/apache-jmeter-${JMETER_VERSION}/bin" >> $GITHUB_PATH
+          /opt/apache-jmeter-${JMETER_VERSION}/bin/jmeter --version
+
+      - name: 安装 Python 依赖
+        run: pip install -r requirements.txt
+
+      - name: 创建目录
+        run: |
+          mkdir -p workspace/执行日志/jmeter-results
+          mkdir -p workspace/执行日志/jmeter-report
+          mkdir -p workspace/执行日志/baselines
+          mkdir -p workspace/测试数据
+
+      - name: 生成 JMeter 参数化 CSV（调用 utils）
+        run: |
+          # 并发数与 PERF_MODE 对齐
+          if [ "$PERF_MODE" = "full" ]; then COUNT=50; else COUNT=10; fi
+          python -m utils.jmeter_csv_exporter --count "$COUNT" --output workspace/测试数据/jmeter_users.csv
+
+      - name: 解析 TEST_API_URL → host/protocol/port
+        id: target
+        run: |
+          python - <<'EOF'
+          import os, urllib.parse, sys
+          url = os.environ.get("TEST_API_URL", "")
+          p = urllib.parse.urlparse(url)
+          host = p.hostname or ""
+          proto = p.scheme or "http"
+          port = str(p.port or (443 if proto == "https" else 80))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"host={host}\n")
+              f.write(f"protocol={proto}\n")
+              f.write(f"port={port}\n")
+          EOF
+
+      - name: 执行 JMeter 性能测试
+        run: |
+          if [ "$PERF_MODE" = "full" ]; then
+            THREADS=50; RAMPUP=60; DURATION=300
+          else
+            THREADS=5;  RAMPUP=10; DURATION=60
+          fi
+          jmeter -n \
+            -t workspace/自动化脚本/jmeter/test_plan.jmx \
+            -l workspace/执行日志/jmeter-results/result.jtl \
+            -e -o workspace/执行日志/jmeter-report/ \
+            -Jtarget_host="${{ steps.target.outputs.host }}" \
+            -Jtarget_protocol="${{ steps.target.outputs.protocol }}" \
+            -Jtarget_port="${{ steps.target.outputs.port }}" \
+            -Jthreads=${THREADS} \
+            -Jrampup=${RAMPUP} \
+            -Jduration=${DURATION} \
+            -j workspace/执行日志/jmeter-results/jmeter.log
+        continue-on-error: true
+
+      - name: 解析 JTL + 性能门禁（含基线对比）
+        run: |
+          UPDATE_FLAG=""
+          if [ "$PERF_MODE" = "full" ] && [[ "${GITHUB_REF}" == refs/heads/release/* ]]; then
+            UPDATE_FLAG="--update-baseline"
+          fi
+          python -m utils.jmeter_result_parser \
+            workspace/执行日志/jmeter-results/result.jtl \
+            --mode "${PERF_MODE}" \
+            --baseline workspace/执行日志/baselines/perf_baseline.json \
+            --regression-max-pct 20 \
+            ${UPDATE_FLAG}
+
+      - name: 上传性能产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-results
+          path: workspace/执行日志/jmeter-results /workspace/执行日志/jmeter-report /workspace/执行日志/baselines
+          retention-days: 14
+
+  # ===== 5. 发布 Allure 报告 =====
+  publish-report:
+    name: 发布测试报告
+    runs-on: ubuntu-latest
+    needs: [smoke-test, regression-test]
+    if: always() && (needs.smoke-test.result == 'success' || needs.regression-test.result == 'success')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 下载冒烟产物
+        uses: actions/download-artifact@v4
+        with:
+          name: smoke-test-results
+          path: artifacts/smoke
+        continue-on-error: true
+
+      - name: 下载回归产物
+        uses: actions/download-artifact@v4
+        with:
+          name: regression-test-results
+          path: artifacts/regression
+        continue-on-error: true
+
+      - name: 合并 allure-results
+        run: |
+          mkdir -p allure-results
+          cp -r artifacts/smoke/allure-results/. allure-results/      2>/dev/null || true
+          cp -r artifacts/regression/allure-results/. allure-results/ 2>/dev/null || true
+
+      - name: 生成 Allure 报告
+        uses: simple-elf/allure-report-action@v1.7
+        with:
+          allure_results: allure-results
+          allure_report: allure-report
+          gh_pages: gh-pages
+          allure_history: allure-history
+
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-report
+
+  # ===== 6. 质量门禁汇总 + 通知 =====
+  quality-gate:
+    name: 质量门禁 + 通知
+    runs-on: ubuntu-latest
+    needs: [preflight, smoke-test, regression-test, performance-test]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 下载所有产物
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+        continue-on-error: true
+
+      - name: 安装 utils 依赖（仅运行门禁）
+        run: pip install pytest
+
+      - name: 综合门禁检查
+        run: |
+          # 解析时优先用每个 artifact 的固定相对路径（artifact 内保留原 workspace/执行日志/ 目录）
+          SMOKE="artifacts/smoke-test-results/smoke-results.xml"
+          REGR="artifacts/regression-test-results/regression-results.xml"
+          COV="artifacts/regression-test-results/coverage.xml"
+          ARGS=""
+          [ -f "$SMOKE" ] && ARGS="$ARGS --smoke-xml $SMOKE"
+          [ -f "$REGR" ]  && ARGS="$ARGS --regression-xml $REGR"
+          [ -f "$COV" ]   && ARGS="$ARGS --coverage-xml $COV --coverage-threshold 80"
+          if [ -n "$ARGS" ]; then
+            python -m utils.ci_quality_gate $ARGS \
+              --output-json workspace/quality_gate_summary.json
+          else
+            echo "⚠️ 无门禁数据可检查"
+          fi
+
+      - name: 通知（成功）
+        if: success() && needs.preflight.outputs.wechat_enabled == 'true'
+        env:
+          WEBHOOK: ${{ secrets.WECHAT_WEBHOOK_URL }}
+          REPORT_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          curl -s -X POST "$WEBHOOK" \
+            -H 'Content-Type: application/json' \
+            -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"✅ **自动化测试通过**\n> 分支：${{ github.ref_name }}\n> 模式：${PERF_MODE}\n> [查看报告](${REPORT_URL})\"}}"
+
+      - name: 通知（失败）
+        if: failure() && needs.preflight.outputs.wechat_enabled == 'true'
+        env:
+          WEBHOOK: ${{ secrets.WECHAT_WEBHOOK_URL }}
+        run: |
+          curl -s -X POST "$WEBHOOK" \
+            -H 'Content-Type: application/json' \
+            -d "{\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"❌ **自动化测试失败**\n> 分支：${{ github.ref_name }}\n> 质量门禁未通过，请查看 Actions 日志\"}}"

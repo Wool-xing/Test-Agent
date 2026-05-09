@@ -1,0 +1,97 @@
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+env/
+.python-version
+
+# ===== 测试产出（不提交）=====
+.pytest_cache/
+.allure-results/
+.coverage
+htmlcov/
+
+# workspace 测试产出（敏感 + 体积大）
+workspace/测试数据/test_data.json
+workspace/测试数据/jmeter_users.csv
+workspace/测试数据/*.json
+workspace/测试数据/*.csv
+workspace/执行日志/
+
+# 但保留 workspace/执行日志/baselines/（性能基线需提交）
+!workspace/执行日志/baselines/
+!workspace/执行日志/baselines/*.json
+
+# ===== 敏感配置 =====
+.env
+.env.local
+.env.*.local
+
+# ===== IDE / 编辑器 =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== Claude Code =====
+.claude/cache/
+.claude/sessions/
+
+# ===== Node（npm 安装的 Claude Code 等）=====
+node_modules/
+npm-debug.log
+package-lock.json
+
+# ===== 操作系统 =====
+.DS_Store
+desktop.ini
+
+# ===== 日志 =====
+*.log
+logs/
+
+# ===== 临时文件 =====
+*.tmp
+*.bak
+*.cache
+tmp/
+temp/
+
+# ===== 移动端构建产物 =====
+*.apk
+*.ipa
+*.aab
+
+# ===== 桌面构建产物 =====
+*.exe
+*.dmg
+*.app
+build/
+dist/
+
+# ===== 视觉测试中间文件 =====
+workspace/自动化脚本/python/visual/screenshots/
+*.airtestlog/
+
+# ===== JMeter 中间文件 =====
+*.jmeter.log
+jmeter.log
+
+# ===== Allure 中间 =====
+allure-history/
+allure-report/
+
+# ===== Java =====
+*.class
+target/
+
+# ===== 备份文件（如 README_DETAIL.md 仍想保留也可加 ! 前缀豁免）=====
+*_backup.*
+*_old.*
