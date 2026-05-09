@@ -1,14 +1,14 @@
 #!/bin/bash
 # Test-Agent 工作流一键部署脚本
 # 用法（远程一行）：
-#   curl -fsSL https://raw.githubusercontent.com/Wool-Xing/Test-Agent工作流搭建/main/install.sh | bash -s -- /path/to/your-test-project
+#   curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 # 用法（本地）：
 #   bash install.sh /path/to/your-test-project
 set -euo pipefail
 
 # ===== 参数 =====
 PROJECT_ROOT="${1:-$(pwd)/test-project}"
-REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-Xing/Test-Agent工作流搭建.git}"
+REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-xing/Test-Agent.git}"
 REPO_BRANCH="${TEST_AGENT_REPO_BRANCH:-main}"
 
 echo "=========================================="

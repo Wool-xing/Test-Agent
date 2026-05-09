@@ -27,7 +27,7 @@
 ## 🚀 Quick Start（一行命令）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR-USER/Test-Agent工作流搭建/main/install.sh | bash -s -- /path/to/your-test-project
+curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 ```
 
 `install.sh` 自动完成：
