@@ -8,13 +8,13 @@ tools: Read, Write, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /testcase-design [需求描述或功能名称]
 ```
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ PRD 文档（任意格式：md/pdf/docx/xlsx/pptx/zip/png/url）
 □ 或 requirements-analyst 已生成 requirements_summary_*.json
 □ openpyxl 已装（生成 4 Sheet Excel）
@@ -50,7 +50,7 @@ tools: Read, Write, Grep, Glob
 
 ### 控制台预览（快速）
 
-```
+```text
 === 测试用例清单（预览）===
 功能模块：[用户登录]
 用例数量：34 条（P0:5, P1:12, P2:12, P3:5）
@@ -91,7 +91,7 @@ P1 主要用例（12 条）：
 
 ### 必覆盖场景
 
-```
+```text
 1. Happy Path（主流程）
 2. 边界值（最大 / 最小 / 零 / 临界 / 空）
 3. 异常处理（网络超时 / 并发 / 第三方失败）

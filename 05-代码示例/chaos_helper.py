@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 混沌工程：故障注入（CPU/内存/磁盘/网络/进程杀死）
 被引用方：16-可靠性稳定性 agent / chaos-test skill

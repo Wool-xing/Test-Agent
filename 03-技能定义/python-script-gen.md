@@ -8,13 +8,13 @@ tools: Read, Write, Edit, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /python-script-gen [测试用例 Excel 路径 或 功能描述]
 ```
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ 测试用例 Excel（workspace/测试用例/testcases_*.xlsx）或功能描述
 □ pytest + pytest-playwright 已装
 □ Playwright 浏览器（playwright install chromium）
@@ -27,7 +27,7 @@ tools: Read, Write, Edit, Grep, Glob
 
 ### Step 1：分析用例
 
-```
+```text
 读取 Excel 测试用例，提取：
   - 测试场景和步骤
   - 测试数据（输入/预期）
@@ -37,7 +37,7 @@ tools: Read, Write, Edit, Grep, Glob
 
 ### Step 2：生成脚本
 
-```
+```text
 由 automation-engineer 执行：
   - 根据用例类型选择框架（Playwright / requests）
   - 性能用例 → 转交 /jmeter-script-gen
@@ -62,7 +62,7 @@ tools: Read, Write, Edit, Grep, Glob
 
 ### 输入
 
-```
+```text
 功能：用户注册
 步骤：
 1. 访问注册页
@@ -158,7 +158,7 @@ class TestLoginAPI:
 
 ## 代码质量要求
 
-```
+```text
 ✅ 无硬编码数据（使用 test_data fixture）
 ✅ 无 time.sleep()（使用 Playwright 显式等待 / expect 自动重试）
 ✅ 选择器语义化（data-testid > role > label > text）
@@ -172,7 +172,7 @@ class TestLoginAPI:
 
 ## 输出文件结构
 
-```
+```text
 workspace/自动化脚本/python/
 ├── pages/                              # UI Page Object
 │   └── {module}_page.py

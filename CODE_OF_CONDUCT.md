@@ -41,8 +41,7 @@
 辱骂、骚扰或其他不可接受行为可向负责执行的社区维护者举报：
 
 - **GitHub Issue**（公开问题）：[New Issue](https://github.com/Wool-xing/Test-Agent/issues/new) 加 `code-of-conduct` 标签
-- **私下举报**：通过 [GitHub Security Advisory](https://github.com/Wool-xing/Test-Agent/security/advisories/new) 私密通道
-- **邮件**：conduct@example.com（替换为实际邮箱）
+- **私下举报**：通过 [GitHub Security Advisory](https://github.com/Wool-xing/Test-Agent/security/advisories/new) 私密通道（推荐，仅维护者可见）
 
 所有投诉都将被迅速、公正地审查和调查。
 

@@ -8,13 +8,13 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /ai-test [子场景：model|drift|perf|fairness|llm]
 ```
 
 ## 🔔 开测前准备清单（必看）
 
-```
+```text
 □ 推理服务 endpoint → AI_INFERENCE_URL
 □ LLM API URL + key → LLM_API_URL / LLM_API_KEY
 □ 黄金测试集 CSV（含 input + label 列）→ AI_GOLDEN_TEST_SET
@@ -63,7 +63,7 @@ pytest -m "ai and llm" -v
 
 ## 输出文件
 
-```
+```text
 workspace/执行日志/
 ├── ai-eval/
 ├── ai-drift/

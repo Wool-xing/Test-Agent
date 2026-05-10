@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 测试套件减重（Suite Minimization）- 检测重复用例 / 冗余覆盖
 被引用方：testcase-designer / 测试质量

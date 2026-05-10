@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 通用协议测试工具：gRPC / TCP / UDP / GraphQL / SOAP / Modbus
 HTTP/REST 用 requests + utils.api_retry_util；WebSocket 用 utils.websocket_helper；

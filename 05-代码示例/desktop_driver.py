@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 桌面应用 driver 工厂 + 进程性能采集
 被引用方：11-桌面测试 agent / desktop-test skill

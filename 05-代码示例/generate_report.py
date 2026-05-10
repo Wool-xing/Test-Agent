@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 测试报告生成 - Word + 通知（企业微信/飞书/钉钉）
 被引用方：09-报告生成 agent
