@@ -23,10 +23,9 @@ repos:
     rev: v0.1.13
     hooks:
       - id: ruff
-        args: [--select, "E,F,W", --ignore, "E501"]
+        args: [--config, "05-代码示例/.ruff.toml"]
         files: ^05-代码示例/
-      - id: ruff-format
-        files: ^05-代码示例/
+      # ruff-format 关掉：utils 紧凑 CLI 风格不需自动重排
 
   # ===== 安全：禁止提交私有源 MD =====
   - repo: local
