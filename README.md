@@ -1,13 +1,16 @@
 # 🤖 Test-Agent 工作流
 
 > **Claude Code 驱动的全链路软件测试自动化工作流**
-> 14 Agent · 13 Skill · 24 Utils · 全平台覆盖（Web/API/移动/桌面/小程序/游戏/IoT/AI）· 一键部署
+> 14 Agent · 13 Skill · 49 Utils · 全平台覆盖（Web/API/移动/桌面/小程序/游戏/IoT/AI）· 一键部署
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org)
+[![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-1.0+-purple.svg)](https://docs.anthropic.com/claude-code)
-[![Pytest](https://img.shields.io/badge/Pytest-7.4-green.svg)](https://pytest.org)
+[![Pytest](https://img.shields.io/badge/Pytest-8.3-green.svg)](https://pytest.org)
 [![JMeter](https://img.shields.io/badge/JMeter-5.6.3-orange.svg)](https://jmeter.apache.org)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/Wool-xing/Test-Agent/security/dependabot)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Wool-xing/Test-Agent/main)](https://github.com/Wool-xing/Test-Agent/commits/main)
 
 ---
 
