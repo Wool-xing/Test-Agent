@@ -249,7 +249,7 @@ if __name__ == "__main__":
 
 ## 5. 包结构建议
 
-```
+```text
 your-test-project/
 └── mcp_servers/                    # 新建目录
     ├── zentao_mcp_server/
@@ -273,7 +273,7 @@ pip install -e mcp_servers/zentao_mcp_server
 
 ## 6. requirements.txt 追加（仅启用 MCP server 时）
 
-```
+```text
 mcp>=0.9.0          # 或 anthropic-mcp，按 SDK 选择
 ```
 

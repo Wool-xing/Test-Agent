@@ -189,7 +189,7 @@
 
 ## 🏗️ 架构图（运行时）
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │                     test-lead（协调者）                         │
 │       全局调度 / 质量门禁 / 风险决策 / 基线管理                  │
@@ -266,7 +266,7 @@ claude
 
 ### 4. 在 Claude Code 提示符使用斜杠技能
 
-```
+```text
 > /smoke-test                          # 10 分钟 P0 冒烟
 > /test-coordinator                    # 完整流程
 > /regression-test                     # 回归 + JMeter
@@ -279,7 +279,7 @@ claude
 
 或自然语言：
 
-```
+```text
 > 帮我对用户登录功能进行完整测试。需求：手机号+密码登录，记住密码，
 > 连续失败 5 次锁定 30 分钟。
 ```
@@ -341,7 +341,7 @@ claude
 
 ## 📂 部署后目录速览
 
-```
+```text
 your-test-project/
 ├── .claude/{agents,skills}/           ← 14 agent + 13 skill
 ├── .github/workflows/test.yml
@@ -422,7 +422,7 @@ your-test-project/
 
 **2024 现代调整**（Google Testing Blog / Microsoft Engineering Fundamentals 综合）：
 
-```
+```text
             ┌─────────────────────┐
             │  E2E / 视觉回归  10% │  ← Playwright / Appium / Airtest（慢但必要）
             ├─────────────────────┤

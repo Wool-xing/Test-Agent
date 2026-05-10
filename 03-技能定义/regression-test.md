@@ -10,7 +10,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ smoke-test 已通过（前置门禁）
 □ workspace/测试用例/*.xlsx 含 P0+P1 用例
 □ workspace/测试数据/test_data.json 已生成

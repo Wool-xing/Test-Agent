@@ -10,7 +10,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ env-manager 已通过基础健康检查（DB/Redis 可达）
 □ .env 已填 TEST_DB_HOST / TEST_DB_USER / TEST_DB_PASSWORD / TEST_DB_NAME
 □ pip 装 faker + factory-boy + SQLAlchemy
@@ -26,7 +26,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 读取测试用例 Excel，提取数据需求。**注意：使用 03-用例设计 标准 Excel 16 列布局**：
 
-```
+```text
 列索引（1-based）：
 1.用例ID  2.模块  3.类型  4.优先级  5.用例名称  6.前置条件
 7.测试步骤  8.测试数据  9.预期结果  ...

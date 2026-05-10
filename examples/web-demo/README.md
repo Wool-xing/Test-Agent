@@ -23,7 +23,7 @@ pytest -v
 
 **预期输出**：
 
-```
+```text
 tests/test_smoke.py::test_homepage_title PASSED
 tests/test_smoke.py::test_search_box_present PASSED
 
@@ -36,7 +36,7 @@ tests/test_smoke.py::test_search_box_present PASSED
 
 ## 文件结构
 
-```
+```text
 examples/web-demo/
 ├── README.md                   ← 本文件
 ├── requirements.txt            ← 最小依赖（pytest + playwright）

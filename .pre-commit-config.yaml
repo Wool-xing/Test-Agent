@@ -65,7 +65,12 @@ repos:
     rev: v0.38.0
     hooks:
       - id: markdownlint
-        args: ['--disable', 'MD013', 'MD033', 'MD041', '--']
+        # MD013(line-length) / MD033(inline-html) / MD041(first-line-h1)：项目宽松规则
+        # MD036(emphasis-as-heading)：中文项目常用 **xxx** 当小标题，避免污染 TOC
+        # MD022/031/032(blanks-around)：旧文档累积问题，渐进修复
+        # MD024(no-duplicate-heading)：同名子段允许
+        # MD034(no-bare-urls)：内部文档可直接贴 URL
+        args: ['--disable', 'MD013', 'MD033', 'MD041', 'MD036', 'MD022', 'MD031', 'MD032', 'MD024', 'MD034', '--']
         exclude: ^Test-Agent工作流搭建\.md$
 
 # 配置：项目根 .markdownlint.json 自定义规则
