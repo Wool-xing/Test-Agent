@@ -37,7 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 1. ✅ 检查工具（git/python3/node/npm/Java）
 2. ✅ 装 Claude Code CLI
 3. ✅ 克隆模板
-4. ✅ 部署 14 agent + 13 skill + 24 utils + CI/CD 文件
+4. ✅ 部署 14 agent + 13 skill + 49 utils + CI/CD 文件
 5. ✅ 创建 `.venv` + 装 Python 依赖 + Playwright
 
 完成后 3 步开测：
