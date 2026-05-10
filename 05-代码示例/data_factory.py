@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 测试数据工厂 - Faker + Factory Boy 生成标准化测试数据
 被引用方：05-数据准备 agent / data-preparation skill / conftest.py

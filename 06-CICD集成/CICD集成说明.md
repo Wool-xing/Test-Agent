@@ -20,7 +20,7 @@
 
 部署脚本会自动放到：
 
-```
+```text
 your-test-project/.github/workflows/test.yml
 ```
 
@@ -37,7 +37,7 @@ your-test-project/.github/workflows/test.yml
 
 在 GitHub 仓库 → Settings → Secrets and variables → Actions：
 
-```
+```text
 # 应用与数据库
 TEST_APP_URL              # 应用 URL（如 http://test.example.com）
 TEST_API_URL              # API URL（如 http://test-api.example.com）
@@ -119,7 +119,7 @@ APP_SRC_PATH              # 默认 ./src
 
 Manage Jenkins → Credentials → 添加以下 Secret text：
 
-```
+```text
 TEST_APP_URL
 TEST_API_URL
 TEST_DB_HOST
@@ -189,7 +189,7 @@ allure generate workspace/执行日志/allure-results \
 
 ### 报告目录结构
 
-```
+```text
 workspace/执行日志/
 ├── allure-results/                # Allure 原始数据
 ├── allure-report/                 # Allure 静态 HTML
@@ -212,7 +212,7 @@ workspace/执行日志/
 CI 通过 curl 调 webhook 直接发送，未走 MCP（与全栈一致）。
 
 通知内容示例：
-```
+```text
 ✅ 测试通过 | 构建#42 | 级别:regression | 模式:ci_quick | 查看报告
 ❌ 测试失败 | 构建#43 | 级别:smoke    | 查看报告
 ```

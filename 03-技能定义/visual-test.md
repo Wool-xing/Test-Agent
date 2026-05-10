@@ -8,13 +8,13 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /visual-test [应用描述 或 Airtest 项目路径]
 ```
 
 ## 🔔 开测前准备清单（必看）
 
-```
+```text
 □ Airtest 已装（pip install airtest）
 □ 模板图（关键 UI 元素截图）→ workspace/自动化脚本/python/visual/images/
 □ 设备 URI → AIRTEST_DEVICE_URI
@@ -92,7 +92,7 @@ git commit -m "chore: update visual baseline for login"
 
 ## 输出文件
 
-```
+```text
 workspace/
 ├── 自动化脚本/python/visual/
 │   ├── images/                          # 模板图

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 长时稳定性测试（soak / endurance / 内存泄漏检测）
 被引用方：16-可靠性稳定性 agent / soak-test skill

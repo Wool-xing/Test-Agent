@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 JMeter JTL 结果解析与性能门禁检查
 被引用方：07-test-executor / jmeter-script-gen skill / CI yml/groovy

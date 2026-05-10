@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 PRD 多格式加载器 - 统一入口，支持 md/txt/pdf/word/excel/zip/img/url
 被引用方：02-需求分析 agent / test-coordinator skill / test-lead 自动路由

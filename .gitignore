@@ -92,9 +92,32 @@ allure-report/
 *.class
 target/
 
-# ===== 备份文件（如 README_DETAIL.md 仍想保留也可加 ! 前缀豁免）=====
+# ===== 备份文件 =====
 *_backup.*
 *_old.*
+
+# ===== Ruff 缓存 =====
+.ruff_cache/
+
+# ===== JMeter 原始结果（敏感+大）=====
+*.jtl
+
+# ===== 证书 / 私钥（防误提交）=====
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_dsa
+id_ed25519
+
+# ===== 覆盖率显式（除 .coverage）=====
+coverage.xml
+
+# ===== 构建中间产物 =====
+pip-wheel-metadata/
 
 # ===== 私有源文档（个人归属，不公开）=====
 Test-Agent工作流搭建.md
