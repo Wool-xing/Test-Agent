@@ -1,0 +1,74 @@
+repos:
+  # ===== 基础 =====
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.md$
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^06-CICD集成/jenkins-pipeline\.groovy$
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=2048']
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # ===== Python 静态检查 =====
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.13
+    hooks:
+      - id: ruff
+        args: [--select, "E,F,W", --ignore, "E501"]
+        files: ^05-代码示例/
+      - id: ruff-format
+        files: ^05-代码示例/
+
+  # ===== 安全：禁止提交私有源 MD =====
+  - repo: local
+    hooks:
+      - id: forbid-private-source
+        name: 禁止提交 Test-Agent工作流搭建.md（私有源文档）
+        entry: bash -c 'if git diff --cached --name-only | grep -q "Test-Agent工作流搭建.md"; then echo "❌ 禁止提交私有源 MD（已在 .gitignore）"; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: forbid-env
+        name: 禁止提交 .env（含敏感信息）
+        entry: bash -c 'if git diff --cached --name-only | grep -E "(^|/)\.env$"; then echo "❌ 禁止提交 .env"; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # 文件统计校验（防误删 agent/skill/utils）
+      - id: file-count-check
+        name: Agents/Skills/Utils 数量校验
+        entry: bash -c '
+          AGENTS=$(ls 02-专家定义/[0-9]*.md 2>/dev/null | wc -l);
+          SKILLS=$(ls 03-技能定义/*.md 2>/dev/null | grep -v README | wc -l);
+          UTILS=$(ls 05-代码示例/*.py 2>/dev/null | wc -l);
+          [ "$AGENTS" = "14" ] || { echo "❌ Agents 数量异常（期 14，实 $AGENTS）"; exit 1; };
+          [ "$SKILLS" = "13" ] || { echo "❌ Skills 数量异常（期 13，实 $SKILLS）"; exit 1; };
+          [ "$UTILS" = "49" ] || { echo "❌ Utils 数量异常（期 49，实 $UTILS）"; exit 1; };
+          echo "✅ 文件统计正确";
+        '
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # ===== Markdown 风格 =====
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: ['--disable', 'MD013', 'MD033', 'MD041', '--']
+        exclude: ^Test-Agent工作流搭建\.md$
+
+# 配置：项目根 .markdownlint.json 自定义规则
+default_install_hook_types: [pre-commit]
+default_stages: [commit]

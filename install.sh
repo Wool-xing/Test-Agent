@@ -17,6 +17,38 @@ echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="
 
+# ===== Idempotency：保留用户敏感数据 =====
+PRESERVE_FILES=(".env" "workspace/测试数据/test_data.json"
+                "workspace/执行日志/baselines/perf_baseline.json"
+                "workspace/regression_modules.yaml")
+BACKUP_DIR=""
+if [[ -d "$PROJECT_ROOT" ]]; then
+    BACKUP_DIR="$(mktemp -d -t test-agent-backup-XXXXXX)"
+    echo "→ 检测到已有项目，备份用户数据到 $BACKUP_DIR"
+    for f in "${PRESERVE_FILES[@]}"; do
+        if [[ -f "$PROJECT_ROOT/$f" ]]; then
+            mkdir -p "$BACKUP_DIR/$(dirname "$f")"
+            cp "$PROJECT_ROOT/$f" "$BACKUP_DIR/$f"
+            echo "  备份: $f"
+        fi
+    done
+fi
+
+# 完成时恢复用户数据
+restore_user_data() {
+    if [[ -n "$BACKUP_DIR" ]] && [[ -d "$BACKUP_DIR" ]]; then
+        echo "→ 恢复用户数据..."
+        for f in "${PRESERVE_FILES[@]}"; do
+            if [[ -f "$BACKUP_DIR/$f" ]]; then
+                cp "$BACKUP_DIR/$f" "$PROJECT_ROOT/$f"
+                echo "  恢复: $f"
+            fi
+        done
+        rm -rf "$BACKUP_DIR"
+    fi
+}
+trap 'restore_user_data; rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null' EXIT
+
 # ===== 1. 检查工具 =====
 need() { command -v "$1" >/dev/null 2>&1 || { echo "❌ 缺少 $1"; exit 1; }; }
 need git
@@ -26,7 +58,7 @@ need npm
 
 # ===== 2. 克隆模板到临时目录 =====
 TEMPLATE_DIR="$(mktemp -d)/Test-Agent工作流搭建"
-trap 'rm -rf "$(dirname "$TEMPLATE_DIR")"' EXIT
+# （restore_user_data trap 已在前置 idempotency 段统一处理）
 
 echo "→ 克隆模板..."
 git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$TEMPLATE_DIR"

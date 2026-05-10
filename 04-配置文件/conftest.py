@@ -236,7 +236,21 @@ def pytest_runtest_makereport(item, call):
 
 # ===== 初始化：创建所有 workflow 产出目录 =====
 
+_DIRS_INITIALIZED = False
+
+
 def pytest_configure(config):
+    """首次运行创建产出目录；已存在则跳过（性能优化）"""
+    global _DIRS_INITIALIZED
+    if _DIRS_INITIALIZED:
+        return
+
+    # 标记文件：存在则跳过 mkdir（首次后第二次启动免 80+ 次 mkdir 调用）
+    sentinel = Path(".pytest_cache/.workflow_dirs_init")
+    if sentinel.exists():
+        _DIRS_INITIALIZED = True
+        return
+
     workflow_dirs = [
         "workspace/测试计划",
         "workspace/需求分析",
@@ -295,6 +309,11 @@ def pytest_configure(config):
     ]
     for d in workflow_dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
+
+    # 标记已初始化
+    sentinel.parent.mkdir(parents=True, exist_ok=True)
+    sentinel.touch()
+    _DIRS_INITIALIZED = True
 
 
 @pytest.fixture(scope="session", autouse=True)
