@@ -48,7 +48,7 @@ updates:
           - "python-pptx"
           - "reportlab"
           - "pdfplumber"
-          - "PyPDF2"
+          - "pypdf"
           - "PyYAML"
           - "beautifulsoup4"
       # 数据库

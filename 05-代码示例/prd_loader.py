@@ -81,7 +81,7 @@ def _load_text(p: Path) -> Dict:
 # ===== PDF =====
 
 def _load_pdf(p: Path) -> Dict:
-    """PDF 解析：优先 pdfplumber（保留布局），fallback PyPDF2"""
+    """PDF 解析：优先 pdfplumber（保留布局），fallback pypdf"""
     text = ""
     metadata = {}
     images: List[str] = []
@@ -97,14 +97,14 @@ def _load_pdf(p: Path) -> Dict:
         logger.info(f"PDF 解析（pdfplumber）: {p.name}, {metadata['pages']} 页")
     except ImportError:
         try:
-            from PyPDF2 import PdfReader
+            from pypdf import PdfReader
             reader = PdfReader(str(p))
             metadata["pages"] = len(reader.pages)
             for page in reader.pages:
                 text += (page.extract_text() or "") + "\n"
-            logger.info(f"PDF 解析（PyPDF2 fallback）: {p.name}")
+            logger.info(f"PDF 解析（pypdf fallback）: {p.name}")
         except ImportError:
-            raise RuntimeError("PDF 解析需要 pdfplumber 或 PyPDF2: pip install pdfplumber")
+            raise RuntimeError("PDF 解析需要 pdfplumber 或 pypdf: pip install pdfplumber")
 
     return {
         "format": "pdf", "source": str(p), "text": text.strip(),
