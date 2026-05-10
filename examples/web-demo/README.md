@@ -8,16 +8,31 @@
 
 ## 5 分钟跑通
 
+> **⚠️ Python 版本要求**：推荐 **Python 3.11 或 3.12**。
+> Python 3.13/3.14 上 `greenlet`（playwright 依赖）尚无预编译 wheel，pip install 会触发本地编译失败。
+> Python 3.10 也可（与项目主依赖兼容），但 3.11/3.12 是推荐路径。
+
 ```bash
 cd examples/web-demo
 
-# 1. 装依赖（Python 3.10+）
+# 0. 确认 Python 版本（应为 3.11 或 3.12）
+python --version
+# 期望：Python 3.11.x 或 3.12.x
+
+# 1. 建独立 venv（避免污染系统 Python）
+python -m venv .venv
+source .venv/Scripts/activate    # Windows Git Bash
+# 或 .venv\Scripts\activate.bat     # Windows CMD
+# 或 source .venv/bin/activate      # macOS/Linux
+
+# 2. 装依赖
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# 2. 装 Playwright 浏览器（首次必跑）
+# 3. 装 Playwright 浏览器（首次必跑，~150MB chromium 下载）
 playwright install chromium --with-deps
 
-# 3. 跑用例
+# 4. 跑用例
 pytest -v
 ```
 
@@ -25,9 +40,9 @@ pytest -v
 
 ```text
 tests/test_smoke.py::test_homepage_title PASSED
-tests/test_smoke.py::test_search_box_present PASSED
+tests/test_smoke.py::test_get_started_link_present PASSED
 
-============== 2 passed in 8.5s ==============
+============== 2 passed in 2-5s ==============
 ```
 
 跑过即说明：✅ Python 环境 OK ✅ Playwright OK ✅ Page Object 模式跑通 ✅ pytest fixture 链路跑通
@@ -70,7 +85,7 @@ examples/web-demo/
 
 本 demo 测试 **`https://playwright.dev`** 官方网站（公开稳定，开发者熟悉）：
 - 测试 1：首页标题包含 "Playwright"
-- 测试 2：首页存在搜索框（`role=button[name="Search"]`）
+- 测试 2：首页存在 "Get started" 链接（hero CTA，稳定多年）
 
 ---
 
@@ -93,7 +108,9 @@ cp -r examples/web-demo /path/to/your-test-project/tests
 
 | 现象 | 可能原因 | 解决 |
 |------|---------|------|
+| `failed-wheel-build-for-install` / `greenlet` 编译失败 | Python 3.13/3.14 缺 wheel | 用 Python 3.11/3.12 重建 venv（见上方"5 分钟跑通"段） |
 | `playwright._impl._errors.Error: Executable doesn't exist` | 未装浏览器 | `playwright install chromium --with-deps` |
+| `AssertionError: Get started 链接缺失` | playwright.dev 网站改版 | 改 `pages/playwright_page.py::GET_STARTED_LINK` selector |
 | `ConnectionError` / 网络超时 | 国内网络访问 playwright.dev 慢 | 改 `tests/test_smoke.py` 的 URL 为本地或国内站点 |
 | Windows 中文路径 `UnicodeDecodeError` | 编码问题 | `set PYTHONUTF8=1` 后再跑 |
 | `pytest` 没用例 | testpaths 未生效 | 确认在 `examples/web-demo/` 目录下跑 |

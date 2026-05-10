@@ -12,6 +12,13 @@
 
 ## [Unreleased]
 
+### Fixed（W3 收尾后发布前实测发现 2 bug）
+
+- **web-demo Python 3.14 跑不通**：`greenlet`（playwright 依赖）尚无 Python 3.13/3.14 预编译 wheel，本地编译失败导致 `pip install` 失败、playwright 装不上、pytest 跑不到。修：`examples/web-demo/README.md` 显式标注 Python 3.11/3.12 推荐 + 加 venv 创建步骤 + 故障排查表新增 wheel 编译失败条目。
+- **web-demo selector 失效**：`test_search_box_present` 用 `role=button[name='Search']` 不匹配 playwright.dev 当前 DOM 结构。修：换更稳定的 `text="Get started"`（hero CTA，多年不变）；`PlaywrightHomePage.has_search_button` → `has_get_started_link`；`test_search_box_present` → `test_get_started_link_present`。
+
+修复验证：Python 3.11.9 + venv 重建后 `pytest -v` 输出 `2 passed in 2.33s`。
+
 ### Security（安全·上架前必修 Batch 1）
 
 - **修复 `eval()` 远程代码注入风险**：`05-代码示例/media_validator.py` 中 `get_video_meta()` 原通过 `eval(video.get("r_frame_rate"))` 解析 FFmpeg 外部输出，存在注入风险。改用 `fractions.Fraction` 安全解析。
