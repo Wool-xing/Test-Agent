@@ -24,7 +24,7 @@ playwright==1.40.0                 # [稳定层] major 升级 dependabot 已锁
 requests==2.32.4                   # [稳定层]（修 GHSA verify=False/netrc/temp file）
 
 # ===== [稳定层] 性能测试 =====
-locust==2.25.0                     # [稳定层] 备用 Python 压测
+locust==2.43.4                     # [稳定层] 备用 Python 压测
 # JMeter 5.6.3 [外部]，需独立装 Java + JMeter（见部署说明）
 
 # ===== [稳定层] 测试数据工厂 =====
