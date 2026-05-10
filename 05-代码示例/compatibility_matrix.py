@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 兼容性矩阵：浏览器 / OS / 分辨率 / 移动设备 / 语言
 被引用方：06-自动化脚本 + 10-移动测试 + visual-tester

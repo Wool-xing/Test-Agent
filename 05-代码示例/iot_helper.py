@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 IoT / 嵌入式辅助：SSH / 串口 / MQTT
 被引用方：13-系统集成测试 agent
@@ -15,13 +16,26 @@ logger = logging.getLogger(__name__)
 
 class SSHClient:
     def __init__(self, host: str, user: str, password: Optional[str] = None,
-                 key_path: Optional[str] = None, port: int = 22):
+                 key_path: Optional[str] = None, port: int = 22,
+                 known_hosts: Optional[str] = None, auto_add_for_testing: bool = False):
+        """
+        默认安全：用 known_hosts 文件验证主机密钥（生产模式）。
+        测试模式：auto_add_for_testing=True 才允许接受未知主机密钥（仅限隔离测试网）。
+        """
         try:
             import paramiko
         except ImportError:
             raise RuntimeError("paramiko 未安装")
         self.client = paramiko.SSHClient()
-        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        if known_hosts:
+            self.client.load_host_keys(known_hosts)
+            self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
+        elif auto_add_for_testing or os.environ.get("IOT_SSH_AUTOACCEPT") == "1":
+            # 仅限隔离测试网络；不可用于生产环境
+            self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        else:
+            self.client.load_system_host_keys()
+            self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
         if key_path:
             self.client.connect(host, port=port, username=user, key_filename=key_path, timeout=10)
         else:

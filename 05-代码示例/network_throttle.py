@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 弱网测试工具：tc / Toxiproxy / Charles / Network Link Conditioner
 被引用方：16-可靠性稳定性 agent / reliability-test skill

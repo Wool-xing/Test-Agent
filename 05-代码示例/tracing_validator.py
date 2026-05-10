@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 链路追踪校验：Jaeger / Zipkin HTTP API
 被引用方：13-系统集成测试 agent

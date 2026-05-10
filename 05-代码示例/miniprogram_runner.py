@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 小程序自动化运行器
 依赖：微信开发者工具 CLI（命令行启动自动化端口）+ miniprogram-automator npm 模块（外部）
