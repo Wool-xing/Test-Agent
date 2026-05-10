@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 回归测试变更影响范围分析
 被引用方：regression-test skill

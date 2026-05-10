@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 状态迁移测试（State Transition Testing）
 被引用方：03-用例设计 agent / testcase-design skill

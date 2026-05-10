@@ -8,7 +8,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /desktop-test [应用路径 或 应用描述]
 ```
 
@@ -16,7 +16,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 调用本 skill 前确认：
 
-```
+```text
 □ 应用路径 → .env WIN_APP_PATH / MAC_APP_PATH / ELECTRON_APP_PATH
 □ 操作系统匹配（Windows EXE 必须 Win，macOS .app 必须 Mac）
 □ pip 装：pywinauto+uiautomation（Win）/ pyautogui（mac/linux）/ playwright（Electron）
@@ -112,7 +112,7 @@ steps:
 
 ## 输出文件
 
-```
+```text
 workspace/
 ├── 自动化脚本/python/desktop/{windows,macos,electron}/
 └── 执行日志/

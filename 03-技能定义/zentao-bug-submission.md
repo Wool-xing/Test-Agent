@@ -8,13 +8,13 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /zentao-bug-submission [Bug 描述 或 测试失败日志]
 ```
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ 禅道实例可访问（ZENTAO_BASE_URL）
 □ .env 填 ZENTAO_ACCOUNT / ZENTAO_PASSWORD（API 凭证）
 □ 禅道 API v1 已启用（管理后台 → 二次开发 → API）
@@ -28,7 +28,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ### Step 1：Bug 信息规范化（bug-manager 执行）
 
-```
+```text
 - 确定 Bug 优先级（P0/P1/P2/P3）
 - 提取复现步骤
 - 整理预期/实际结果
@@ -38,7 +38,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ### Step 2：提交禅道（utils/zentao_bug_manager.py）
 
-```
+```text
 - 自动指数退避重试（10s/20s/40s）
 - token 失效自动续期
 - 返回禅道 Bug ID
@@ -121,7 +121,7 @@ def track_bug_status(bug_ids: list) -> dict:
 
 `.env` 中配置：
 
-```
+```text
 ZENTAO_BASE_URL=http://your-zentao.com/zentao/api.php/v1
 TEST_ZENTAO_URL=          # 可选，按环境隔离
 STAGING_ZENTAO_URL=       # 可选
@@ -133,7 +133,7 @@ ZENTAO_PASSWORD=your_password
 
 ## 提交后输出示例
 
-```
+```text
 === Bug 提交结果 ===
 已提交：3 个 Bug
 

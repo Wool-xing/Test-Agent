@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 BDD（Behavior-Driven Development）/ 验收测试 - pytest-bdd 包装
 被引用方：03-用例设计 + 06-自动化脚本（验收测试场景）

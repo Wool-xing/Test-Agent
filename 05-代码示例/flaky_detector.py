@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 Flaky 测试检测器
 依赖：pytest 启用 --junitxml 输出到 workspace/执行日志/history/

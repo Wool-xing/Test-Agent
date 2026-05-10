@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 测试 Excel 生成器（用例/结果）
 权威实现：本文件，03-用例设计 agent 文档不再内嵌副本。

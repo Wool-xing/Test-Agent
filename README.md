@@ -1,13 +1,18 @@
 # 🤖 Test-Agent 工作流
 
+> **项目代号**：`test-agent-team` · **版本**：V1.0.0 · **License**：MIT
+>
 > **Claude Code 驱动的全链路软件测试自动化工作流**
-> 14 Agent · 13 Skill · 24 Utils · 全平台覆盖（Web/API/移动/桌面/小程序/游戏/IoT/AI）· 一键部署
+> 14 Agent · 13 Skill · 49 Utils · 全平台覆盖（Web/API/移动/桌面/小程序/游戏/IoT/AI）· 一键部署
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org)
+[![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-1.0+-purple.svg)](https://docs.anthropic.com/claude-code)
-[![Pytest](https://img.shields.io/badge/Pytest-7.4-green.svg)](https://pytest.org)
+[![Pytest](https://img.shields.io/badge/Pytest-8.3-green.svg)](https://pytest.org)
 [![JMeter](https://img.shields.io/badge/JMeter-5.6.3-orange.svg)](https://jmeter.apache.org)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/Wool-xing/Test-Agent/security/dependabot)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Wool-xing/Test-Agent/main)](https://github.com/Wool-xing/Test-Agent/commits/main)
 
 ---
 
@@ -55,16 +60,19 @@ claude                                         # 启动
 ## 📁 项目结构
 
 ```text
-Test-Agent工作流搭建/
+Test-Agent/
 ├── 00-项目导航.md           ← 5 维度分类速查
-├── 01-快速开始/             ← 使用手册 / 部署 / 配置清单 / 交付物
-├── 02-专家定义/             ← 14 个 Agent（核心 9 + 平台扩展 5）
-├── 03-技能定义/             ← 13 个 Skill（通用 8 + 平台 5）
-├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json / requirements
-├── 05-代码示例/             ← 49 个 utils（核心 11 + 平台 9 + 协议 2 + 非功能 6 + 用例方法 2 + 类型 2 + 安全增强 2 + DB/契约/API 3 + 移动专项 1 + a11y/i18n 2 + 度量 2 + 区块链/AI 对抗 2 + 输入 1 + __init__）
-├── 06-CICD集成/             ← GitHub Actions + Jenkins
+├── 01-快速开始/             ← 使用手册 / 部署 / 配置清单 / 交付物 + INDEX
+├── 02-专家定义/             ← 14 个 Agent（核心 9 + 平台扩展 5）+ README
+├── 03-技能定义/             ← 13 个 Skill（通用 8 + 平台 5）+ README
+├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json + INDEX
+├── 05-代码示例/             ← 49 个 utils（含 __init__）+ README
+├── 06-CICD集成/             ← GitHub Actions + Jenkins + INDEX
 ├── install.sh               ← 一键部署脚本
-└── README.md
+├── README.md                ← 本文件（简明入口）
+├── FULL_GUIDE.md            ← 完整详细指南（架构/矩阵/技术栈深度）
+├── CHANGELOG.md / VERSION   ← 版本变更记录
+└── LICENSE / SECURITY.md / CODE_OF_CONDUCT.md / CONTRIBUTING.md
 ```
 
 ---
@@ -100,112 +108,37 @@ Test-Agent工作流搭建/
 
 | 文档 | 用途 |
 |------|------|
-| [00-项目导航.md](00-项目导航.md) | 按职责分类速查（强烈推荐） |
-| [01-快速开始/使用手册.md](01-快速开始/使用手册.md) | 启动指引 + 13 skill 详解 + FAQ |
-| [01-快速开始/部署说明.md](01-快速开始/部署说明.md) | 跨平台部署（Win/Mac/Linux）+ Java/JMeter/Allure 安装 |
-| [01-快速开始/配置清单.md](01-快速开始/配置清单.md) | .env 全字段 + Secrets / Webhook 申请 |
-| [01-快速开始/交付物清单.md](01-快速开始/交付物清单.md) | 测试计划 / 报告 / Bug 提交位置 |
+| [FULL_GUIDE.md](FULL_GUIDE.md) | **完整详细指南**（架构 / 三视角矩阵 / 技术栈 / 闭环约定 / 跨工具兼容） |
+| [00-项目导航.md](00-项目导航.md) | 按职责分类速查（按通用流程 / 平台专项 / 协议 / 输入 / CI 五维分类） |
+| [01-快速开始/INDEX.md](01-快速开始/INDEX.md) | 使用手册 / 部署 / 配置 / 交付物索引 |
+| [02-专家定义/README.md](02-专家定义/README.md) | 14 个 Agent 索引 + 流程依赖关系 |
+| [03-技能定义/README.md](03-技能定义/README.md) | 13 个 Skill 索引 + 用法速查 |
+| [05-代码示例/README.md](05-代码示例/README.md) | 49 个 utils 分类索引 |
+| [04-配置文件/INDEX.md](04-配置文件/INDEX.md) | conftest / pytest / mcp / requirements 配置索引 |
+| [06-CICD集成/INDEX.md](06-CICD集成/INDEX.md) | GitHub Actions + Jenkins 流水线索引 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 添加 agent / skill / utils / marker / .env 流程 + 同步铁律 |
+| [SECURITY.md](SECURITY.md) | 漏洞报告流程 |
+| [CHANGELOG.md](CHANGELOG.md) | 版本变更日志 |
 
 ---
 
-## 🛠️ 技术栈
+## 🛠️ 技术栈速览
 
-| 类型 | 工具 |
-|------|------|
-| 测试框架 | pytest 7.4 + pytest-xdist + pytest-rerunfailures + pytest-mock + pytest-playwright |
-| UI 自动化 | Playwright 1.40（Web/Electron）/ Appium 4.0（移动）/ pywinauto 0.6（Windows EXE）/ PyAutoGUI（macOS） |
-| API | requests 2.31 + websocket-client + websockets + grpcio + paho-mqtt + paramiko + kafka-python + pika |
-| 性能 | JMeter 5.6.3（主） + Locust 2.25（备） |
-| 视觉 | Airtest 1.3 + OpenCV 4.8 + scikit-image + Tesseract |
-| AI | scikit-learn + scipy（漂移） + LLM 评估 |
-| 数据 | Faker + Factory Boy + SQLAlchemy + pdfplumber + python-docx + openpyxl |
-| 报告 | Allure 2.13 + python-docx 1.1 + 三端 webhook（企微/飞书/钉钉） |
-| Bug | 禅道 SDK |
-| CI/CD | GitHub Actions + Jenkins |
-| AI 模型 | Claude 4.x（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理） |
+pytest · Playwright · Appium · pywinauto · JMeter · Allure · Airtest · OpenCV · Faker · SQLAlchemy · 禅道 SDK · GitHub Actions · Jenkins · Claude 4.x（Opus 4.7 / Sonnet 4.6 / Haiku 4.5）
+
+完整版本号 + 跨工具兼容性矩阵 + 三视角覆盖矩阵 → [FULL_GUIDE.md](FULL_GUIDE.md)
 
 ---
 
-## 🔄 跨工具兼容性
+## 📊 覆盖能力（速览）
 
-Claude Code 是**默认推荐**而非强制：
+- **产品形态**：Web · API · Android · iOS · 小程序 · Windows EXE · macOS · Linux · Electron · 游戏 · IoT · 音视频 · AI/LLM · 区块链
+- **测试类型**：功能 · 性能 · 安全 · 兼容 · 弱网 · 稳定 · 可靠性 · 混沌 · 灾备 · UX · A11y · i18n · 契约 · 视觉回归 · AI对抗 · 变异测试 · DORA
+- **用例方法**：等价类 · 边界值 · 判定表 · 场景法 · 状态迁移 · 配对测试 · 正交 · SBTM · 风险矩阵
+- **测试金字塔**：E2E 10% / 集成 20% / 单元 70%
+- **总覆盖率 ≈ 95%**（剩 5% 为合规领域：DO-178C / HIPAA / IEC61508，业务方按需自加）
 
-- ✅ **`utils/` + pytest + JMeter + CI** 完全跨工具（纯 Python / 标准 CI 文件）
-- ⚠️ **`.claude/agents/` + `.claude/skills/`** 是 Claude Code 独有，迁移其他工具（Cursor / Continue）需重写为对应格式
-- 🔌 **`.mcp.json`** 是 MCP 开放协议，Claude Desktop / Cursor 部分支持
-
----
-
-## 📊 全链路覆盖矩阵（三视角）
-
-### 矩阵 A：产品形态覆盖
-
-| 产品形态 | 工具栈 | 状态 |
-|---------|-------|------|
-| Web（PC + 移动 H5） | Playwright | ✅ |
-| REST / GraphQL / SOAP API | requests / protocol_helper | ✅ |
-| Android APP | Appium + adb | ✅ |
-| iOS APP | Appium + XCUITest | ✅ |
-| 微信 / 支付宝 / 抖音小程序 | 微信开发者工具 CLI | ✅ |
-| Windows EXE | pywinauto + uiautomation | ✅ |
-| macOS .app | PyAutoGUI + AppleScript | ✅ |
-| Linux GUI | atspi + xdotool | ✅ |
-| Electron 跨平台 | Playwright Electron API | ✅ |
-| 游戏 / Canvas / WebGL / Unity | Airtest + OpenCV | ✅ |
-| IoT / 嵌入式 | SSH + 串口 + MQTT + Modbus | ✅ |
-| 音视频 / 流媒体 | FFmpeg + ffprobe | ✅ |
-| AI / ML 模型 + LLM | scikit-learn + scipy + LLM eval | ✅ |
-| 区块链 / 智能合约 | Web3 + Slither + Foundry | ✅ |
-
-### 矩阵 B：测试类型覆盖
-
-| 测试类型 | 工具 / utils | 状态 |
-|---------|------------|------|
-| 功能（单元/集成/系统/UAT BDD） | pytest + pytest-mock + pytest-bdd | ✅ |
-| 性能（基准/负载/压力/Volume/Spike/Soak/SLO） | JMeter + Locust + slo_validator + soak_runner | ✅ |
-| 安全（SAST/DAST/依赖/Header/TLS/API/Fuzzing） | Bandit + Safety + ZAP + Burp Pro + api_security_scanner + fuzzer | ✅ |
-| 兼容（浏览器/OS/分辨率/语言矩阵） | compatibility_matrix（pairwise） | ✅ |
-| 弱网（3G/4G/wifi_weak/satellite/offline） | tc + Toxiproxy + network_throttle | ✅ |
-| 稳定（Android Monkey + 长时 soak + 内存泄漏） | mobile_driver.run_monkey + soak_runner | ✅ |
-| 可靠性（重连/重试/降级/熔断） | api_retry_util + 业务故障注入 | ✅ |
-| 混沌（CPU/内存/磁盘/网络/进程/k8s） | chaos_helper | ✅ |
-| 灾备 / Failover | chaos_helper.kill_pod + 数据一致性校验 | ✅ |
-| UX（任务时长/点击数/TTI/恢复率） | ux_metrics.UXTracker | ✅ |
-| 易用性（Nielsen 10 + 角色扮演） | 人工 walkthrough | ✅ |
-| 探索性（SBTM session + heuristics） | charter 模板 + 录屏 | ✅ |
-| 前端性能 Web Vitals（LCP/FID/CLS/INP） | web_vitals_collector | ✅ |
-| A11y 无障碍（WCAG 2.1） | a11y_scanner | ✅ |
-| 国际化 / 本地化（多语言/RTL） | i18n_checker | ✅ |
-| 数据库（事务/死锁/迁移/备份恢复/主从） | db_test_helper | ✅ |
-| 契约测试（Pact / jsonschema） | contract_test + openapi_test_gen | ✅ |
-| 视觉回归（SSIM + OCR + diff） | visual_helper | ✅ |
-| AI 对抗 / LLM 越狱 / Prompt Injection | ai_adversarial | ✅ |
-| 变异测试（用例有效性） | mutation_runner | ✅ |
-| DORA 4 指标 + 缺陷密度 + 套件减重 | dora_metrics + suite_minimizer | ✅ |
-
-### 矩阵 C：用例设计方法（ISTQB 经典）
-
-| 方法 | utils / 实现 | 状态 |
-|------|------------|------|
-| 等价类划分 / 边界值 | testcase-designer 文档 + Excel 模板 | ✅ |
-| 判定表 / 因果图 | 文档手动 + Excel | ✅ |
-| 场景法 / 错误推测 | testcase-designer 文档 | ✅ |
-| 状态迁移法（0/1-switch） | state_machine_tester | ✅ |
-| 配对测试（Allpairs） | pairwise_generator | ✅ |
-| 正交实验法 | compatibility_matrix（隐含） | ✅ |
-| 探索性测试（SBTM） | charter 模板 | ✅ |
-| 易用性走查（Nielsen 10） | 人工 + 检查清单 | ✅ |
-| 基于风险的测试 | 风险矩阵文档 | ✅ |
-
-### 测试金字塔分布
-
-```text
-        E2E（10%）         ← Playwright/Appium，慢但必要
-       /集成（20%）/        ← API + 服务间 + Mock
-      /单元（70%）/         ← pytest + pytest-mock，秒级反馈
-```
-
-**总覆盖率 ~99%**（含闭环工具链：Bug 闭环禅道 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
+详细矩阵 + 工具映射 → [FULL_GUIDE.md](FULL_GUIDE.md)
 
 ---
 

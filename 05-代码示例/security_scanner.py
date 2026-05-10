@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 安全扫描：SAST（代码静态分析）+ DAST（运行时扫描）+ 依赖漏洞 + Header / TLS
 被引用方：15-安全测试 agent / security-test skill
@@ -86,6 +87,10 @@ def check_tls_cert(host: str, port: int = 443) -> Dict:
     from datetime import datetime
 
     ctx = ssl.create_default_context()
+    # 显式拒绝弱 TLS（CodeQL py/insecure-protocol 要求声明）
+    ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+    ctx.check_hostname = True
+    ctx.verify_mode = ssl.CERT_REQUIRED
     with socket.create_connection((host, port), timeout=10) as sock:
         with ctx.wrap_socket(sock, server_hostname=host) as ssock:
             cert = ssock.getpeercert()
@@ -127,11 +132,13 @@ def burp_active_scan(target_url: str,
         "scan_configurations": [{"name": "Crawl and Audit - Lightweight", "type": "NamedConfiguration"}],
     }, timeout=30)
     r.raise_for_status()
-    task_id = r.headers.get("Location", "").rstrip("/").split("/")[-1]
+    # Location 头可能反射含 API key 的完整 URL — 只取末段 task_id，绝不记录原始头
+    location = r.headers.get("Location", "")
+    task_id = location.rstrip("/").split("/")[-1] if location else ""
     if not task_id:
-        return {"error": "未获取到 task_id", "response": r.text[:500]}
+        return {"error": "未获取到 task_id"}
 
-    logger.info(f"Burp 扫描启动 task_id={task_id}")
+    logger.info("Burp 扫描启动")  # 不记录 task_id（避免链路反推 API key）
 
     # 2. 轮询状态
     end = time.time() + timeout
@@ -166,7 +173,6 @@ def burp_active_scan(target_url: str,
 
     return {
         "target": target_url,
-        "task_id": task_id,
         "total_issues": len(issues),
         "by_severity": by_severity,
         "issues": issue_summaries[:50],

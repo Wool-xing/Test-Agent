@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 变异测试（Mutation Testing）- 评估测试用例有效性
 被引用方：度量 / 测试质量评估

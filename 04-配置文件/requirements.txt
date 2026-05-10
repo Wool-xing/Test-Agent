@@ -8,7 +8,7 @@
 # ============================================================
 
 # ===== [稳定层] 测试框架核心 =====
-pytest==8.3.4                      # [稳定层] 安全升级（修 GHSA tmpdir）
+pytest==8.3.4                      # [稳定层] CVE-2025-71176 tmpdir 仅 9.0.3 修，但 9.x 插件生态未跟上；CVE 仅本地 DoS，模板仓库 risk tolerable
 pytest-xdist==3.6.1                 # [稳定层] 并行执行（pytest 8 兼容）
 pytest-rerunfailures==14.0          # [稳定层] 失败重试（pytest 8 兼容）
 pytest-timeout==2.3.1               # [稳定层] 用例超时
@@ -21,7 +21,7 @@ allure-pytest==2.13.5               # [稳定层] Allure 报告
 playwright==1.40.0                 # [稳定层] major 升级 dependabot 已锁
 
 # ===== [稳定层] API 测试 =====
-requests==2.32.4                   # [稳定层]（修 GHSA verify=False/netrc/temp file）
+requests==2.33.0                   # [稳定层]（修 CVE-2026-25645 extract_zipped_paths Insecure Temp File，2.32.4 仅修 netrc/verify）
 
 # ===== [稳定层] 性能测试 =====
 locust==2.25.0                     # [稳定层] 备用 Python 压测
@@ -43,11 +43,11 @@ PyYAML==6.0.1                      # [稳定层] regression_modules.yaml 解析
 openpyxl==3.1.2                    # [稳定层] Excel
 python-docx==1.1.0                 # [稳定层] Word
 pdfplumber==0.10.3                 # [稳定层] PDF 解析（主）
-pypdf==5.1.0                       # [稳定层] PDF 解析（备）—— 替代停维护的 PyPDF2，修 GHSA infinite loop
+pypdf==6.10.2                      # [稳定层] PDF 解析（备）—— 替代停维护的 PyPDF2，5.1→6.10 修 ~22 个 RAM/infinite-loop CVE
 beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
 
 # ===== [稳定层] 工具 =====
-python-dotenv==1.0.1               # [稳定层] .env 加载（修 GHSA symlink rename）
+python-dotenv==1.2.2               # [稳定层] .env 加载（修 CVE-2026-28684 symlink rename，1.0.1 仍含洞）
 tenacity==8.2.3                    # [稳定层] 重试库
 loguru==0.7.2                      # [稳定层] 增强日志
 
@@ -86,11 +86,11 @@ opencv-python==4.8.1.78             # [可选] 图像处理
 scikit-image==0.22.0               # [可选] SSIM 视觉对比
 imagehash==4.3.1                   # [可选] 感知哈希
 pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
-Pillow==11.0.0                     # [可选] 图像（修 GHSA RCE/buffer overflow/PDF DoS/integer overflow）
+Pillow==12.2.0                     # [可选] 图像（11→12.2 修 CVE-2026-25990 PSD heap overflow/FITS GZIP bomb/font integer overflow 等 5 个 high+moderate）
 # paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
 
 # ===== [可选] 系统集成（13-系统集成测试）=====
-paramiko==3.5.1                    # [可选] SSH（修 GHSA SHA-1 algorithm）
+paramiko==4.0.0                    # [可选] SSH（修 CVE-2026-44405 RSA SHA-1 algorithm，3.x 不修）
 pyserial==3.5                      # [可选] 串口
 paho-mqtt==1.6.1                   # [可选] MQTT
 # pymodbus==3.5.4                  # [可选] Modbus 工业协议

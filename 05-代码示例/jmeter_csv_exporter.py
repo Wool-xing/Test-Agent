@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 JMeter 参数化 CSV 文件生成
 被引用方：05-数据准备 agent / data-preparation skill / CI yml/groovy

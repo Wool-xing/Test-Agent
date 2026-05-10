@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 API 调用工具 - 指数退避重试
 权威重试策略：base_delay=10s, max_delay=60s, max_retries=3
