@@ -27,6 +27,14 @@ repos:
         files: ^05-代码示例/
       # ruff-format 关掉：utils 紧凑 CLI 风格不需自动重排
 
+  # ===== 凭据扫描（gitleaks）=====
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+        # 扫描所有暂存内容，发现 API key/密码/token 即阻断 commit
+        # 自定义规则可在项目根放 .gitleaks.toml 覆盖默认规则
+
   # ===== 安全：禁止提交私有源 MD =====
   - repo: local
     hooks:
