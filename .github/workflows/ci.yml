@@ -18,7 +18,7 @@ jobs:
     name: utils/ Ruff + 类型检查
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-python@v5
         with:
@@ -39,7 +39,7 @@ jobs:
     name: 依赖 CVE 扫描
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -64,7 +64,7 @@ jobs:
     name: install.sh 语法
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
@@ -78,7 +78,7 @@ jobs:
     name: 配置文件语法
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -115,7 +115,7 @@ jobs:
     name: utils 模块可导入
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -155,7 +155,7 @@ jobs:
     name: Markdown 内部链接有效性
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 检查内部链接
         run: |
@@ -186,7 +186,7 @@ jobs:
     name: Agents/Skills/Utils 数量 + 私有 MD 防护
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: 统计核对
         run: |
