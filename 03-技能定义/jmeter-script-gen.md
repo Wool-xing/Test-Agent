@@ -8,13 +8,13 @@ tools: Read, Write, Edit, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /jmeter-script-gen [接口信息 或 业务流程描述]
 ```
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ Java JRE 17+ 已装（java -version）
 □ JMeter 5.6.3 已装（jmeter --version 可执行，PATH 配好）
 □ data-preparer 已生成 workspace/测试数据/jmeter_users.csv
@@ -26,7 +26,7 @@ tools: Read, Write, Edit, Grep, Glob
 
 ## 数据流（与其他 Agent 闭环）
 
-```
+```text
 data-preparer
   → workspace/测试数据/jmeter_users.csv（参数化数据，由 utils/jmeter_csv_exporter）
        ↓
@@ -405,7 +405,7 @@ python -m utils.jmeter_result_parser \
 
 ## 输出文件结构
 
-```
+```text
 workspace/自动化脚本/jmeter/
 ├── test_plan.jmx              # 标准接口压测计划
 ├── business_flow.jmx          # 业务流程并发计划（按需）
@@ -422,7 +422,7 @@ workspace/执行日志/
 
 ## 代码质量要求
 
-```
+```text
 ✅ JMX 中 host/protocol/port 全变量化（${TARGET_HOST/PROTOCOL/PORT}）
 ✅ TARGET_HOST 不含协议前缀
 ✅ CSV 由 data-preparer 生成，不在 JMX 中手写数据

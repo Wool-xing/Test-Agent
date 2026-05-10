@@ -47,14 +47,30 @@ restore_user_data() {
         rm -rf "$BACKUP_DIR"
     fi
 }
-trap 'restore_user_data; rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null' EXIT
+trap 'restore_user_data; [[ -n "${TEMPLATE_DIR:-}" ]] && rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null || true' EXIT
 
 # ===== 1. 检查工具 =====
 need() { command -v "$1" >/dev/null 2>&1 || { echo "❌ 缺少 $1"; exit 1; }; }
 need git
-need python3
 need node
 need npm
+
+# Python 3 检测：Windows 上 python3 可能是 MS Store stub（exit 49 不输出版本），逐个测真可用
+PYTHON_BIN=""
+for cand in python3 python py; do
+    if command -v "$cand" >/dev/null 2>&1; then
+        ver_out="$("$cand" --version 2>&1 || true)"
+        if [[ "$ver_out" == Python\ 3* ]]; then
+            PYTHON_BIN="$cand"
+            break
+        fi
+    fi
+done
+if [[ -z "$PYTHON_BIN" ]]; then
+    echo "❌ 缺少 Python 3（python3 / python / py 均不可用）"
+    exit 1
+fi
+echo "→ 使用 Python: $PYTHON_BIN ($("$PYTHON_BIN" --version 2>&1))"
 
 # ===== 2. 克隆模板到临时目录 =====
 TEMPLATE_DIR="$(mktemp -d)/Test-Agent工作流搭建"
@@ -100,7 +116,7 @@ cp "$TEMPLATE_DIR/04-配置文件/.mcp.json"        "$PROJECT_ROOT/"
 cp "$TEMPLATE_DIR/04-配置文件/requirements.txt" "$PROJECT_ROOT/"
 [[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/04-配置文件/.env.example" "$PROJECT_ROOT/.env"
 
-# ===== 7. utils（12 个 .py + __init__）=====
+# ===== 7. utils（49 个 .py + __init__）=====
 echo "→ 拷贝 utils（49 个）..."
 for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
          excel_generator.py flaky_detector.py generate_report.py \
@@ -130,12 +146,22 @@ cp "$TEMPLATE_DIR/06-CICD集成/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsf
 cd "$PROJECT_ROOT"
 if [[ ! -d ".venv" ]]; then
     echo "→ 创建虚拟环境..."
-    python3 -m venv .venv
+    "$PYTHON_BIN" -m venv .venv
 fi
-# shellcheck disable=SC1091
-source .venv/bin/activate
+# Windows Git Bash venv 路径是 Scripts/activate；Linux/Mac 是 bin/activate
+if [[ -f ".venv/Scripts/activate" ]]; then
+    # shellcheck disable=SC1091
+    source .venv/Scripts/activate
+else
+    # shellcheck disable=SC1091
+    source .venv/bin/activate
+fi
 
 echo "→ 安装 Python 依赖..."
+# Windows GBK 默认编码读 UTF-8 requirements 会 UnicodeDecodeError；强制 UTF-8 mode
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+python -m pip install --upgrade pip -q
 pip install -r requirements.txt -q
 playwright install chromium --with-deps 2>/dev/null || echo "⚠️ Playwright deps 安装失败，UI 测试需手动 'playwright install chromium --with-deps'"
 

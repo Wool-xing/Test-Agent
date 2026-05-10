@@ -8,13 +8,13 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /system-test [子场景：iot|media|tracing|mq 或 复合描述]
 ```
 
 ## 🔔 开测前准备清单（按子场景）
 
-```
+```text
 IoT/嵌入式：
 □ SSH 凭证 → IOT_SSH_HOST / USER / PASSWORD
 □ 串口路径 + 波特率 → IOT_SERIAL_PORT / IOT_SERIAL_BAUDRATE
@@ -87,7 +87,7 @@ pytest -m "system and p0" -v
 
 ## 输出文件
 
-```
+```text
 workspace/执行日志/
 ├── iot-logs/
 ├── media-frames/

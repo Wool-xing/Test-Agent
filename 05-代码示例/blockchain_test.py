@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 区块链 / 智能合约测试
 被引用方：DApp / Web3 / DeFi 项目

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 AI 对抗鲁棒性测试 + LLM 越狱 / Prompt Injection
 被引用方：14-AI模型测试 agent 扩展

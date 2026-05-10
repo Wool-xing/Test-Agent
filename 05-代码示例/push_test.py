@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 移动推送通知测试（FCM / APNs / 个推 / 极光）
 被引用方：10-移动测试 agent

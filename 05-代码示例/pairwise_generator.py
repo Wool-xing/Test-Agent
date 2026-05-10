@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 Pairwise / Allpairs 测试 - 组合优化
 被引用方：03-用例设计 agent

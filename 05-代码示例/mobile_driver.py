@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 移动端 driver 工厂 + 性能采集
 被引用方：10-移动测试 agent / mobile-test skill
