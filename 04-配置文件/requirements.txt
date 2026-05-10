@@ -8,7 +8,7 @@
 # ============================================================
 
 # ===== [稳定层] 测试框架核心 =====
-pytest==7.4.3                     # [稳定层] major 升级 dependabot 已锁
+pytest==9.0.3                     # [稳定层] major 升级 dependabot 已锁
 pytest-xdist==3.5.0                # [稳定层] 并行执行
 pytest-rerunfailures==13.0         # [稳定层] 失败重试
 pytest-timeout==2.2.0              # [稳定层] 用例超时
@@ -21,7 +21,7 @@ allure-pytest==2.13.2              # [稳定层] Allure 报告
 playwright==1.40.0                 # [稳定层] major 升级 dependabot 已锁
 
 # ===== [稳定层] API 测试 =====
-requests==2.31.0                   # [稳定层]
+requests==2.33.0                   # [稳定层]
 
 # ===== [稳定层] 性能测试 =====
 locust==2.25.0                     # [稳定层] 备用 Python 压测
@@ -33,7 +33,7 @@ factory-boy==3.3.0                 # [稳定层]
 
 # ===== [稳定层] 数据库 =====
 psycopg2-binary==2.9.9             # [稳定层] PostgreSQL（按实际数据库选其一）
-pymysql==1.1.0                     # [稳定层] MySQL
+pymysql==1.1.1                     # [稳定层] MySQL
 SQLAlchemy==2.0.25                 # [稳定层] ORM
 
 # ===== [稳定层] 配置 =====
@@ -47,7 +47,7 @@ PyPDF2==3.0.1                      # [稳定层] PDF 解析（备）
 beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
 
 # ===== [稳定层] 工具 =====
-python-dotenv==1.0.0               # [稳定层] .env 加载
+python-dotenv==1.2.2               # [稳定层] .env 加载
 tenacity==8.2.3                    # [稳定层] 重试库
 loguru==0.7.2                      # [稳定层] 增强日志
 
@@ -86,11 +86,11 @@ opencv-python==4.8.1.78             # [可选] 图像处理
 scikit-image==0.22.0               # [可选] SSIM 视觉对比
 imagehash==4.3.1                   # [可选] 感知哈希
 pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
-Pillow==10.1.0                     # [可选] 图像
+Pillow==12.2.0                     # [可选] 图像
 # paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
 
 # ===== [可选] 系统集成（13-系统集成测试）=====
-paramiko==3.4.0                    # [可选] SSH
+paramiko==5.0.0                    # [可选] SSH
 pyserial==3.5                      # [可选] 串口
 paho-mqtt==1.6.1                   # [可选] MQTT
 # pymodbus==3.5.4                  # [可选] Modbus 工业协议
@@ -99,7 +99,7 @@ kafka-python==2.0.2                # [可选] Kafka
 pika==1.3.2                        # [可选] RabbitMQ
 
 # ===== [可选] AI/ML（14-AI模型测试）=====
-scikit-learn==1.4.0                # [可选] 模型评估
+scikit-learn==1.5.0                # [可选] 模型评估
 scipy==1.11.4                      # [可选] 漂移检测（KS）
 # alibi-detect==0.12.0             # [可选] 漂移高级检测
 # deepeval==0.20.50                # [可选] LLM 评估
