@@ -47,16 +47,6 @@
 
 ---
 
-## 添加新 Skill 流程
+## 添加新 Skill
 
-1. 选定分类（通用 / 平台专项）
-2. 文件名 `<verb>-<noun>.md`（如 `chaos-test.md`）
-3. 顶部 YAML frontmatter
-4. 加准备清单 + 流程 + 门禁
-5. **同步**：
-   - 本 README 加一行
-   - `00-项目导航.md` 加一行
-   - `01-快速开始/使用手册.md` skill 详解段加描述
-   - `02-专家定义/01-测试主管.md` 快速命令清单加一行
-   - `install.sh` + `部署说明.md` 拷贝清单加文件名
-   - 源 MD `Test-Agent工作流搭建.md` 内嵌段
+详见根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md) "添加新 Skill" 章节。

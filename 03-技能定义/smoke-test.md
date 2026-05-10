@@ -8,6 +8,19 @@ tools: Read, Write, Bash, Grep, Glob
 
 > **目标**：10 分钟内完成核心功能验证。仅测 P0 用例，快速暴露主干流程问题。
 
+## 🔔 调用前置准备
+
+```
+□ env-manager 已通过基础健康检查
+□ workspace/测试用例/*.xlsx 存在含 P0 用例（或 testcase-designer 先生成）
+□ workspace/测试数据/test_data.json 存在（或 data-preparer 兜底）
+□ workspace/自动化脚本/python/ 含 P0 用例（marker @pytest.mark.p0）
+□ pytest.ini markers 已注册项目模块 marker
+□ HEADLESS=true（CI）/ false（本地调试）
+```
+
+缺项 test-lead 会 prompt 用户补齐。
+
 ## 📋 执行流程（含 1 分钟缓冲，总上限 11 分钟）
 
 ### 阶段1：环境检查（1 分钟）

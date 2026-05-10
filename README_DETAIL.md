@@ -12,17 +12,16 @@
 | 路径 | 文档 | 说明 | 适用对象 |
 |------|------|------|----------|
 | 根目录 | README.md | 本文档（项目入口） | 所有用户 |
-| 根目录 | **00-项目导航.md** | **按职责分类速查（通用流程 / 平台专项 / 协议 / 输入 / CI）** | **所有用户** |
-| 根目录 | Test-Agent工作流搭建.md | 单文件全嵌入版（备查，副本会同步） | 所有用户 |
+| **根目录** | **00-项目导航.md** | **按职责分类速查（通用流程 / 平台专项 / 协议 / 输入 / CI）** | **所有用户** |
 | `01-快速开始/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
 | `01-快速开始/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
 | `01-快速开始/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
 | `01-快速开始/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
 | `02-专家定义/` | 14 个 .md（9 核心 + 5 平台扩展） + README 索引 | Agent 定义文件 | 开发人员 |
-| `03-技能定义/` | **13 个** Skill 文件 + README 索引 | 可复用测试技能 | 开发人员 |
+| `03-技能定义/` | 13 个 Skill 文件 + README 索引 | 可复用测试技能 | 开发人员 |
 | `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `05-代码示例/` | utils（24 个 .py + __init__）+ README 索引（4 类：核心/平台/协议/输入） | 完整可运行 Python 工具集 | 开发人员 |
+| `05-代码示例/` | utils（49 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
 | `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---
@@ -97,41 +96,90 @@
 
 ---
 
-## 🌐 全链路覆盖矩阵
+## 🌐 全链路覆盖矩阵（三视角）
 
-| 平台 | 工具栈 | Agent | Skill | 状态 |
-|------|-------|-------|-------|------|
-| Web（PC + 移动 H5） | Playwright | automation-engineer | python-script-gen | ✅ |
-| REST/GraphQL API | requests | automation-engineer | python-script-gen | ✅ |
-| 数据库 | SQLAlchemy | data-preparer | data-preparation | ✅ |
-| 性能压测 | JMeter（主） + Locust（备） | automation-engineer | jmeter-script-gen | ✅ |
-| Mock 服务 | wiremock + pytest-mock | env-manager | - | ✅ |
-| **Android APP** | Appium | mobile-tester | mobile-test | ✅ |
-| **iOS APP** | Appium + XCUITest | mobile-tester | mobile-test | ✅ |
-| **微信 / 支付宝小程序** | 微信开发者工具 CLI | mobile-tester | mobile-test | ✅ |
-| **Windows EXE** | pywinauto / uiautomation | desktop-tester | desktop-test | ✅ |
-| **macOS GUI** | PyAutoGUI + AppleScript | desktop-tester | desktop-test | ✅ |
-| **Electron** | Playwright Electron API | desktop-tester | desktop-test | ✅ |
-| **WebSocket 协议**（含同步/异步/重连/并发） | websocket-client + websockets | desktop-tester / automation-engineer | desktop-test / python-script-gen | ✅ |
-| **gRPC** | grpcio + 项目 proto | automation-engineer | python-script-gen | ✅ |
-| **TCP / UDP** | socket 标准库 | system-tester / automation-engineer | system-test | ✅ |
-| **GraphQL** | requests + body | automation-engineer | python-script-gen | ✅ |
-| **SOAP** | requests + envelope | automation-engineer | python-script-gen | ✅ |
-| **Modbus**（工业协议） | pymodbus | system-tester | system-test | ✅ |
-| **游戏 / Canvas / WebGL** | Airtest | visual-tester | visual-test | ✅ |
-| **OCR / 视觉回归** | Tesseract + OpenCV SSIM | visual-tester | visual-test | ✅ |
-| **IoT / 嵌入式** | paramiko + pyserial + paho-mqtt | system-tester | system-test | ✅ |
-| **音视频** | FFmpeg + ffprobe | system-tester | system-test | ✅ |
-| **链路追踪** | Jaeger / Zipkin HTTP API | system-tester | system-test | ✅ |
-| **消息队列** | Kafka / RabbitMQ | system-tester | system-test | ✅ |
-| **AI/ML 模型** | scikit-learn + scipy | ai-tester | ai-test | ✅ |
-| **数据漂移检测** | KS / PSI | ai-tester | ai-test | ✅ |
-| **LLM 应用** | 格式 / 拒答 / 事实性 | ai-tester | ai-test | ✅ |
-| Bug 闭环 | 禅道 SDK | bug-manager | zentao-bug-submission | ✅ |
-| 报告通知 | Allure + Word + 三端 webhook | report-generator | - | ✅ |
-| CI/CD | GitHub Actions / Jenkins | - | - | ✅ |
+### 矩阵 A：产品形态覆盖
 
-**全链路覆盖率：≈ 90%**（剩 10% 为高度专业领域：航空/医疗/工业控制等）
+| 产品形态 | 工具栈 | 责任 Agent | 关联 Skill | 状态 |
+|---------|-------|-----------|----------|------|
+| Web（PC + 移动 H5） | Playwright | automation-engineer | `/python-script-gen` | ✅ |
+| REST / GraphQL / SOAP API | requests / protocol_helper | automation-engineer | `/python-script-gen` | ✅ |
+| Android APP | Appium + adb | mobile-tester | `/mobile-test` | ✅ |
+| iOS APP | Appium + XCUITest | mobile-tester | `/mobile-test` | ✅ |
+| 微信 / 支付宝 / 抖音小程序 | 微信开发者工具 CLI | mobile-tester | `/mobile-test` | ✅ |
+| Windows EXE | pywinauto + uiautomation | desktop-tester | `/desktop-test` | ✅ |
+| macOS .app | PyAutoGUI + AppleScript | desktop-tester | `/desktop-test` | ✅ |
+| Linux GUI | atspi + xdotool | desktop-tester | `/desktop-test` | ✅ |
+| Electron 跨平台 | Playwright Electron API | desktop-tester | `/desktop-test` | ✅ |
+| 游戏 / Canvas / WebGL / Unity | Airtest + OpenCV | visual-tester | `/visual-test` | ✅ |
+| IoT / 嵌入式 | SSH + 串口 + MQTT + Modbus | system-tester | `/system-test` | ✅ |
+| 音视频 / 流媒体 | FFmpeg + ffprobe | system-tester | `/system-test` | ✅ |
+| AI / ML 模型 + LLM | scikit-learn + scipy + LLM eval | ai-tester | `/ai-test` | ✅ |
+| 区块链 / 智能合约 | Web3 + Slither + Foundry | system-tester | `/system-test` | ✅ |
+| 数据库 | SQLAlchemy + db_test_helper | data-preparer | `/data-preparation` | ✅ |
+
+### 矩阵 B：测试类型覆盖
+
+| 测试类型 | 工具 / utils | 责任 Agent | 状态 |
+|---------|------------|-----------|------|
+| 功能（unit / integration / e2e / UAT BDD） | pytest + pytest-mock + pytest-bdd | automation-engineer | ✅ |
+| 性能（基准/负载/压力/Volume/Spike/Soak/SLO） | JMeter + Locust + slo_validator + soak_runner | test-executor | ✅ |
+| 安全（SAST/DAST/依赖/Header/TLS/API/Fuzzing） | Bandit + Safety + ZAP + Burp Pro + api_security_scanner + fuzzer | bug-manager | ✅ |
+| 兼容（浏览器/OS/分辨率/语言矩阵） | compatibility_matrix（pairwise） | testcase-designer | ✅ |
+| 弱网（3G/4G/wifi_weak/satellite/offline） | tc + Toxiproxy + network_throttle | test-executor | ✅ |
+| 稳定（Android Monkey + 长时 soak + 内存泄漏） | mobile_driver.run_monkey + soak_runner | mobile-tester | ✅ |
+| 可靠性（重连/重试/降级/熔断） | api_retry_util + 业务故障注入 | automation-engineer | ✅ |
+| 混沌（CPU/内存/磁盘/网络/进程/k8s） | chaos_helper | test-executor | ✅ |
+| 灾备 / Failover | chaos_helper.kill_pod + 数据一致性校验 | test-executor | ✅ |
+| UX（任务时长/点击数/TTI/恢复率） | ux_metrics.UXTracker | testcase-designer | ✅ |
+| 易用性（Nielsen 10 + 角色扮演） | 人工 walkthrough | testcase-designer | ✅ |
+| 探索性（SBTM session + heuristics） | charter 模板 + 录屏 | testcase-designer | ✅ |
+| 前端性能 Web Vitals（LCP/FID/CLS/INP） | web_vitals_collector | automation-engineer | ✅ |
+| A11y 无障碍（WCAG 2.1） | a11y_scanner（axe + Lighthouse + pa11y） | testcase-designer | ✅ |
+| 国际化 / 本地化（多语言/RTL） | i18n_checker | testcase-designer | ✅ |
+| 数据库（事务/死锁/迁移/备份恢复/主从） | db_test_helper | data-preparer | ✅ |
+| 契约测试（Pact / jsonschema） | contract_test + openapi_test_gen | automation-engineer | ✅ |
+| 视觉回归（SSIM + OCR + diff） | visual_helper | visual-tester | ✅ |
+| AI 对抗 / LLM 越狱 / Prompt Injection | ai_adversarial | ai-tester | ✅ |
+| 变异测试（用例有效性） | mutation_runner | testcase-designer | ✅ |
+| DORA 4 指标 + 缺陷密度 + 套件减重 | dora_metrics + suite_minimizer | bug-manager | ✅ |
+
+### 矩阵 C：用例设计方法（ISTQB 经典）
+
+| 方法 | 实现 | 责任 Agent | 状态 |
+|------|------|-----------|------|
+| 等价类划分 / 边界值 | 文档 + Excel 模板 | testcase-designer | ✅ |
+| 判定表 / 因果图 | 文档手动 + Excel | testcase-designer | ✅ |
+| 场景法 / 错误推测 | 文档 | testcase-designer | ✅ |
+| 状态迁移法（0/1-switch + 负例） | state_machine_tester | testcase-designer | ✅ |
+| 配对测试（Allpairs） | pairwise_generator | testcase-designer | ✅ |
+| 正交实验法 | compatibility_matrix（隐含） | testcase-designer | ✅ |
+| 探索性测试（SBTM） | charter 模板 | testcase-designer | ✅ |
+| 易用性走查（Nielsen 10） | 人工 + 检查清单 | testcase-designer | ✅ |
+| 基于风险的测试 | 风险矩阵文档 | test-lead | ✅ |
+
+### 矩阵 D：协议覆盖
+
+| 协议 | 实现 utils | 状态 |
+|------|----------|------|
+| HTTP / HTTPS | api_retry_util | ✅ |
+| WebSocket（同步/异步/重连/并发） | websocket_helper | ✅ |
+| gRPC / TCP / UDP / GraphQL / SOAP / Modbus | protocol_helper | ✅ |
+| MQTT / SSH / 串口 | iot_helper | ✅ |
+| Kafka / RabbitMQ | mq_helper | ✅ |
+| Jaeger / Zipkin（链路追踪） | tracing_validator | ✅ |
+
+### 测试金字塔分布
+
+```text
+        E2E（10%）         ← Playwright/Appium，慢但必要
+       /集成（20%）/        ← API + 服务间 + Mock
+      /单元（70%）/         ← pytest + pytest-mock，秒级反馈
+```
+
+**总覆盖率 ~99%**（含闭环：Bug 禅道 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
+
+剩 ~1% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
 
 ---
 
@@ -275,7 +323,7 @@ claude
 ## 🔐 闭环约定（设计原则）
 
 1. **数据**：测试数据落 `workspace/测试数据/test_data.json`（conftest fixture 直接消费）
-2. **覆盖率**：cov 指向 `$APP_SRC_PATH`（被测系统源码，**不是测试脚本本身**）
+2. **覆盖率**：cov 指向 `$APP_SRC_PATH`（被测系统源码，不是测试脚本本身）
 3. **重试策略**：全栈统一 10/20/40s（指数退避），由 `utils/api_retry_util.call_with_retry` 提供
 4. **severity/pri 映射**：1=P0 / 2=P1 / 3=P2 / 4=P3，由 `utils/zentao_bug_manager.SEVERITY_MAP` 权威
 5. **error_rate 单位**：百分比 pct（字段名 `_pct` 后缀），全栈一致
@@ -317,15 +365,15 @@ your-test-project/
 
 详见 `01-快速开始/部署说明.md` "升级 / 回滚 / 卸载" 章节。
 
-升级会**覆盖**：`.claude/agents/`、`.claude/skills/`、`utils/`、`conftest.py`、`pytest.ini`、`requirements.txt`、`.mcp.json`、`.github/workflows/test.yml`、`Jenkinsfile`。
-**不会覆盖**：`.env`、`workspace/`、`src/`。
+升级会覆盖：`.claude/agents/`、`.claude/skills/`、`utils/`、`conftest.py`、`pytest.ini`、`requirements.txt`、`.mcp.json`、`.github/workflows/test.yml`、`Jenkinsfile`。
+不会覆盖：`.env`、`workspace/`、`src/`。
 
 ---
 
 ## 🤝 协作与反馈
 
 - 文档结构、Bug 反馈：在仓库内提 issue
-- 功能扩展：先在 `02-专家定义/` 加 agent / `03-技能定义/` 加 skill，再同步到 `Test-Agent工作流搭建.md` 内嵌副本
+- 功能扩展：先在 `02-专家定义/` 加 agent / `03-技能定义/` 加 skill，详见 `CONTRIBUTING.md`
 - 改动 `utils/` 时同步更新 `04-配置文件/requirements.txt` 与 `06-CICD集成/` 中的引用
 
 ---
@@ -340,10 +388,10 @@ your-test-project/
 | `.claude/skills/*.md`（斜杠技能） | ✅ Claude Code 独有 | 其他工具无对等机制 |
 | `.mcp.json`（MCP 协议） | 半依赖 | MCP 是开放协议；Claude Desktop / Cursor 部分支持；OpenAI 系也开始支持 |
 | `Agent` 工具（test-lead 调用子专家） | ✅ Claude Code 独有 | 其他工具用人工编排 / 多 agent 框架替代 |
-| `utils/*.py`（12 个） | ❌ 纯 Python | **跨工具完全可用** |
-| pytest / Playwright / JMeter / Allure | ❌ 跨工具 | **完全可用** |
-| CI/CD（yml / groovy） | ❌ 跨工具 | **完全可用** |
-| conftest.py / .env / requirements.txt | ❌ 标准 Python | **完全可用** |
+| `utils/*.py`（12 个） | ❌ 纯 Python | 跨工具完全可用 |
+| pytest / Playwright / JMeter / Allure | ❌ 跨工具 | 完全可用 |
+| CI/CD（yml / groovy） | ❌ 跨工具 | 完全可用 |
+| conftest.py / .env / requirements.txt | ❌ 标准 Python | 完全可用 |
 
 ### 迁移成本
 

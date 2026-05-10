@@ -1,6 +1,6 @@
 # 05-代码示例（utils/）索引
 
-24 个 Python 工具模块（含 `__init__.py`），按职责四分类。
+49 个 Python 工具模块（含 `__init__.py`），按职责多分类（核心 / 平台 / 协议 / 非功能 / 用例方法 / 测试类型 / 安全增强 / DB/契约/API / 移动专项 / a11y/i18n / 度量 / 区块链/AI 对抗 / 输入）。
 
 > 顶层导航见根目录 `00-项目导航.md`。
 > import 路径权威：`from utils.<module> import ...`（部署后 utils/ 在项目根，conftest.py 已注入 sys.path）。
@@ -52,7 +52,90 @@
 
 ---
 
-## 类别 4：输入加载（1 个）— PRD 多格式入口
+## 类别 4：非功能维度（6 个）— 安全 / 兼容 / 弱网 / 稳定 / 混沌 / UX
+
+| utils 文件 | 维度 | 关键 API |
+|----------|------|---------|
+| `security_scanner.py` | 安全（SAST/DAST/依赖/Header/TLS） | `run_bandit` / `run_safety_check` / `check_security_headers` / `check_tls_cert` / `zap_active_scan` |
+| `network_throttle.py` | 弱网（3G/4G/wifi_weak/satellite/offline） | `apply_preset(preset, mode='tc')` / `tc_apply` / `adb_throttle_emulator` / `ToxiproxyClient` |
+| `chaos_helper.py` | 混沌工程 | `stress_cpu` / `stress_memory` / `stress_disk` / `kill_pod` / `block_outbound` / `shift_clock` |
+| `soak_runner.py` | 长时稳定性 + 内存泄漏 | `soak_test(scenario, duration_hours, metric_proc_pid)` |
+| `ux_metrics.py` | UX 量化 | `UXTracker` / `measure_tti` / `task_efficiency` / `check_ux_gates` |
+| `compatibility_matrix.py` | 浏览器/OS/分辨率/语言矩阵 | `web_matrix` / `mobile_matrix` / `to_pytest_params` |
+
+> 注：稳定性 Android Monkey 在 `mobile_driver.run_monkey`（已有，归类平台驱动）。
+
+---
+
+## 类别 5：用例方法（2 个）— ISTQB 经典法
+
+| utils 文件 | 方法 | 关键 API |
+|----------|------|---------|
+| `state_machine_tester.py` | 状态迁移法（0/1-switch + 负例） | `StateMachine.add_transition` / `gen_0switch` / `gen_1switch` / `gen_negative` |
+| `pairwise_generator.py` | 配对测试 / Allpairs | `pairwise(parameters)` / `generate_test_cases` |
+
+## 类别 6：测试类型（2 个）— V 模型核心
+
+| utils 文件 | 类型 | 关键 API |
+|----------|------|---------|
+| `bdd_runner.py` | 验收测试 BDD（Gherkin） | `create_feature_file` / `create_step_file` |
+| `web_vitals_collector.py` | 前端性能 LCP/FID/CLS/INP | `collect_via_playwright` / `collect_via_lighthouse` |
+
+## 类别 7：安全增强（2 个）— OWASP API Top 10 + Fuzzing
+
+| utils 文件 | 维度 | 关键 API |
+|----------|------|---------|
+| `api_security_scanner.py` | API 安全（IDOR/SSRF/JWT/CORS/CSRF/限流） | `test_idor` / `test_ssrf` / `test_jwt_none_alg` / `test_cors` / `test_rate_limit` |
+| `fuzzer.py` | 模糊测试（HTTP / 文件） | `fuzz_http_endpoint` / `fuzz_file_parser` |
+
+## 类别 8：DB / 契约 / API（3 个）
+
+| utils 文件 | 用途 |
+|----------|------|
+| `db_test_helper.py` | 事务 ACID / 死锁 / 慢查询 / 迁移 / 备份恢复 / 主从延迟 |
+| `contract_test.py` | Pact 契约 / jsonschema 响应验证 |
+| `openapi_test_gen.py` | OpenAPI 自动生成用例 + 全 endpoint 冒烟 |
+
+## 类别 9：移动专项（1 个）
+
+| utils 文件 | 用途 |
+|----------|------|
+| `push_test.py` | FCM / APNs 推送 + DeepLink + 安装升级 + 后台杀进程 |
+
+## 类别 10：A11y / i18n（2 个）
+
+| utils 文件 | 用途 |
+|----------|------|
+| `a11y_scanner.py` | WCAG 2.1（axe-core + Lighthouse + pa11y） |
+| `i18n_checker.py` | 多语言 key 完整性 + 硬编码检测 + 文本膨胀 + RTL |
+
+## 类别 11：度量（2 个）
+
+| utils 文件 | 用途 |
+|----------|------|
+| `mutation_runner.py` | 变异测试（mutmut，验证用例有效性） |
+| `dora_metrics.py` | DORA 4 大指标（部署频率 / Lead Time / 变更失败率 / MTTR） |
+
+## 类别 12：区块链 / AI 对抗（2 个）
+
+| utils 文件 | 用途 |
+|----------|------|
+| `blockchain_test.py` | Web3 + Slither 合约审计 + Foundry invariant + Gas 回归 |
+| `ai_adversarial.py` | 对抗样本（FGSM）+ 文本扰动 + LLM 越狱 / Prompt Injection / 隐私推断 |
+
+---
+
+## 类别 13：报告 / SLO / 邮件 / 减重（3 个）
+
+| utils 文件 | 用途 |
+|----------|------|
+| `slo_validator.py` | SLO/SLI 性能契约 + 错误预算 + 燃烧率 |
+| `email_sender.py` | SMTP 邮件直发（含附件 docx/pdf/pptx） |
+| `suite_minimizer.py` | 用例去重（Jaccard 相似度）+ 覆盖率减重 |
+
+> 报告输出 PDF / PPTX 已合并到 `generate_report.py`（generate_pdf_report / generate_pptx_summary）。
+
+## 类别 14：输入加载（1 个）— PRD 多格式入口
 
 | utils 文件 | 用途 | 关键 API |
 |----------|------|---------|
@@ -97,18 +180,6 @@ python -m utils.protocol_helper tcp/udp/graphql ...
 
 ---
 
-## 添加新 utils 流程
+## 添加新 utils
 
-1. 选定分类（核心 / 平台驱动 / 协议 / 输入加载）
-2. 文件名小写下划线（如 `chaos_helper.py`）
-3. 顶部 docstring 说明被引用方
-4. 实现公开 API + CLI（argparse）
-5. **同步**：
-   - 本 README 表格加一行
-   - `00-项目导航.md` 对应分类加一行
-   - `04-配置文件/requirements.txt` 加新依赖
-   - `04-配置文件/.env.example` 加配置字段
-   - `04-配置文件/conftest.py` `pytest_configure` 加产出目录
-   - `04-配置文件/pytest.ini` markers 加新标记
-   - `install.sh` + `01-快速开始/部署说明.md` 拷贝清单加文件名
-   - 源 MD `Test-Agent工作流搭建.md` 内嵌段
+详见根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md) "添加新 utils" 章节。

@@ -8,6 +8,18 @@ tools: Read, Write, Bash, Grep, Glob
 
 > **目标**：测试执行前自动准备所有必要数据，测试结束后自动清理。
 
+## 🔔 调用前置准备
+
+```
+□ env-manager 已通过基础健康检查（DB/Redis 可达）
+□ .env 已填 TEST_DB_HOST / TEST_DB_USER / TEST_DB_PASSWORD / TEST_DB_NAME
+□ pip 装 faker + factory-boy + SQLAlchemy
+□ utils/data_factory.py + data_masking.py + jmeter_csv_exporter.py 已部署
+□ 业务表 schema 已就绪（DB 写入需要）
+□ 用例 Excel（用于分析数据需求，可选）
+□ 性能场景需指定并发数（CSV 行数 = 并发数）
+```
+
 ## 📋 执行流程
 
 ### 步骤1：分析数据需求

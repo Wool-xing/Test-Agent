@@ -12,6 +12,17 @@ tools: Read, Write, Edit, Grep, Glob
 /python-script-gen [测试用例 Excel 路径 或 功能描述]
 ```
 
+## 🔔 调用前置准备
+
+```
+□ 测试用例 Excel（workspace/测试用例/testcases_*.xlsx）或功能描述
+□ pytest + pytest-playwright 已装
+□ Playwright 浏览器（playwright install chromium）
+□ conftest.py 已部署项目根
+□ utils/api_retry_util.py 已部署（脚本会 import call_with_retry）
+□ 测试目标 URL → .env TEST_APP_URL / TEST_API_URL
+```
+
 ## 执行流程
 
 ### Step 1：分析用例

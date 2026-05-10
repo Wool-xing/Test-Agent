@@ -12,6 +12,16 @@ tools: Read, Write, Grep, Glob
 /testcase-design [需求描述或功能名称]
 ```
 
+## 🔔 调用前置准备
+
+```
+□ PRD 文档（任意格式：md/pdf/docx/xlsx/pptx/zip/png/url）
+□ 或 requirements-analyst 已生成 requirements_summary_*.json
+□ openpyxl 已装（生成 4 Sheet Excel）
+□ utils/excel_generator.py 部署到 utils/
+□ 业务模块名（用于用例 ID：TC-{MODULE}-{TYPE}-{NUM}）
+```
+
 ## 适用场景
 
 - 需求评审阶段，快速梳理测试点

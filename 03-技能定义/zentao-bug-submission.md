@@ -12,6 +12,18 @@ tools: Read, Write, Bash, Grep, Glob
 /zentao-bug-submission [Bug 描述 或 测试失败日志]
 ```
 
+## 🔔 调用前置准备
+
+```
+□ 禅道实例可访问（ZENTAO_BASE_URL）
+□ .env 填 ZENTAO_ACCOUNT / ZENTAO_PASSWORD（API 凭证）
+□ 禅道 API v1 已启用（管理后台 → 二次开发 → API）
+□ 已知产品 ID（product 字段必填，禅道后台查）
+□ Bug 描述含必备字段：title / 复现步骤 / 预期 / 实际
+□ utils/zentao_bug_manager.py + utils/api_retry_util.py 已部署
+□ 批量场景：test-executor 已输出 regression_summary.json（含 failures 列表）
+```
+
 ## 执行流程
 
 ### Step 1：Bug 信息规范化（bug-manager 执行）

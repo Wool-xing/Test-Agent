@@ -56,6 +56,8 @@ def load_prd(source: Union[str, Path]) -> Dict:
         return _load_image(p)
     if suffix in (".html", ".htm"):
         return _load_html(p)
+    if suffix == ".pptx":
+        return _load_pptx(p)
 
     # 兜底当文本读
     logger.warning(f"未知格式 {suffix}，按文本读取")
@@ -217,6 +219,32 @@ def _load_image(p: Path) -> Dict:
         "text": f"[图片 PRD：{p.name}，需 Claude Code 视觉能力解读，或先用 utils.visual_helper.ocr_image 转文字]",
         "attachments": [], "images": [str(p)],
         "metadata": {"size_bytes": p.stat().st_size, "name": p.name},
+    }
+
+
+# ===== PPTX =====
+
+def _load_pptx(p: Path) -> Dict:
+    """python-pptx 解析 PPT 幻灯片文本"""
+    try:
+        from pptx import Presentation
+    except ImportError:
+        raise RuntimeError("python-pptx 未安装：pip install python-pptx")
+
+    prs = Presentation(str(p))
+    text_parts = []
+    slides_count = len(prs.slides)
+    for i, slide in enumerate(prs.slides, 1):
+        text_parts.append(f"## 幻灯片 {i}")
+        for shape in slide.shapes:
+            if hasattr(shape, "text") and shape.text:
+                text_parts.append(shape.text)
+        text_parts.append("")
+
+    return {
+        "format": "pptx", "source": str(p), "text": "\n".join(text_parts),
+        "attachments": [], "images": [],
+        "metadata": {"slides": slides_count, "name": p.name},
     }
 
 

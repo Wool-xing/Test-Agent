@@ -77,6 +77,18 @@ jobs:
           pip install ruff
           ruff check workspace/自动化脚本/python/ utils/ --select E,F,W --ignore E501
 
+      - name: 依赖漏洞扫描（pip-audit）
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt --strict --format columns
+        continue-on-error: false   # CVE 直接 fail CI
+
+      - name: 依赖安全扫描（safety）
+        run: |
+          pip install safety
+          safety check -r requirements.txt --short-report
+        continue-on-error: true    # safety DB 偶尔限流，不强阻塞
+
       - name: 类型检查
         run: |
           pip install mypy

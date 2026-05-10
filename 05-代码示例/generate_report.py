@@ -223,6 +223,152 @@ def send_all_notifications(summary: Dict):
     }
 
 
+# ===== PDF 报告（reportlab） =====
+
+def generate_pdf_report(data: Dict, output_path: str) -> str:
+    """生成 PDF 测试报告。需 pip install reportlab"""
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import cm
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    except ImportError:
+        raise RuntimeError("reportlab 未安装：pip install reportlab")
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    doc = SimpleDocTemplate(output_path, pagesize=A4,
+                            topMargin=2 * cm, bottomMargin=2 * cm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle("title", parent=styles["Title"], alignment=1)
+
+    story = []
+    story.append(Paragraph(f"测试报告 - {data.get('project_name', '')}", title_style))
+    story.append(Spacer(1, 0.5 * cm))
+    story.append(Paragraph(f"版本: {data.get('version', '')}", styles["Normal"]))
+    story.append(Paragraph(f"环境: {data.get('environment', '')}", styles["Normal"]))
+    story.append(Paragraph(f"日期: {datetime.now():%Y-%m-%d %H:%M}", styles["Normal"]))
+    story.append(Spacer(1, 1 * cm))
+
+    # 摘要表
+    results = data.get("results", {})
+    summary_data = [
+        ["指标", "数值"],
+        ["总用例", str(results.get("total", 0))],
+        ["通过", str(results.get("passed", 0))],
+        ["失败", str(results.get("failed", 0))],
+        ["通过率", f"{results.get('pass_rate', 0):.1%}"],
+        ["覆盖率", f"{data.get('coverage', 0):.1%}"],
+        ["结论", data.get("verdict", "通过")],
+    ]
+    table = Table(summary_data, colWidths=[5 * cm, 8 * cm])
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#366092")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ("FONTSIZE", (0, 0), (-1, -1), 10),
+    ]))
+    story.append(table)
+    story.append(Spacer(1, 0.8 * cm))
+
+    # 性能段
+    perf = data.get("performance")
+    if perf:
+        story.append(Paragraph("性能指标（JMeter）", styles["Heading2"]))
+        perf_data = [
+            ["指标", "实测", "门禁"],
+            ["TPS", str(perf.get("tps", "-")), "≥100"],
+            ["平均响应", f"{perf.get('avg_response_ms', '-')} ms", "≤200ms"],
+            ["P95 响应", f"{perf.get('p95_response_ms', '-')} ms", "≤500ms"],
+            ["错误率", f"{perf.get('error_rate_pct', '-')}%", "<1%"],
+        ]
+        story.append(Table(perf_data, colWidths=[4 * cm, 4 * cm, 4 * cm]))
+        story.append(Spacer(1, 0.5 * cm))
+
+    # 风险
+    risks = data.get("risks", [])
+    if risks:
+        story.append(Paragraph("风险与建议", styles["Heading2"]))
+        for r in risks:
+            story.append(Paragraph(f"• 【{r.get('level', '中')}】 {r.get('description', '')}", styles["Normal"]))
+
+    doc.build(story)
+    logger.info(f"PDF 报告已生成: {output_path}")
+    return output_path
+
+
+# ===== PPTX 摘要（高管汇报）=====
+
+def generate_pptx_summary(data: Dict, output_path: str) -> str:
+    """生成 PPT 摘要（5 页：封面/摘要/缺陷/性能/风险与建议）"""
+    try:
+        from pptx import Presentation
+        from pptx.util import Inches, Pt
+        from pptx.dml.color import RGBColor
+    except ImportError:
+        raise RuntimeError("python-pptx 未安装：pip install python-pptx")
+
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    prs = Presentation()
+
+    # 封面
+    slide = prs.slides.add_slide(prs.slide_layouts[0])
+    slide.shapes.title.text = f"{data.get('project_name', '')} 测试报告"
+    slide.placeholders[1].text = (
+        f"版本: {data.get('version', '')}\n"
+        f"环境: {data.get('environment', '')}\n"
+        f"日期: {datetime.now():%Y-%m-%d}"
+    )
+
+    # 执行摘要
+    slide = prs.slides.add_slide(prs.slide_layouts[5])
+    slide.shapes.title.text = "执行摘要"
+    results = data.get("results", {})
+    text_frame = slide.shapes.placeholders[0].text_frame
+    text_frame.text = (
+        f"总用例: {results.get('total', 0)}    "
+        f"通过率: {results.get('pass_rate', 0):.1%}    "
+        f"覆盖率: {data.get('coverage', 0):.1%}\n"
+        f"结论: {data.get('verdict', '通过')}"
+    )
+
+    # 缺陷
+    slide = prs.slides.add_slide(prs.slide_layouts[5])
+    slide.shapes.title.text = "缺陷统计"
+    bugs = data.get("bugs", {})
+    slide.shapes.placeholders[0].text_frame.text = (
+        f"P0: {bugs.get('p0', 0)} (修复率 {bugs.get('p0_fix_rate', 0):.0%})\n"
+        f"P1: {bugs.get('p1', 0)} (修复率 {bugs.get('p1_fix_rate', 0):.0%})\n"
+        f"P2: {bugs.get('p2', 0)}    P3: {bugs.get('p3', 0)}"
+    )
+
+    # 性能
+    perf = data.get("performance")
+    if perf:
+        slide = prs.slides.add_slide(prs.slide_layouts[5])
+        slide.shapes.title.text = "性能指标"
+        slide.shapes.placeholders[0].text_frame.text = (
+            f"TPS: {perf.get('tps', '-')}\n"
+            f"P95: {perf.get('p95_response_ms', '-')} ms\n"
+            f"错误率: {perf.get('error_rate_pct', '-')}%\n"
+            f"门禁: {perf.get('quality_gate', 'PASS')}"
+        )
+
+    # 风险
+    slide = prs.slides.add_slide(prs.slide_layouts[5])
+    slide.shapes.title.text = "风险与建议"
+    risks_text = "\n".join(
+        f"• 【{r.get('level', '中')}】 {r.get('description', '')}"
+        for r in data.get("risks", [])
+    ) or "无重大风险"
+    slide.shapes.placeholders[0].text_frame.text = risks_text
+
+    prs.save(output_path)
+    logger.info(f"PPTX 摘要已生成: {output_path}")
+    return output_path
+
+
 # ===== CLI =====
 
 def main():
@@ -237,7 +383,7 @@ def main():
     with open(args.data, encoding="utf-8") as f:
         data = json.load(f)
 
-    output = args.output or f"workspace/执行日志/报告/测试报告_{datetime.now().strftime('%Y%m%d')}.docx"
+    output = args.output or f"workspace/测试报告/测试报告_{datetime.now().strftime('%Y%m%d')}.docx"
     generate_test_report(data, output)
 
     if args.notify:

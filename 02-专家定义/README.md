@@ -74,16 +74,6 @@ tools: Read, Write, Bash, Grep, Glob   # 按需添加 Edit
 
 ---
 
-## 添加新 Agent 流程
+## 添加新 Agent
 
-1. 选定分类（核心 / 平台扩展）
-2. 文件命名 `15-XXX.md`（继续递增）
-3. 顶部 YAML frontmatter
-4. 编写职责 / 工具栈 / 模板 / 协作输出
-5. **同步**：
-   - 本 README 加一行
-   - `00-项目导航.md` 加一行
-   - `01-测试主管.md` 路由表（如平台扩展）
-   - `utils/prd_loader.PLATFORM_KEYWORDS` 加关键词（如平台扩展）
-   - `install.sh` + `部署说明.md` 拷贝清单加文件名
-   - 源 MD `Test-Agent工作流搭建.md` 内嵌段
+详见根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md) "添加新 Agent" 章节。

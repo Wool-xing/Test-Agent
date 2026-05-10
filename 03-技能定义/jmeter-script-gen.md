@@ -12,6 +12,18 @@ tools: Read, Write, Edit, Grep, Glob
 /jmeter-script-gen [接口信息 或 业务流程描述]
 ```
 
+## 🔔 调用前置准备
+
+```
+□ Java JRE 17+ 已装（java -version）
+□ JMeter 5.6.3 已装（jmeter --version 可执行，PATH 配好）
+□ data-preparer 已生成 workspace/测试数据/jmeter_users.csv
+□ 目标接口信息：URL（解析为 host/protocol/port 三参，不含协议前缀）
+□ 性能目标：目标 TPS / P95 / 并发数（决定 PERF_MODE）
+□ workspace/自动化脚本/jmeter/ 目录已存在（conftest 自动建）
+□ workspace/执行日志/baselines/perf_baseline.json（基线对比，可选）
+```
+
 ## 数据流（与其他 Agent 闭环）
 
 ```

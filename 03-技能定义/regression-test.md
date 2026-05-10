@@ -8,6 +8,20 @@ tools: Read, Write, Bash, Grep, Glob
 
 > **目标**：在版本迭代或重大变更后，验证新功能正常且老功能未退化。
 
+## 🔔 调用前置准备
+
+```
+□ smoke-test 已通过（前置门禁）
+□ workspace/测试用例/*.xlsx 含 P0+P1 用例
+□ workspace/测试数据/test_data.json 已生成
+□ workspace/自动化脚本/python/ 脚本完整
+□ APP_SRC_PATH 指向被测系统源码（覆盖率指向）
+□ workspace/regression_modules.yaml 配置（git diff 影响分析，可选）
+□ JMeter 5.6.3 + Java JRE（性能阶段）
+□ workspace/执行日志/baselines/perf_baseline.json（基线对比，首次跑会建）
+□ workspace/执行日志/history/*.xml（Flaky 检测，至少 2 次执行后才有）
+```
+
 ## 📋 执行流程
 
 ### 阶段1：变更影响分析（5 分钟）

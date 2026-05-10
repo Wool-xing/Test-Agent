@@ -236,7 +236,7 @@ output:
   - Word 测试报告（含性能基准对比）
   - Excel 数据报告
   - 企业微信/飞书/钉钉 三端通知（自动跳过未配置）
-保存：workspace/执行日志/报告/
+保存：workspace/测试报告/
 ```
 
 ### Step 11：最终决策（test-lead）

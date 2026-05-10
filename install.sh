@@ -43,10 +43,11 @@ mkdir -p "$PROJECT_ROOT"/.claude/{agents,skills}
 mkdir -p "$PROJECT_ROOT"/.github/workflows
 mkdir -p "$PROJECT_ROOT"/utils
 mkdir -p "$PROJECT_ROOT"/src
-mkdir -p "$PROJECT_ROOT"/workspace/{测试计划,需求分析,测试用例,测试数据}
+mkdir -p "$PROJECT_ROOT"/workspace/{测试计划,需求分析,测试用例,测试数据,测试报告}
+mkdir -p "$PROJECT_ROOT"/workspace/测试用例/charters
 mkdir -p "$PROJECT_ROOT"/workspace/自动化脚本/python/{pages,api,tests,scripts}
 mkdir -p "$PROJECT_ROOT"/workspace/自动化脚本/jmeter
-mkdir -p "$PROJECT_ROOT"/workspace/执行日志/{allure-results,jmeter-results,jmeter-report,coverage-report,baselines,history,截图,报告}
+mkdir -p "$PROJECT_ROOT"/workspace/执行日志/{allure-results,jmeter-results,jmeter-report,coverage-report,baselines,history,截图}
 
 # ===== 5. 拷贝 Agent / Skill 定义 =====
 echo "→ 拷贝 Agent 定义（14 个）..."
@@ -68,7 +69,7 @@ cp "$TEMPLATE_DIR/04-配置文件/requirements.txt" "$PROJECT_ROOT/"
 [[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/04-配置文件/.env.example" "$PROJECT_ROOT/.env"
 
 # ===== 7. utils（12 个 .py + __init__）=====
-echo "→ 拷贝 utils（24 个）..."
+echo "→ 拷贝 utils（49 个）..."
 for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
          excel_generator.py flaky_detector.py generate_report.py \
          jmeter_csv_exporter.py jmeter_result_parser.py \
@@ -76,7 +77,15 @@ for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
          mobile_driver.py miniprogram_runner.py desktop_driver.py \
          visual_helper.py iot_helper.py media_validator.py \
          tracing_validator.py mq_helper.py ai_validator.py \
-         prd_loader.py websocket_helper.py protocol_helper.py; do
+         prd_loader.py websocket_helper.py protocol_helper.py \
+         security_scanner.py network_throttle.py chaos_helper.py \
+         soak_runner.py ux_metrics.py compatibility_matrix.py \
+         state_machine_tester.py pairwise_generator.py bdd_runner.py \
+         web_vitals_collector.py api_security_scanner.py fuzzer.py \
+         db_test_helper.py contract_test.py openapi_test_gen.py \
+         push_test.py a11y_scanner.py i18n_checker.py \
+         mutation_runner.py dora_metrics.py blockchain_test.py ai_adversarial.py \
+         slo_validator.py email_sender.py suite_minimizer.py; do
     cp "$TEMPLATE_DIR/05-代码示例/${f}" "$PROJECT_ROOT/utils/"
 done
 

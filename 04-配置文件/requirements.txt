@@ -1,95 +1,143 @@
-# ===== 测试框架核心 =====
-pytest==7.4.3
-pytest-xdist==3.5.0          # 并行执行
-pytest-rerunfailures==13.0   # 失败重试（默认关，命令行显式开启）
-pytest-timeout==2.2.0        # 用例超时
-pytest-cov==4.1.0            # 代码覆盖率
-pytest-mock==3.12.0          # Mock 工具（unittest.mock 包装）
-pytest-playwright==0.4.4     # Playwright 官方 pytest 插件
-allure-pytest==2.13.2        # Allure 报告（注：还需手动安装 allure CLI，见部署说明）
+# ============================================================
+# 依赖版本管理策略：
+#   ① == 锁定（CI 可复现）+ Dependabot 周扫描自动 PR + pip-audit 拦 CVE
+#   ② [稳定层] 升级需跑全量回归（regression-test）
+#   ③ [可选]   按需启用，注释解开 pip install
+#   ④ [外部]   非 pip 包，需独立安装（见部署说明）
+#   ⑤ 详细策略见 01-快速开始/配置清单.md "依赖管理章节"
+# ============================================================
 
-# ===== UI 自动化 =====
-playwright==1.40.0
+# ===== [稳定层] 测试框架核心 =====
+pytest==7.4.3                     # [稳定层] major 升级 dependabot 已锁
+pytest-xdist==3.5.0                # [稳定层] 并行执行
+pytest-rerunfailures==13.0         # [稳定层] 失败重试
+pytest-timeout==2.2.0              # [稳定层] 用例超时
+pytest-cov==4.1.0                  # [稳定层] 代码覆盖率
+pytest-mock==3.12.0                # [稳定层] Mock 工具
+pytest-playwright==0.4.4           # [稳定层] Playwright 官方 pytest 插件
+allure-pytest==2.13.2              # [稳定层] Allure 报告
 
-# ===== API 测试 =====
-requests==2.31.0
+# ===== [稳定层] UI 自动化 =====
+playwright==1.40.0                 # [稳定层] major 升级 dependabot 已锁
 
-# ===== 性能测试 =====
-# 主：JMeter 5.6.3（Java 工具，需单独安装。见 01-快速开始/部署说明.md "JMeter 安装"）
-# 备：Locust（Python，开发期快速压测）
-locust==2.25.0
+# ===== [稳定层] API 测试 =====
+requests==2.31.0                   # [稳定层]
 
-# ===== 测试数据工厂 =====
-faker==20.1.0
-factory-boy==3.3.0
+# ===== [稳定层] 性能测试 =====
+locust==2.25.0                     # [稳定层] 备用 Python 压测
+# JMeter 5.6.3 [外部]，需独立装 Java + JMeter（见部署说明）
 
-# ===== 数据库 =====
-psycopg2-binary==2.9.9       # PostgreSQL（按实际数据库选其一）
-pymysql==1.1.0               # MySQL
-SQLAlchemy==2.0.25           # ORM（data_factory 通用插入/删除依赖）
+# ===== [稳定层] 测试数据工厂 =====
+faker==20.1.0                      # [稳定层]
+factory-boy==3.3.0                 # [稳定层]
 
-# ===== 配置 =====
-PyYAML==6.0.1                # regression_modules.yaml 解析
+# ===== [稳定层] 数据库 =====
+psycopg2-binary==2.9.9             # [稳定层] PostgreSQL（按实际数据库选其一）
+pymysql==1.1.0                     # [稳定层] MySQL
+SQLAlchemy==2.0.25                 # [稳定层] ORM
 
-# ===== Excel/文档（PRD 多格式加载也用）=====
-openpyxl==3.1.2
-python-docx==1.1.0
-pdfplumber==0.10.3                # PDF 解析（主）
-PyPDF2==3.0.1                     # PDF 解析（备）
-beautifulsoup4==4.12.2            # HTML/URL PRD 解析
+# ===== [稳定层] 配置 =====
+PyYAML==6.0.1                      # [稳定层] regression_modules.yaml 解析
 
-# ===== 工具 =====
-python-dotenv==1.0.0         # .env 加载
-tenacity==8.2.3              # 重试库（call_with_retry 主用方案 + tenacity 装饰器备选）
-loguru==0.7.2                # 增强日志
+# ===== [稳定层] Excel/文档（PRD 多格式加载也用）=====
+openpyxl==3.1.2                    # [稳定层] Excel
+python-docx==1.1.0                 # [稳定层] Word
+pdfplumber==0.10.3                 # [稳定层] PDF 解析（主）
+PyPDF2==3.0.1                      # [稳定层] PDF 解析（备）
+beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
 
-# ===== 通知（直连 SDK/curl 方式，无需额外包；MCP 通道当前关闭，参考 .mcp.json）=====
-# 企业微信/飞书/钉钉 通知通过 utils/generate_report.py 中 requests.post 直连 webhook 实现
+# ===== [稳定层] 工具 =====
+python-dotenv==1.0.0               # [稳定层] .env 加载
+tenacity==8.2.3                    # [稳定层] 重试库
+loguru==0.7.2                      # [稳定层] 增强日志
 
-# ===== 扩展平台（按需启用，注释掉即不装）=====
+# ===== [稳定层] 验收测试 BDD =====
+pytest-bdd==7.0.0                  # [稳定层] BDD 框架
 
-# 移动端（10-移动测试）
-Appium-Python-Client==4.0.0
-selenium==4.15.0
-websocket-client==1.7.0           # 同步 WebSocket（小程序协议 + EXE WS 测试）
-websockets==12.0                  # 异步 WebSocket（高并发性能测试）
+# ===== [稳定层] 契约测试 =====
+jsonschema==4.21.0                 # [稳定层] JSON Schema 验证
 
-# 桌面（11-桌面测试）
-# pywinauto==0.6.8                # 仅 Windows
-# uiautomation==2.0.20            # 仅 Windows
-pyautogui==0.9.54                 # 跨平台键鼠 + 截图
-mss==9.0.1                        # 跨平台高速截图
-psutil==5.9.6                     # 进程性能采集
+# ===== [稳定层] 报告 =====
+reportlab==4.0.7                   # [稳定层] PDF 报告
+python-pptx==0.6.23                # [稳定层] PPTX 报告 + PRD pptx 输入
 
-# 视觉/游戏（12-视觉游戏测试）
-airtest==1.3.5
-opencv-python==4.8.1.78
-scikit-image==0.22.0
-imagehash==4.3.1
-pytesseract==0.3.10               # OCR（外部需装 tesseract 二进制）
-Pillow==10.1.0
-# paddleocr==2.7.0.3              # 备选 OCR（重，按需启用）
+# ===== [稳定层] 通知（webhook 直连，无需 SDK 包，requests 已含）=====
 
-# 系统集成（13-系统集成测试）
-paramiko==3.4.0                   # SSH
-pyserial==3.5                     # 串口
-paho-mqtt==1.6.1                  # MQTT
-# pymodbus==3.5.4                 # Modbus（按需启用）
-ffmpeg-python==0.2.0              # FFmpeg 命令封装（外部需装 ffmpeg 二进制）
-kafka-python==2.0.2               # Kafka（或 confluent-kafka）
-pika==1.3.2                       # RabbitMQ
+# ============================================================
+# 扩展平台测试（按需启用）
+# ============================================================
 
-# AI/ML（14-AI模型测试）
-scikit-learn==1.4.0
-scipy==1.11.4
-# alibi-detect==0.12.0            # 漂移高级检测（按需启用，依赖较重）
-# deepeval==0.20.50               # LLM 评估（按需启用）
+# ===== [可选] 移动端（10-移动测试）=====
+Appium-Python-Client==4.0.0        # [可选] Android/iOS 自动化
+selenium==4.15.0                   # [可选] WebDriver 协议
+websocket-client==1.7.0            # [稳定层] 同步 WebSocket（小程序协议 + EXE WS 测试）
+websockets==12.0                   # [稳定层] 异步 WebSocket（高并发性能测试）
 
-# ===== 注意：以下为外部工具，需独立安装（见部署说明）=====
+# ===== [可选] 桌面（11-桌面测试）=====
+# pywinauto==0.6.8                 # [可选] 仅 Windows
+# uiautomation==2.0.20              # [可选] 仅 Windows
+pyautogui==0.9.54                  # [可选] 跨平台键鼠 + 截图
+mss==9.0.1                         # [可选] 跨平台高速截图
+psutil==5.9.6                      # [稳定层] 进程性能采集
+
+# ===== [可选] 视觉/游戏（12-视觉游戏测试）=====
+airtest==1.3.5                     # [可选] 跨平台图像识别测试
+opencv-python==4.8.1.78             # [可选] 图像处理
+scikit-image==0.22.0               # [可选] SSIM 视觉对比
+imagehash==4.3.1                   # [可选] 感知哈希
+pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
+Pillow==10.1.0                     # [可选] 图像
+# paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
+
+# ===== [可选] 系统集成（13-系统集成测试）=====
+paramiko==3.4.0                    # [可选] SSH
+pyserial==3.5                      # [可选] 串口
+paho-mqtt==1.6.1                   # [可选] MQTT
+# pymodbus==3.5.4                  # [可选] Modbus 工业协议
+ffmpeg-python==0.2.0               # [可选] FFmpeg 命令封装（外部需装 ffmpeg）
+kafka-python==2.0.2                # [可选] Kafka
+pika==1.3.2                        # [可选] RabbitMQ
+
+# ===== [可选] AI/ML（14-AI模型测试）=====
+scikit-learn==1.4.0                # [可选] 模型评估
+scipy==1.11.4                      # [可选] 漂移检测（KS）
+# alibi-detect==0.12.0             # [可选] 漂移高级检测
+# deepeval==0.20.50                # [可选] LLM 评估
+
+# ===== [可选] 安全扫描 =====
+bandit==1.7.6                      # [稳定层] SAST Python 代码扫描
+safety==3.0.1                      # [稳定层] 依赖 CVE 检查
+# OWASP ZAP DAST [外部]：daemon 模式（zap.sh -daemon -port 8080）
+# Burp Suite Pro [外部]：商业工具，启 REST API
+# pip-audit                        # CI 临时安装，无需固定
+
+# ===== [可选] 区块链测试 =====
+# web3==6.15.1                     # [可选] 以太坊 + EVM 链
+# slither-analyzer==0.10.0         # [可选] 智能合约静态分析（需 solc）
+
+# ===== [可选] AI 对抗 =====
+# foolbox==3.3.4                   # [可选] CV 对抗
+# adversarial-robustness-toolbox==1.17.1  # [可选]
+
+# ===== [可选] 变异测试 =====
+# mutmut==2.4.5                    # [可选] 变异测试 mutmut
+
+# ===== 弱网 / 混沌 / soak（utils.network_throttle / chaos_helper / soak_runner）=====
+# tc + netem [外部]：Linux 内置（需 root）
+# Toxiproxy [外部]：docker run shopify/toxiproxy
+# stress-ng [外部]：apt install stress-ng（chaos_helper 自动 fallback Python loop）
+
+# ============================================================
+# 外部工具（[外部]，非 pip，需独立安装。详见 01-快速开始/部署说明.md）
+# ============================================================
 # - JMeter 5.6.3（Java 8+ 必装）
 # - Allure CLI 2.x
 # - Java JRE 8+（JMeter / Allure 均依赖）
-# - tesseract（OCR 二进制，apt/brew/scoop 安装）
-# - ffmpeg + ffprobe（音视频处理）
-# - Appium server（npm install -g appium，移动端必装）
-# - 微信开发者工具（小程序测试，单独下载 dmg/exe）
+# - tesseract（OCR 二进制）
+# - ffmpeg + ffprobe（音视频）
+# - Appium server（npm install -g appium）
+# - 微信开发者工具（小程序）
+# - lighthouse（npm install -g lighthouse，A11y/Web Vitals）
+# - pa11y（npm install -g pa11y，A11y）
+# - Foundry / forge（区块链智能合约）
+# - kubectl（K8s 混沌测试）

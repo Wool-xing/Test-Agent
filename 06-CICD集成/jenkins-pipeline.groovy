@@ -92,7 +92,7 @@ pipeline {
                     mkdir -p workspace/执行日志/coverage-report
                     mkdir -p workspace/执行日志/baselines
                     mkdir -p workspace/执行日志/history
-                    mkdir -p workspace/执行日志/报告
+                    mkdir -p workspace/测试报告
                     mkdir -p workspace/测试用例
                     mkdir -p workspace/测试数据
                     mkdir -p workspace/自动化脚本/python/pages

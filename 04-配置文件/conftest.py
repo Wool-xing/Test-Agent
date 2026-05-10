@@ -242,6 +242,7 @@ def pytest_configure(config):
         "workspace/需求分析",
         "workspace/测试用例",
         "workspace/测试数据",
+        "workspace/测试报告",
         "workspace/自动化脚本/python",
         "workspace/自动化脚本/jmeter",
         "workspace/执行日志/allure-results",
@@ -251,7 +252,6 @@ def pytest_configure(config):
         "workspace/执行日志/coverage-report",
         "workspace/执行日志/baselines",
         "workspace/执行日志/history",
-        "workspace/执行日志/报告",
         # 扩展平台产出目录
         "workspace/执行日志/mobile-perf",
         "workspace/执行日志/monkey",
@@ -271,6 +271,27 @@ def pytest_configure(config):
         "workspace/执行日志/ai-drift",
         "workspace/执行日志/ai-fairness",
         "workspace/执行日志/llm-cases",
+        # 非功能 8 维度产出
+        "workspace/执行日志/security",
+        "workspace/执行日志/compat",
+        "workspace/执行日志/weak-network",
+        "workspace/执行日志/soak",
+        "workspace/执行日志/chaos",
+        "workspace/执行日志/ux",
+        "workspace/执行日志/usability",
+        "workspace/执行日志/exploratory",
+        "workspace/测试用例/charters",
+        # 新增维度产出
+        "workspace/执行日志/web-vitals",
+        "workspace/执行日志/a11y",
+        "workspace/执行日志/i18n",
+        "workspace/执行日志/mutation",
+        "workspace/执行日志/dora",
+        "workspace/执行日志/blockchain",
+        "workspace/执行日志/adversarial",
+        "workspace/自动化脚本/python/features",
+        "workspace/自动化脚本/python/i18n",
+        "workspace/自动化脚本/python/pacts",
     ]
     for d in workflow_dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
