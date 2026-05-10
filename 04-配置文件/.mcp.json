@@ -1,0 +1,14 @@
+{
+  "_comment": "MCP 服务配置。当前仅启用 filesystem。zentao/wechat/feishu/dingtalk 通知与 Bug 提交目前走 SDK/curl 直连（参考 utils/zentao_bug_manager.py / utils/generate_report.py）。如需启用 MCP 通道，自行实现对应 mcp_server 模块后追加配置即可。",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${PROJECT_ROOT:-./workspace}"
+      ],
+      "description": "文件系统访问 - 读写 workspace 目录中的测试文件"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+version: 2
+
+updates:
+  # ===== Python pip 依赖 =====
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "pip"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    groups:
+      # pytest 生态一起升
+      pytest-ecosystem:
+        patterns:
+          - "pytest"
+          - "pytest-*"
+          - "allure-pytest"
+      # 安全工具
+      security-tools:
+        patterns:
+          - "bandit"
+          - "safety"
+      # UI 自动化
+      ui-automation:
+        patterns:
+          - "playwright"
+          - "Appium-Python-Client"
+          - "selenium"
+          - "pywinauto"
+          - "uiautomation"
+      # 性能
+      performance:
+        patterns:
+          - "locust"
+      # 数据 / 文档
+      data-doc:
+        patterns:
+          - "openpyxl"
+          - "python-docx"
+          - "python-pptx"
+          - "reportlab"
+          - "pdfplumber"
+          - "PyPDF2"
+          - "PyYAML"
+          - "beautifulsoup4"
+      # 数据库
+      database:
+        patterns:
+          - "psycopg2-binary"
+          - "pymysql"
+          - "SQLAlchemy"
+      # 协议 / 链路
+      protocols:
+        patterns:
+          - "requests"
+          - "websocket-client"
+          - "websockets"
+          - "paho-mqtt"
+          - "kafka-python"
+          - "pika"
+          - "paramiko"
+          - "pyserial"
+      # AI / 数据科学
+      ai-ml:
+        patterns:
+          - "scikit-learn"
+          - "scipy"
+          - "faker"
+          - "factory-boy"
+    ignore:
+      # 锁死的核心库不允许 dependabot 升 major（手动评估）
+      - dependency-name: "pytest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "playwright"
+        update-types: ["version-update:semver-major"]
+
+  # ===== GitHub Actions =====
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+
+  # ===== npm（Claude Code CLI / lighthouse / pa11y / playwright 等）=====
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "deps(npm)"
