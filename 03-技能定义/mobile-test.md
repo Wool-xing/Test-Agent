@@ -8,13 +8,13 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /mobile-test [APP/小程序描述 或 已有 .apk/.ipa 路径]
 ```
 
 ## 🔔 开测前准备清单（必看）
 
-```
+```text
 Android：
 □ APK 路径 → .env ANDROID_APP_PATH
 □ 包名 + 启动 Activity → ANDROID_PACKAGE / ANDROID_ACTIVITY
@@ -178,7 +178,7 @@ driver.orientation = "LANDSCAPE"
 
 ## 输出文件
 
-```
+```text
 workspace/
 ├── 自动化脚本/python/mobile/             # 移动端 page object + 用例
 ├── 自动化脚本/python/miniprogram/        # 小程序用例

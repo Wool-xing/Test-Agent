@@ -10,7 +10,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 🔔 调用前置准备
 
-```
+```text
 □ env-manager 已通过基础健康检查
 □ workspace/测试用例/*.xlsx 存在含 P0 用例（或 testcase-designer 先生成）
 □ workspace/测试数据/test_data.json 存在（或 data-preparer 兜底）
@@ -35,7 +35,7 @@ tools: Read, Write, Bash, Grep, Glob
 
 ### 阶段2：P0 用例筛选（1 分钟）
 
-```
+```text
 - 读取 workspace/测试用例/*.xlsx
 - 过滤条件：优先级 = P0
 - 排除标记 @pytest.mark.flaky 用例（已隔离）
@@ -90,7 +90,7 @@ allure generate workspace/执行日志/allure-results \
 ## 输出示例
 
 **通过：**
-```
+```text
 ✅ 冒烟测试通过
 模块：用户登录模块 V1.0.0
 执行时间：8 分 32 秒
@@ -99,7 +99,7 @@ P0 用例：25 个，通过 25 个，失败 0 个（100%）
 ```
 
 **失败：**
-```
+```text
 ❌ 冒烟测试失败，阻止部署
 模块：用户登录模块 V1.0.0
 执行时间：7 分 15 秒
