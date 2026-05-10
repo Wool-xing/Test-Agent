@@ -52,9 +52,16 @@ trap 'restore_user_data; rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null' EXIT
 # ===== 1. 检查工具 =====
 need() { command -v "$1" >/dev/null 2>&1 || { echo "❌ 缺少 $1"; exit 1; }; }
 need git
-need python3
 need node
 need npm
+
+# Python 3 检测：Windows 上 python3 可能是 MS Store stub（exit 49），fallback python
+PYTHON_BIN="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || true)"
+if [[ -z "$PYTHON_BIN" ]] || ! "$PYTHON_BIN" --version 2>&1 | grep -q "Python 3"; then
+    echo "❌ 缺少 Python 3（python3 / python 均不可用）"
+    exit 1
+fi
+echo "→ 使用 Python: $PYTHON_BIN ($("$PYTHON_BIN" --version 2>&1))"
 
 # ===== 2. 克隆模板到临时目录 =====
 TEMPLATE_DIR="$(mktemp -d)/Test-Agent工作流搭建"
@@ -130,10 +137,16 @@ cp "$TEMPLATE_DIR/06-CICD集成/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsf
 cd "$PROJECT_ROOT"
 if [[ ! -d ".venv" ]]; then
     echo "→ 创建虚拟环境..."
-    python3 -m venv .venv
+    "$PYTHON_BIN" -m venv .venv
 fi
-# shellcheck disable=SC1091
-source .venv/bin/activate
+# Windows Git Bash venv 路径是 Scripts/activate；Linux/Mac 是 bin/activate
+if [[ -f ".venv/Scripts/activate" ]]; then
+    # shellcheck disable=SC1091
+    source .venv/Scripts/activate
+else
+    # shellcheck disable=SC1091
+    source .venv/bin/activate
+fi
 
 echo "→ 安装 Python 依赖..."
 pip install -r requirements.txt -q
