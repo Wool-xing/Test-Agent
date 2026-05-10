@@ -27,7 +27,7 @@ def test_homepage_title(page):
 @pytest.mark.p0
 @pytest.mark.smoke
 @pytest.mark.ui
-def test_search_box_present(page):
-    """TC-DEMO-UI-002: 首页含搜索按钮"""
+def test_get_started_link_present(page):
+    """TC-DEMO-UI-002: 首页含 Get started 链接（hero CTA）"""
     home = PlaywrightHomePage(page).goto()
-    assert home.has_search_button(), "搜索按钮缺失"
+    assert home.has_get_started_link(), "Get started 链接缺失"
