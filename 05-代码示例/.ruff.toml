@@ -1,0 +1,16 @@
+# utils 专用 ruff 配置
+line-length = 120
+
+[lint]
+select = ["E", "F", "W"]
+ignore = [
+    "E501",   # 行长（超 120 也容忍）
+    "F401",   # 未使用 import（utils 内大量 try-import 探测模式，故意报错友好）
+    "E402",   # 顶部 import（lazy import 设计）
+    "E722",   # bare except（fallback 兜底场景）
+    "F841",   # 未使用变量（部分 utils 用作 capture）
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"*_test.py" = ["F401", "F811"]
