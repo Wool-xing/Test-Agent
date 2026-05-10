@@ -119,8 +119,10 @@ jobs:
 
       - name: 安装基础依赖
         run: |
+          set -o pipefail
+          python -m pip install --upgrade pip
           pip install -r 04-配置文件/requirements.txt 2>&1 | tail -20 || \
-            pip install pytest faker requests websocket-client pdfplumber python-docx openpyxl PyYAML python-dotenv tenacity loguru beautifulsoup4
+            pip install pytest faker factory-boy requests websocket-client pdfplumber python-docx openpyxl PyYAML python-dotenv tenacity loguru beautifulsoup4 jsonschema
 
       - name: 核心 utils 导入测试
         run: |

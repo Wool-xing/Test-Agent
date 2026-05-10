@@ -9,6 +9,8 @@ ignore = [
     "E402",   # 顶部 import（lazy import 设计）
     "E722",   # bare except（fallback 兜底场景）
     "F841",   # 未使用变量（部分 utils 用作 capture）
+    "E702",   # 一行多语句分号（CLI argparse add_parser; add_argument 紧凑风格）
+    "E741",   # 变量名歧义（utils 临时变量 l/I/O 容忍）
 ]
 
 [lint.per-file-ignores]
