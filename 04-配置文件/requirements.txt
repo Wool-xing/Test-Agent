@@ -43,7 +43,7 @@ PyYAML==6.0.1                      # [稳定层] regression_modules.yaml 解析
 openpyxl==3.1.2                    # [稳定层] Excel
 python-docx==1.1.0                 # [稳定层] Word
 pdfplumber==0.10.3                 # [稳定层] PDF 解析（主）
-pypdf==5.1.0                       # [稳定层] PDF 解析（备）—— 替代停维护的 PyPDF2，修 GHSA infinite loop
+pypdf==6.10.2                      # [稳定层] PDF 解析（备）—— 替代停维护的 PyPDF2，5.1→6.10 修 ~22 个 RAM/infinite-loop CVE
 beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
 
 # ===== [稳定层] 工具 =====
@@ -86,7 +86,7 @@ opencv-python==4.8.1.78             # [可选] 图像处理
 scikit-image==0.22.0               # [可选] SSIM 视觉对比
 imagehash==4.3.1                   # [可选] 感知哈希
 pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
-Pillow==11.0.0                     # [可选] 图像（修 GHSA RCE/buffer overflow/PDF DoS/integer overflow）
+Pillow==12.2.0                     # [可选] 图像（11→12.2 修 CVE-2026-25990 PSD heap overflow/FITS GZIP bomb/font integer overflow 等 5 个 high+moderate）
 # paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
 
 # ===== [可选] 系统集成（13-系统集成测试）=====
