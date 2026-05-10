@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 音视频校验：FFmpeg 元信息 / 帧抽取 / SSIM / 音画同步
 被引用方：13-系统集成测试 agent
@@ -7,6 +8,7 @@ import json
 import logging
 import os
 import subprocess
+from fractions import Fraction
 from pathlib import Path
 from typing import Dict, List
 
@@ -37,7 +39,7 @@ def get_video_meta(path: str) -> Dict:
         "width": video.get("width"),
         "height": video.get("height"),
         "video_codec": video.get("codec_name"),
-        "fps": eval(video.get("r_frame_rate", "0/1")) if video.get("r_frame_rate") else None,
+        "fps": float(Fraction(video["r_frame_rate"])) if video.get("r_frame_rate") else None,
         "audio_codec": audio.get("codec_name"),
         "audio_sample_rate": audio.get("sample_rate"),
     }
