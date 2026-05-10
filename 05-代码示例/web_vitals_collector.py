@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 前端性能 Web Vitals 采集（LCP / FID / CLS / FCP / TTFB）
 被引用方：06-自动化脚本 / Web 测试场景

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 契约测试（Contract Testing） - 微服务消费者-提供者契约
 被引用方：API 测试 / 微服务集成

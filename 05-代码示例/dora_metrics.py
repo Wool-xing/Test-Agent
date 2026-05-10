@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 DORA 4 大指标 - DevOps 成熟度度量
 - 部署频率（Deployment Frequency）

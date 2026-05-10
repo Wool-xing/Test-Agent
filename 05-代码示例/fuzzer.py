@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 模糊测试（Fuzzing）- 随机/变异输入探测崩溃 + 异常处理
 被引用方：安全测试 / 健壮性测试

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 禅道 Bug 管理客户端 - 使用指数退避重试
 权威 severity 映射：1=P0, 2=P1, 3=P2, 4=P3

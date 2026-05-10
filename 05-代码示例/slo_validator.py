@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 SLO/SLI 性能契约验证（SRE 视角）
 被引用方：test-lead / 性能测试
