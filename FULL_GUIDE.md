@@ -1,8 +1,12 @@
-# Test-Agent 测试全流程专家团队
+# Test-Agent 完整指南（FULL_GUIDE）
 
-**项目目录名**：`Test-Agent工作流搭建`
-**版本**：V1.0.0
-**更新日期**：2026-05-10
+> **本文档定位**：完整详细指南（架构 / 三视角矩阵 / 技术栈深度 / 闭环约定 / 跨工具兼容）。
+> 简明入口 → [README.md](README.md) ；按职责分类速查 → [00-项目导航.md](00-项目导航.md)。
+
+**项目代号**：`test-agent-team`（全英文）
+**项目目录名**：`Test-Agent`（中文别名 `Test-Agent工作流搭建`）
+**版本**：V1.0.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
+**更新日期**：2026-05-11
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
 
 ---
@@ -11,7 +15,7 @@
 
 | 路径 | 文档 | 说明 | 适用对象 |
 |------|------|------|----------|
-| 根目录 | README.md | 本文档（项目入口） | 所有用户 |
+| 根目录 | README.md | 简明入口（≤ 200 行） | 所有用户 |
 | **根目录** | **00-项目导航.md** | **按职责分类速查（通用流程 / 平台专项 / 协议 / 输入 / CI）** | **所有用户** |
 | `01-快速开始/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
 | `01-快速开始/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
@@ -28,7 +32,7 @@
 
 ## 🚀 核心特性
 
-### 8 位专家 + 1 位协调者
+### 13 位专家 + 1 位协调者（核心 8 + 平台扩展 5 + test-lead）
 
 | 角色 | 职责 |
 |------|------|
@@ -177,9 +181,9 @@
       /单元（70%）/         ← pytest + pytest-mock，秒级反馈
 ```
 
-**总覆盖率 ~99%**（含闭环：Bug 禅道 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
+**总覆盖率 ~95%**（含闭环：Bug 禅道 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
 
-剩 ~1% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
+剩 ~5% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
 
 ---
 
@@ -228,14 +232,14 @@
 
 ```bash
 # Mac / Linux 一行远程部署
-curl -fsSL https://raw.githubusercontent.com/YOUR-USER/Test-Agent工作流搭建/main/install.sh | bash -s -- /path/to/your-test-project
+curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 
 # 或先 clone 再本地跑
-git clone https://github.com/YOUR-USER/Test-Agent工作流搭建.git
+git clone https://github.com/Wool-xing/Test-Agent.git
 bash Test-Agent工作流搭建/install.sh /path/to/your-test-project
 ```
 
-> 替换 `YOUR-USER` 为你的 GitHub 用户名。Windows / 手动方式见 `01-快速开始/部署说明.md`。
+> 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `01-快速开始/部署说明.md`。
 
 `install.sh` 自动完成：克隆模板 → 装 Claude Code → 建目录 → 拷贝全部文件 → 装 Python 依赖 + Playwright。
 
@@ -339,10 +343,10 @@ claude
 
 ```
 your-test-project/
-├── .claude/{agents,skills}/           ← 9 agent + 8 skill
+├── .claude/{agents,skills}/           ← 14 agent + 13 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
-├── utils/                             ← 12 个 .py + __init__
+├── utils/                             ← 49 个 .py + __init__
 ├── src/                               ← 被测系统源码（cov 指向）
 ├── workspace/
 │   ├── 测试计划/  需求分析/  测试用例/  测试数据/
@@ -388,7 +392,7 @@ your-test-project/
 | `.claude/skills/*.md`（斜杠技能） | ✅ Claude Code 独有 | 其他工具无对等机制 |
 | `.mcp.json`（MCP 协议） | 半依赖 | MCP 是开放协议；Claude Desktop / Cursor 部分支持；OpenAI 系也开始支持 |
 | `Agent` 工具（test-lead 调用子专家） | ✅ Claude Code 独有 | 其他工具用人工编排 / 多 agent 框架替代 |
-| `utils/*.py`（12 个） | ❌ 纯 Python | 跨工具完全可用 |
+| `utils/*.py`（49 个，含 `__init__.py`） | ❌ 纯 Python | 跨工具完全可用 |
 | pytest / Playwright / JMeter / Allure | ❌ 跨工具 | 完全可用 |
 | CI/CD（yml / groovy） | ❌ 跨工具 | 完全可用 |
 | conftest.py / .env / requirements.txt | ❌ 标准 Python | 完全可用 |
@@ -408,8 +412,148 @@ your-test-project/
 
 ---
 
-## 📜 LICENSE / CHANGELOG / CONTRIBUTING
+## 🏗️ 测试架构合理性深度（金字塔 / 左移 / 右移 / 可观测 / 门禁）
 
-- LICENSE：项目按需选择（推荐 MIT / Apache-2.0）
-- CHANGELOG：建议建 `CHANGELOG.md` 记录版本演进（V1.0.0 首版）
-- CONTRIBUTING：维护者按需补充贡献流程
+> 本节是项目方法论核心。回答："为什么这套架构合理？" "全球顶尖测试团队怎么看？"
+
+### 1. 测试金字塔 2024 现代版
+
+**经典金字塔**（Mike Cohn 2009）：单元 70% / 集成 20% / E2E 10%。
+
+**2024 现代调整**（Google Testing Blog / Microsoft Engineering Fundamentals 综合）：
+
+```
+            ┌─────────────────────┐
+            │  E2E / 视觉回归  10% │  ← Playwright / Appium / Airtest（慢但必要）
+            ├─────────────────────┤
+            │  系统/契约      20% │  ← API + 服务间 + Pact + jsonschema + Mock
+            ├─────────────────────┤
+            │  集成/组件      30% │  ← pytest + pytest-mock + WireMock
+            ├─────────────────────┤
+            │  单元           40% │  ← pytest（秒级反馈，含变异测试）
+            └─────────────────────┘
+                ↑
+        变异测试（mutation_runner）反向验证用例有效性
+```
+
+**与经典模型差异**：
+- **不再 70%/20%/10% 一刀切**，按"变更频率 + 阻塞代价"重新分布
+- 单元层增加变异测试 — 用例有效性必须可量化（不只覆盖率）
+- 契约层独立成层（Pact/jsonschema/openapi_test_gen）— 微服务时代必备
+- 视觉回归归 E2E 层（不另设层）— SSIM/OCR 与 E2E 一同 owner
+
+**Test-Agent 落地**：
+- 单元：`pytest + pytest-mock`（项目自身 utils 层 Phase 2 补齐自测）
+- 集成：`pytest` 内嵌 + `wiremock 3.3.1` Mock Server
+- 契约：`utils/contract_test.py` (Pact + jsonschema) + `utils/openapi_test_gen.py`
+- E2E：`Playwright`（Web/Electron）+ `Appium`（移动）+ `Airtest`（视觉）
+- 变异：`utils/mutation_runner.py`（mutmut）
+
+### 2. Shift-Left（左移）— 测试介入越早越便宜
+
+**Boehm 法则**：缺陷修复成本随开发阶段呈指数增长（需求 1× → 设计 5× → 编码 10× → 测试 50× → 生产 200×）。
+
+**Shift-Left 实施层级**（从最早到最晚）：
+
+| 层 | 介入点 | 工具 / utils | 阻断力 |
+|----|--------|------------|--------|
+| L1 | **需求阶段** | `requirements-analyst` 双轨输出（MD + JSON）+ 风险矩阵 | 弱（评审） |
+| L2 | **设计阶段** | `testcase-designer` 等价类/边界值/状态迁移/配对测试 + 风险矩阵 | 弱（评审） |
+| L3 | **IDE 编码时** | ruff + mypy + IDE 实时提示 | 强（编辑器红线） |
+| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 14/13/49 文件统计 | 强（阻断 commit） |
+| L5 | **PR gate** | CodeQL + pip-audit + safety + ci.yml 全套 | 强（阻断合入） |
+| L6 | **静态分析** | Bandit（Python SAST）+ ZAP/Burp Pro（DAST） | 中（发现/修） |
+| L7 | **契约测试** | `utils/contract_test.py` consumer-side / provider-side | 强（CI 阻断） |
+
+**Test-Agent 现状评估**：L1-L5 已串通；L6 在 utils 已有 `security_scanner.py`；L7 utils 存在但未串成"自动 PR 阻断"链路。
+
+**Phase 2 收尾点**：把 L7 契约测试串成"PR 改了 OpenAPI spec → 自动跑 contract → 不通过阻断合入"链路。
+
+### 3. Shift-Right（右移）— 生产即测试环境
+
+**核心理念**：测试不止于发布前；通过生产监测 + 安全发布机制 + 主动故障注入持续验证质量。
+
+**Shift-Right 实施层级**：
+
+| 层 | 机制 | 工具 / utils | Test-Agent 状态 |
+|----|------|------------|----------------|
+| R1 | **合成监控**（Synthetic Monitoring） | 定时跑核心路径（登录/下单），24h 覆盖 | ⚪ 路线图 Phase 3 加 `utils/synthetic_monitor.py` |
+| R2 | **真实用户监测**（RUM） | Web Vitals 上报 + 前端错误堆栈 | ✅ `utils/web_vitals_collector.py`（采集端） |
+| R3 | **链路追踪**（Distributed Tracing） | Jaeger / Zipkin + traceID 业务断言 | ✅ `utils/tracing_validator.py` |
+| R4 | **金丝雀发布**（Canary）+ **特性开关**（Feature Flag） | 渐进放量 + 回滚阀 | ⚪ 路线图 Phase 3 加 `utils/canary_runner.py` + `feature_flag_validator.py` |
+| R5 | **混沌工程**（Chaos Engineering） | 主动注入 CPU/内存/磁盘/网络/进程/k8s 故障 | ✅ `utils/chaos_helper.py` |
+| R6 | **灾备演练**（Failover Drill） | 主动 kill-pod + 数据一致性校验 | ✅ `utils/chaos_helper.kill_pod` |
+| R7 | **A/B 测试**（Experimentation） | 多版本流量切分验证 | ⚪ 业务方按需自加 |
+| R8 | **DORA 4 指标**（部署频率 / Lead Time / 失败率 / MTTR） | DevOps 健康度量 | ✅ `utils/dora_metrics.py` |
+| R9 | **SLO/错误预算** | SLI 阈值 + 错误预算燃烧率 | ✅ `utils/slo_validator.py` |
+
+**Phase 3 收尾点**：补 R1（合成监控）+ R4（canary/feature flag），完成 Shift-Right 闭环。
+
+### 4. 可观测性（Observability）三柱 + 测试可视化
+
+**三柱**（OpenTelemetry 标准）：
+- **Traces**（链路）：`utils/tracing_validator.py`
+- **Metrics**（指标）：JMeter result + DORA + flaky rate
+- **Logs**（日志）：pytest log + logcat / iOS syslog（mobile_driver）+ 系统日志（desktop_driver）
+
+**测试侧可观测**（独立于业务可观测性）：
+
+| 维度 | 数据源 | 现状 | 可视化目标 |
+|------|--------|------|----------|
+| 用例通过率 | junit-xml | ✅ Allure | Allure 报告 |
+| 覆盖率 | coverage.xml | ✅ pytest-cov HTML | 覆盖率 HTML |
+| 性能基线 | jmeter-results/result.jtl | ✅ JMeter HTML + baseline.json | JMeter HTML |
+| Flaky 率 | history/junit-xml | ✅ flaky_detector | ⚪ 缺统一仪表盘 |
+| DORA 4 指标 | git log + 缺陷库 | ✅ dora_metrics.py | ⚪ 缺统一仪表盘 |
+| 缺陷密度/逃逸率/重开率 | 禅道 | ✅ bug-manager 内嵌 | ⚪ 缺统一仪表盘 |
+| 用例减重信号 | 覆盖率 + Jaccard | ✅ suite_minimizer | ⚪ 报告内嵌 |
+| 变异分数 | mutmut | ✅ mutation_runner | ⚪ 报告内嵌 |
+
+**Phase 3 收尾点**：整合 flaky/DORA/缺陷密度/变异分数到统一 dashboard（Grafana 或 静态 HTML）。
+
+### 5. 质量门禁分层（Layered Quality Gates）
+
+**为什么分层**：一刀切门禁要么过严卡死开发节奏，要么过松形同虚设。分层 = 不同阶段不同严苛度。
+
+**Test-Agent 五层门禁**：
+
+| 层 | 触发 | 关键阈值 | 不达标处置 | 实现 |
+|----|------|---------|----------|------|
+| **smoke** | 每次 commit/PR | P0 通过率 ≥95% + 0 新 P0 Bug + API ≤3000ms | 阻断后续 | `utils/ci_quality_gate.py::GATES['smoke']` |
+| **regression** | merge 到 main / develop | P0=100% / P1≥95% / 总体≥90% / cov ≥80% / Flaky <5% | 评估遗留风险 | `utils/ci_quality_gate.py::GATES['regression_p0_p1']` |
+| **performance_ci_quick** | CI 默认（5 并发） | TPS≥20 / P95≤800ms / err <1% | 警告不阻 | `utils/jmeter_result_parser.DEFAULT_GATES_CI_QUICK` |
+| **performance_full** | release/* 分支 + 手动（50 并发） | TPS≥100 / P95≤500ms / 基线回归 <20% | 阻断 release | `utils/jmeter_result_parser.DEFAULT_GATES_FULL` |
+| **release** | 上线前 | 上述全 PASS + bug-manager 审批 + test-lead 决策 | 不上线 | `02-专家定义/01-测试主管.md::上线决策` |
+
+**门禁可配置性**：阈值集中在 `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*`。Phase 2 抽 `quality_gate_engine.py` + yaml 驱动，让用户改阈值不需改代码。
+
+**Flaky vs Reruns 设计哲学**：
+- **冒烟阶段**：不开 reruns，**保留 flaky 信号**（Flaky 是质量问题，不是网络问题）
+- **回归阶段**：开 reruns（`--reruns=2 --reruns-delay=5`），**追求快反馈**
+- **Flaky 检测**：`utils/flaky_detector.py` 离线扫 history，失败率 >30% 标 quarantine
+- **Quarantined 用例**：单独 marker `@flaky`，不计入门禁，每周清理
+
+### 6. 调整路径（路线图 Phase 2-4 落地点）
+
+> 详细路线见根目录战略地图（私有源 `Test-Agent工作流搭建.md` 第十三节）。
+
+| 维度 | 现状 | 路线图阶段 | 关键交付 |
+|------|------|----------|---------|
+| **金字塔单元层** | 弱（utils 自身无测试） | Phase 2 (M4-M5) | `tests/test_utils_*.py` 全覆盖 + 变异测试反向用 |
+| **Shift-Left L7 契约链路** | utils 雏形未串通 | Phase 2 (M5-M6) | OpenAPI 改动 → contract → PR 阻断 |
+| **Shift-Right R1 合成监控** | 缺 | Phase 3 (M7-M8) | `utils/synthetic_monitor.py` |
+| **Shift-Right R4 canary + feature flag** | 缺 | Phase 3 (M7-M8) | `utils/canary_runner.py` + `feature_flag_validator.py` |
+| **可观测统一 dashboard** | 散落 HTML 报告 | Phase 3 (M8-M9) | DORA + 缺陷密度 + flaky + 变异分数 → Grafana / 静态 HTML 模板 |
+| **门禁引擎抽象** | 阈值写死代码 | Phase 2 (M4) | `utils/quality_gate_engine.py` + yaml 驱动 |
+| **AI 测试深化** | 漂移 + LLM eval | Phase 4 (M11) | + prompt 版本回归 + RAG 召回精度 + token 成本门禁 + hallucination rate |
+
+---
+
+## 📜 LICENSE / CHANGELOG / CONTRIBUTING / SECURITY
+
+- **LICENSE**：MIT（详见 [`LICENSE`](LICENSE)）
+- **CHANGELOG**：详见 [`CHANGELOG.md`](CHANGELOG.md)（V1.0.0 首版 + W1-W3 增量）
+- **VERSION**：详见 [`VERSION`](VERSION)
+- **CONTRIBUTING**：详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)（含同步铁律 + RACI 矩阵）
+- **SECURITY**：详见 [`SECURITY.md`](SECURITY.md)（漏洞报告流程 + GitHub Security Advisories 入口）
+- **CODE_OF_CONDUCT**：详见 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)（基于 Contributor Covenant 2.1）
