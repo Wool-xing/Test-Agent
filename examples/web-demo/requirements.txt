@@ -1,6 +1,6 @@
 # Web Demo 最小依赖
 # 完整 Test-Agent 工作流依赖见 04-配置文件/requirements.txt
 
-pytest==7.4.3
+pytest==9.0.3
 pytest-playwright==0.4.4
 playwright==1.40.0
