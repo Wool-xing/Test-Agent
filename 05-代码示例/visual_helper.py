@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 视觉测试辅助：模板匹配 / OCR / SSIM 视觉回归 / diff 高亮
 被引用方：12-视觉游戏测试 agent / visual-test skill

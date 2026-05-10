@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 国际化（i18n）/ 本地化（l10n）测试
 被引用方：UX / 兼容 / 全球化产品

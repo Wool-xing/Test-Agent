@@ -1,0 +1,210 @@
+name: 模板仓库自检
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "30 2 * * 1"   # 每周一 02:30 UTC（北京时间 10:30）
+
+# 全局最小权限（CodeQL 要求显式声明，避免默认 read-write 全权限）
+permissions:
+  contents: read
+
+jobs:
+  # ===== 1. utils/ 代码质量 =====
+  lint-utils:
+    name: utils/ Ruff + 类型检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Ruff 检查（用 utils/.ruff.toml 配置）
+        run: |
+          pip install ruff
+          ruff check 05-代码示例/ --config 05-代码示例/.ruff.toml
+
+      - name: 语法检查（py_compile）
+        run: |
+          python -m compileall 05-代码示例/ -q
+
+  # ===== 2. 依赖漏洞扫描 =====
+  security-audit:
+    name: 依赖 CVE 扫描
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: 升级 pip
+        run: python -m pip install --upgrade pip
+
+      - name: pip-audit 扫描
+        run: |
+          pip install pip-audit
+          pip-audit -r 04-配置文件/requirements.txt --format columns || true
+        continue-on-error: true   # CI 模板仓库 audit 仅做参考，不强阻（避免依赖冲突误杀）
+
+      - name: safety 扫描
+        run: |
+          pip install safety
+          safety check -r 04-配置文件/requirements.txt --short-report
+        continue-on-error: true
+
+  # ===== 3. install.sh 脚本检查 =====
+  shell-check:
+    name: install.sh 语法
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          severity: warning
+          scandir: '.'
+          additional_files: 'install.sh'
+
+  # ===== 4. YAML / JSON 语法 =====
+  config-syntax:
+    name: 配置文件语法
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: 验证 YAML
+        run: |
+          pip install pyyaml
+          python -c "
+          import yaml, sys
+          for f in ['.github/dependabot.yml', '.github/workflows/ci.yml', '06-CICD集成/github-actions-test.yml']:
+              try:
+                  yaml.safe_load(open(f))
+                  print(f'✅ {f}')
+              except Exception as e:
+                  print(f'❌ {f}: {e}')
+                  sys.exit(1)
+          "
+
+      - name: 验证 JSON
+        run: |
+          python -c "
+          import json, sys
+          for f in ['04-配置文件/.mcp.json']:
+              try:
+                  json.load(open(f))
+                  print(f'✅ {f}')
+              except Exception as e:
+                  print(f'❌ {f}: {e}')
+                  sys.exit(1)
+          "
+
+  # ===== 5. utils 模块导入自检 =====
+  import-check:
+    name: utils 模块可导入
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: 安装基础依赖
+        run: |
+          set -o pipefail
+          python -m pip install --upgrade pip
+          pip install -r 04-配置文件/requirements.txt 2>&1 | tail -20 || \
+            pip install pytest faker factory-boy requests websocket-client pdfplumber python-docx openpyxl PyYAML python-dotenv tenacity loguru beautifulsoup4 jsonschema
+
+      - name: 核心 utils 导入测试
+        run: |
+          cd 05-代码示例
+          python -c "
+          import sys
+          modules = [
+              'api_retry_util', 'data_factory', 'data_masking',
+              'excel_generator', 'flaky_detector', 'jmeter_csv_exporter',
+              'jmeter_result_parser', 'regression_scope',
+              'ci_quality_gate', 'prd_loader',
+          ]
+          failed = []
+          for m in modules:
+              try:
+                  __import__(m)
+                  print(f'✅ {m}')
+              except Exception as e:
+                  failed.append((m, str(e)))
+                  print(f'❌ {m}: {e}')
+          sys.exit(1 if failed else 0)
+          "
+
+  # ===== 6. Markdown 链接检查 =====
+  markdown-links:
+    name: Markdown 内部链接有效性
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 检查内部链接
+        run: |
+          set -e
+          fail=0
+          for md in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*"); do
+            # 提取 markdown 内部链接 [...](xxx.md) 形式
+            grep -oE "\[[^]]*\]\(([^)]+)\)" "$md" | grep -oE "\(([^)]+)\)" | tr -d "()" | while read link; do
+              # 跳过 URL/锚点
+              [[ "$link" =~ ^https?:// ]] && continue
+              [[ "$link" =~ ^# ]] && continue
+              [[ "$link" =~ ^mailto: ]] && continue
+              # 解析相对路径
+              dir=$(dirname "$md")
+              target="$dir/$link"
+              # 去 #anchor 部分
+              target_file="${target%%#*}"
+              if [ ! -f "$target_file" ] && [ ! -d "$target_file" ]; then
+                echo "❌ $md → $link (target=$target_file 不存在)"
+                fail=1
+              fi
+            done || true
+          done
+          [ $fail -eq 0 ] && echo "✅ 所有内部链接有效"
+
+  # ===== 7. 文件统计校验 =====
+  file-count:
+    name: Agents/Skills/Utils 数量 + 私有 MD 防护
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 统计核对
+        run: |
+          AGENTS=$(ls 02-专家定义/[0-9]*.md | wc -l)
+          SKILLS=$(ls 03-技能定义/*.md | grep -v README | wc -l)
+          UTILS=$(ls 05-代码示例/*.py | wc -l)
+          echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
+          [ "$AGENTS" = "14" ] || { echo "❌ Agents 数量不符（期 14，实 $AGENTS）"; exit 1; }
+          [ "$SKILLS" = "13" ] || { echo "❌ Skills 数量不符（期 13，实 $SKILLS）"; exit 1; }
+          [ "$UTILS" = "49" ] || { echo "❌ Utils 数量不符（期 49，实 $UTILS）"; exit 1; }
+          echo "✅ 文件统计正确"
+
+      - name: 验证 .gitignore 排除源 MD
+        run: |
+          if [ -f "Test-Agent工作流搭建.md" ]; then
+            echo "❌ 私有源 MD 未应该出现在仓库"
+            exit 1
+          fi
+          grep "Test-Agent工作流搭建.md" .gitignore || \
+            { echo "❌ .gitignore 未排除源 MD"; exit 1; }
+          echo "✅ 私有源 MD 受保护"

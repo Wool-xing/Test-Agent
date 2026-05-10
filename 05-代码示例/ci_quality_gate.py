@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 CI 质量门禁统一检查工具
 被引用方：06-CICD/github-actions-test.yml / jenkins-pipeline.groovy

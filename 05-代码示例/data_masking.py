@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 敏感数据脱敏工具
 被引用方：05-数据准备 agent / 日志输出

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 API 安全测试 - OWASP API Top 10 覆盖
 - API1: BOLA（越权访问对象）

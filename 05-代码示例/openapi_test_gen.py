@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 OpenAPI / Swagger 自动用例生成（Schemathesis 风格）
 被引用方：API 测试 / 契约 / 模糊测试

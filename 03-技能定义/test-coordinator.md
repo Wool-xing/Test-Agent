@@ -1,6 +1,6 @@
 ---
 name: test-coordinator
-description: 完整测试流程编排技能。输入需求文档或功能描述，自动调用 8 位专家 + test-lead（协调者）完成从需求分析到报告生成的完整测试流程。适用于新功能测试、迭代测试。
+description: 完整测试流程编排技能。输入需求文档或功能描述，自动调用核心 8 位专家 + test-lead（协调者，按 PRD 路由调用平台扩展 5 位专家）完成从需求分析到报告生成的完整测试流程。适用于新功能测试、迭代测试。
 tools: Read, Write, Bash, Grep, Glob
 ---
 
@@ -8,13 +8,13 @@ tools: Read, Write, Bash, Grep, Glob
 
 ## 触发方式
 
-```
+```text
 /test-coordinator [需求描述或文档路径]
 ```
 
 ## 流程总览
 
-```
+```text
 需求输入（任意格式：md/pdf/docx/xlsx/zip/截图/URL）
    ↓
 utils.prd_loader.load_prd() ─→ 提取文本 + metadata
@@ -56,7 +56,7 @@ test-lead（最终决策：功能+性能双门禁）
 
 清单按检测到的平台拼装。例：
 
-```
+```text
 > /test-coordinator
 > 帮我测试这个 Windows EXE 程序
 
@@ -82,7 +82,7 @@ test-lead（最终决策：功能+性能双门禁）
 
 ### Step 1：PRD 加载 + 平台识别 + 任务分析（test-lead）
 
-```
+```text
 input: 用户提供的需求文档（任意格式）或自然语言描述
 处理:
   1. 调 utils.prd_loader.load_prd(source) → 文本 + metadata
@@ -99,7 +99,7 @@ output:
 
 ### 路由分支（按平台识别结果动态编排）
 
-```
+```text
 通用核心链路（8 必经）：
   requirements-analyst → testcase-designer → env-manager → data-preparer
                                                           ↓
@@ -124,7 +124,7 @@ output:
 
 ### Step 2：需求分析（requirements-analyst）
 
-```
+```text
 input: 需求文档 / PRD / 用户故事
 output:
   - workspace/需求分析/requirements_analysis_{日期}.md
@@ -133,7 +133,7 @@ output:
 
 ### Step 3：用例设计（testcase-designer）
 
-```
+```text
 input: 需求 JSON 摘要
 output:
   - workspace/测试用例/testcases_[模块]_[日期].xlsx（4 Sheet）
@@ -143,14 +143,14 @@ output:
 
 ### Step 4：环境健康（env-manager）
 
-```
+```text
 output: workspace/执行日志/环境检查_{时间戳}.json
 失败 → 重试 10/20/40s → 仍失败则阻止后续步骤
 ```
 
 ### Step 5：数据准备（data-preparer，env 通过后启动）
 
-```
+```text
 output:
   - workspace/测试数据/test_data.json（pytest 功能测试，conftest fixture 直接消费）
   - workspace/测试数据/jmeter_users.csv（JMeter 参数化）
@@ -158,7 +158,7 @@ output:
 
 ### Step 6：脚本开发（automation-engineer）
 
-```
+```text
 output:
   6a. pytest 功能脚本：workspace/自动化脚本/python/
   6b. JMeter JMX：workspace/自动化脚本/jmeter/test_plan.jmx（调用 /jmeter-script-gen）
@@ -167,7 +167,7 @@ output:
 
 ### Step 7：冒烟门禁
 
-```
+```text
 执行: /smoke-test
 条件: P0 通过率 ≥95% 且 无新增 P0 Bug
 失败 → 停止，通知 test-lead，等待修复
@@ -218,7 +218,7 @@ python -m utils.jmeter_result_parser \
 
 ### Step 9：Bug 管理（bug-manager）
 
-```
+```text
 input:
   - 功能失败列表（failure_type=product_bug）
   - 性能门禁失败项
@@ -229,7 +229,7 @@ output:
 
 ### Step 10：报告生成（report-generator）
 
-```
+```text
 output:
   - Allure 交互式报告（功能）
   - JMeter HTML 报告（性能）
@@ -241,7 +241,7 @@ output:
 
 ### Step 11：最终决策（test-lead）
 
-```
+```text
 output:
   - 功能门禁判定
   - 性能门禁判定（按 mode 选择 full / ci_quick 阈值）
@@ -284,7 +284,7 @@ output:
 
 ## 输出文件清单
 
-```
+```text
 workspace/
 ├── 测试计划/
 │   └── test_plan_[项目]_[日期].md         # test-lead 输出（IEEE 829 风格）

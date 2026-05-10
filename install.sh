@@ -17,16 +17,64 @@ echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="
 
+# ===== Idempotency：保留用户敏感数据 =====
+PRESERVE_FILES=(".env" "workspace/测试数据/test_data.json"
+                "workspace/执行日志/baselines/perf_baseline.json"
+                "workspace/regression_modules.yaml")
+BACKUP_DIR=""
+if [[ -d "$PROJECT_ROOT" ]]; then
+    BACKUP_DIR="$(mktemp -d -t test-agent-backup-XXXXXX)"
+    echo "→ 检测到已有项目，备份用户数据到 $BACKUP_DIR"
+    for f in "${PRESERVE_FILES[@]}"; do
+        if [[ -f "$PROJECT_ROOT/$f" ]]; then
+            mkdir -p "$BACKUP_DIR/$(dirname "$f")"
+            cp "$PROJECT_ROOT/$f" "$BACKUP_DIR/$f"
+            echo "  备份: $f"
+        fi
+    done
+fi
+
+# 完成时恢复用户数据
+restore_user_data() {
+    if [[ -n "$BACKUP_DIR" ]] && [[ -d "$BACKUP_DIR" ]]; then
+        echo "→ 恢复用户数据..."
+        for f in "${PRESERVE_FILES[@]}"; do
+            if [[ -f "$BACKUP_DIR/$f" ]]; then
+                cp "$BACKUP_DIR/$f" "$PROJECT_ROOT/$f"
+                echo "  恢复: $f"
+            fi
+        done
+        rm -rf "$BACKUP_DIR"
+    fi
+}
+trap 'restore_user_data; [[ -n "${TEMPLATE_DIR:-}" ]] && rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null || true' EXIT
+
 # ===== 1. 检查工具 =====
 need() { command -v "$1" >/dev/null 2>&1 || { echo "❌ 缺少 $1"; exit 1; }; }
 need git
-need python3
 need node
 need npm
 
+# Python 3 检测：Windows 上 python3 可能是 MS Store stub（exit 49 不输出版本），逐个测真可用
+PYTHON_BIN=""
+for cand in python3 python py; do
+    if command -v "$cand" >/dev/null 2>&1; then
+        ver_out="$("$cand" --version 2>&1 || true)"
+        if [[ "$ver_out" == Python\ 3* ]]; then
+            PYTHON_BIN="$cand"
+            break
+        fi
+    fi
+done
+if [[ -z "$PYTHON_BIN" ]]; then
+    echo "❌ 缺少 Python 3（python3 / python / py 均不可用）"
+    exit 1
+fi
+echo "→ 使用 Python: $PYTHON_BIN ($("$PYTHON_BIN" --version 2>&1))"
+
 # ===== 2. 克隆模板到临时目录 =====
 TEMPLATE_DIR="$(mktemp -d)/Test-Agent工作流搭建"
-trap 'rm -rf "$(dirname "$TEMPLATE_DIR")"' EXIT
+# （restore_user_data trap 已在前置 idempotency 段统一处理）
 
 echo "→ 克隆模板..."
 git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$TEMPLATE_DIR"
@@ -68,7 +116,7 @@ cp "$TEMPLATE_DIR/04-配置文件/.mcp.json"        "$PROJECT_ROOT/"
 cp "$TEMPLATE_DIR/04-配置文件/requirements.txt" "$PROJECT_ROOT/"
 [[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/04-配置文件/.env.example" "$PROJECT_ROOT/.env"
 
-# ===== 7. utils（12 个 .py + __init__）=====
+# ===== 7. utils（49 个 .py + __init__）=====
 echo "→ 拷贝 utils（49 个）..."
 for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
          excel_generator.py flaky_detector.py generate_report.py \
@@ -98,12 +146,22 @@ cp "$TEMPLATE_DIR/06-CICD集成/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsf
 cd "$PROJECT_ROOT"
 if [[ ! -d ".venv" ]]; then
     echo "→ 创建虚拟环境..."
-    python3 -m venv .venv
+    "$PYTHON_BIN" -m venv .venv
 fi
-# shellcheck disable=SC1091
-source .venv/bin/activate
+# Windows Git Bash venv 路径是 Scripts/activate；Linux/Mac 是 bin/activate
+if [[ -f ".venv/Scripts/activate" ]]; then
+    # shellcheck disable=SC1091
+    source .venv/Scripts/activate
+else
+    # shellcheck disable=SC1091
+    source .venv/bin/activate
+fi
 
 echo "→ 安装 Python 依赖..."
+# Windows GBK 默认编码读 UTF-8 requirements 会 UnicodeDecodeError；强制 UTF-8 mode
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+python -m pip install --upgrade pip -q
 pip install -r requirements.txt -q
 playwright install chromium --with-deps 2>/dev/null || echo "⚠️ Playwright deps 安装失败，UI 测试需手动 'playwright install chromium --with-deps'"
 

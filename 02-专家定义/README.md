@@ -22,7 +22,7 @@
 
 ### 流程依赖关系
 
-```
+```text
 test-lead 协调
    ↓
 requirements-analyst → testcase-designer → [并行] env-manager + data-preparer →

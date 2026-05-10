@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 WebSocket 测试辅助：同步 + 异步客户端 / 心跳 / 重连 / 并发性能
 被引用方：06-自动化脚本 agent / 11-桌面测试 agent（EXE+WS 混合场景）
