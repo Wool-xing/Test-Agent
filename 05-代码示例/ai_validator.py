@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 AI/ML 模型校验：模型评估 / 漂移检测 / 公平性 / LLM 输出
 被引用方：14-AI模型测试 agent

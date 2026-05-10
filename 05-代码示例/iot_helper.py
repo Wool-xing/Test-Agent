@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 IoT / 嵌入式辅助：SSH / 串口 / MQTT
 被引用方：13-系统集成测试 agent

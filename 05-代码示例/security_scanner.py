@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 安全扫描：SAST（代码静态分析）+ DAST（运行时扫描）+ 依赖漏洞 + Header / TLS
 被引用方：15-安全测试 agent / security-test skill

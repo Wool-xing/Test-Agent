@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 消息队列测试辅助：Kafka / RabbitMQ
 被引用方：13-系统集成测试 agent

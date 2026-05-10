@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """
 SMTP 邮件发送（含附件）
 被引用方：09-报告生成 / 报告分发场景
