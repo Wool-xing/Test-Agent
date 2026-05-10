@@ -1,6 +1,6 @@
 ---
 name: test-coordinator
-description: 完整测试流程编排技能。输入需求文档或功能描述，自动调用 8 位专家 + test-lead（协调者）完成从需求分析到报告生成的完整测试流程。适用于新功能测试、迭代测试。
+description: 完整测试流程编排技能。输入需求文档或功能描述，自动调用核心 8 位专家 + test-lead（协调者，按 PRD 路由调用平台扩展 5 位专家）完成从需求分析到报告生成的完整测试流程。适用于新功能测试、迭代测试。
 tools: Read, Write, Bash, Grep, Glob
 ---
 
