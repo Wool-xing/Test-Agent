@@ -37,14 +37,14 @@ pymysql==1.1.0                     # [稳定层] MySQL
 SQLAlchemy==2.0.25                 # [稳定层] ORM
 
 # ===== [稳定层] 配置 =====
-PyYAML==6.0.1                      # [稳定层] regression_modules.yaml 解析
+PyYAML==6.0.3                      # [稳定层] regression_modules.yaml 解析
 
 # ===== [稳定层] Excel/文档（PRD 多格式加载也用）=====
-openpyxl==3.1.2                    # [稳定层] Excel
-python-docx==1.1.0                 # [稳定层] Word
-pdfplumber==0.10.3                 # [稳定层] PDF 解析（主）
+openpyxl==3.1.5                    # [稳定层] Excel
+python-docx==1.2.0                 # [稳定层] Word
+pdfplumber==0.11.9                 # [稳定层] PDF 解析（主）
 PyPDF2==3.0.1                      # [稳定层] PDF 解析（备）
-beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
+beautifulsoup4==4.14.3             # [稳定层] HTML/URL PRD 解析
 
 # ===== [稳定层] 工具 =====
 python-dotenv==1.0.0               # [稳定层] .env 加载
@@ -58,8 +58,8 @@ pytest-bdd==7.0.0                  # [稳定层] BDD 框架
 jsonschema==4.21.0                 # [稳定层] JSON Schema 验证
 
 # ===== [稳定层] 报告 =====
-reportlab==4.0.7                   # [稳定层] PDF 报告
-python-pptx==0.6.23                # [稳定层] PPTX 报告 + PRD pptx 输入
+reportlab==4.5.0                   # [稳定层] PDF 报告
+python-pptx==1.0.2                # [稳定层] PPTX 报告 + PRD pptx 输入
 
 # ===== [稳定层] 通知（webhook 直连，无需 SDK 包，requests 已含）=====
 
