@@ -12,6 +12,27 @@
 
 ## [Unreleased]
 
+### Added(V1.9.0-alpha · 用例多格式导出 · 用户自选 · 2026-05-12)
+
+- **`runtime/exporters/` 新模块**(对标主宪章 §5 多格式 I/O):
+  - `base.py`:`TestCaseTree` + `TestCaseNode` IR + `Exporter` ABC + `REGISTRY` + `@register` 装饰器
+  - `xmind.py`:XMind 8/ZEN/2020+ `.xmind`(ZIP:content.json + metadata.json + manifest.json,P0→priority-1 marker 自动转,无第三方 lib)
+  - `markmap.py`:Markmap `.md`(frontmatter + nested headings/list,GitHub README 直渲,markmap.js / VSCode 插件兼容)
+  - `opml.py`:OPML 2.0 `.opml`(标准 XML,MindManager / Workflowy / Word / OmniOutliner 通用)
+  - `INDEX.md`:索引 + IR 结构 + CLI 用法
+- **CLI 子命令 `tagent export`**:
+  ```bash
+  tagent export plan.json --format xmind   --out workspace/测试用例/login.xmind
+  tagent export plan.json --format markmap --out workspace/测试用例/login.md
+  tagent export plan.json --format opml    --out workspace/测试用例/login.opml
+  tagent export plan.json --format all     --out-dir workspace/测试用例/
+  ```
+- **`/testcase-design` skill 扩**:description 加多格式声明;末尾加 V1.9 思维导图 / 大纲段(Excel 仍是默认)
+- **保留**:Excel 4-Sheet(`utils/excel_generator.py`)不动,§27 简洁优先
+- **扩展点 P2 留位**:freemind / plantuml / mermaid-mindmap(按需加)
+- 烟雾测试:3 exporter × sample TestCaseTree 全过(content.json 解析正常 / OPML XML 解析正常 / Markmap frontmatter 完整)
+- 版本 V1.8.0-alpha → V1.9.0-alpha
+
 ### Added(V1.8.0-alpha · build-your-own-x 教学扩 + Marketplace 4 lane · 2026-05-12)
 
 - **精髓库扩**:`_精髓库/build-your-own-x.md`(codecrafters/build-your-own-x curated list 萃取);加 INDEX 条目

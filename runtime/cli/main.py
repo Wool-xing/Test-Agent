@@ -247,6 +247,69 @@ def uninstall(name: str = typer.Argument(...)):
 
 
 @app.command()
+def export(
+    plan: str = typer.Argument(..., help="TestCaseTree JSON path (testcase-designer output)"),
+    format: str = typer.Option("xmind", "--format", help="xmind | markmap | opml | all"),
+    out: str = typer.Option("", "--out", help="output file (single format only)"),
+    out_dir: str = typer.Option("workspace/测试用例", "--out-dir", help="dir when --format all"),
+):
+    """Export TestCaseTree to xmind / markmap / opml / all (charter §5 多格式 I/O)."""
+    from runtime.exporters import xmind as _x  # noqa: F401 ensure registration
+    from runtime.exporters import markmap as _m  # noqa: F401
+    from runtime.exporters import opml as _o  # noqa: F401
+    from runtime.exporters.base import REGISTRY, TestCaseNode, TestCaseTree, get_exporter
+
+    plan_path = Path(plan)
+    if not plan_path.is_file():
+        console.print(f"[red]plan not found:[/] {plan}")
+        raise typer.Exit(2)
+    raw = json.loads(plan_path.read_text(encoding="utf-8"))
+    tree = _tree_from_dict(raw)
+
+    formats = sorted(REGISTRY) if format == "all" else [format]
+    written: list[Path] = []
+    for fmt in formats:
+        if fmt not in REGISTRY:
+            console.print(f"[red]unknown format:[/] {fmt}; available={sorted(REGISTRY)}")
+            raise typer.Exit(2)
+        exp = get_exporter(fmt)
+        if format == "all" or not out:
+            target = Path(out_dir) / f"{tree.project_name}{exp.extension}"
+        else:
+            target = Path(out)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        final = exp.export(tree, target)
+        written.append(final)
+        console.print(f"[green]{fmt}[/] → {final}")
+    if format == "all":
+        console.print(f"[bold]done[/]: {len(written)} files written under {out_dir}")
+
+
+def _tree_from_dict(d: dict) -> "TestCaseTree":
+    from runtime.exporters.base import TestCaseNode, TestCaseTree
+
+    def _node(n: dict) -> TestCaseNode:
+        return TestCaseNode(
+            title=n.get("title", "(untitled)"),
+            kind=n.get("kind", "feature"),
+            priority=n.get("priority"),
+            preconditions=list(n.get("preconditions", [])),
+            expected=list(n.get("expected", [])),
+            notes=n.get("notes", ""),
+            tags=list(n.get("tags", [])),
+            id=n.get("id", ""),
+            children=[_node(c) for c in n.get("children", [])],
+        )
+
+    return TestCaseTree(
+        project_name=d.get("project_name", "untitled"),
+        root=_node(d.get("root", {"title": "root"})),
+        version=d.get("version", "1.0"),
+        author=d.get("author", "Test-Agent"),
+    )
+
+
+@app.command()
 def verify(
     source: str = typer.Argument(...),
     skip_sandbox: bool = typer.Option(False, "--skip-sandbox"),
