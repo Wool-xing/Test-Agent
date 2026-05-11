@@ -84,7 +84,7 @@ psutil==5.9.6                      # [稳定层] 进程性能采集
 airtest==1.3.5                     # [可选] 跨平台图像识别测试
 opencv-python==4.13.0.92             # [可选] 图像处理
 scikit-image==0.22.0               # [可选] SSIM 视觉对比
-imagehash==4.3.1                   # [可选] 感知哈希
+imagehash==4.3.2                   # [可选] 感知哈希
 pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
 Pillow==12.2.0                     # [可选] 图像（11→12.2 修 CVE-2026-25990 PSD heap overflow/FITS GZIP bomb/font integer overflow 等 5 个 high+moderate）
 # paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
