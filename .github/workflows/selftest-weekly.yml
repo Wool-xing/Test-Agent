@@ -1,0 +1,64 @@
+name: 周自检 · L4 真 LLM e2e（主宪章 §33）
+
+on:
+  schedule:
+    # 周一 03:00 UTC（北京时间 11:00）
+    - cron: "0 3 * * 1"
+  workflow_dispatch:    # 手动触发用于调试
+
+permissions:
+  contents: read
+
+# 仅 main 分支 push 触发,fork PR 不跑（防 secrets 泄露,主宪章 §30）
+jobs:
+  selftest-weekly:
+    name: L4 · 真 LLM e2e
+    # 仅当 secrets.ANTHROPIC_API_KEY 存在时跑(fork 仓库默认拿不到)
+    if: ${{ github.repository == 'Wool-xing/Test-Agent' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r 04-配置文件/requirements.txt 2>&1 | tail -10
+          pip install litellm  # 真 LLM 调用必需
+
+      - name: L1 frontmatter lint
+        run: python -m runtime.healthcheck.agent_smoke
+
+      - name: L3 真 LLM e2e
+        env:
+          TAGENT_LLM_PROVIDER: claude
+          TAGENT_LLM_PROVIDER_FALLBACK: ollama
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          mkdir -p discussions
+          VER=$(cat VERSION)
+          TS=$(date +%Y%m%d_%H%M%S)
+          python -m runtime.cli.main selftest --e2e --pass-threshold 0.80 \
+            2>&1 | tee discussions/selftest_${VER}_${TS}_e2e.log
+          python -m runtime.cli.main doctor --agents --probe \
+            2>&1 | tee discussions/selftest_${VER}_${TS}_probe.log
+          echo "✅ L4 周自检 PASS"
+
+      - name: 上传自检日志为 artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-weekly-${{ github.run_id }}
+          path: discussions/selftest_*.log
+          retention-days: 90
+
+      - name: 失败通知（占位 · 接入飞书/钉钉 webhook 时填）
+        if: failure()
+        run: |
+          echo "::warning::L4 周自检失败,日志已上传 artifact;手动审查后修复 main"

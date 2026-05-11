@@ -12,6 +12,29 @@
 
 ## [Unreleased]
 
+### Added(V1.10.0-alpha · 4 层自检 + 精髓库三重防线 + 字体粗细 · 2026-05-12)
+
+- **4 层自检铁律(主宪章 §33)**:
+  - L1 frontmatter lint(无 LLM):`runtime/healthcheck/agent_smoke.py` + pre-push hook
+  - L2 CI mock e2e(stub LLM,0 成本):`selftest-mock` job 每 push 跑
+  - L3 真 LLM(~$4/release):`tagent doctor --agents --probe` + `tagent selftest --e2e`
+  - L4 周自检(~$16/月):`.github/workflows/selftest-weekly.yml` 周一 03:00 UTC
+- **`runtime/healthcheck/` 新模块**:`agent_smoke.py`(L1)+ `llm_probe.py`(L3)+ INDEX
+- **CLI 新增/扩展**:
+  - `tagent doctor --agents [--probe]`:L1 + 可选 L3 LLM ping 16 agent
+  - `tagent selftest --e2e [--strict] [--pass-threshold 0.80]`:整体 e2e
+- **`LLMClient.complete()`**:plain text completion(原仅 `complete_json`),probe 用
+- **精髓库三重防线(主宪章 §34)**:
+  - `.gitignore` 加 `_精髓库/` + `**/_精髓库/`
+  - pre-commit hook `forbid-essence-library`(diff --cached 含路径即 reject)
+  - CI file-count job 双校验
+- **字体粗细统一(主宪章 §35)**:`docs/STYLE.md`(标题 ≤3 级,`**bold**` 仅 3 场景,中英空格)
+- **补缺顶级 INDEX**:`docs/INDEX.md` + `examples/INDEX.md` + `profiles/INDEX.md` + `scripts/INDEX.md`
+- **pre-tag hook**:`scripts/git-pre-tag.sh` 卡 `git tag v1.x`(7 天内必须有 L3 log)
+- **fixture**:`examples/_smoke_prd.md` 触发完整 16 agent DAG
+- 主宪章扩 §33/§34/§35;VERSION 1.9.0-alpha → **1.10.0-alpha**
+- 烟雾测试:L1 16/16+32/≥25 全过;L2 stub e2e 88% PASS(7/8 节点)
+
 ### Added(V1.9.0-alpha · 用例多格式导出 · 用户自选 · 2026-05-12)
 
 - **`runtime/exporters/` 新模块**(对标主宪章 §5 多格式 I/O):

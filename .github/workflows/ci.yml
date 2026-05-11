@@ -208,3 +208,43 @@ jobs:
           grep "Test-Agent工作流搭建.md" .gitignore || \
             { echo "❌ .gitignore 未排除源 MD"; exit 1; }
           echo "✅ 私有源 MD 受保护"
+
+      - name: 验证 .gitignore 排除精髓库（V1.10 §34）
+        run: |
+          if [ -d "_精髓库" ] || [ -d "**/_精髓库" ]; then
+            echo "❌ 私有精髓库不应该出现在仓库（主宪章 §29 §34）"
+            exit 1
+          fi
+          grep "_精髓库" .gitignore || \
+            { echo "❌ .gitignore 未排除精髓库"; exit 1; }
+          echo "✅ 私有精髓库受保护"
+
+  # ===== 8. L2 self-test(mock LLM,主宪章 §33,V1.10)=====
+  selftest-mock:
+    name: L2 self-test · mock LLM e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: 安装运行时依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r 04-配置文件/requirements.txt 2>&1 | tail -10 || true
+          # 兜底:确保关键运行时模块在
+          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect
+
+      - name: L1 frontmatter lint(主宪章 §33 第 1 层)
+        run: |
+          python -m runtime.healthcheck.agent_smoke
+
+      - name: L2 e2e mock router(stub LLM,无外部调用)
+        env:
+          TAGENT_LLM_PROVIDER: stub
+          TAGENT_LLM_PROVIDER_FALLBACK: stub
+        run: |
+          python -m runtime.cli.main selftest --e2e --pass-threshold 0.80
+          echo "✅ L2 stub e2e ≥80% 节点通过"

@@ -121,3 +121,12 @@ pip-wheel-metadata/
 
 # ===== 私有源文档（个人归属，不公开）=====
 Test-Agent工作流搭建.md
+
+# ===== 私有精髓库（跨项目知识，绝不公开 · 主宪章 §29 + V1.10 §34）=====
+# 正确位置:D:/项目文件/_精髓库/(repo 外)。若误 cp 进 repo,pre-commit hook 二次拦截
+_精髓库/
+**/_精髓库/
+
+# ===== 自检 smoke 临时产物 =====
+workspace/**/_smoke_*
+workspace/测试用例/_smoke_out/
