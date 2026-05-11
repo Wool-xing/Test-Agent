@@ -1,0 +1,191 @@
+# tagent init 单源真理矩阵(V1.12.0-alpha)
+#
+# 测试类型 × 平台 × LLM provider × BugTracker × 通知渠道 → 生成 .env + tagent.yml + STARTUP.md
+# 加新选项:补这里 + 看 wizard 自动列出。
+
+# 1. 测试类型(8 选)
+test_types:
+  web:
+    label: Web 系统测试
+    description: 浏览器/网页/REST API/SaaS 后台
+    default_skills: [smoke-test, regression-test, testcase-design, python-script-gen, jmeter-script-gen, data-preparation, zentao-bug-submission]
+    default_platform: linux
+    required_env:
+      - TEST_APP_URL
+      - PYTEST_BROWSER          # chromium|firefox|webkit
+  api:
+    label: REST/gRPC API 测试
+    description: 后端接口契约 + 性能 + 负载
+    default_skills: [smoke-test, regression-test, testcase-design, python-script-gen, jmeter-script-gen, zentao-bug-submission]
+    default_platform: linux
+    required_env:
+      - API_BASE_URL
+      - API_AUTH_TOKEN          # 或 OAuth 配置
+  mobile:
+    label: 移动 App 测试(Android/iOS)
+    description: APK/IPA + Appium + 真机/模拟器
+    default_skills: [smoke-test, mobile-test, testcase-design, zentao-bug-submission]
+    default_platform: android
+    required_env:
+      - APP_SRC_PATH
+      - APPIUM_SERVER_URL
+  desktop:
+    label: 桌面应用测试
+    description: .exe/.msi/.dmg + pywinauto/cmd
+    default_skills: [smoke-test, desktop-test, testcase-design, zentao-bug-submission]
+    default_platform: windows
+    required_env:
+      - APP_EXE_PATH
+  iot:
+    label: IoT/嵌入式测试
+    description: 串口/MQTT/BLE/CoAP 协议
+    default_skills: [smoke-test, system-test, testcase-design, zentao-bug-submission]
+    default_platform: embedded
+    required_env:
+      - DEVICE_SERIAL_PORT
+      - MQTT_BROKER_URL
+  car:
+    label: 车载 & 自动驾驶测试
+    description: CAN-bus + AUTOSAR + 仿真场景
+    default_skills: [smoke-test, system-test, testcase-design, zentao-bug-submission]
+    default_platform: embedded
+    required_env:
+      - CAN_INTERFACE
+      - CARLA_SERVER_URL
+  ai_model:
+    label: AI/LLM 模型测试
+    description: 评测集 + RAG/agent eval-harness
+    default_skills: [smoke-test, ai-test, testcase-design, zentao-bug-submission]
+    default_platform: linux
+    required_env:
+      - MODEL_ENDPOINT
+      - EVAL_DATASET_PATH
+  security:
+    label: 渗透 & 安全测试
+    description: ZAP/Burp/sqlmap + OWASP Top 10
+    default_skills: [smoke-test, regression-test, testcase-design, zentao-bug-submission]
+    default_platform: linux
+    required_env:
+      - TARGET_URL
+      - SCAN_PROFILE            # quick|full|stealth
+
+# 2. 平台(6 选)
+platforms:
+  linux:
+    label: Linux(Ubuntu/Debian/CentOS)
+    extras: [DOCKER_HOST]
+  windows:
+    label: Windows 10/11
+    extras: []
+  mac:
+    label: macOS
+    extras: []
+  android:
+    label: Android(Appium + UiAutomator2)
+    extras: [ANDROID_HOME, ANDROID_PLATFORM_VERSION]
+  ios:
+    label: iOS(Appium + XCUITest)
+    extras: [IOS_PLATFORM_VERSION, IOS_DEVICE_NAME]
+  embedded:
+    label: 嵌入式(裸板/Linux 设备/RTOS)
+    extras: [SSH_HOST, SSH_USER, SSH_KEY_PATH]
+
+# 3. LLM provider(5 选)
+llm_providers:
+  claude:
+    label: Anthropic Claude(默认推荐 · 长上下文 + JSON 模式稳)
+    env:
+      ANTHROPIC_API_KEY: "<your_anthropic_key>"
+    model_hint: claude-sonnet-4-6
+  openai:
+    label: OpenAI GPT
+    env:
+      OPENAI_API_KEY: "<your_openai_key>"
+    model_hint: gpt-4o
+  qwen:
+    label: 阿里通义千问(国内/数据合规)
+    env:
+      DASHSCOPE_API_KEY: "<your_dashscope_key>"
+    model_hint: qwen-plus
+  deepseek:
+    label: DeepSeek(性价比首选)
+    env:
+      DEEPSEEK_API_KEY: "<your_deepseek_key>"
+    model_hint: deepseek-chat
+  ollama:
+    label: Ollama 本地模型(离线/隐私首选 · 无外网调用)
+    env:
+      OLLAMA_HOST: "http://localhost:11434"
+    model_hint: qwen2.5:7b
+
+# 4. BugTracker(6 选,主宪章 §37)
+bug_trackers:
+  zentao:
+    label: 禅道(默认)
+    env:
+      BUG_TRACKER: zentao
+      ZENTAO_URL: "<your_zentao_url>"
+      ZENTAO_USERNAME: "<your_zentao_user>"
+      ZENTAO_PASSWORD: "<your_zentao_password>"
+  jira:
+    label: Atlassian Jira
+    env:
+      BUG_TRACKER: jira
+      JIRA_URL: "<your_jira_url>"
+      JIRA_EMAIL: "<your_jira_email>"
+      JIRA_API_TOKEN: "<your_jira_token>"
+      JIRA_PROJECT_KEY: "<your_project_key>"
+  github:
+    label: GitHub Issues
+    env:
+      BUG_TRACKER: github
+      GITHUB_TOKEN: "<your_github_pat>"
+      GITHUB_REPO: "<owner/repo>"
+  gitlab:
+    label: GitLab Issues
+    env:
+      BUG_TRACKER: gitlab
+      GITLAB_URL: "https://gitlab.com"
+      GITLAB_TOKEN: "<your_gitlab_token>"
+      GITLAB_PROJECT_ID: "<project_id>"
+  linear:
+    label: Linear
+    env:
+      BUG_TRACKER: linear
+      LINEAR_API_KEY: "<your_linear_key>"
+      LINEAR_TEAM_ID: "<your_team_id>"
+  webhook:
+    label: 自定义 Webhook
+    env:
+      BUG_TRACKER: webhook
+      BUG_WEBHOOK_URL: "<your_webhook_endpoint>"
+
+# 5. 通知渠道(6 选,可多选,主宪章 §36)
+notifiers:
+  wechat:
+    label: 企业微信群机器人
+    env:
+      WECHAT_WEBHOOK_URL: "<your_wechat_webhook>"
+  feishu:
+    label: 飞书群机器人
+    env:
+      FEISHU_WEBHOOK: "<your_feishu_webhook>"
+  dingtalk:
+    label: 钉钉群机器人
+    env:
+      DINGTALK_WEBHOOK: "<your_dingtalk_webhook>"
+  slack:
+    label: Slack Incoming Webhook
+    env:
+      SLACK_WEBHOOK_URL: "<your_slack_webhook>"
+  email:
+    label: SMTP 邮件
+    env:
+      EMAIL_SMTP_HOST: "<smtp.example.com>"
+      EMAIL_SMTP_USER: "<your_email>"
+      EMAIL_SMTP_PASSWORD: "<your_smtp_password>"
+      EMAIL_TO: "<dest@example.com>"
+  teams:
+    label: Microsoft Teams
+    env:
+      TEAMS_WEBHOOK_URL: "<your_teams_webhook>"
