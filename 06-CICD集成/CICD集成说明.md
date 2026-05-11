@@ -8,7 +8,7 @@
 - 并行执行加速
 - 质量门禁分层（统一调用 `utils/ci_quality_gate.py` 与 `utils/jmeter_result_parser.py`）
 - Allure 测试报告
-- 三端通知（企业微信 / 飞书 / 钉钉，curl 直连 webhook，**未启用 MCP 通道**）
+- 多端通知（企业微信 / 飞书 / 钉钉 / Slack / 邮件 / Teams，curl 直连 webhook，**未启用 MCP 通道**）
 
 > 通知与 Bug 提交均走直连 SDK/webhook（参见 `utils/generate_report.send_*` / `utils/zentao_bug_manager.py`）。`.mcp.json` 仅启用 filesystem。
 

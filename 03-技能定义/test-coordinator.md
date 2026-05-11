@@ -41,7 +41,7 @@ test-executor（JMeter 性能测试，按 PERF_MODE 走 ci_quick / full）
    ↓
 bug-manager（功能 Bug + 性能 Bug 提交追踪）
    ↓
-report-generator（Allure + JMeter HTML + Word + 三端通知）
+report-generator（Allure + JMeter HTML + Word + 多端通知:企微/飞书/钉钉/Slack/邮件/Teams）
    ↓
 test-lead（最终决策：功能+性能双门禁）
 ```
@@ -235,7 +235,7 @@ output:
   - JMeter HTML 报告（性能）
   - Word 测试报告（含性能基准对比）
   - Excel 数据报告
-  - 企业微信/飞书/钉钉 三端通知（自动跳过未配置）
+  - 多端通知:企业微信/飞书/钉钉/Slack/邮件/Teams（自动跳过未配置）
 保存：workspace/测试报告/
 ```
 

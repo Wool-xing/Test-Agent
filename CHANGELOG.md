@@ -12,6 +12,19 @@
 
 ## [Unreleased]
 
+### Fixed(V1.11.0-alpha · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
+
+- **同步铁律(§1)执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
+  - `00-项目导航.md` · `02-专家定义/{01,07,08,09}.md` · `02-专家定义/README.md` · `03-技能定义/{README,test-coordinator,zentao-bug-submission}.md` · `04-配置文件/mcp-server-impl.md` · `05-代码示例/{README.md,api_retry_util.py}` · `06-CICD集成/{INDEX,CICD集成说明}.md` · `01-快速开始/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md` · 私有源
+- **adapter 修 V1.10 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
+  - 现 `tagent selftest --e2e --strict` **100% PASS 8/8**(原 88% 7/8)
+  - generate_report.py 默认注入 `--data=workspace/执行日志/_selftest_summary.json`,fixture 自动生成
+- **主宪章扩**:
+  - §36 多端通知 canon(扩 §6,6 渠道权威清单 + env 字段 + 业务语言铁律)
+  - §37 BugTracker canon(扩 §12,6 adapter 权威清单 + measurement env + 措辞规范)
+  - §10 五铭文 + §6 MCP 接入:"三端通知" → "多端通知"
+- VERSION:1.10.0-alpha → **1.11.0-alpha**
+
 ### Added(V1.10.0-alpha · 4 层自检 + 精髓库三重防线 + 字体粗细 · 2026-05-12)
 
 - **4 层自检铁律(主宪章 §33)**:

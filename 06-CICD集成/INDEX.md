@@ -34,7 +34,7 @@
 │ 3. smoke-test  →  /smoke-test（≥95% 门禁）                │
 │ 4. regression-test  →  P0+P1（≥90% + cov≥80% + Flaky）   │
 │ 5. performance-test  →  JMeter 双模式（ci_quick / full）  │
-│ 6. publish + quality-gate + notify  →  三端 webhook       │
+│ 6. publish + quality-gate + notify  →  多端 webhook       │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -56,7 +56,7 @@
 | Jenkins JMeter PATH 跨 sh 块丢失 | 用 `withEnv(["PATH+JMETER=..."])` 持久 PATH |
 | 性能 CI 不达标 TPS≥100 | CI 默认 `ci_quick`（5 并发，门禁 TPS≥20）；`PERF_MODE=full` 切完整压测 |
 | 性能基线何时更新 | 仅 `release/*` 分支 + `PERF_MODE=full` + 当次门禁全 PASS |
-| 三端通知未发出 | `.env` / Secrets 未配 `WECHAT_WEBHOOK_URL` 等；未配自动跳过不阻塞 |
+| 多端通知未发出 | `.env` / Secrets 未配 `WECHAT_WEBHOOK_URL` / `FEISHU_WEBHOOK` / `DINGTALK_WEBHOOK` / `SLACK_WEBHOOK_URL` / `EMAIL_SMTP_*` / `TEAMS_WEBHOOK_URL` 等；未配自动跳过不阻塞 |
 
 ## 同步链路（宪章§1 同步铁律）
 
