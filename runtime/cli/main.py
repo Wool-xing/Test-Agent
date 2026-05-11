@@ -324,6 +324,54 @@ def uninstall(name: str = typer.Argument(...)):
 
 
 @app.command()
+def init(
+    test_type: str = typer.Option("", "--test-type", help="web/api/mobile/desktop/iot/car/ai_model/security(非交互时填)"),
+    platform: str = typer.Option("", "--platform", help="linux/windows/mac/android/ios/embedded"),
+    llm: str = typer.Option("", "--llm", help="claude/openai/qwen/deepseek/ollama"),
+    bug_tracker: str = typer.Option("", "--bug-tracker", help="zentao/jira/github/gitlab/linear/webhook(默认 zentao)"),
+    notifier: str = typer.Option("", "--notifier", help="逗号分隔 wechat,feishu,dingtalk,slack,email,teams"),
+    preset: str = typer.Option("", "--preset", help="minimal/saas-web/国内-web/mobile-android/security-pentest"),
+    out: str = typer.Option("workspace", "--out", help="产物目录(.env / tagent.yml / STARTUP.md)"),
+    overwrite: bool = typer.Option(False, "--overwrite", help="允许覆盖已有 .env/tagent.yml/STARTUP.md"),
+):
+    """5 分钟生成 `.env` + `tagent.yml` + `STARTUP.md`(主宪章 §1 一键部署 + §7)."""
+    from runtime.init.matrix import load_matrix
+    from runtime.init.renderer import render_all
+    from runtime.init.wizard import InitAnswers, from_args, from_preset, run_wizard
+
+    matrix = load_matrix()
+
+    if preset:
+        answers = from_preset(preset, matrix=matrix)
+        console.print(f"[green]preset[/] {preset}: {answers.test_type}/{answers.platform}/{answers.llm_provider}/{answers.bug_tracker} + {answers.notifiers}")
+    elif test_type and platform and llm:
+        notifiers = [n.strip() for n in notifier.split(",") if n.strip()] or ["wechat"]
+        answers = from_args(
+            test_type=test_type,
+            platform=platform,
+            llm_provider=llm,
+            bug_tracker=bug_tracker or "zentao",
+            notifiers=notifiers,
+            matrix=matrix,
+        )
+        console.print(f"[green]args[/] {answers.test_type}/{answers.platform}/{answers.llm_provider}/{answers.bug_tracker} + {answers.notifiers}")
+    else:
+        answers = run_wizard(matrix=matrix)
+
+    try:
+        res = render_all(answers, Path(out), matrix=matrix, overwrite=overwrite)
+    except FileExistsError as e:
+        console.print(f"[red]{e}[/]")
+        raise typer.Exit(2)
+
+    console.print("\n[bold green]✓ 配置生成完毕[/]")
+    console.print(f"  .env       → {res.env_path}")
+    console.print(f"  tagent.yml → {res.yml_path}")
+    console.print(f"  STARTUP.md → {res.startup_path}")
+    console.print(f"\n[bold]下一步[/]:`cat {res.startup_path}` 看启动指南")
+
+
+@app.command()
 def export(
     plan: str = typer.Argument(..., help="TestCaseTree JSON path (testcase-designer output)"),
     format: str = typer.Option("xmind", "--format", help="xmind | markmap | opml | all"),

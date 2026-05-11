@@ -12,6 +12,34 @@
 
 ## [Unreleased]
 
+### Added(V1.12.0-alpha · `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
+
+- **新模块 `runtime/init/`**:
+  - `matrix.py`:`load_matrix()` 加载 `04-配置文件/templates/matrix.yaml`(单源真理)
+  - `wizard.py`:`run_wizard()` 交互向导 · `from_args()` 非交互 · `from_preset()` 5 预设
+  - `renderer.py`:`render_all()` 把 InitAnswers + matrix + 模板 → `.env` + `tagent.yml` + `STARTUP.md`
+- **新模板库 `04-配置文件/templates/`**:
+  - `matrix.yaml` 单源真理:**8 测试类型 × 6 平台 × 5 LLM × 6 BugTracker × 6 通知 = 8640 组合**
+  - `base.env.tpl` · `base.tagent.yml.tpl` · `STARTUP.md.tpl`(`{{var}}` 占位)
+- **CLI**:`tagent init [--test-type] [--platform] [--llm] [--bug-tracker] [--notifier] [--preset] [--out] [--overwrite]`
+- **5 预设**(开箱即用):
+  - `minimal`(web/linux/ollama/webhook/email · 离线最小)
+  - `saas-web`(web/linux/claude/github/slack+email · 海外 SaaS)
+  - `国内-web`(web/linux/qwen/zentao/wechat+feishu+dingtalk · 国内合规)
+  - `mobile-android`(mobile/android/claude/jira/slack)
+  - `security-pentest`(security/linux/claude/github/email)
+- **支持选项**:
+  - 测试类型:web/api/mobile/desktop/iot/car/ai_model/security
+  - 平台:linux/windows/mac/android/ios/embedded
+  - LLM:claude/openai/qwen/deepseek/ollama
+  - BugTracker(主宪章 §37):zentao/jira/github/gitlab/linear/webhook
+  - 通知(主宪章 §36):wechat/feishu/dingtalk/slack/email/teams(可多选)
+- **加新选项**:改 `matrix.yaml` 一处,wizard/CLI 自动列出(无需改代码)
+- **STARTUP.md 启动指南**:含填占位清单 + 装依赖 hint + 健康检查 + 烟雾跑通命令 + 推荐 skill 顺序 + 出错对照表
+- 烟测:5 preset × 全过 + 8 测试类型组合全过
+- L1 + L3 strict 不破:agents=16/16 skills=32/≥25 + selftest 8/8 100%
+- 版本 V1.11.0-alpha → **V1.12.0-alpha**
+
 ### Fixed(V1.11.0-alpha · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
 
 - **同步铁律(§1)执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
