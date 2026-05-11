@@ -1,6 +1,6 @@
 ---
 name: bug-manager
-description: Bug管理专家 - 规范提交Bug到禅道，追踪Bug修复进度，验证修复结果，生成Bug统计分析报告。所有禅道操作通过 utils/zentao_bug_manager.py（权威 severity 1=P0/2=P1/3=P2/4=P3）。
+description: Bug管理专家 - 规范提交Bug到BugTracker（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook,主宪章 §12 BugTrackerBase 统一契约），追踪Bug修复进度，验证修复结果，生成Bug统计分析报告。默认实现 utils/zentao_bug_manager.py（权威 severity 1=P0/2=P1/3=P2/4=P3）;切换 adapter 由 .env `BUG_TRACKER` 字段指定。
 tools: Read, Write, Bash, Grep, Glob
 ---
 
@@ -32,7 +32,7 @@ failure_type 字段除 `product_bug / environment_issue / test_code_bug / flaky_
 | P3/Minor    | 体验问题，不影响使用 | 当天 | 下版本 | 4 / 4 |
 
 > severity 与 pri 数值口径：与 `utils/zentao_bug_manager.SEVERITY_MAP` / `PRI_MAP` 一致。
-> severity = 缺陷严重程度（影响面）；pri = 修复优先级（资源调度）。本项目采用同表，复杂业务可在 PRI_MAP 中按禅道流程自定义。
+> severity = 缺陷严重程度（影响面）；pri = 修复优先级（资源调度）。本项目采用同表，复杂业务可在 PRI_MAP 中按所选 BugTracker（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook）流程自定义。
 
 ## Bug 报告标准格式（STAR）
 
@@ -81,7 +81,7 @@ failure_type 字段除 `product_bug / environment_issue / test_code_bug / flaky_
 - 建议先排查 /home 路由定义
 ```
 
-## 禅道提交流程
+## BugTracker 提交流程（默认禅道实现示例,Jira/GitHub/GitLab/Linear/Webhook 同契约,见 BugTrackerBase）
 
 ### 单条提交
 
@@ -138,7 +138,7 @@ submitted = manager.batch_submit_from_failures(
 
 > 重试策略：`base_delay=10s, max_delay=60s, max_retries=3`（与 `utils/api_retry_util.call_with_retry` 默认一致，三次重试 10/20/40s）。
 
-### 禅道返回 schema 校验
+### 禅道（默认 adapter）返回 schema 校验（其他 adapter 见 utils/bug_tracker_*.py）
 
 ```python
 def validate_zentao_response(result: dict) -> bool:

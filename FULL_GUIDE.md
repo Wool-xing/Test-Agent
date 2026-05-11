@@ -148,7 +148,7 @@
 | automation-engineer | Playwright（UI）+ requests（API）+ JMeter 驱动（性能）+ Locust（开发期备用） |
 | test-executor | 并行执行、失败分类、Flaky 隔离、JMeter 性能阶段 |
 | bug-manager | Bug 提交（5 适配器：禅道/Jira/GitHub/Linear/Webhook）、生命周期追踪、回归验证 |
-| report-generator | Allure + JMeter HTML + Word + 三端通知（企微/飞书/钉钉，curl 直连） |
+| report-generator | Allure + JMeter HTML + Word + 多端通知（企微/飞书/钉钉/Slack/邮件/Teams，curl 直连） |
 | mobile-tester / desktop-tester / visual-tester / system-tester / ai-tester | 平台扩展 5 位专家 |
 
 ### 14 个执行技能（13 业务 + 1 自进化）
@@ -299,7 +299,7 @@
       /单元（70%）/         ← pytest + pytest-mock，秒级反馈
 ```
 
-**总覆盖率 ~95%**（含闭环：Bug 多适配 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
+**总覆盖率 ~95%**（含闭环：Bug 多适配 + 多端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
 
 剩 ~5% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
 
@@ -625,7 +625,7 @@ $ bash install.sh --add visual,ai
 |--------|------|---------|
 | 被测系统 | `.env` | `TEST_APP_URL` / `APP_SRC_PATH` / `TEST_DB_*` |
 | Bug Tracker | `.env` | `BUG_TRACKER` + 对应 adapter 字段（zentao_/jira_/github_/linear_/webhook_） |
-| 三端通知 | `.env` | `WECHAT_WEBHOOK_URL` / `FEISHU_WEBHOOK_URL` / `DINGTALK_WEBHOOK_URL`（至少一个） |
+| 多端通知 | `.env` | `WECHAT_WEBHOOK_URL` / `FEISHU_WEBHOOK_URL` / `DINGTALK_WEBHOOK_URL` / `SLACK_WEBHOOK_URL` / `EMAIL_SMTP_*` / `TEAMS_WEBHOOK_URL`（至少一个） |
 | 性能门禁 | `utils/jmeter_result_parser.py::DEFAULT_GATES_*` | 阈值微调 |
 | 功能门禁 | `utils/ci_quality_gate.py::GATES` | 阈值微调 |
 | 回归范围 | `workspace/regression_modules.yaml` | 模块白名单 |
@@ -665,7 +665,7 @@ $ bash install.sh --add visual,ai
                            [bug-manager]
                                 ↓
                           [report-generator]
-                  Allure + JMeter HTML + Word + 三端通知
+                  Allure + JMeter HTML + Word + 多端通知
                                 ↓
                         test-lead 最终决策
 ```
@@ -1077,7 +1077,7 @@ your-test-project/
 | 沉默故障 | 不报警的恶化——指标看着正常但用户体验/语义已塌 |
 | 末日哨兵 | 极端风险下越过流程直达全人类的预警机制——需监管/学界共识授权 |
 | 缺席者代言 | 为未联网者、残障者、未出生者保留测试用例配额 |
-| 熄火协议 | Agent 被关闭前的遗嘱与决策链留存规则——三端通知 + Word 报告 + decisions/ 归档 |
+| 熄火协议 | Agent 被关闭前的遗嘱与决策链留存规则——多端通知 + Word 报告 + decisions/ 归档 |
 | 货物崇拜 | 形式齐备但实质缺失——飞机跑道堆好了，飞机不会降落。本项目最大敌人之一 |
 | Skin in the Game | 是否承担后果。Agent 的判断无 skin，因此最终决策由 test-lead 签字 |
 | Via Negativa | 通过命名"不做的事"而非"做的事"来定义边界。本项目用它显式标注 darwin-skill 不自学习、反问不建 KB |

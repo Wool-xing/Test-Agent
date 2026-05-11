@@ -16,11 +16,11 @@
 | `data_masking.py` | 敏感字段脱敏 | `DataMasker.mask_phone/email/dict_recursive` |
 | `excel_generator.py` | 4 Sheet 用例 Excel + 结果 Excel | `create_testcase_excel(cases, path)` / `create_result_excel` |
 | `flaky_detector.py` | junit-xml 历史归档 + flaky 检测 | `FlakyTestDetector.detect()` / `archive_junit` |
-| `generate_report.py` | Word 报告 + 三端通知 webhook | `generate_test_report(data, path)` / `send_all_notifications` |
+| `generate_report.py` | Word 报告 + 多端通知 webhook（企微/飞书/钉钉/Slack/邮件/Teams） | `generate_test_report(data, path)` / `send_all_notifications` |
 | `jmeter_csv_exporter.py` | JMeter 参数化 CSV 生成 | `generate_jmeter_dataset(count, output)` |
 | `jmeter_result_parser.py` | JTL 解析 + 性能门禁 + 基线对比 | `parse_jtl(jtl)` / `check_performance_gates` / `compare_with_baseline` |
 | `regression_scope.py` | git diff 影响范围分析（YAML 配置） | `analyze_change_impact(base_branch)` |
-| `zentao_bug_manager.py` | 禅道 SDK + token 续期 | `ZentaoBugManager.create_bug` / `batch_submit_from_failures` |
+| `zentao_bug_manager.py` | BugTracker 默认 adapter:禅道 SDK + token 续期（其他 adapter 同契约 BugTrackerBase,主宪章 §12） | `ZentaoBugManager.create_bug` / `batch_submit_from_failures` |
 | `ci_quality_gate.py` | CI 门禁统一（junit + cov） | `parse_junit` / `check_smoke` / `check_regression` / `check_coverage` |
 
 ---

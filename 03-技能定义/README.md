@@ -17,7 +17,7 @@
 | `/python-script-gen` | `python-script-gen.md` | pytest UI/API 脚本生成 | 用例转自动化 |
 | `/jmeter-script-gen` | `jmeter-script-gen.md` | JMeter JMX 性能计划（双模式 ci_quick/full） | 性能测试 |
 | `/data-preparation` | `data-preparation.md` | 测试数据 + JMeter CSV 生成 | 测试前数据准备 |
-| `/zentao-bug-submission` | `zentao-bug-submission.md` | 禅道 Bug 规范提交 | 失败用例后 |
+| `/zentao-bug-submission` | `zentao-bug-submission.md` | BugTracker 规范提交（默认禅道示例,可换 Jira/GitHub/GitLab/Linear/Webhook,见 `BUG_TRACKER` env） | 失败用例后 |
 
 ---
 

@@ -8,11 +8,16 @@ Expert/Skill execution model:
 - A handful of experts have a strong default script. The rest fall back to
   recording the expert step + producing an empty result placeholder which the
   report-generator then summarises (matching V1.0.0 manual workflow).
+- Scripts with required CLI args(e.g. generate_report.py --data)get default
+  inputs auto-injected via SCRIPT_DEFAULT_ARGS;referenced fixtures auto-materialized
+  by _ensure_fixture (V1.11 修 V1.10 n7 selftest bug)。
 """
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
 
 from runtime.orchestrator.adapters.scripts import ScriptResult, list_available_scripts, run_script
 
@@ -50,6 +55,39 @@ SKILL_SCRIPT_MAP: dict[str, str | None] = {
     "system-test": None,
     "ai-test": "ai_validator.py",
 }
+
+# Scripts that require CLI args; injected when DAG node provides no inputs.
+# Explicit DAG inputs always win; defaults only fill the gap.
+SCRIPT_DEFAULT_ARGS: dict[str, dict[str, str]] = {
+    "generate_report.py": {"data": "workspace/执行日志/_selftest_summary.json"},
+}
+
+# Fixture content materialized on demand when a SCRIPT_DEFAULT_ARGS value points to
+# a missing file. Keys are workspace-relative paths.
+SCRIPT_FIXTURES: dict[str, dict] = {
+    "workspace/执行日志/_selftest_summary.json": {
+        "project_name": "Test-Agent selftest fixture",
+        "version": "0.0.0-selftest",
+        "environment": "ci",
+        "verdict": "通过",
+        "results": {"total": 0, "passed": 0, "failed": 0, "pass_rate": 0.0},
+        "bugs": {"p0": 0, "p0_fix_rate": 0.0, "p1": 0, "p1_fix_rate": 0.0, "p2": 0, "p2_fix_rate": 0.0, "p3": 0, "p3_fix_rate": 0.0},
+        "coverage": 0.0,
+        "risks": [{"level": "低", "desc": "selftest fixture - no real data", "owner": "ci"}],
+    },
+}
+
+
+def _ensure_fixture(path_str: str) -> None:
+    """Materialize a default fixture file if absent. Keys match SCRIPT_FIXTURES."""
+    p = Path(path_str)
+    if p.exists():
+        return
+    fixture = SCRIPT_FIXTURES.get(path_str)
+    if fixture is None:
+        return
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(fixture, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 @dataclass(slots=True)
@@ -101,7 +139,12 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
             stderr=f"script '{script}' not found under 05-代码示例/",
             duration_ms=0,
         )
-    args = [f"--{k}={v}" for k, v in inputs.items()]
+    defaults = SCRIPT_DEFAULT_ARGS.get(script, {})
+    merged = {**defaults, **inputs}  # explicit inputs win
+    for k, v in defaults.items():
+        if k not in inputs:  # only materialize fixture for auto-injected defaults
+            _ensure_fixture(str(v))
+    args = [f"--{k}={v}" for k, v in merged.items()]
     res: ScriptResult = run_script(script, args=args, timeout=timeout)
     return StepOutcome(
         name=name,

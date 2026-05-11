@@ -172,7 +172,7 @@ async def async_api_call_with_retry(
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    # 示例 1：禅道 Bug 提交
+    # 示例 1：BugTracker Bug 提交（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook）
     def submit_bug_example():
         from zentao_bug_manager import ZentaoBugManager
         client = ZentaoBugManager()

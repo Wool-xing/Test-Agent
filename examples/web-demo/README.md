@@ -1,6 +1,6 @@
 # Web Demo · 最小可跑示例（5 分钟）
 
-> 本目录是 **Test-Agent 工作流的最小可运行 Web 测试示例**。无需部署完整模板，无需配 .env，无需禅道/Allure，**纯 pytest + Playwright 跑通 1 个 P0 冒烟用例**。
+> 本目录是 **Test-Agent 工作流的最小可运行 Web 测试示例**。无需部署完整模板，无需配 .env，无需 BugTracker/Allure，**纯 pytest + Playwright 跑通 1 个 P0 冒烟用例**。
 >
 > 验证目标：让首次接触 Test-Agent 的用户在 5 分钟内看到"Page Object 模式 + pytest fixture 复用 + Playwright 浏览器自动化"完整链路。
 
@@ -73,7 +73,7 @@ examples/web-demo/
 |-----------|---------|
 | 14 Agent + 13 Skill + 49 utils | 仅 pytest + playwright |
 | `.env` 配置 8 必填 | 不需 `.env` |
-| Allure / JMeter / 禅道集成 | 不集成 |
+| Allure / JMeter / BugTracker 集成 | 不集成 |
 | 冒烟 + 回归 + 性能门禁 | 仅 1 冒烟用例 |
 | `install.sh` 一键部署 | `pip install -r requirements.txt` 即可 |
 

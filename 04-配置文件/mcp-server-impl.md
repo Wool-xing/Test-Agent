@@ -9,7 +9,7 @@
 | 场景 | 推荐方案 |
 |------|---------|
 | 项目用 Claude Code 单机开发，只需 utils 调用 | **不需要 MCP**，当前直连方案足够 |
-| 团队多个开发者，希望 Claude Code 直接通过 MCP 调用禅道/通知 | 实现对应 mcp_server |
+| 团队多个开发者，希望 Claude Code 直接通过 MCP 调用 BugTracker/通知 | 实现对应 mcp_server |
 | 需要 Claude Code agent 主动查询 Bug 状态、读取 webhook 历史 | 实现对应 mcp_server |
 | 与其他工具（Cursor / Continue.dev）共享 MCP 通道 | 实现 mcp_server（MCP 跨工具标准） |
 
@@ -32,7 +32,7 @@ MCP server 通常通过 stdio 与 client 通信，对外暴露 tools / resources
 
 ```python
 # zentao_mcp_server/__main__.py
-"""禅道 MCP Server 骨架"""
+"""禅道 MCP Server 骨架（默认 BugTracker 实现示例;Jira/GitHub/GitLab/Linear/Webhook 同骨架,主宪章 §12）"""
 import asyncio
 import json
 import logging
@@ -68,7 +68,7 @@ async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="zentao_create_bug",
-            description="提交 Bug 到禅道",
+            description="提交 Bug 到禅道（默认 BugTracker;其他 adapter 同 tool schema）",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         "ZENTAO_ACCOUNT": "${ZENTAO_ACCOUNT}",
         "ZENTAO_PASSWORD": "${ZENTAO_PASSWORD}"
       },
-      "description": "禅道 Bug 管理 MCP"
+      "description": "禅道 Bug 管理 MCP（默认 BugTracker;Jira/GitHub/GitLab/Linear/Webhook 同 MCP 接口）"
     },
     "wechat": {
       "command": "python",
