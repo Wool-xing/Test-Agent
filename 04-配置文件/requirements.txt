@@ -141,3 +141,28 @@ safety==3.0.1                      # [稳定层] 依赖 CVE 检查
 # - pa11y（npm install -g pa11y，A11y）
 # - Foundry / forge（区块链智能合约）
 # - kubectl（K8s 混沌测试）
+
+# ============================================================
+# V1.1.0-alpha 运行时层(`runtime/`)依赖 — 全部 [可选]
+# 仅启用 V1.1.0 运行时(AI 路由+Prefect+飞轮+FastAPI/CLI)时安装
+# 完整列表见 runtime/pyproject.toml
+# ============================================================
+
+# ===== [可选 · runtime 核心] =====
+# mcp>=1.0.0                       # V1.2.0-alpha MCP SDK(6 件套 server:test-orchestrator/protocol-adapter/evidence-vault/defect-tracker/knowledge-base/compliance-checker)
+# litellm>=1.55.0                  # 多厂商 LLM 路由(Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)
+# prefect>=2.20.0,<3.0             # 编排引擎(可选,Direct 执行器在 prefect 缺席时自动接管)
+# fastapi>=0.115.0                 # HTTP 入口
+# uvicorn[standard]>=0.32.0        # ASGI server
+# typer>=0.13.0                    # CLI
+# rich>=13.9.0                     # 终端美化
+# pydantic-settings>=2.6.0         # env-driven 配置(pydantic v2)
+# alembic>=1.13.0                  # DB 迁移
+# psycopg[binary]>=3.2.0           # postgres 驱动(替代 psycopg2)
+# pgvector>=0.3.0                  # pgvector ORM 类型
+# minio>=7.2.0                     # MinIO 客户端
+# opentelemetry-api>=1.27.0        # OTel
+# opentelemetry-sdk>=1.27.0
+# opentelemetry-exporter-otlp>=1.27.0
+# opentelemetry-instrumentation-fastapi>=0.48b0
+# httpx>=0.27.0                    # 异步 HTTP(API client)

@@ -1,0 +1,21 @@
+framework: IEC 61508(工业功能安全)
+version: 2010 (Edition 2.0)
+applicable_industries: [Industrial Control, Process Automation, Power]
+sil_levels: [1, 2, 3, 4]
+status: skeleton
+checks:
+  - id: Part3-7.4
+    title: Software architecture design
+    severity: P0
+    rule: Modular + verifiable architecture; tool qualification matched to SIL.
+    evidence_required: [architecture_doc, tool_qualification]
+  - id: Part3-7.7
+    title: Software integration testing
+    severity: P0
+    rule: Boundary value + functional + structural testing per SIL.
+    evidence_required: [integration_test_report]
+  - id: Part3-7.9
+    title: Software safety validation
+    severity: P0
+    rule: Validation against safety requirements specification with documented results.
+    evidence_required: [safety_validation_report]

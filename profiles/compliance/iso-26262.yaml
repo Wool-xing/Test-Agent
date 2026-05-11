@@ -1,0 +1,26 @@
+framework: ISO 26262(汽车功能安全)
+version: 2018 (Second Edition)
+applicable_industries: [Automotive, ADAS, AV]
+asil_levels: [QM, A, B, C, D]
+status: skeleton
+checks:
+  - id: Part4-7.4.3
+    title: Software safety requirements specification
+    severity: P0
+    rule: Safety requirements derived from system level; traceability to hazard analysis (HARA).
+    evidence_required: [safety_requirements_doc, traceability_matrix]
+  - id: Part6-9
+    title: Software unit testing
+    severity: P0
+    rule: Unit test for ASIL B+; structural coverage MC/DC for ASIL D.
+    evidence_required: [unit_test_report, coverage_mcdc]
+  - id: Part6-10
+    title: Software integration testing
+    severity: P0
+    rule: Hardware-software integration verified including fault injection (ASIL C/D).
+    evidence_required: [integration_test_report, fault_injection_log]
+  - id: Part4-9
+    title: Vehicle integration + testing
+    severity: P0
+    rule: Real-world driving tests covering ODD boundary + degraded mode.
+    evidence_required: [road_test_log, odd_boundary_test]

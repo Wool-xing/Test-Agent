@@ -1,0 +1,68 @@
+# Theory KB card schema (charter §23).
+# 每张卡片(*.zh.md / *.en.md) frontmatter 必须满足此 schema.
+# 主宪章 §23 铁律:LLM 在 learn mode 下只能引用 KB 中存在的 id;不在 KB 的概念输出"该领域未收录"。
+
+required_fields:
+  id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9-]*$"
+    desc: "全局唯一 kebab-case slug;router 引用此 id"
+  category:
+    type: string
+    enum:
+      - 01-tools           # 工具使用 pytest/Playwright/JMeter/Appium/...
+      - 02-coding          # 代码编程 Python pytest fixture/async/typing/...
+      - 03-foundation      # 测试基础理论 ISTQB/V 模型/金字塔/Boehm/七原则
+      - 04-strategy        # 测试策略 风险驱动/SBTM/Shift-Left/Right/灰度
+      - 05-methods         # 用例设计方法 等价类/边界值/判定表/状态迁移
+      - 06-protocols       # 协议认知 HTTP/gRPC/WS/MQTT/Kafka/WebRTC
+      - 07-platforms       # 平台架构 Web/移动/桌面/嵌入式/Serverless/Edge
+      - 08-gates           # 质量门禁 smoke/regression/perf/Flaky/SLO/DORA
+      - 09-security        # 安全测试 SAST/DAST/Fuzz/红蓝紫队/OWASP
+      - 10-ai-testing      # AI 测试 幻觉/Prompt 注入/漂移/对抗/公平性/XAI
+      - 11-compliance      # 行业合规 SOC2/PCI/HIPAA/IEC/ISO/DO-178C/GDPR
+      - 12-process         # 流程文化 TDD/BDD/ATDD/RACI/RCA/缺陷生命周期
+  level:
+    type: string
+    enum: [基础, 中级, 高级]
+  name_zh:
+    type: string
+  name_en:
+    type: string
+  one_liner_zh:
+    type: string
+    max_length: 80
+    desc: "30 字内最佳;执行模式只输出此字段"
+  one_liner_en:
+    type: string
+    max_length: 120
+  authority:
+    type: list
+    desc: "必须从 _authority_sources.yaml 白名单选;含具体章节号/年份"
+  confidence:
+    type: string
+    enum: [high, medium, low, llm-draft-unreviewed]
+    desc: "LLM 草稿初值 llm-draft-unreviewed;人工审后改 high/medium/low"
+  last_reviewed:
+    type: date
+  reviewer:
+    type: string
+    desc: "user / agent-curator / community-PR-#xxx"
+
+optional_fields:
+  when_to_use:
+    type: string
+  common_pitfall:
+    type: string
+  example:
+    type: string
+  related_to:
+    type: list
+    desc: "其他 KB id"
+  reading_zh:
+    type: list
+  reading_en:
+    type: list
+  superseded_by:
+    type: string
+    desc: "已被新卡替代时填后续卡 id"

@@ -1,0 +1,20 @@
+framework: PIPL(个人信息保护法)
+version: 2021
+applicable_industries: [Any with China subjects' data]
+status: skeleton
+checks:
+  - id: Art-13
+    title: Lawful basis for processing
+    severity: P0
+    rule: One of consent/contract/legal obligation/vital interest/public interest/HR documented per processing.
+    evidence_required: [lawful_basis_matrix]
+  - id: Art-38
+    title: Cross-border data transfer
+    severity: P0
+    rule: Security assessment / standard contract / certification before any cross-border transfer.
+    evidence_required: [transfer_assessment, contract_copy]
+  - id: Art-55
+    title: Impact assessment for high-risk processing
+    severity: P0
+    rule: PIA conducted before sensitive PI / large-scale processing / automated decision.
+    evidence_required: [pia_report]

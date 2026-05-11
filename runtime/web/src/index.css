@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #ffffff;
+  --color-fg: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-border: #e2e8f0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+/* charter §21 L2: 可访问性 — 高对比焦点 */
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}

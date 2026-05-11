@@ -1,0 +1,33 @@
+# essence_watcher 选择性应用 policy(主宪章 §29)
+#
+# 实际部署:cp 到 D:/项目文件/_精髓库/_apply_policy.yaml 启用
+# 默认所有 delta 仅入精髓库,不动 Test-Agent.
+
+# 自动提议入 Test-Agent(待审)
+auto_propose:
+  - skill_definitions       # 新 skill name/description/metadata
+  - charter_rules           # 主宪章规则更新建议
+  - safety_patterns         # 防护模式
+  - test_methodology        # 测试方法论新增
+  - tool_integrations       # 工具集成模式
+
+# 仅入精髓库,不动 Test-Agent
+essence_only:
+  - branding                # 项目名 / Logo / 推特
+  - business_lane           # 企业商业版细节
+  - deployment_specifics    # 特定 host / 云细节
+  - unrelated_features      # 与测试无关
+
+# 永不入(硬拒)
+never:
+  - source_code_blocks_lt_100_lines  # 大段源码不抄
+  - vendor_specific_apis             # 厂商锁定 API(Anthropic / OpenAI 私有)
+  - personal_data_examples           # 包含真实人名/邮箱的示例
+  - copyrighted_book_excerpts        # 书摘 > 50 字
+
+# 提议时附加要求
+proposal_requirements:
+  require_authority_source: true     # 引用必须出自 docs/theory/_authority_sources.yaml 白名单
+  require_confidence_tag: true       # 必标 llm-draft-unreviewed 待审
+  require_diff_summary: true         # 必含与现有的差异摘要
+  require_test_relevance: true       # "对测试有用"必有说明,否则归 essence_only

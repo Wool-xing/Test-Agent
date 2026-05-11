@@ -1,0 +1,26 @@
+framework: IEC 62304(医疗器械软件生命周期)
+version: 2006 + Amendment 1:2015
+applicable_industries: [Medical Device]
+status: skeleton
+software_safety_classifications: [A, B, C]  # 风险等级
+checks:
+  - id: 5.1
+    title: Software development planning
+    severity: P0
+    rule: Documented development plan covering all life-cycle processes; updated per classification.
+    evidence_required: [dev_plan, classification_record]
+  - id: 5.3
+    title: Software unit verification
+    severity: P0
+    rule: Each software unit verified per acceptance criteria; class B/C require unit testing evidence.
+    evidence_required: [unit_test_report]
+  - id: 6.1
+    title: Software risk management
+    severity: P0
+    rule: Risk analysis linked to ISO 14971; mitigations validated.
+    evidence_required: [risk_management_file]
+  - id: 9.1
+    title: Software problem resolution
+    severity: P1
+    rule: Documented procedure for receiving, investigating, resolving software problems.
+    evidence_required: [problem_log, resolution_record]

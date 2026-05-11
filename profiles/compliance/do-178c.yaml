@@ -1,0 +1,21 @@
+framework: DO-178C(航空机载软件)
+version: 2011
+applicable_industries: [Aviation, Avionics]
+dal_levels: [A, B, C, D, E]  # Design Assurance Level (A = catastrophic)
+status: skeleton
+checks:
+  - id: 6.3.1
+    title: Requirements traceability
+    severity: P0
+    rule: Bi-directional traceability from system reqs → SW reqs → design → code → test.
+    evidence_required: [traceability_matrix]
+  - id: 6.4.4
+    title: Structural coverage analysis
+    severity: P0
+    rule: Statement coverage (DAL C+); decision coverage (DAL B+); MC/DC (DAL A).
+    evidence_required: [coverage_report, mcdc_proof]
+  - id: 11.2
+    title: Software life-cycle data
+    severity: P0
+    rule: All life-cycle data (PSAC/SDP/SVP/SCMP/SQAP/SCI/SAS) maintained + auditable.
+    evidence_required: [psac, sdp, svp, scmp, sqap, sci, sas]

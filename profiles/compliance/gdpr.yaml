@@ -1,0 +1,20 @@
+framework: GDPR(欧盟通用数据保护条例)
+version: Regulation 2016/679
+applicable_industries: [Any with EU subjects' data]
+status: skeleton
+checks:
+  - id: Art-25
+    title: Data protection by design + by default
+    severity: P0
+    rule: Privacy embedded in design; default settings minimize data collected.
+    evidence_required: [dpia_report, default_config_audit]
+  - id: Art-32
+    title: Security of processing
+    severity: P0
+    rule: Pseudonymisation + encryption + integrity + resilience tested.
+    evidence_required: [encryption_audit, pen_test_report]
+  - id: Art-33
+    title: Breach notification within 72h
+    severity: P0
+    rule: Documented incident response with regulator notification path ≤ 72h.
+    evidence_required: [incident_runbook, breach_drill_log]
