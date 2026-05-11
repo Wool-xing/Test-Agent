@@ -194,8 +194,8 @@ jobs:
           SKILLS=$(ls 03-技能定义/*.md | grep -v README | wc -l)
           UTILS=$(ls 05-代码示例/*.py | wc -l)
           echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
-          [ "$AGENTS" = "14" ] || { echo "❌ Agents 数量不符（期 14，实 $AGENTS）"; exit 1; }
-          [ "$SKILLS" = "13" ] || { echo "❌ Skills 数量不符（期 13，实 $SKILLS）"; exit 1; }
+          [ "$AGENTS" = "16" ] || { echo "❌ Agents 数量不符（期 16，实 $AGENTS）"; exit 1; }
+          [ "$SKILLS" -ge "25" ] || { echo "❌ Skills 数量不符（期 ≥25，实 $SKILLS）"; exit 1; }
           [ "$UTILS" = "49" ] || { echo "❌ Utils 数量不符（期 49，实 $UTILS）"; exit 1; }
           echo "✅ 文件统计正确"
 
