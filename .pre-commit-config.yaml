@@ -54,6 +54,14 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # 防精髓库误入(主宪章 §29 + V1.10 铁律):_精髓库/ 是私有跨项目知识,绝不入 Test-Agent repo
+      - id: forbid-essence-library
+        name: 禁止提交 _精髓库/ 路径（私有跨项目知识）
+        entry: bash -c 'M=$(git diff --cached --name-only | grep -E "(^|/)_?精髓库(/|$)" || true); if [ -n "$M" ]; then echo "❌ 禁止提交私有精髓库内容(主宪章 §29 + V1.10 铁律)"; echo "命中文件:"; echo "$M"; echo "处置:git rm --cached <file> && 移出 repo(精髓库应在 D:/项目文件/_精髓库/)"; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # 文件统计校验（防误删 agent/skill/utils）
       - id: file-count-check
         name: Agents/Skills/Utils 数量校验
@@ -61,6 +69,15 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+
+      # L1 自检:agent/skill frontmatter lint(主宪章 §33,V1.10)
+      - id: agent-frontmatter-lint
+        name: Agent/Skill frontmatter L1 自检
+        entry: bash -c 'cd "$(git rev-parse --show-toplevel)" && python -m runtime.healthcheck.agent_smoke || exit 1'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
 
   # ===== Markdown 风格 =====
   - repo: https://github.com/igorshubovych/markdownlint-cli

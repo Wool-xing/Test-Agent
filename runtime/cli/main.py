@@ -82,8 +82,11 @@ def plan(
 
 
 @app.command()
-def doctor():
-    """Sanity check: settings + catalog + optional DB/MinIO ping."""
+def doctor(
+    agents: bool = typer.Option(False, "--agents", help="L1 frontmatter lint + optional --probe LLM ping"),
+    probe: bool = typer.Option(False, "--probe", help="L3 真 LLM 每 agent ping 一次(~$0.5,主宪章 §33)"),
+):
+    """Sanity check: settings + catalog + optional DB/MinIO ping + L1/L3 self-check."""
     s = get_settings()
     console.print("[bold]Settings:[/]")
     console.print(f"  project_root      = {s.project_root}")
@@ -95,6 +98,80 @@ def doctor():
     console.print(f"\n[bold]Catalog:[/] {cat['counts']['experts']} experts, {cat['counts']['skills']} skills")
     _ping_db()
     _ping_minio()
+
+    if agents:
+        from runtime.healthcheck.agent_smoke import run_smoke
+
+        console.print("\n[bold]L1 frontmatter lint:[/]")
+        report = run_smoke()
+        if report.ok:
+            console.print(f"[green]OK[/] agents={report.expert_count}/16 skills={report.skill_count}/≥25")
+        else:
+            console.print(f"[red]FAIL[/] {len(report.issues)} issue(s):")
+            for i in report.issues:
+                console.print(f"  - {i}")
+            raise typer.Exit(1)
+
+    if probe:
+        from runtime.healthcheck.llm_probe import probe_all_agents
+
+        console.print("\n[bold]L3 LLM probe (real call,主宪章 §33):[/]")
+        results = probe_all_agents()
+        for r in results:
+            mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
+            console.print(f"  {mark} {r.name:30}  {r.latency_ms:>5} ms  {r.reason or ''}")
+        failed = [r for r in results if not r.ok]
+        if failed:
+            console.print(f"[red]{len(failed)}/{len(results)} agents probe failed[/]")
+            raise typer.Exit(1)
+        console.print(f"[green]all {len(results)} agents responded[/]")
+
+
+@app.command()
+def selftest(
+    e2e: bool = typer.Option(False, "--e2e", help="L3 整体 E2E(读 fixture PRD → 16 agent DAG → 执行 → 落盘,真 LLM,~$3)"),
+    fixture: str = typer.Option("examples/_smoke_prd.md", "--fixture", help="PRD fixture 路径"),
+    persist: bool = typer.Option(False, "--persist", help="写 DB"),
+    strict: bool = typer.Option(False, "--strict", help="100% 节点过才算通过;默认 ≥80% 过(主宪章 §33 容忍)"),
+    pass_threshold: float = typer.Option(0.80, "--pass-threshold", help="非 strict 模式最低通过率 0.0-1.0"),
+):
+    """L3 整体自检(主宪章 §33,pre-tag 必跑).
+
+    默认容忍模式:节点通过率 ≥ pass_threshold(0.80)即通过。Fixture e2e 因部分节点
+    需运行时输入(如 --data 路径),容忍部分失败,但通过率必须达标。
+    --strict 关此容忍,任一节点失败即算 fail(用于发布前最终验证)。
+    """
+    if not e2e:
+        console.print("[yellow]nothing to do; pass --e2e[/]")
+        raise typer.Exit(0)
+
+    fixture_path = Path(fixture)
+    if not fixture_path.exists():
+        console.print(f"[red]fixture not found:[/] {fixture}")
+        raise typer.Exit(2)
+
+    console.print(f"[bold]L3 E2E selftest[/]  fixture={fixture}  mode={'strict' if strict else f'tolerant ≥{pass_threshold:.0%}'}")
+    art = parse_path(fixture_path)
+    run_id, decision = _kernel.submit(art, persist=persist)
+    console.print(f"  run_id      = {run_id}")
+    console.print(f"  target_type = {decision.detected_target_type}  confidence={decision.confidence:.2f}")
+    console.print(f"  dag nodes   = {len(decision.dag)}")
+    summary = _kernel.execute_sync(run_id, decision)
+
+    total = summary["total"]
+    succ = summary["succeeded"]
+    rate = succ / total if total else 0.0
+    if strict:
+        ok = summary["failed"] == 0
+        label = "strict (100%)"
+    else:
+        ok = rate >= pass_threshold
+        label = f"tolerant ≥{pass_threshold:.0%}"
+
+    mark = "[green]✓ PASS[/]" if ok else "[red]✗ FAIL[/]"
+    console.print(f"{mark}  {succ}/{total} ok ({rate:.0%}, {label})  {summary['failed']} failed")
+    if not ok:
+        raise typer.Exit(1)
 
 
 def _build_artifact(target: str, note: str):

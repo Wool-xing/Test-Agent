@@ -43,26 +43,39 @@ class LLMClient:
                 logger.warning("provider {} failed: {}", prov, e)
         raise LLMError(f"all providers failed: primary={self.provider} fallback={self.fallback}")
 
-    def _call(self, provider: str, system: str, user: str, temperature: float) -> str:
+    def complete(self, system: str, user: str, *, temperature: float = 0.1, max_tokens: int = 256) -> str:
+        """Plain text completion(no JSON parse)· healthcheck probe / 简单总结 用."""
+        for prov in [self.provider, self.fallback]:
+            try:
+                return self._call(prov, system, user, temperature, max_tokens=max_tokens, json_mode=False)
+            except Exception as e:  # noqa: BLE001
+                logger.warning("provider {} failed: {}", prov, e)
+        raise LLMError(f"all providers failed: primary={self.provider} fallback={self.fallback}")
+
+    def _call(self, provider: str, system: str, user: str, temperature: float, *, max_tokens: int | None = None, json_mode: bool = True) -> str:
         if provider == "stub":
-            return _stub_response(system, user)
+            return _stub_response(system, user) if json_mode else "stub: ok"
         try:
             import litellm  # local import keeps tests cheap
         except ImportError as e:
             raise LLMError("litellm not installed; pip install litellm") from e
 
         model = PROVIDER_MODEL_MAP.get(provider, provider)
-        resp = litellm.completion(
-            model=model,
-            messages=[
+        kwargs: dict[str, Any] = {
+            "model": model,
+            "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
-            temperature=temperature,
-            timeout=self.timeout,
-            num_retries=self.max_retries,
-            response_format={"type": "json_object"},
-        )
+            "temperature": temperature,
+            "timeout": self.timeout,
+            "num_retries": self.max_retries,
+        }
+        if json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+        if max_tokens is not None:
+            kwargs["max_tokens"] = max_tokens
+        resp = litellm.completion(**kwargs)
         return resp["choices"][0]["message"]["content"]
 
     @staticmethod
