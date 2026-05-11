@@ -1,6 +1,6 @@
 ---
 name: testcase-design
-description: 快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例 Excel（4 Sheet），不执行完整测试流程。适用于用例评审、快速梳理测试点。
+description: 快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选：默认 Excel（4 Sheet），可选 xmind / markmap / opml 思维导图（V1.9 加），或 --format all 一键产全部。适用于用例评审、快速梳理测试点。
 tools: Read, Write, Grep, Glob
 ---
 
@@ -70,7 +70,7 @@ P1 主要用例（12 条）：
 [Excel 已保存至 workspace/测试用例/testcases_登录_20260510.xlsx]
 ```
 
-### Excel 文件
+### Excel 文件（默认）
 
 落盘路径：`workspace/测试用例/testcases_[模块]_[YYYYMMDD].xlsx`
 
@@ -80,6 +80,28 @@ P1 主要用例（12 条）：
 - **Sheet2 测试用例**：完整用例（16 列，含 API 字段 method/path/headers/expected_status）
 - **Sheet3 P0冒烟集**：仅 P0 用例（带前置条件、数据）
 - **Sheet4 P0_P1回归集**：P0+P1 用例
+
+### 思维导图 / 大纲（V1.9 加，按需）
+
+`runtime/exporters/` 已注册 3 个 exporter，用户自选；同一 TestCaseTree 一份 IR，三种落盘：
+
+| `--format` | 扩展 | 用途 | 工具兼容 |
+|-----------|------|------|---------|
+| `xmind`   | `.xmind` | 思维导图（P0/P1/P2 自动转 marker） | XMind 8 / ZEN / 2020+ / Mind+ |
+| `markmap` | `.md`    | Markdown 嵌入式（GitHub README 直渲） | markmap.js / VSCode 插件 |
+| `opml`    | `.opml`  | 通用大纲交换 | MindManager / Workflowy / Word |
+| `all`     | —        | 一键产全部 3 种 + Excel | 用户自挑 |
+
+CLI：
+
+```bash
+tagent export plan.json --format xmind   --out workspace/测试用例/login.xmind
+tagent export plan.json --format markmap --out workspace/测试用例/login.md
+tagent export plan.json --format opml    --out workspace/测试用例/login.opml
+tagent export plan.json --format all     --out-dir workspace/测试用例/
+```
+
+`plan.json` 是 `TestCaseTree` 的 JSON 序列化（testcase-designer 输出，结构见 `runtime/exporters/INDEX.md`）。
 
 ## 用例 ID 规范
 
