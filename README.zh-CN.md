@@ -1,14 +1,37 @@
 # 🤖 Test-Agent
 
-> **AI 测试 Agent 框架 · 开源 · 多 LLM · 边用边学**
+> **AI 测试 Agent 框架 · 开源 · 多 LLM · 5 秒上手**
 
 [![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
+[![Self-test](https://img.shields.io/badge/selftest-100%25-brightgreen.svg)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![English](https://img.shields.io/badge/Lang-English-blue.svg)](README.md)
 
 [English](README.md) | **简体中文**
+
+---
+
+## ⚡ 30 秒 demo
+
+```bash
+git clone https://github.com/Wool-xing/Test-Agent.git
+cd Test-Agent && pip install -e .
+
+tagent demo            # 0 API key · 0 配置 · stub LLM · 30 秒看完整产物
+```
+
+产物:测试用例(Excel + xmind + markmap + opml)+ Word 报告 + 决策日志,全在 `workspace/`。
+
+要在自己项目跑?
+
+```bash
+tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / security-pentest
+# → 产 .env + tagent.yml + STARTUP.md(5 步上手指南)
+```
+
+8640 种配置组合,改 `matrix.yaml` 一行,向导自动列出。见 [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md)。
 
 ---
 
@@ -16,44 +39,22 @@
 
 Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告,全自主。为 QA 团队、安全研究员、车载测试工程师、以及任何想**用 AI 测试同时学测试理论**的人而生。
 
-- **16 个专家 Agent**(功能 / 安全 / 移动 / 桌面 / AI 模型 / 车载 / 渗透 …)
-- **34 个可复用 Skill**(TDD / E2E / 回归 / 渗透 / 车载 CAN 总线 / eval-harness …)
-- **49 个生产工具**(pytest / Playwright / JMeter / Appium / Burp / Allure / OpenCV …)
-- **多 LLM**(Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama — 无厂商锁定)
-- **MCP 原生**(6 件套:test-orchestrator / protocol-adapter / evidence-vault / defect-tracker / knowledge-base / compliance-checker)
+- **16 专家 Agent** — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
+- **32+ 可复用 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
+- **49 生产工具** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV ……
+- **多 LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(无厂商锁定)
+- **6 BugTracker 适配** — 禅道 · Jira · GitHub Issues · GitLab Issues · Linear · Webhook(主宪章 §37)
+- **6 通知渠道** — 企微 · 飞书 · 钉钉 · Slack · 邮件 · Teams(主宪章 §36)
+- **MCP 原生** — 6 件套 + 4 关 marketplace 安全门
+- **4 层自检** — L1 lint · L2 CI mock · L3 真 LLM pre-tag · L4 周自检(主宪章 §33)
 
-## ✨ 30 秒 Demo
-
-> _Demo gif 下个 release 加_
->
-> 暂时:
-> ```bash
-> tagent run "测 ./app.exe" --mode learn --lang zh
-> ```
-> 每步带:**原因 + 理论引用 + 替代方案 + 深度阅读**
-
-## 🚀 安装
+## 🚀 生产安装
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 ```
 
-或本地:
-
-```bash
-git clone https://github.com/Wool-xing/Test-Agent.git
-cd Test-Agent && bash install.sh /path/to/your-test-project
-```
-
-3 步首测:
-
-```bash
-cd /path/to/your-test-project
-vim .env                    # 填 8 个必填字段(LLM key / Bug tracker / Webhook)
-claude /login               # 首次登录 Claude
-claude                      # 启动
-> /smoke-test               # 10 分钟 P0 冒烟
-```
+然后 `tagent init` 自动生成 `.env`/`tagent.yml`/`STARTUP.md`——不用再花 30 分钟手填字段。
 
 ## 🎯 5 大核心能力
 

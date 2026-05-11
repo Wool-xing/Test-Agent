@@ -1,14 +1,37 @@
 # 🤖 Test-Agent
 
-> **AI Testing Agent Framework · Open-Source · Multi-LLM · Learn-While-Using**
+> **AI Testing Agent Framework · Open-Source · Multi-LLM · 5-second setup**
 
 [![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
+[![Self-test](https://img.shields.io/badge/selftest-100%25-brightgreen.svg)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![中文](https://img.shields.io/badge/Lang-中文-red.svg)](README.zh-CN.md)
 
 **English** | [简体中文](README.zh-CN.md)
+
+---
+
+## ⚡ 30-second demo
+
+```bash
+git clone https://github.com/Wool-xing/Test-Agent.git
+cd Test-Agent && pip install -e .
+
+tagent demo            # 0 API key · 0 config · stub LLM · 30s end-to-end
+```
+
+Outputs: test cases (Excel + xmind + markmap + opml) + Word report + decision logs, all under `workspace/`.
+
+Ready to run on your project?
+
+```bash
+tagent init --preset 国内-web    # or: minimal / saas-web / mobile-android / security-pentest
+# → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
+```
+
+8640 config combinations from a single `matrix.yaml` — change a line in YAML, the wizard picks it up. See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
 
 ---
 
@@ -16,44 +39,22 @@
 
 Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports. Built for QA teams, security researchers, automotive testers, and anyone who wants to **use AI testing while learning the theory behind it**.
 
-- **16 expert agents** (functional / security / mobile / desktop / AI model / automotive / pentest …)
-- **34 reusable skills** (TDD / E2E / regression / pentest / car-can-bus / eval-harness …)
-- **49 production utils** (pytest / Playwright / JMeter / Appium / Burp / Allure / OpenCV …)
-- **Multi-LLM** (Claude, OpenAI, Gemini, Qwen, DeepSeek, Ollama — no vendor lock-in)
-- **MCP-native** (6-server suite: test-orchestrator / protocol-adapter / evidence-vault / defect-tracker / knowledge-base / compliance-checker)
+- **16 expert agents** — functional · security · mobile · desktop · AI model · automotive · pentest …
+- **32+ reusable skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
+- **49 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
+- **Multi-LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(local,no vendor lock-in)
+- **6 BugTracker adapters** — Zentao · Jira · GitHub Issues · GitLab Issues · Linear · Webhook(主宪章 §37)
+- **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams(主宪章 §36)
+- **MCP-native** — 6-server suite + 4-gate marketplace
+- **4-layer self-test** — L1 lint · L2 mock CI · L3 real-LLM pre-tag · L4 weekly cron(主宪章 §33)
 
-## ✨ 30-second Demo
-
-> _Demo gif coming next release._
->
-> Until then:
-> ```bash
-> tagent run "test ./app.exe" --mode learn --lang zh
-> ```
-> Every step explained with theory references + alternatives considered + further reading.
-
-## 🚀 Install
+## 🚀 Install for production
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 ```
 
-Or local:
-
-```bash
-git clone https://github.com/Wool-xing/Test-Agent.git
-cd Test-Agent && bash install.sh /path/to/your-test-project
-```
-
-Three steps to first test:
-
-```bash
-cd /path/to/your-test-project
-vim .env                    # fill 8 required fields (LLM key, bug tracker, webhook)
-claude /login               # first-time Claude login
-claude                      # start
-> /smoke-test               # 10-min P0 smoke
-```
+Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 mins of hand-editing.
 
 ## 🎯 5 Key Capabilities
 
