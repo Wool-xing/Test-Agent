@@ -1,0 +1,36 @@
+---
+name: automotive-ota-update-test
+description: OTA 升级测试 Skill。包签名 + 差分 + A/B 分区 + 断电恢复 + 行车安全 + 回退;UN R156 / GB 44496-2024 合规。
+tools: Read, Write, Bash, Grep, Glob
+requires_layer: [base, system]
+---
+
+# automotive-ota-update-test
+
+## 必测路径(7 项)
+
+1. **包签名 + 证书链**:防中间人;PKI 校验失败必拒绝
+2. **差分包正确性**:bsdiff / xdelta3 / xz patch;校验前后 hash
+3. **A/B 分区切换**:active 分区与 standby 分区独立;切换失败回到 active
+4. **断电 / 弱网 / 中断恢复**:任意阶段断电后再上电必能恢复
+5. **升级中行车安全**:车速 > 0 / 档位 ≠ P / 手刹未拉 → 拒绝升级
+6. **诊断 DTC 升级前后对比**:升级后无新 DTC
+7. **回退机制**:用户主动 / 系统自动检测异常都能回上版
+
+## 合规标准
+
+- **UN R156**:OTA 软件更新管理系统(SUMS),欧盟强制 2024+
+- **GB 44496-2024**:中国汽车 OTA 强制标准
+- **AUTOSAR Adaptive Update and Config Management**
+
+## 工具
+
+- 升级流量重放:wireshark + scapy
+- 中断模拟:`utils/chaos_helper.py` 在升级中触发(`runtime/scheduler` 集成)
+- 弱网模拟:tc + netem(主宪章已用)
+
+## 输出
+
+- OTA 升级矩阵(各场景过/挂)
+- 回退用例验证报告
+- UN R156 文档化送审包

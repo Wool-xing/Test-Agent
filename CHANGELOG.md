@@ -12,7 +12,145 @@
 
 ## [Unreleased]
 
-### Fixed（W3 收尾后发布前实测发现 2 bug）
+### Added(V1.7.0-alpha · Karpathy 4 原则 + ECC 测试加固 + Essence 自动汲取 · 2026-05-12)
+
+- **精髓库扩 2 条目**:
+  - `_精髓库/karpathy-skills.md`(125k★ · LLM 写代码 4 原则元层)
+  - `_精髓库/everything-claude-code.md`(179k★ · AI agent harness 性能优化 200 skill / 53 agent / Homunculus instincts / Selective install)
+- **Karpathy 4 原则**(主宪章 §27,元层贯穿):Think Before / Simplicity First / Surgical Changes / Goal-Driven Execution;`03-技能定义/karpathy-guidelines/SKILL.md` 部署 upstream 原文(类 darwin-skill 不改本地)
+- **ECC 6 测试 skill 入库**(对测试有用的,§28):
+  - `tdd-workflow` · TDD 80%+ 覆盖
+  - `verification-loop` · 5-phase verify(build→typecheck→lint→test→coverage)
+  - `e2e-testing` · Playwright + 2FA/TOTP/SSO + 视觉回归 + 录屏
+  - `eval-harness` · pass@k / Jaccard@k / top-1 / latency Δ
+  - `security-review` · 代码层白盒 5 维(与 §25 pentest 应用层互补)
+  - `agent-introspection-debugging` · 决策回放 + OTel + token + 上下文
+- **Essence 自动汲取**(主宪章 §29):`runtime/essence_watcher/`
+  - parser + tracker(gh API)+ delta_extractor(aux LLM)+ runner
+  - 周期跑;新 commit → LLM 萃取 delta → 写 `_精髓库/{name}.update_{date}.md` 标 `llm-draft-unreviewed` 待审
+  - `_精髓库_apply_policy.example.yaml`:auto_propose / essence_only / never 三档
+  - safe-by-default:`tagent.yml essence_watcher.enabled: true` 才跑
+- **主宪章新增 3 节**:§27 Karpathy 4 原则 / §28 ECC 测试加固 / §29 Essence 自动汲取 + TOC 同步
+- 数字:14 skill → **32**(原 14 + 7 pentest + 5 automotive + 6 ECC) + `karpathy-guidelines/SKILL.md` upstream 1 个
+- 版本 V1.6.0-alpha → V1.7.0-alpha
+
+### Added(V1.6.0-alpha · 渗透&安全 + 车载&自动驾驶 双垂直专家+skill 集 · 2026-05-12)
+
+- **精髓库扩**:`_精髓库/pentest-ai-agents.md` 合并萃取 pentagi(黑盒)+ shannon(白盒);10 节;含对比表+应用 checklist
+- **2 新专家**:
+  - `02-专家定义/15-渗透测试.md` `pentest-tester`(白盒+黑盒+5 攻击域 + Static-Dynamic Correlation + PoC-only)
+  - `02-专家定义/16-车载测试.md` `automotive-tester`(ISO 26262 + AUTOSAR + HIL/SIL/MIL/PIL + ADAS + OTA + V2X)
+- **7 新 pentest skill**:
+  - `pentest-coordinator`(主)/ `pentest-recon` / `pentest-vuln` / `pentest-exploit` / `pentest-web` / `pentest-api` / `pentest-report`
+- **5 新 automotive skill**:
+  - `automotive-test`(主)/ `automotive-can-bus-test` / `automotive-adas-scenario` / `automotive-ota-update-test` / `automotive-hil-loop-test`
+- **主宪章 §25**:渗透 & 安全测试强化(规则化:授权前置 / scope 防护 / prod 禁 / 沙箱 / PoC-only / 不可逆禁止 / 责任披露 / PII scrub)
+- **主宪章 §26**:车载 & 自动驾驶强化(规则化:ASIL C/D 必 HIL / L4 极深 / OTA 必回退 / 公开道路授权 / 录波 MDF4 / PII 禁存 / 领域档案签字)
+- **主宪章 §2 升级**:专家 14 → 16(核心 9 + 平台扩展 7)
+- **TOC 同步**:加 §25 §26
+- 数字:14 expert → **16** | 14 skill → **26**(7 pentest + 5 automotive 新增)
+- 版本 V1.5.0-alpha → V1.6.0-alpha
+
+### Added(V1.5.0-alpha · GBrain-inspired 强化 + 跨项目精髓库扩 · 2026-05-12)
+
+- **精髓库扩**:`D:/项目文件/_精髓库/gbrain.md`(完整 10 节萃取,300+ 行)+ INDEX 更新
+- **KB 自连图谱**:`runtime/tutor/graph.py`,零 LLM 抽取 typed link(6 种边:related_to/superseded_by/extends/prerequisite_of/contradicts/tool_implements);BFS walk + backlink-boosted ranking。实测 12 卡 → 40 edges + 44 nodes
+- **eval 回放**:`runtime/tutor/eval_replay.py`,`TAGENT_EVAL_CAPTURE=1` opt-in;PII 自动 scrub(email/phone/SSN/API-key/card 6 类正则);replay 3 数(Jaccard@k/top-1 stability/latency Δ);默认 off
+- **safe-by-default yaml 栅栏**:`runtime/config/safety.py` + `tagent.yml.example`;scheduler/curator/backends/gateway/destructive_ops 默认 deny;`assert_allowed` / `gate_*` 工厂函数;缺配置 → `SafeByDefaultBlocked` 异常
+- **主宪章 §24**:GBrain-inspired 强化(自连图谱 + 混合检索 + eval 回放 + safe-by-default + PII 单源)+ TOC 同步
+- 版本 V1.4.0-alpha → V1.5.0-alpha
+
+### Added(V1.4.0-alpha · 教学层 · 用户边用边学 · 2026-05-12)
+
+- **主宪章 §23 教学层准则**:exec(老手)/learn(新手)双模式 + 反幻觉 3 层 + 双语切换 + 持续累积
+- **Theory KB**:`docs/theory/`,12 大类目录(工具/编程/基础理论/策略/方法/协议/平台/门禁/安全/AI测试/合规/流程)
+  - `_schema.yaml`:卡片字段定义(id/category/level/authority/confidence/last_reviewed)
+  - `_authority_sources.yaml`:权威源白名单(国际 ISTQB/IEEE/ISO/IEC/NIST/OWASP/MITRE/Google/Microsoft/Fowler/arXiv/ICSE/ISSTA + 中国 GB/T/等保/阿里/腾讯/美团/字节/CCF + AI HF/Anthropic/OpenAI/DeepEval + 经典书 Beizer/Myers/Crispin/Kaner)
+  - 种子 12 张(每类 1 张):pytest / pytest-fixture / test-pyramid-2024 / shift-left / equivalence-partitioning / http-https / desktop-testing-windows / flaky-vs-reruns / owasp-top-10 / hallucination-evaluation / iec-62304 / bug-lifecycle;7 张完整中文 + 1 张完整双语
+- **`runtime/tutor/` 教学层模块**:
+  - `theory_kb.py`:KB loader,双语合并,L1 引用约束(`is_known_id`)
+  - `verbosity.py`:Mode(exec/learn/silent)枚举
+  - `i18n.py`:zh/en/zh-en 切换
+  - `explainer.py`:Explanation 渲染 + filter_refs(L1)+ verify_refs_async(L2)
+  - `feedback.py`:用户回报(L3)落 `workspace/learning/feedback/`
+- **路由器 schema 扩展**(`router/schema.py` DAGNode):`one_liner_zh/one_liner_en/why/theory_refs/alternatives` 字段
+- **路由器 system prompt**:11 条 HARD RULES 加教学指令(KB id 必经 L1 过滤,unsure 留空)
+- **CLI**:`tagent run --mode exec|learn|silent --lang zh|en|zh-en`
+- **API**:`POST /run/text?mode=&lang=` query 参数
+- **反幻觉**:实测 unknown-id 正确标记"该领域未收录,慎用"
+- 版本 V1.3.0-alpha → V1.4.0-alpha
+
+### Added(V1.3.0-alpha · Hermes-inspired 5 模块 + 跨项目精髓库 · 2026-05-11)
+
+- **跨项目精髓库**:`D:/项目文件/_精髓库/`
+  - `INDEX.md`:精髓库索引
+  - `hermes-agent.md`:NousResearch/hermes-agent 完整精髓萃取(8 节,300+ 行;思想+模式+反模式+迁移 checklist)
+- **5 新 runtime 模块**(派生 hermes 精髓):
+  - `runtime/scheduler/`:定时任务(croniter + fcntl/msvcrt 双栈文件锁 + 运行时 prompt 注入扫描);`jobs.py / scheduler.py / injection_scan.py`
+  - `runtime/subagent/`:并行子代理(ThreadPool 32 默认,resize 动态调整 + auxiliary LLM client 隔离 cache);`pool.py / aux_client.py / spawn.py`
+  - `runtime/learning_loop/`:封闭学习循环(curator 闲置触发 + FTS5 跨会话搜 + 用户画像);`curator.py / session_search.py / user_model.py`;只归档不删
+  - `runtime/backends/`:7 执行后端(`local/docker/ssh/singularity/modal/daytona/vercel_sandbox`);统一 `BaseExecutionEnv` 7 方法;Modal/Daytona 提供 serverless hibernate
+  - `runtime/gateway/`:多平台 messaging(`telegram/discord/slack/wechat/feishu/dingtalk/email/webhook` 8 平台);统一 `Platform.send/configure`;`session.py` 跨平台对话连续
+- **主宪章 §22**:Hermes-inspired 扩展能力章节(规则化);TOC 同步更新
+- 版本 V1.2.0-alpha → V1.3.0-alpha
+
+### Added(V1.2.0-alpha · M2 MCP 6 件套 + Web UI + 真模型路由 + 飞轮回灌 · 2026-05-11)
+
+- **MCP 6 件套全部实现**(主宪章 §16):
+  - `runtime/mcp/test_orchestrator/`:包装 runtime/router + orchestrator,5 工具(catalog/plan/run/status/report);Claude Code 可直接调用
+  - `runtime/mcp/protocol_adapter/`:统一 ProtocolAdapter 抽象 + 5 起步 adapter(HTTP/gRPC/WS/MQTT/Kafka);HTTP 实测 ping 通过
+  - `runtime/mcp/evidence_vault/`:证据归档 5 工具(upload_evidence/upload_evidence_path/list/get/search),MinIO + Postgres
+  - `runtime/mcp/defect_tracker/`:工单桥 5 工具(create/get/update/query_bugs/list_trackers),默认 zentao + 预留扩展位(主宪章 §12 契约)
+  - `runtime/mcp/knowledge_base/`:pgvector 向量检索 4 工具(embed/index_case/index_defect/search_similar),LiteLLM embedding + stub 兜底
+  - `runtime/mcp/compliance_checker/`:行业合规规则 3 工具(list_profiles/get_profile/check_compliance);10 框架 profile 起步空载(SOC2/PCI-DSS/HIPAA/IEC 62304/IEC 61508/ISO 26262/DO-178C/GDPR/PIPL/CCPA)
+  - 共享基类 `runtime/mcp/base.py`:make_server / run_stdio / @tool_decision_logged(决策落 `workspace/执行日志/decisions/` 符合主宪章 §18-12)
+- **行业合规规则插槽** `profiles/compliance/`:10 框架空载示例 YAML,真规则由领域专家+test-lead 双签签字后入库
+- **飞轮回灌路由**(M2-9):`runtime/router/retrieval.py` 历史相似用例 → LLM prompt few-shot;router 透明集成,无 KB 时降级
+- **真模型路由测试套件**(M2-7):`runtime/tests/test_router_real.py` 20 样本(4 类型 × 5)真模型测试;门槛单模型 ≥85%、双模型投票 ≥95%;无 API key 自动 skip;失败自动落 decisions/ 含 seed+模型版本+输入快照(主宪章 §21 横切准则)
+- **Web UI MVP**(M2-8):`runtime/web/` Vite+React 18+TypeScript+shadcn/ui+TanStack Query+React Router v7
+  - 4 页:Upload(text/file/URL 三模式) / RunStatus(SSE 进度条) / Report(节点结果表) / Catalog(14 专家+14 skill)
+  - §21 L2 必测项:Playwright E2E 7 用例(功能+边界+异常+兼容+可访问性);axe-core a11y 0 critical 门槛
+  - 配套 vite 代理 `/api` → FastAPI(:8800)
+- **`.mcp.json` 升级**:启用 `filesystem` + `test-orchestrator`;其他 5 件套写入 `_pending_servers_v1_2_0_alpha` 段供按需启用
+- 版本 V1.1.0-alpha → V1.2.0-alpha
+
+### Added(V1.1.0-alpha · 宪章合一 · darwin-skill 入库 · 2026-05-11)
+
+- **主宪章扩展(memory `project_test_agent_workflow.md`)**:原 §0-§9 + How to apply 1-6 **字符级保留**;新增 §10-§20 仅承载规则/要求/约束(剔除示例/枚举/参考表):
+  - §10 灵魂底色:三公理 + 五条铭文 + V1.0.0 锁死 + 双签解锁条件
+  - §11 FULL_GUIDE.md 定位补充(优先级链:memory ＞ 私有源 ＞ FULL_GUIDE ＞ README)
+  - §12 多 Bug Tracker(默认 zentao + 扩展位 `BugTrackerBase` 契约)
+  - §13 按需安装 + 运行时补装铁律
+  - §14 darwin-skill 自进化(棘轮 + Via Negativa 不消费运行数据)
+  - §15 AgentChat 协作协议(test-lead 中枢 + 反问 3 级预算 + 争议未落档不签发)
+  - §16 MCP 服务扩展位(6 件套 Phase 2)
+  - §17 九大簇维度边界(认知地图;承认存在不假装能交付)
+  - §18 测试架构 + 5 层门禁分层 + Flaky vs Reruns 哲学
+  - §19 闭环约定 18 条(扩展 §8 质量闭环)
+  - §20 Phase 触发条件(不绑月份)
+  - How to apply 7-12 扩展项(铭文优先级 / 决策可追溯 / 纪要不可删 / darwin 棘轮 / 依赖补装反问 / 修改四关)
+- **行业适配参照表全删除**(主宪章 + FULL_GUIDE 双删)
+- **darwin-skill 入库**:`03-技能定义/darwin-skill/` 完整部署(SKILL.md + scripts/ + templates/ + assets/ + docs/),upstream 原文不改;13 Skill → 14 Skill
+- **FULL_GUIDE.md 优化**:三公理/铭文 + 18 闭环段替换为"已迁主宪章 §X"指引(避免双份维护);Bug Tracker / 按需安装 / darwin / AgentChat 详节保留作为深度参考;附 runtime 章节(M1-11 留存)
+
+### Added(V1.1.0-alpha · 运行时层)
+
+- **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 49 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
+  - `runtime/router/`:AI 路由(LiteLLM 多厂商:Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)。被测物 → 专家+Skill DAG。含 stub provider 供 CI 离线测,准确率 5/5 类型(web/api/mobile/desktop/ai-model)
+  - `runtime/registry/`:扫 `02-专家定义/*.md` + `03-技能定义/*.md` frontmatter 生成统一目录(14 expert + 13 skill,实测通过)
+  - `runtime/orchestrator/`:**双轨**——Prefect 2.x flow(全功能,带 UI/重试/状态机)+ Direct 执行器(无 Prefect 也能跑,ThreadPoolExecutor 并发,降级方案)
+  - `runtime/api/`:FastAPI 入口 `/run/text` `/run/file` `/run/url` `/status/{run_id}` `/report/{run_id}` `/catalog` `/health`。多格式上传 PDF/Word/MD/exe/APK/IPA/Docker/口头/URL/目录
+  - `runtime/cli/`:Typer CLI `tagent run|plan|catalog|doctor`
+  - `runtime/storage/`:飞轮 schema:Postgres+pgvector(向量检索),SQLAlchemy ORM(Run/Case/Defect/Evidence/Feedback/Embedding)+ Alembic 迁移 + MinIO 对象存储
+  - `runtime/observability/`:OpenTelemetry trace + Loguru 结构化日志,run_id 全链路贯穿
+  - `runtime/config/settings.py`:pydantic-settings 统一配置,`TAGENT_*` env 前缀
+- **`runtime/docker-compose.yml`**:一键起 Postgres(pgvector)/MinIO/Prefect Server;可选 `--profile observability` 起 Tempo+Loki+Grafana
+- **`runtime/Dockerfile`**:运行时镜像
+- **`runtime/pyproject.toml`**:独立子包,声明 `tagent` 命令入口
+- **路由验证**:5/5 类型(web/api/mobile/desktop/ai-model)stub 路由准确率 100%;E2E direct 模式 8 节点 DAG 跑通,run_id+耗时+脚本输出全记录
+- **架构原则**:八维测试矩阵(平台/协议/类型/流程/自动化层/部署/Profile/智能等级)作为运行时元数据骨架;**行业 Profile 留扩展位**(`profiles/`,通用层做厚)
+
+### Fixed(W3 收尾后发布前实测发现 2 bug)
 
 - **web-demo Python 3.14 跑不通**：`greenlet`（playwright 依赖）尚无 Python 3.13/3.14 预编译 wheel，本地编译失败导致 `pip install` 失败、playwright 装不上、pytest 跑不到。修：`examples/web-demo/README.md` 显式标注 Python 3.11/3.12 推荐 + 加 venv 创建步骤 + 故障排查表新增 wheel 编译失败条目。
 - **web-demo selector 失效**：`test_search_box_present` 用 `role=button[name='Search']` 不匹配 playwright.dev 当前 DOM 结构。修：换更稳定的 `text="Get started"`（hero CTA，多年不变）；`PlaywrightHomePage.has_search_button` → `has_get_started_link`；`test_search_box_present` → `test_get_started_link_present`。

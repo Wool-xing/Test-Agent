@@ -1,0 +1,20 @@
+framework: HIPAA Security Rule
+version: 45 CFR 164 Subpart C
+applicable_industries: [Healthcare, Medical, Insurance]
+status: skeleton
+checks:
+  - id: 164.308(a)(3)
+    title: Workforce security
+    severity: P0
+    rule: Authorization + supervision + clearance + termination procedures for PHI access.
+    evidence_required: [workforce_clearance_log, termination_procedure]
+  - id: 164.312(a)(1)
+    title: Access control
+    severity: P0
+    rule: Unique user identification + emergency access + automatic logoff + encryption/decryption of ePHI.
+    evidence_required: [uid_policy, emergency_proc, encryption_config]
+  - id: 164.312(b)
+    title: Audit controls
+    severity: P0
+    rule: Hardware/software/procedural mechanisms recording access to systems containing ePHI.
+    evidence_required: [audit_log]

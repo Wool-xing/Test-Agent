@@ -1,0 +1,20 @@
+framework: PCI-DSS v4.0
+version: 2022
+applicable_industries: [Payment, Card processing, Banking]
+status: skeleton
+checks:
+  - id: 3.4.1
+    title: PAN encryption at rest
+    severity: P0
+    rule: Cardholder PAN must be encrypted; truncation/hashing for storage outside CDE.
+    evidence_required: [encryption_config, db_audit]
+  - id: 6.4.3
+    title: Web app firewall presence
+    severity: P0
+    rule: All public web apps must be protected by WAF or equivalent.
+    evidence_required: [waf_config, traffic_log]
+  - id: 11.3.1
+    title: External penetration testing
+    severity: P0
+    rule: External pen-test executed >= annually + after significant change.
+    evidence_required: [pentest_report]

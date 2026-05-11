@@ -1,0 +1,163 @@
+# 权威源白名单(Q4-D 全要)· 主宪章 §23 铁律
+# LLM 在 learn mode 引用必须出自此列表;否则标 confidence=llm-draft-unreviewed.
+
+international:
+  certification:
+    - id: istqb
+      name: ISTQB(国际软件测试资质认证委员会)
+      url: https://www.istqb.org
+      coverage: [foundation, advanced, expert, mobile, automotive, AI, agile, gambling, ML]
+    - id: ieee-829
+      name: IEEE 829 测试文档标准
+      url: https://standards.ieee.org/standard/829-2008.html
+    - id: ieee-1012
+      name: IEEE 1012 软件验证与确认
+      url: https://standards.ieee.org/standard/1012-2016.html
+
+  standards:
+    - id: iso-iec-25010
+      name: ISO/IEC 25010 软件质量模型(8 大特性)
+      url: https://iso25000.com/index.php/en/iso-25000-standards/iso-25010
+    - id: iso-iec-29119
+      name: ISO/IEC/IEEE 29119 软件测试标准族
+    - id: iso-iec-27001
+      name: ISO/IEC 27001 信息安全管理
+    - id: nist-sp-800-115
+      name: NIST SP 800-115 信息安全测试技术指南
+      url: https://csrc.nist.gov/publications/detail/sp/800-115/final
+    - id: nist-sp-800-218
+      name: NIST SP 800-218 SSDF 安全软件开发框架
+
+  security:
+    - id: owasp-top-10
+      name: OWASP Top 10 Web 应用风险
+      url: https://owasp.org/Top10/
+    - id: owasp-asvs
+      name: OWASP Application Security Verification Standard
+      url: https://owasp.org/asvs/
+    - id: owasp-llm-top-10
+      name: OWASP Top 10 for LLM Applications
+      url: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+    - id: cwe-mitre
+      name: MITRE CWE Common Weakness Enumeration
+      url: https://cwe.mitre.org
+    - id: capec
+      name: MITRE CAPEC 攻击模式枚举
+      url: https://capec.mitre.org
+
+  industry_compliance:
+    - id: pci-dss-v4
+      name: PCI-DSS v4.0
+      url: https://www.pcisecuritystandards.org
+    - id: hipaa-security-rule
+      name: HIPAA Security Rule(45 CFR 164 Subpart C)
+    - id: iec-62304
+      name: IEC 62304 医疗器械软件生命周期
+    - id: iec-61508
+      name: IEC 61508 工业功能安全
+    - id: iso-26262
+      name: ISO 26262 汽车功能安全(ASIL)
+    - id: do-178c
+      name: DO-178C 航空机载软件
+    - id: gdpr
+      name: EU Regulation 2016/679 GDPR
+    - id: soc2
+      name: AICPA SOC 2 Type II
+
+  engineering_blogs:
+    - id: google-testing-blog
+      name: Google Testing Blog
+      url: https://testing.googleblog.com
+      authority_note: 工程实践标杆,引用具体文章+日期
+    - id: microsoft-engineering-fundamentals
+      name: Microsoft Engineering Fundamentals
+      url: https://microsoft.github.io/code-with-engineering-playbook/
+    - id: martin-fowler
+      name: Martin Fowler blog
+      url: https://martinfowler.com
+      authority_note: 测试金字塔/契约测试/微服务测试原始作者
+
+  academic:
+    - id: arxiv-cs-se
+      name: arXiv cs.SE / cs.PL / cs.LG(testing relevant)
+      url: https://arxiv.org/list/cs.SE/recent
+      authority_note: 引用必须带 arXiv id + 年份,经同行评议优先
+    - id: icse
+      name: ICSE 国际软件工程会议论文集
+    - id: issta
+      name: ISSTA 国际软件测试与分析研讨会
+    - id: fse
+      name: FSE/ESEC ACM 软件工程基础研讨会
+
+china:
+  national_standards:
+    - id: gb-t-25000-10
+      name: GB/T 25000.10 软件产品质量(等同 ISO/IEC 25010)
+    - id: gb-t-38673
+      name: GB/T 38673 信息技术 应用软件质量评估
+    - id: dengbao-2.0
+      name: 网络安全等级保护 2.0
+      url: https://www.djbh.net
+    - id: gb-t-22239
+      name: GB/T 22239 信息安全等级保护基本要求
+
+  industry:
+    - id: ali-test-academy
+      name: 阿里巴巴技术质量公众号 / 阿里测试学院
+      url: https://developer.aliyun.com
+    - id: tencent-test
+      name: 腾讯测试公众号 / TMQ 移动质量
+      url: https://tmq.qq.com
+    - id: meituan-tech-blog
+      name: 美团技术团队博客(测试栏目)
+      url: https://tech.meituan.com
+    - id: bytedance-mobile-quality
+      name: 字节跳动移动质量
+    - id: ccf
+      name: CCF 中国计算机学会软件工程专委
+      url: https://www.ccf.org.cn
+
+  academic:
+    - id: ruanjianxuebao
+      name: 软件学报
+      url: http://www.jos.org.cn
+    - id: jisuanjixuebao
+      name: 计算机学报
+      url: http://cjc.ict.ac.cn
+
+llm_specific:
+  - id: hf-evaluate
+    name: Hugging Face Evaluate 库文档
+    url: https://huggingface.co/docs/evaluate
+  - id: anthropic-research
+    name: Anthropic Research(safety/eval)
+    url: https://www.anthropic.com/research
+  - id: openai-evals
+    name: OpenAI Evals(开源框架)
+    url: https://github.com/openai/evals
+  - id: deepeval
+    name: DeepEval LLM 评估
+    url: https://github.com/confident-ai/deepeval
+
+books:
+  classic:
+    - "Beizer 1990 《Software Testing Techniques》(2nd ed)"
+    - "Myers 2011 《The Art of Software Testing》(3rd ed)"
+    - "Lisa Crispin & Janet Gregory 《Agile Testing》"
+    - "Gerald Weinberg 《Perfect Software... and Other Illusions about Testing》"
+    - "Cem Kaner 《Lessons Learned in Software Testing》"
+  performance:
+    - "Henry Liu 2009 《Software Performance and Scalability》"
+    - "Brendan Gregg 《Systems Performance》"
+  security:
+    - "Dafydd Stuttard 《The Web Application Hacker's Handbook》"
+    - "Andrew Hoffman 《Web Application Security》(O'Reilly)"
+  ai_testing:
+    - "Tariq Rashid 《Make Your Own Neural Network》(原理基础)"
+    - "Aurelien Geron 《Hands-On ML》"
+
+# 使用规范:
+# - LLM 引用必须 id + 章节号/年份(若有)
+# - 中文 KB 卡 reading_zh 优先用 china/ 来源
+# - 英文 KB 卡 reading_en 优先用 international/ 来源
+# - 国际+中国都有的(如 ISO 25010 / GB/T 25000.10),双语卡可双引

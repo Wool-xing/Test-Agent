@@ -1,0 +1,75 @@
+# Test-Agent 配置(safe-by-default 栅栏 · gbrain §1.9 派生)
+#
+# 危险操作 / 自动化 / 影响生产 的功能 **必须显式开启**,否则 destructive-guard 拒绝运行.
+# 复制为 `tagent.yml` 并按需启用.
+
+# ============== 1. 调度器(runtime/scheduler) ==============
+scheduler:
+  enabled: false              # 必须显式 true 才允许后台 tick
+  cron_jobs_allowed: false    # 允许定时调用真模型 + 自动批准
+  max_concurrent_jobs: 1
+
+# ============== 2. Curator 自动维护(runtime/learning_loop) ==============
+curator:
+  enabled: false              # 闲置触发后台 skill 整理
+  interval_hours: 24
+  auto_archive_skills: false  # 即使开了也只归档不删(charter §22)
+
+# ============== 3. Eval 捕获(retrieval 质量量化) ==============
+eval:
+  capture: false              # TAGENT_EVAL_CAPTURE=1 同效;PII 已自动 scrub
+  max_captures_per_day: 500
+
+# ============== 4. Subagent 并行(runtime/subagent) ==============
+subagent:
+  pool_size: 32
+  allow_aux_provider_override: true
+
+# ============== 5. Backends(runtime/backends 7 后端) ==============
+backends:
+  # 默认仅 local 允许;远端后端必须显式 opt-in
+  allowed:
+    - local
+    # - docker
+    # - ssh
+    # - singularity
+    # - modal
+    # - daytona
+    # - vercel_sandbox
+  allow_arbitrary_exec: false    # 远端后端跑任意 shell 命令必须显式
+
+# ============== 6. Gateway(runtime/gateway 8 平台) ==============
+gateway:
+  # 默认无平台启用;接入任意平台必须显式
+  enabled_platforms: []
+  # 例:
+  # enabled_platforms: [telegram, feishu]
+
+# ============== 7. Bug Tracker(charter §12) ==============
+bug_tracker:
+  default: zentao
+  # 多 tracker 并存按 label 路由
+  enabled: [zentao]
+  # enabled: [zentao, jira, github]
+
+# ============== 8. Profile(行业 / 测试深度合规) ==============
+profile:
+  industry: generic            # generic / saas / finance / medical / industrial / automotive / aviation / ...
+  default_depth_level: L2      # L0/L1/L2/L3/L4(charter §21);L3+ 需双签
+  compliance_profiles: []
+  # 例(L4 极深被测项必触发):
+  # compliance_profiles: [soc2, pci-dss]
+
+# ============== 9. 语言与教学(charter §23) ==============
+tutor:
+  default_lang: zh             # zh / en / zh-en
+  default_mode: exec           # exec / learn / silent
+  feedback_collection: true    # 允许 learn mode "👎 标记错误" 落档
+
+# ============== 10. 危险操作白名单(destructive-guard) ==============
+destructive_ops:
+  # 默认全 deny;显式 allow 才放行
+  allow_db_truncate: false
+  allow_minio_bucket_drop: false
+  allow_git_force_push: false
+  allow_prod_endpoint_call: false

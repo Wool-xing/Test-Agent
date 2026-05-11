@@ -1,0 +1,21 @@
+framework: SOC 2 Type II
+version: 2017 TSC (Revised 2022)
+applicable_industries: [SaaS, Cloud]
+status: skeleton  # 空载示例; 真规则由领域专家供
+checks:
+  - id: CC6.1
+    title: Logical access controls — auth + authorization
+    severity: P0
+    rule: All system access must be authenticated; least-privilege enforced; access reviewed quarterly.
+    evidence_required: [access_log, iam_policy, review_record]
+    references: [https://www.aicpa.org/SOC2]
+  - id: CC7.2
+    title: Continuous monitoring of security events
+    severity: P0
+    rule: Security monitoring + alerting must cover all production systems; mean time to detection <= 1h.
+    evidence_required: [siem_alert_log, mttr_report]
+  - id: CC7.4
+    title: Incident response
+    severity: P1
+    rule: Incident response runbook published; tabletop drill >= annually.
+    evidence_required: [runbook, drill_report]

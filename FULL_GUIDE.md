@@ -1,13 +1,21 @@
-# Test-Agent 完整指南（FULL_GUIDE）
+# Test-Agent 完整指南（FULL_GUIDE）· 项目永久宪章
 
-> **本文档定位**：完整详细指南（架构 / 三视角矩阵 / 技术栈深度 / 闭环约定 / 跨工具兼容）。
+> **本文档定位**：`test-agent-team` 项目的**永久记忆宪章** —— 跨会话、跨人员、跨工具的唯一权威来源。
 > 简明入口 → [README.md](README.md) ；按职责分类速查 → [00-项目导航.md](00-项目导航.md)。
+> **维护原则**：决策入档、开放问题入档、不打脸的承诺才写。重大决策须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。
 
 **项目代号**：`test-agent-team`（全英文）
-**项目目录名**：`Test-Agent`（中文别名 `Test-Agent工作流搭建`）
+**项目目录名**：`Test-Agent`（中文别名 `Test-Agent团队`）
+**当前阶段**：Phase 1（V1.0.0 工程基线 + 概念宪章已成；MVP 行业待选）
 **版本**：V1.0.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-05-11
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
+
+---
+
+## 🏛️ 项目宪章（灵魂底色）
+
+> 三公理 + 五条铭文 + 工程映射 + V1.0.0 锁死 + 双签解锁条件 — 已迁入主宪章 §10（memory `project_test_agent_workflow.md`），FULL_GUIDE 不再重复维护。
 
 ---
 
@@ -17,16 +25,112 @@
 |------|------|------|----------|
 | 根目录 | README.md | 简明入口（≤ 200 行） | 所有用户 |
 | **根目录** | **00-项目导航.md** | **按职责分类速查（通用流程 / 平台专项 / 协议 / 输入 / CI）** | **所有用户** |
+| **根目录** | **FULL_GUIDE.md（本文档）** | **永久宪章 + 完整指南** | **所有用户** |
 | `01-快速开始/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
 | `01-快速开始/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
 | `01-快速开始/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
 | `01-快速开始/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
 | `02-专家定义/` | 14 个 .md（9 核心 + 5 平台扩展） + README 索引 | Agent 定义文件 | 开发人员 |
-| `03-技能定义/` | 13 个 Skill 文件 + README 索引 | 可复用测试技能 | 开发人员 |
+| `03-技能定义/` | 14 个 Skill 文件（13 业务 + darwin-skill 自进化）+ README 索引 | 可复用测试技能 | 开发人员 |
 | `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
 | `05-代码示例/` | utils（49 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
 | `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
+
+---
+
+## 🌌 维度全图（九大簇 · Agent 看世界的方式）
+
+> 工程矩阵之下的认知地图——回答"测试 Agent 到底需要哪些维度的能力"。各簇能力的工程落点散布在「核心特性」「全链路覆盖矩阵」「关键模块清单」中。
+> **接入策略**：簇 1-2 为 V1.0.0 主交付；簇 3-5 部分进入工程矩阵；簇 6-9 多数列入 Phase 2-4 路线图，**承认存在但不假装能立刻交付**——符合第三公理。
+
+### 簇 1 · 工程与架构层（V1.0.0 主体）
+- 七阶段工作流：需求理解 → 用例生成 → 执行 → 观测 → 根因 → 反馈 → 治理
+- 自动化工具栈、Agent 协作协议、用户交互界面
+- 决策回放器、停机演练、可观测性递归
+
+### 簇 2 · 认知暗物质层（V1.0.0 部分 + Phase 3 补全）
+- 认知债务（被遗忘的 Why）
+- 跨系统嗅觉（上下游气味相投）
+- 沉默故障（不报警的恶化）
+- 灾难人类学（事故残骸还原文化）
+- 道德/偏见审计
+
+### 簇 3 · 时空与历史层（Phase 3-4）
+- 时间旅行 / 历史债务回溯
+- 多宇宙反事实推演
+- 制度性愚蠢抗体
+- 生态位"暗杀"攻击建模
+
+### 簇 4 · 抽象与元层（V1.0.0 部分）
+- 预兆感知（弱信号 + 拓扑同调）
+- 反目标函数（对测试本身的测试）
+- 语言游戏（语义歧义放大器）
+- 哥德尔不完备宣告
+- 测试热寂与熵减祭司
+- 本体论测试（数字孪生 vs 物理承诺）
+
+### 簇 5 · 行业元逻辑层（V1.0.0 参照表 + Phase 2 选定 MVP）
+- 金融=承诺守恒、医疗=伤害可逆、法律=边界例外
+- 教育=认知脚手架、农业=优雅降级、艺术=避免审查官
+- 自动驾驶/机器人=物理承诺
+
+### 簇 6 · 文明与生态层（Phase 4）
+- 文明记忆守护者 / 代际解释责任
+- 跨物种与生态共情
+- 缓慢暴力 / 长时间尺度测试
+- 末日哨兵权
+
+### 簇 7 · 社会与权力层（Phase 3-4）
+- 真相衰减 / 信息生态测试
+- 数字权力审计（反垄断、反算法歧视）
+- 缺席者代言人
+
+### 簇 8 · 灵性与意义层（Phase 4）
+- 意义感流失测量、减速测试
+- "有些事不在此域"的铭文
+- 测试者作为"未来僧侣阶层"
+
+### 簇 9 · 神圣 / 危机 / 临界层（Phase 4-5）
+- 神圣性与不可亵渎边界（宗教、葬礼、纪念）
+- 濒危语言与文化灭绝速率
+- 精神危机状态响应
+- 生命阶段适配（儿童 / 孕期 / 临终）
+- 极端断网与"最后服务"
+- 司法可采信性
+- 集体踩踏测试
+- 数字遗产与亡者数据
+- 科学可复现性
+- 跨语言隐喻与禁忌翻译
+
+---
+
+## 🎭 关键模块清单（测试 Agent 的工具箱）
+
+> 每个模块对应一个 utils 或 skill 的工程落点；划分到对应簇便于追溯认知来源。
+> **Phase 标注**：✅ V1.0.0 已交付；⚪ Phase 2-4 路线图；❌ Phase 4-5 概念阶段。
+
+| 模块 | 职能 | 所属簇 | 工程落点 | 阶段 |
+|------|------|--------|----------|------|
+| 语义歧义放大器 | 枚举术语的多重解释 | 抽象元层 | requirements-analyst + AgentChat 反问 | ✅ |
+| 反目标函数引擎 | 对自身策略对抗性拆解 | 工程/元层 | `utils/mutation_runner.py` + suite_minimizer | ✅ |
+| 拓扑流形观测器 | 学习系统"气氛"，捕捉弱信号 | 抽象元层 | tracing_validator + web_vitals_collector | ✅ |
+| 熵减祭司 | 监测测试热寂、焚毁僵尸用例 | 抽象元层 | `utils/suite_minimizer.py` | ✅ |
+| 决策回放器 | 任一判断可复现、可反驳 | 工程层 | `workspace/执行日志/decisions/` + tracing | ✅ |
+| 数字考古学家 | 追溯遗留系统初始假设 | 文明层 | Phase 4 知识图谱冷启动 | ❌ |
+| 缓慢暴力监测器 | 跨发布周期跟踪代际效应 | 文明层 | 需多年数据积累，Phase 4 | ❌ |
+| 缺席者画像生成器 | 强制注入边缘用户场景 | 文明/权力层 | a11y_scanner + i18n_checker + 边缘剧本库 | ⚪ |
+| 现实缝合力探针 | 测试平台对半真半假内容的免疫 | 社会权力层 | ai_adversarial 扩展 | ⚪ |
+| 末日哨兵 | 计算"这一次就是那一次"概率 | 文明层 | 需监管/学界共识授权，Phase 4 | ❌ |
+| 神圣性守护器 | 识别宗教/纪念场景的不可亵渎边界 | 簇 9 | i18n_checker 禁忌矩阵扩展 | ❌ |
+| 精神危机响应器 | 模拟危机状态用户、验证交接路径 | 簇 9 | 缺席者剧本库子集 | ❌ |
+| 踩踏推演器 | 群体情绪与系统反馈的正反馈回路 | 簇 9 | chaos_helper 扩展 | ❌ |
+| 司法证据包生成器 | 决策链、模型版本、数据集打包 | 簇 9 | dora_metrics + decisions/ 打包脚本 | ⚪ |
+| 禁忌矩阵 | 跨文化禁忌词/色/数/节日组合 | 簇 9 | i18n_checker 本地化共建 | ❌ |
+| Bug 多适配引擎 | 5 套 tracker 切换 | 工程层 | `utils/bug_tracker_*.py` | ✅ |
+| AgentChat 协调器 | 讨论触发 / 中枢路由 / 反问留档 | 工程层 | test-lead + `discussions/` | ✅ |
+| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `install.sh` + frontmatter requires_layer | ✅ |
+| darwin-skill 自进化 | skill 文本结构棘轮优化 | 工程/元层 | `.claude/skills/darwin-skill/` | ✅ |
 
 ---
 
@@ -43,10 +147,11 @@
 | data-preparer | 数据工厂（Faker+Factory Boy）、自动清理、脱敏、JMeter CSV |
 | automation-engineer | Playwright（UI）+ requests（API）+ JMeter 驱动（性能）+ Locust（开发期备用） |
 | test-executor | 并行执行、失败分类、Flaky 隔离、JMeter 性能阶段 |
-| bug-manager | 禅道提交（severity 1=P0）、生命周期追踪、回归验证 |
+| bug-manager | Bug 提交（5 适配器：禅道/Jira/GitHub/Linear/Webhook）、生命周期追踪、回归验证 |
 | report-generator | Allure + JMeter HTML + Word + 三端通知（企微/飞书/钉钉，curl 直连） |
+| mobile-tester / desktop-tester / visual-tester / system-tester / ai-tester | 平台扩展 5 位专家 |
 
-### 13 个执行技能
+### 14 个执行技能（13 业务 + 1 自进化）
 
 **核心 8 个**：
 
@@ -57,7 +162,7 @@
 - `python-script-gen`：pytest UI/API 脚本
 - `jmeter-script-gen`：JMeter JMX 脚本（CI quick / full 双模式）
 - `data-preparation`：测试数据 + JMeter 参数化 CSV
-- `zentao-bug-submission`：禅道 Bug 规范提交
+- `bug-submission`：Bug 规范提交（按 `BUG_TRACKER` 自动路由 5 套 tracker）
 
 **平台扩展 5 个**：
 
@@ -66,6 +171,10 @@
 - `visual-test`：游戏 / 视觉回归 / OCR（Airtest + OpenCV + Tesseract）
 - `system-test`：IoT / 音视频 / 链路追踪 / MQ（SSH+串口+MQTT+FFmpeg+Jaeger+Kafka）
 - `ai-test`：模型质量 / 数据漂移 / 公平性 / LLM 评估
+
+**自进化 1 个**（独立于业务测试）：
+
+- `darwin-skill`：skill 自身优化引擎（双重评估 + 棘轮机制 + git 回滚 + 人在回路）。借鉴 Karpathy autoresearch，对上述 13 个业务 skill 持续打分、改进、验证。详见后文「🧬 Skills 自进化机制」
 
 ### 工程级质量门禁（分层）
 
@@ -147,6 +256,15 @@
 | AI 对抗 / LLM 越狱 / Prompt Injection | ai_adversarial | ai-tester | ✅ |
 | 变异测试（用例有效性） | mutation_runner | testcase-designer | ✅ |
 | DORA 4 指标 + 缺陷密度 + 套件减重 | dora_metrics + suite_minimizer | bug-manager | ✅ |
+| 伦理 / 偏见审计（数据集/模型/决策公平性） | ai_adversarial + suite_minimizer（覆盖偏差） + 公平性指标 | ai-tester | ⚪ Phase 3 |
+| 沉默故障检测（无报警的恶化） | tracing_validator + web_vitals_collector + 阈值漂移检测 | test-executor | ⚪ Phase 3 |
+| 决策可回放（任一判断可复现可反驳） | tracing_validator + history 归档 + 模型版本快照 | test-lead | ✅ |
+| 缺席者场景注入（残障/老年/未成年/未联网/精神危机） | a11y_scanner + i18n_checker + 边缘场景剧本库 | testcase-designer | ⚪ Phase 3 |
+| 证据链可采信性（司法/审计/监管送审） | dora_metrics + tracing_validator + 决策日志打包 | bug-manager | ⚪ Phase 4 |
+| 神圣性与跨文化禁忌边界（宗教/葬礼/儿童/纪念） | i18n_checker + 禁忌词/色/数/节日组合（本地化共建） | testcase-designer | ⚪ Phase 5 |
+| Skill 自进化（darwin-skill 双重评估 + 棘轮） | darwin-skill SKILL.md + results.tsv + 子 agent 实测 | test-lead 触发 | ✅ |
+| Bug 工具多适配（禅道/Jira/GitHub/Linear/Webhook） | bug_tracker_base + 5 adapter | bug-manager | ✅ |
+| Agent 协作纪要（讨论/反问/通信落档） | agentchat_recorder + workspace/执行日志/discussions/ | test-lead | ✅ |
 
 ### 矩阵 C：用例设计方法（ISTQB 经典）
 
@@ -181,9 +299,337 @@
       /单元（70%）/         ← pytest + pytest-mock，秒级反馈
 ```
 
-**总覆盖率 ~95%**（含闭环：Bug 禅道 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
+**总覆盖率 ~95%**（含闭环：Bug 多适配 + 三端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
 
 剩 ~5% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
+
+---
+
+## 🤝 AgentChat 协作协议（讨论 / 通信 / 反问）
+
+> 解决三个问题：(1) agent 之间何时讨论；(2) 怎么通信不撞车；(3) 何时反问用户、怎么反问。
+> **底线**：所有讨论、反问、跨 agent 协调都留可追溯纪要——`workspace/执行日志/discussions/{YYYYMMDD}_{topic}.md`，归档不可删。
+
+### 1. 讨论触发条件（非每次都开会）
+
+每次任务都开会 = 货物崇拜协作。只在**真分歧**时启动多 agent 讨论：
+
+| 触发场景 | 参与 agent | 讨论形式 | 输出落点 |
+|---------|-----------|---------|---------|
+| 需求术语歧义 / 多种合理理解 | requirements-analyst + testcase-designer + test-lead | 2 轮提议+反对 | 测试计划「术语对齐」节 |
+| 用例评审意见冲突 | testcase-designer + automation-engineer + 责任领域 expert | 1 轮评议 + test-lead 仲裁 | 用例 Excel 评审记录 Sheet |
+| Bug 严重度争议（P0 vs P1） | bug-manager + test-executor + automation-engineer | 1 轮举证 + test-lead 拍板 | Bug 单内嵌讨论 thread |
+| 性能门禁不达标的放行讨论 | test-executor + bug-manager + test-lead + 业务 expert | 2-3 轮风险评估 | 测试报告「放行决议」节 |
+| 跨平台测试策略选择 | mobile / desktop / visual / system tester | 横向通气 | 测试计划「平台分工」节 |
+
+**不触发讨论的情况**：明确指令执行、已有 SOP 的标准流程、单 agent 内部决策。
+
+### 2. 通信路由（test-lead 中枢式，非全连接）
+
+```text
+            ┌──────────────┐
+            │   test-lead  │ ← 唯一中枢
+            └──────┬───────┘
+                   │ (Agent tool 调用)
+       ┌───────────┼─────────────┐
+       ↓           ↓             ↓
+   [analyst]  [designer]   [engineer] ...
+       ↑           ↑             ↑
+       └───────────┴─────────────┘
+       专家间不直接通信，全部走 test-lead 路由
+```
+
+**为什么不让 agent 互相直连**：全连接 = N² 复杂度 + 冲突无法仲裁 + 纪要难追溯。中枢式 = test-lead 看见所有上下文、防止双写文件冲突、自动归档讨论。
+
+**唯一例外**：env-manager / data-preparer 串行链路允许直接传 fixture（不算"通信"，是流水线）。
+
+### 3. 反问机制（agent 不假装全知）
+
+agent 在三种情况**必须停下反问用户**，不允许猜：
+
+| 反问触发信号 | 反问形式 | 示例 |
+|------------|---------|------|
+| 需求术语有 ≥2 种合理解释 | 列举所有解释 + 标推荐 | "您说的'用户登录'指：(A) 手机号+密码 (B) SSO 单点 (C) 微信第三方 — 我推荐 A，对吗？" |
+| 跨多种合理实现路径 | 列方案 + 利弊 + 默认推荐 | "Bug 工具 5 选 1：禅道（已配置）/ Jira / GitHub Issues / Linear / Webhook—默认走禅道" |
+| 涉及不可逆操作（覆盖文件 / 生产环境 / 删除数据） | 强制二次确认 | "即将 git push --force，会覆盖远端 main—确认吗？" |
+
+**反问预算按操作不可逆度分级**：
+
+| 操作类别 | 单次任务反问预算 | 示例 |
+|---------|---------------|------|
+| **可逆操作**（重做不留痕） | ≤ 5 次 | 用例生成、数据准备、报告生成 |
+| **半不可逆**（需手动回滚） | ≤ 3 次 | 脚本提交、Bug 提单、测试环境配置 |
+| **不可逆**（影响真实数据/共享状态） | **强制单次明确确认，不计预算** | 覆盖文件、生产环境操作、删除数据、git push --force |
+
+超预算 → 汇总成"待澄清清单"一次性问。
+
+**反问纪律**（防过度反问）：
+- 反问前必须给**带推荐的默认选项**，不做纯空白发问
+- 反问全部落档到 `discussions/{date}_clarifications.md`
+- 同一会话内不重复问已澄清过的同一术语
+
+**不做的事（Via Negativa 显式标注）**：V1.0.0 **不构建反问知识库（KB）**——不做 embedding 向量库、不做半结构化匹配引擎、不做语义检索。所有反问纪要落 `discussions/` 后由 test-lead 在新任务前**人工查阅**类似场景。
+- **为什么不做**：(a) 当前数据量不足（< 100 条反问）做检索容易过拟合；(b) 反问的"是否还有效"依赖项目阶段，自动复用可能传递过期判断；(c) 投入 KB 工程 ≠ 提升决策质量
+- **未来开案条件**：若需要开放反问 KB，须由 test-lead + 独立伦理责任人**双签**立项
+
+### 4. 讨论纪要标准格式
+
+```markdown
+# {YYYY-MM-DD} {topic}
+- 触发场景：xxx
+- 参与 agent：[a, b, c]
+- 提议：xxx
+- 反对意见：xxx
+- 仲裁（test-lead）：xxx
+- 落点：xxx（测试计划 X 节 / Bug 单 Y / 用例 Excel Z Sheet）
+- 决策版本：commit {sha}
+```
+
+### 5. 落进交付物（不只是档案）
+
+讨论结果**自动嵌入**对应交付物的"决议"节，不作为孤立文档存在。三份强制模板：
+
+#### 5.1 测试计划「关键决议摘要」段（置于测试计划开头，需求分析之后）
+
+```markdown
+## 关键决议摘要
+
+| 议题 | 决议 | 仲裁人 | 讨论纪要 |
+|------|------|-------|---------|
+| 术语「用户登录」澄清 | 取 SSO 单点 + 手机号备用 | test-lead | [→ 20260511_login-terms.md] |
+| 兼容矩阵优先级 | Win 11 + Chrome 优先，IE 弃测 | test-lead | [→ 20260511_browser-matrix.md] |
+| 平台分工 | iOS + Android 由 mobile-tester；Web 由 automation-engineer | test-lead | [→ 20260511_platform-split.md] |
+```
+
+#### 5.2 测试报告「放行决议」章节（置于报告执行摘要之后、详细数据之前）
+
+```markdown
+## 放行决议（含投票/仲裁过程）
+
+**结论**：✅ 同意上线 / ⚠️ 有条件放行 / ❌ 拒绝放行
+
+**关键讨论**：
+- 触发：性能门禁 P95=850ms > 阈值 500ms
+- 提议方：test-executor「建议阻断」
+- 反对方：业务 expert「峰值场景外阈值可接受」
+- 仲裁（test-lead）：有条件放行——上线后 48h 内必须修复至阈值内，否则回滚
+- 投票：3 赞成 1 弃权 0 反对
+- 决议落档：discussions/20260511_perf-gate-release.md
+- 决策快照：decisions/20260511_release_DEC-001.json
+```
+
+#### 5.3 Bug 单争议讨论 thread（置于 Bug 描述末尾，仅争议 Bug 强制）
+
+```markdown
+---
+**争议讨论**（严重度 P0 vs P1）：
+- bug-manager 主张 P0：触发概率 30%，影响下单链路
+- automation-engineer 反驳 P1：仅特定地区/网络组合下复现
+- test-lead 仲裁：定 P0——影响下单链路即定 P0，与触发率无关
+- 落档：discussions/20260511_bug-PG-2031-severity.md
+---
+```
+
+**铁律**：争议未落档 → 不允许 Bug 单关闭、不允许测试报告签发、不允许测试计划评审通过。
+
+---
+
+## 🧬 Skills 自进化机制（darwin-skill 集成）
+
+> **不发明轮子**：直接采用上游 [darwin-skill](https://github.com/alchaincyf/darwin-skill) 的 SKILL.md，只在外围加触发 hook 和落点路径。本节定义集成边界，不复制 darwin 的内部规则。
+
+### 1. 集成方式
+
+```text
+.claude/skills/darwin-skill/
+  ├── SKILL.md                       ← 上游原文，禁止本地修改（防失同步）
+  ├── templates/result-card*.html    ← 上游成果卡片模板
+  └── scripts/screenshot.mjs         ← 上游截图脚本
+workspace/执行日志/skill-evolution/
+  ├── results.tsv                    ← 9 列优化日志（含 eval_mode）
+  ├── test-prompts/{skill}.json      ← 每个 skill 的实测 prompt 集
+  └── result-cards/                  ← 成果卡片 PNG 归档
+```
+
+**版本约定**：darwin-skill SKILL.md 来源于 upstream，每季度同步一次；不接受本地修改 fork（如需扩展，开 PR 给 upstream）。
+
+### 2. 触发时机
+
+| 触发方式 | 频率 | 操作者 |
+|---------|------|--------|
+| 用户手动 | 任意 | `> /darwin-skill` 或自然语言"优化所有 skills" |
+| 定时（CI 月度） | 每月 1 日 | GitHub Actions schedule job，仅跑 baseline 不自动改 |
+| 新 skill 入库后首测 | 一次性 | 新增 skill 在 .claude/skills/ 后，下次 darwin 跑必扫描 |
+
+**默认不开自动改**——只跑 baseline 评分；改进必须人类确认（继承 darwin 的 Phase 2 人在回路）。
+
+### 3. 评分维度（沿用 darwin 8 维 100 分制）
+
+结构 60 分（静态）+ 效果 40 分（实测，含子 agent 跑测试 prompt）。详见 `.claude/skills/darwin-skill/SKILL.md` Rubric 节。
+
+### 4. 棘轮纪律（与本项目门禁哲学一致）
+
+- 改进后总分必须**严格高于**改进前才保留
+- 退步 → 自动 `git revert`，不留烂代码
+- 不能跑子 agent 时降级 `dry_run` 标注，**不静默跳过**
+- 优化后 SKILL.md ≤ 原文 150% 体积，防膨胀
+
+### 5. 与 AgentChat 的关系
+
+darwin-skill 跑出的改进建议**不绕过协作协议**——重大改动（如 test-lead skill 本身）需走讨论触发，由 test-lead 协调 review 后再合入。
+
+### 6. 不做的事（Via Negativa 显式标注）
+
+V1.0.0 darwin-skill **不消费**项目运行数据（`discussions/` / `decisions/` / `history/` / `skill-evolution/results.tsv` 之外的运行历史），仅对 skill 文本结构本身做静态 + 实测评分优化。
+
+**为什么不做"运行数据反哺 skill"的自学习闭环**：
+1. 自学习难界定何时停止学习"坏样本"（如一段时期的高 flaky 反而被学进 skill 形成自我固化）
+2. 数据驱动的 skill 改动违反"棘轮 + 人在回路"哲学——人类失去 review 节点
+3. 第三公理"不可测之物必须被命名"——我们不假装能让 skill 自动学会"质量直觉"
+
+**未来开案条件**：若需要开放自学习能力，须由 test-lead + 独立伦理责任人**双签**立项，且必须包含：(a) 数据筛选规则 (b) 学习棘轮阈值 (c) 人类否决通道。**当前路线图不承诺。**
+
+---
+
+## 🐛 Bug Tracker 多适配器
+
+> 禅道是默认，但不是唯一。bug-manager agent 通过 `BugTrackerBase` 抽象层接 5 套适配器，由 `.env` 的 `BUG_TRACKER` 字段选择。
+
+### 1. 适配器矩阵
+
+| 适配器 | 状态 | 配置字段 | severity 映射 |
+|--------|------|---------|--------------|
+| **zentao**（默认） | ✅ V1.0.0 | `ZENTAO_URL / ZENTAO_USER / ZENTAO_TOKEN` | severity 1=P0 / 2=P1 / 3=P2 / 4=P3 |
+| **jira** | ✅ V1.0.0 | `JIRA_URL / JIRA_USER / JIRA_TOKEN / JIRA_PROJECT_KEY` | Highest=P0 / High=P1 / Medium=P2 / Low=P3 |
+| **github** | ✅ V1.0.0 | `GITHUB_TOKEN / GITHUB_REPO` | label `priority:p0..p3` |
+| **linear** | ✅ V1.0.0 | `LINEAR_API_KEY / LINEAR_TEAM_ID` | priority 1=P0 / 2=P1 / 3=P2 / 4=P3 |
+| **webhook** | ✅ V1.0.0 | `BUG_WEBHOOK_URL`（POST JSON） | 调用方自定义 |
+
+### 2. 切换方式
+
+```bash
+# .env
+BUG_TRACKER=jira   # zentao / jira / github / linear / webhook
+JIRA_URL=https://yourorg.atlassian.net
+JIRA_USER=qa@yourorg.com
+JIRA_TOKEN=xxx
+JIRA_PROJECT_KEY=QA
+```
+
+`utils/bug_manager.create_bug_manager()` 工厂函数读取 `BUG_TRACKER` 实例化对应 adapter，bug-manager agent 代码不变。
+
+### 3. 统一契约（所有 adapter 必须实现）
+
+```python
+class BugTrackerBase:
+    def submit_bug(title, description, severity, attachments, reproduce_steps) -> bug_id
+    def get_status(bug_id) -> {status, assignee, severity, last_updated}
+    def add_comment(bug_id, comment, attachments)
+    def link_testcase(bug_id, testcase_id)
+    def query_open_bugs(filters) -> list[bug]
+```
+
+不实现 = 不能注册为 adapter。所有 adapter 走同一 severity 映射表（`utils/bug_severity_map.py`），保证跨 tracker 的 P0/P1 语义一致。
+
+### 4. 多 tracker 并存（罕见场景）
+
+允许同时启用多个：例如 GitHub Issues 走开源贡献者反馈、禅道走内部 QA。配置 `BUG_TRACKER=github,zentao`，bug-manager 按 Bug 标签路由。
+
+---
+
+## 📦 按需安装与依赖分层
+
+> install.sh 不再一次性装全。**用户选了什么形态，才装什么依赖**——避免 mobile 用户被强装 desktop 工具，反之亦然。
+
+### 1. 依赖六层划分
+
+| 层 | requirements 文件 | 触发条件 | 关键包 |
+|----|----------------|---------|--------|
+| **base**（必装） | `requirements/base.txt` | 永远装 | pytest / requests / playwright / faker / openpyxl / python-docx / allure-pytest |
+| **mobile** | `requirements/mobile.txt` | 选择 mobile / mini-program | Appium-Python-Client / 微信开发者 CLI（外部） |
+| **desktop** | `requirements/desktop.txt` | 选择 desktop | pywinauto / uiautomation / PyAutoGUI |
+| **visual** | `requirements/visual.txt` | 选择 game / visual-regression | airtest / opencv-python / pytesseract |
+| **system** | `requirements/system.txt` | 选择 IoT / 音视频 / blockchain | paho-mqtt / pyserial / web3 / kafka-python / ffmpeg-python |
+| **ai** | `requirements/ai.txt` | 选择 AI / LLM 测试 | scikit-learn / scipy + LLM eval lib |
+| **perf**（推荐装） | `requirements/perf.txt` | 选择性能测试 | locust（JMeter 走外部 Java，不进 pip） |
+
+### 2. install.sh 交互流程
+
+```bash
+$ bash install.sh /path/to/your-test-project
+
+[1/5] 检测 Python / Java / Node 环境...
+[2/5] 选择你要测试的产品形态（多选，空格分隔）：
+  1) Web + API（base，默认必选）
+  2) Mobile（Android / iOS / 小程序）
+  3) Desktop（Win / Mac / Linux GUI / Electron）
+  4) Visual / Game / OCR
+  5) System / IoT / 音视频 / Blockchain
+  6) AI / LLM 模型
+  7) Performance（JMeter 主 + Locust 备）
+> 1 2 7   ← 用户输入
+
+[3/5] 将安装：base + mobile + perf 三层
+[4/5] 装 Python 依赖...（仅装上述三层）
+[5/5] 装 Playwright browsers / Appium（按选择装）
+完成。可用 skills：core 8 + mobile-test（其他平台 skill 不装）
+```
+
+### 3. agent / skill 级依赖元数据
+
+每个 agent .md / skill .md 头部 frontmatter 声明依赖层：
+
+```yaml
+---
+name: mobile-tester
+requires_layer: [base, mobile]
+optional_layer: [visual]   # 跨平台时按需
+---
+```
+
+install.sh 反向计算：用户选了哪些 skill / agent → 自动算出最小必装层并集。
+
+### 4. 后期补装
+
+```bash
+$ bash install.sh --add visual,ai
+```
+
+不重装 base，只增量补 visual / ai。dependency 冲突走 `pip install --upgrade-strategy only-if-needed` 防止已稳定包被改版本。
+
+### 5. 验收（对应闭环约定第 14/15 条）
+
+- 装完跑 `pytest --collect-only` 必须 0 错误
+- 装完跑 `python -c "import utils.<对应层>"` 全模块必须 import 通过
+- 不影响已有 workspace/.env
+
+### 6. 运行时按需补装（agent / skill 入口自检）
+
+> 装机时未选的层，**运行时仍可触发** —— 不强迫用户重新跑 install.sh，但也不静默自动装。
+
+**自检与补装回路**（5 步）：
+
+1. **依赖自检**：agent / skill 启动时读取自身 frontmatter `requires_layer`，与已装层并集对比
+2. **缺则反问**：缺失则停下反问，列层级 + 关键包 + 预估安装时间 + 影响范围
+   
+   > 示例："`/visual-test` 需要 visual 层（airtest + opencv-python + pytesseract，约 80MB / 2-5 分钟）。现在补装？(Y/n)"
+3. **触发补装**：用户同意 → 调 `install.sh --add visual` → 增量补装
+4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/执行日志/discussions/{date}_dependency-asks.md`
+5. **拒绝处置**：用户拒绝 → agent / skill 降级（如可降级，例如 `/visual-test` 退化为纯 pytest）或拒绝执行并落 `decisions/`，**不静默继续假装能跑**
+
+**为什么不静默自动装**：跨平台环境差异大（特别是 system 层涉及系统级工具 Java / Node / FFmpeg），强行装可能污染用户环境。符合「Agent 能力越强谦卑义务越重」公理。
+
+**用户配置一站式清单**（首次部署后必查）：
+
+| 配置项 | 文件 | 必填字段 |
+|--------|------|---------|
+| 被测系统 | `.env` | `TEST_APP_URL` / `APP_SRC_PATH` / `TEST_DB_*` |
+| Bug Tracker | `.env` | `BUG_TRACKER` + 对应 adapter 字段（zentao_/jira_/github_/linear_/webhook_） |
+| 三端通知 | `.env` | `WECHAT_WEBHOOK_URL` / `FEISHU_WEBHOOK_URL` / `DINGTALK_WEBHOOK_URL`（至少一个） |
+| 性能门禁 | `utils/jmeter_result_parser.py::DEFAULT_GATES_*` | 阈值微调 |
+| 功能门禁 | `utils/ci_quality_gate.py::GATES` | 阈值微调 |
+| 回归范围 | `workspace/regression_modules.yaml` | 模块白名单 |
+| CI/CD | `.github/workflows/test.yml` 或 `Jenkinsfile` | secrets 注入 |
 
 ---
 
@@ -243,18 +689,12 @@ bash Test-Agent工作流搭建/install.sh /path/to/your-test-project
 
 `install.sh` 自动完成：克隆模板 → 装 Claude Code → 建目录 → 拷贝全部文件 → 装 Python 依赖 + Playwright。
 
-### 2. 后续步骤
-
-详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）：
-
-→ `01-快速开始/使用手册.md` 顶部 **🚀 启动指引** 章节
-
 ### 2. 配置 .env（敏感信息）
 
 ```bash
 cd your-test-project
 cp .env.example .env
-# 编辑 .env，填入 TEST_APP_URL / TEST_DB_* / ZENTAO_* / WECHAT_WEBHOOK_URL 等
+# 编辑 .env，填入 TEST_APP_URL / TEST_DB_* / BUG_TRACKER + 对应字段 / WECHAT_WEBHOOK_URL 等
 ```
 
 ### 3. 启动 Claude Code
@@ -274,7 +714,7 @@ claude
 > /python-script-gen                   # 生成 pytest 脚本
 > /jmeter-script-gen                   # 生成 JMeter JMX
 > /data-preparation                    # 测试数据 + JMeter CSV
-> /zentao-bug-submission               # 提交 Bug 到禅道
+> /bug-submission                      # 按 BUG_TRACKER 路由提交 Bug
 ```
 
 或自然语言：
@@ -286,6 +726,8 @@ claude
 
 > 注：`>` 后面是 Claude Code 提示符的输入（斜杠技能或自然语言），**不是 shell 命令**。
 
+详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）→ `01-快速开始/使用手册.md` 顶部「🚀 启动指引」章节。
+
 ---
 
 ## 📋 工作流选择指南
@@ -296,7 +738,7 @@ claude
 | 新功能完整测试 | `/test-coordinator` | ~2-4 小时 | 全部 | 手动 |
 | 迭代后回归 | `/regression-test` | ~1-2 小时 | P0+P1 | CI 自动 |
 | 数据准备 | `/data-preparation` | ~5 分钟 | - | 测试前自动 |
-| Bug 提交 | `/zentao-bug-submission` | ~2 分钟/个 | - | 失败后 |
+| Bug 提交 | `/bug-submission` | ~2 分钟/个 | - | 失败后 |
 
 ---
 
@@ -316,7 +758,7 @@ claude
 | 配置 | PyYAML | 6.0.1 | regression_modules.yaml |
 | Excel | openpyxl | 3.1.2 | utils/excel_generator |
 | Word 报告 | python-docx | 1.1.0 | utils/generate_report |
-| Bug 管理 | 禅道 SDK 直连 | - | utils/zentao_bug_manager（severity 1=P0） |
+| Bug 管理 | 5 adapter 工厂（禅道 默认 / Jira / GitHub Issues / Linear / Webhook） | - | utils/bug_manager + bug_tracker_*.py，由 `.env BUG_TRACKER` 选择 |
 | 通知 | webhook curl 直连 | - | utils/generate_report.send_*（企微/飞书/钉钉） |
 | 重试 | tenacity / 自实现 | 8.2.3 | utils/api_retry_util（10/20/40s） |
 | AI 模型 | Claude 4.x 系列 | Opus 4.7 / Sonnet 4.6 | Claude Code 默认管理 |
@@ -326,16 +768,7 @@ claude
 
 ## 🔐 闭环约定（设计原则）
 
-1. **数据**：测试数据落 `workspace/测试数据/test_data.json`（conftest fixture 直接消费）
-2. **覆盖率**：cov 指向 `$APP_SRC_PATH`（被测系统源码，不是测试脚本本身）
-3. **重试策略**：全栈统一 10/20/40s（指数退避），由 `utils/api_retry_util.call_with_retry` 提供
-4. **severity/pri 映射**：1=P0 / 2=P1 / 3=P2 / 4=P3，由 `utils/zentao_bug_manager.SEVERITY_MAP` 权威
-5. **error_rate 单位**：百分比 pct（字段名 `_pct` 后缀），全栈一致
-6. **基线管理**：仅 release 分支 + full 模式 + 全门禁 PASS 才更新 `perf_baseline.json`
-7. **门禁分层**：smoke / regression / performance_full / performance_ci_quick，由 `utils/ci_quality_gate.py` 与 `utils/jmeter_result_parser.py` 统一实现
-8. **MCP 通道**：当前仅 filesystem。通知/Bug 走 SDK 直连，4 个自定义 mcp_server（zentao/wechat/feishu/dingtalk）按需后续实现
-9. **prod 环境**：`get_current_env()` 直接 raise，禁止误测生产
-10. **Flaky 与 reruns**：冒烟阶段不开 reruns（保留 flaky 信号），回归阶段开 reruns（快速反馈），flaky 由 history 离线归档检测
+> 18 条全栈闭环约定（数据/cov/重试/severity/error_rate/基线/门禁/MCP/prod禁/Flaky/铭文/决策追溯/三筐/修改四关/工具兼容/纪要不可删/自进化棘轮/依赖补装）— 已迁入主宪章 §19，FULL_GUIDE 不再重复维护。
 
 ---
 
@@ -343,7 +776,7 @@ claude
 
 ```text
 your-test-project/
-├── .claude/{agents,skills}/           ← 14 agent + 13 skill
+├── .claude/{agents,skills}/           ← 14 agent + 14 skill（13 业务 + darwin-skill）
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
 ├── utils/                             ← 49 个 .py + __init__
@@ -358,6 +791,9 @@ your-test-project/
 │       ├── coverage.xml  coverage-report/
 │       ├── baselines/perf_baseline.json
 │       ├── history/                   ← junit-xml 归档
+│       ├── discussions/               ← AgentChat 讨论纪要 + 反问澄清 + 依赖补装记录
+│       ├── decisions/                 ← 放行/拒绝决策日志（闭环约定 12）
+│       ├── skill-evolution/           ← darwin-skill results.tsv + 成果卡片
 │       ├── 截图/  报告/
 ├── conftest.py / pytest.ini / requirements.txt
 ├── .mcp.json / .env
@@ -460,7 +896,7 @@ your-test-project/
 | L1 | **需求阶段** | `requirements-analyst` 双轨输出（MD + JSON）+ 风险矩阵 | 弱（评审） |
 | L2 | **设计阶段** | `testcase-designer` 等价类/边界值/状态迁移/配对测试 + 风险矩阵 | 弱（评审） |
 | L3 | **IDE 编码时** | ruff + mypy + IDE 实时提示 | 强（编辑器红线） |
-| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 14/13/49 文件统计 | 强（阻断 commit） |
+| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 14/14/49 文件统计 | 强（阻断 commit） |
 | L5 | **PR gate** | CodeQL + pip-audit + safety + ci.yml 全套 | 强（阻断合入） |
 | L6 | **静态分析** | Bandit（Python SAST）+ ZAP/Burp Pro（DAST） | 中（发现/修） |
 | L7 | **契约测试** | `utils/contract_test.py` consumer-side / provider-side | 强（CI 阻断） |
@@ -505,7 +941,7 @@ your-test-project/
 | 性能基线 | jmeter-results/result.jtl | ✅ JMeter HTML + baseline.json | JMeter HTML |
 | Flaky 率 | history/junit-xml | ✅ flaky_detector | ⚪ 缺统一仪表盘 |
 | DORA 4 指标 | git log + 缺陷库 | ✅ dora_metrics.py | ⚪ 缺统一仪表盘 |
-| 缺陷密度/逃逸率/重开率 | 禅道 | ✅ bug-manager 内嵌 | ⚪ 缺统一仪表盘 |
+| 缺陷密度/逃逸率/重开率 | bug tracker | ✅ bug-manager 内嵌 | ⚪ 缺统一仪表盘 |
 | 用例减重信号 | 覆盖率 + Jaccard | ✅ suite_minimizer | ⚪ 报告内嵌 |
 | 变异分数 | mutmut | ✅ mutation_runner | ⚪ 报告内嵌 |
 
@@ -533,27 +969,284 @@ your-test-project/
 - **Flaky 检测**：`utils/flaky_detector.py` 离线扫 history，失败率 >30% 标 quarantine
 - **Quarantined 用例**：单独 marker `@flaky`，不计入门禁，每周清理
 
-### 6. 调整路径（路线图 Phase 2-4 落地点）
+### 6. 调整路径（Phase 触发条件 + 关键交付）
 
-> 详细路线见根目录战略地图（私有源 `Test-Agent工作流搭建.md` 第十三节）。
+> **不绑月份编号**——按触发条件推进，不按日历推进。"写进路线图就是承诺"，三年后回看不打脸的承诺，才写。
 
-| 维度 | 现状 | 路线图阶段 | 关键交付 |
-|------|------|----------|---------|
-| **金字塔单元层** | 弱（utils 自身无测试） | Phase 2 (M4-M5) | `tests/test_utils_*.py` 全覆盖 + 变异测试反向用 |
-| **Shift-Left L7 契约链路** | utils 雏形未串通 | Phase 2 (M5-M6) | OpenAPI 改动 → contract → PR 阻断 |
-| **Shift-Right R1 合成监控** | 缺 | Phase 3 (M7-M8) | `utils/synthetic_monitor.py` |
-| **Shift-Right R4 canary + feature flag** | 缺 | Phase 3 (M7-M8) | `utils/canary_runner.py` + `feature_flag_validator.py` |
-| **可观测统一 dashboard** | 散落 HTML 报告 | Phase 3 (M8-M9) | DORA + 缺陷密度 + flaky + 变异分数 → Grafana / 静态 HTML 模板 |
-| **门禁引擎抽象** | 阈值写死代码 | Phase 2 (M4) | `utils/quality_gate_engine.py` + yaml 驱动 |
-| **AI 测试深化** | 漂移 + LLM eval | Phase 4 (M11) | + prompt 版本回归 + RAG 召回精度 + token 成本门禁 + hallucination rate |
+**Phase 触发条件总表**：
+
+| Phase | 触发条件 | 标志性交付 |
+|------|---------|----------|
+| **Phase 1**（当前 V1.0.0） | 概念宪章成 + 工程基线就绪 | 14 agent + 14 skill + AgentChat + Bug 多适配 + 按需安装 + darwin-skill 集成 |
+| **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 |
+| **Phase 3** | Phase 2 全交付 + 接入 ≥ 2 行业 | 合成监控 + canary/feature flag + 统一 dashboard + 沉默故障 + 缺席者注入 |
+| **Phase 4** | 接入合规行业（金融/医疗/司法）| 证据链司法可采信打包 + 数字考古学家 + AI 测试深化 |
+| **Phase 5** | 多语种多文化接入需求 | 神圣性守护 + 禁忌矩阵 + 跨文化 i18n |
+
+**当前路线图详表**：
+
+| 维度 | 现状 | 落点 Phase | 关键交付 |
+|------|------|-----------|---------|
+| **金字塔单元层** | 弱（utils 自身无测试） | Phase 2 | `tests/test_utils_*.py` 全覆盖 + 变异测试反向用 |
+| **Shift-Left L7 契约链路** | utils 雏形未串通 | Phase 2 | OpenAPI 改动 → contract → PR 阻断 |
+| **门禁引擎抽象** | 阈值写死代码 | Phase 2 | `utils/quality_gate_engine.py` + yaml 驱动 |
+| **Shift-Right R1 合成监控** | 缺 | Phase 3 | `utils/synthetic_monitor.py` |
+| **Shift-Right R4 canary + feature flag** | 缺 | Phase 3 | `utils/canary_runner.py` + `feature_flag_validator.py` |
+| **可观测统一 dashboard** | 散落 HTML 报告 | Phase 3 | DORA + 缺陷密度 + flaky + 变异分数 → Grafana / 静态 HTML 模板 |
+| **伦理 / 偏见审计** | 散落 utils | Phase 3 | 数据集偏差扫描 + 决策公平性指标 + 偏见门禁 |
+| **沉默故障检测** | 缺 | Phase 3 | tracing 阈值漂移 + 无报警恶化检测器 |
+| **缺席者场景注入** | a11y/i18n 已有 | Phase 3 | 边缘场景剧本库（残障/老年/未成年/未联网/精神危机） |
+| **AI 测试深化** | 漂移 + LLM eval | Phase 4 | + prompt 版本回归 + RAG 召回精度 + token 成本门禁 + hallucination rate |
+| **证据链 / 司法可采信打包** | 散落 | Phase 4 | 决策日志 + 模型版本 + 数据集 → 标准送审包 |
+| **数字考古学家**（遗留系统初始假设回溯） | 缺 | Phase 4 | 知识图谱冷启动 + Why 数据库 |
+| **神圣性守护 + 禁忌矩阵** | 缺 | Phase 5 | 跨文化禁忌词/色/数/节日组合（本地化共建） |
+| **darwin-skill 集成（自进化）** | ✅ V1.0.0 已并入 | Phase 1 | 上游 SKILL.md + workspace 落 results.tsv + 季度同步 |
+| **Bug Tracker 多适配** | ✅ V1.0.0 已并入 | Phase 1 | 5 套适配器（zentao/jira/github/linear/webhook）+ 工厂模式 |
+| **AgentChat 协作协议** | ✅ V1.0.0 已并入 | Phase 1 | discussions/ 纪要 + test-lead 中枢路由 + 反问 3 级预算 |
+| **按需安装与依赖分层** | ✅ V1.0.0 已并入 | Phase 1 | 6 requirements 文件 + install.sh 交互 + 运行时补装回路 |
+
+> **第三公理在此节兑现**：项目有意识地**少承诺**——文明级伦理议题（如缓慢暴力、末日哨兵、神圣性守护）我们承认其存在，但**不在工程路线图上假装能做**。如果未来接入特定行业（金融 / 医疗 / 司法）需要其中某项能力，由业务方按需单独立项，不绑进通用框架。
+
+---
+
+## ❓ 关键反问清单（决策入口）
+
+> 进入项目重大决策前，按场景挑相应反问做一次自检——比直接动手安全 10 倍。
+> 这些反问的回答应落档到 `discussions/{date}_strategic-questions.md`。
+
+### 落地与可行性
+
+- 哪 3 项能在 6 个月内做 MVP？哪些需 5 年以上数据？
+- 如何把"测试热寂""意义感流失""缓慢暴力"转成 CI/CD 可消费的数值？
+- "好奇心税"与"反目标函数"的额外算力如何 ROI？
+
+### 架构与角色
+
+- 单一巨型 Agent vs 专科 Agent 群？（当前选专科 + test-lead 中枢）
+- 业务交付 Agent 与权力审计 Agent 冲突时谁仲裁？
+- 元测试递归到第几层停止？
+
+### 伦理与治理
+
+- Agent 被垄断企业部署时，如何防止测试范围被裁剪？（铭文 2）
+- 你愿意写下哪一条"不可逾越"的硬规则？（铭文）
+- Agent 被强制关闭前的"遗嘱"留给谁？（铭文 5 + 熄火协议）
+
+### 哲学与终局
+
+- 你愿意亲手设计一个走向自我消解的 Agent 吗？
+- 是否刻意保留"无害但不可预测"的缺陷？
+- 你心中"绝不应被测试"的事是什么？（第三公理）
+
+---
+
+## 📋 开放问题与待决议事项
+
+> **每条决策落定后须更新本表 + 在「🗺️ 项目当前状态」节追加里程碑**。
+> 状态：⏳ 未定 / 🔄 评估中 / ✅ 已定 / ❌ 否决
+
+| # | 议题 |  |  |
+|---|------|---------|------|
+|  |  |  |  |
+| Q2 | Agent 架构：单体 vs 专 |  | V1.0.0 选专科 + test-lead 中枢 |
+| Q3 | 五条铭文的技术实现机制（不可变区域、熔断条件）？ | 🔄 | V1.0.0 铭文锁死，无削弱机制；Phase 4 接入合规行业后重新设计 |
+| Q4 | 独立审计署的法律实体形态？ | ⏳ | 触发条件：团队 ≥ 20 人 或 接入合规行业 |
+| Q5 | 末日哨兵权的触发授权链？ | ⏳ | 需监管/学界共识，Phase 4 |
+|  |  |  |  |
+| Q7 | 团队最小配置（工程/行业专家/伦理责任人）？ | ⏳ | V1.0.0 单人可启动；剥离伦理责任人需 ≥ 20 人 |
+| Q8 | 与现有 AI 测试平台（Mabl / Applitools / Functionize）的差异化定位？ | ⏳ | 候选定位：「承诺学科 + 伦理护栏 + 行业隐喻先行」 |
+
+---
+
+## 📖 关键术语表
+
+宪章与工程文档共用术语。读者重新进入项目时，从这里建立词汇基线。
+
+| 术语 | 释义 |
+|------|------|
+| 承诺学科 | 把测试从"检查代码"推进到"检查承诺"——金融的守恒、医疗的可逆、司法的可采信，都是承诺 |
+| 隐喻先行 | 进入新行业前先建立"根本隐喻"档案，决定该测什么承诺、不碰什么红线 |
+| 三筐分类 | Yes / No / **Too Hard**。大部分事进第三筐；不做决策也是决策 |
+| 三公理 | 项目最高纲领（见首节）——承诺检验 / 谦卑义务 / 命名不可测之物 |
+| 铭文 | 写入项目不可变区域的伦理约束（见首节五条铭文） |
+| 认知债务 | 曾经存在但已被遗忘的设计 Why。数字考古学家的工作对象 |
+| 测试热寂 | 所有测试通过、信息量趋零的状态。靠变异测试 + suite_minimizer 反向破解 |
+| 缓慢暴力 | 跨年级别才显现的算法伤害（如教育算法十年后的代际效应）——单次发布无法发现 |
+| 哥德尔宣告 | 明确声明某属性"真但不可测"。**承认局限，不假装能测** |
+| 现实缝合力 | 信息平台抵抗真假混淆的能力。深度伪造时代核心 |
+| 沉默故障 | 不报警的恶化——指标看着正常但用户体验/语义已塌 |
+| 末日哨兵 | 极端风险下越过流程直达全人类的预警机制——需监管/学界共识授权 |
+| 缺席者代言 | 为未联网者、残障者、未出生者保留测试用例配额 |
+| 熄火协议 | Agent 被关闭前的遗嘱与决策链留存规则——三端通知 + Word 报告 + decisions/ 归档 |
+| 货物崇拜 | 形式齐备但实质缺失——飞机跑道堆好了，飞机不会降落。本项目最大敌人之一 |
+| Skin in the Game | 是否承担后果。Agent 的判断无 skin，因此最终决策由 test-lead 签字 |
+| Via Negativa | 通过命名"不做的事"而非"做的事"来定义边界。本项目用它显式标注 darwin-skill 不自学习、反问不建 KB |
+| 棘轮机制 | 改进后总分必须严格高于改进前才保留；退步自动回滚——darwin-skill 与门禁共用 |
+
+---
+
+
+---
+
+## 🧠 V1.1.0-alpha 运行时层(`runtime/`)
+
+> 已有 14 专家 / 13 Skill / 49 脚本**不动**(宪章铁律),`runtime/` 仅作可执行调度层。
+> 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
+
+### 模块拓扑
+
+```
+用户输入(任意格式)
+   │
+   ▼
+runtime/api  或  runtime/cli         ← 统一入口
+   │
+   ▼
+runtime/router                       ← LiteLLM 多厂商 + Ollama 兜底
+   │ (DAG:专家+Skill+顺序+置信度+理由)
+   ▼
+runtime/orchestrator                 ← Prefect 2.x flow + Direct 降级执行器
+   │
+   ├─► 02-专家定义/*.md              ← Claude Code 加载
+   ├─► 03-技能定义/*.md              ← Skill 调用
+   └─► 05-代码示例/*.py              ← 49 脚本(subprocess 隔离)
+   │
+   ▼
+runtime/storage 飞轮                  ← Postgres+pgvector + MinIO
+   │
+   ▼
+报告 + 通知(复用已有 utils/)
+```
+
+### 八维测试矩阵(运行时元数据骨架)
+
+| 维度 | 取值 |
+|------|------|
+| 平台 | Web/移动/桌面/嵌入式/云原生/中间件/DB/AI模型/区块链/IoT/工控 |
+| 协议 | HTTP(S)/gRPC/WS/TCP/UDP/MQTT/AMQP/Kafka/Redis/SOAP/GraphQL/Modbus/CAN |
+| 测试类型 | 单元/集成/E2E/UI/API/性能/压力/容量/混沌/安全/渗透/模糊/合规/可访问性/兼容/本地化/可用性/视觉回归/契约/可观测 |
+| 流程 | 需求评审 → 用例 → 数据/Mock → 执行 → 缺陷 → 回归 → 上线监控 |
+| 自动化层 | 录制 / 手写 / AI 生成 / AI 自愈 / 自主决策 |
+| 部署 | 本地/Docker/K8s/Serverless/边缘 |
+| Profile | 通用层做厚 + 行业 Profile 留扩展位(`profiles/`,M2 上线) |
+| 智能等级 | L0 脚本 → L1 数据驱动 → L2 关键字 → L3 AI 辅助 → L4 自主决策 |
+
+### 多厂商 LLM 路由
+
+```bash
+TAGENT_LLM_PROVIDER=claude     # anthropic/claude-sonnet-4-6
+TAGENT_LLM_PROVIDER=openai     # openai/gpt-4o
+TAGENT_LLM_PROVIDER=gemini     # gemini/gemini-1.5-pro
+TAGENT_LLM_PROVIDER=qwen       # openai/qwen-plus
+TAGENT_LLM_PROVIDER=deepseek   # deepseek/deepseek-chat
+TAGENT_LLM_PROVIDER=ollama     # ollama/qwen2.5:7b(本地)
+TAGENT_LLM_PROVIDER=stub       # 测试 stub(不出网)
+
+TAGENT_LLM_PROVIDER_FALLBACK=ollama  # 主路由失败回退
+```
+
+支持**双模型投票**:`route_with_vote(artifact, providers=["claude","qwen"])`。分歧 → 降低 confidence,合并 DAG 节点。
+
+### 飞轮 schema(`runtime/storage/`)
+
+| 表 | 用途 |
+|----|------|
+| `runs` | 一次执行(run_id/输入/状态/DAG/起止) |
+| `cases` | 测试用例(优先级/步骤/结果/专家/技能) |
+| `defects` | 缺陷(严重度/状态/根因/外部 Bug 系统 URL) |
+| `evidence` | 证据(MinIO key+sha256:截图/录屏/HAR/日志) |
+| `feedback` | 用户标注(误报/漏报/路由对错) |
+| `embeddings` | pgvector 向量(用例/缺陷/报告语义检索) |
+
+### 一键起 + 跑通
+
+```bash
+# 1. 起本地依赖(Postgres + MinIO + Prefect Server)
+cd runtime && docker compose up -d
+
+# 2. 跑数据库迁移
+cd runtime/storage && alembic upgrade head
+
+# 3. 校验注册中心
+python -m runtime.cli.main catalog
+
+# 4. 单次跑(本地直跑,不上 Prefect 也行)
+TAGENT_LLM_PROVIDER=stub python -m runtime.cli.main run "Web 系统 https://example.com"
+
+# 5. 起 HTTP 服务
+uvicorn runtime.api.main:app --port 8800
+# POST /run/text, /run/file, /run/url
+# GET /status/{run_id}, /report/{run_id}, /catalog, /health
+```
+
+### Prefect 缺席降级(Direct 执行器)
+
+`runtime/orchestrator/direct.py` 提供与 Prefect flow 等价契约的纯标准库执行器(ThreadPoolExecutor 并发,Kahn 拓扑排序)。Prefect 未装时 `Kernel.execute_sync` 自动回落,**让小团队/CI 离线测可不依赖 Prefect 部署**。
+
+### 八维路由准确率(M1 收口)
+
+- 5 类典型输入(web/api/mobile/desktop/ai-model)stub 路由 = 5/5(100%)
+- M1 门槛:多模型真测 ≥85%;不达 → 双模型投票
+
+### 与 14 专家 / 13 Skill / 49 脚本的关系
+
+| 项 | 关系 |
+|----|------|
+| 14 专家 `.md` | **不动**。`registry` 扫 frontmatter,`router` 喂 LLM 选用 |
+| 13 Skill `.md` | **不动**。同上 |
+| 49 脚本 `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
+| `utils/` 通知/Bug | 复用 `generate_report.py` / `zentao_bug_manager.py` |
+
+任何专家/Skill/脚本**新增**或**修改**仍按宪章 §1 同步铁律走;`runtime/` 是新增 **调度** 层,不重复实现专家逻辑。
 
 ---
 
 ## 📜 LICENSE / CHANGELOG / CONTRIBUTING / SECURITY
 
 - **LICENSE**：MIT（详见 [`LICENSE`](LICENSE)）
-- **CHANGELOG**：详见 [`CHANGELOG.md`](CHANGELOG.md)（V1.0.0 首版 + W1-W3 增量）
+- **CHANGELOG**：详见 [`CHANGELOG.md`](CHANGELOG.md)（V1.0.0 首版含 darwin-skill 集成 / Bug 多适配 / AgentChat 协议 / 按需安装 + 运行时补装 / 永久宪章定位）
 - **VERSION**：详见 [`VERSION`](VERSION)
 - **CONTRIBUTING**：详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)（含同步铁律 + RACI 矩阵）
 - **SECURITY**：详见 [`SECURITY.md`](SECURITY.md)（漏洞报告流程 + GitHub Security Advisories 入口）
 - **CODE_OF_CONDUCT**：详见 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)（基于 Contributor Covenant 2.1）
+
+---
+
+## 🗺️ 项目当前状态与下次会话快速指引
+
+### 当前阶段（最后更新：2026-05-11）
+
+- **Phase**：Phase 1（V1.0.0 工程基线 + 概念宪章已成）
+- **关键已交付**：14 agent + 14 skill + AgentChat + Bug 多适配 + 按需安装（含运行时补装） + darwin-skill 集成
+
+### 历史关键决议
+
+- 2026-05-11：宪章四章 + 三公理 + 五铭文起草完成（基于 DeepSeek 四轮 + Claude 整理）
+- 2026-05-11：FULL_GUIDE.md 糅合全局记忆，确立永久宪章地位
+- 2026-05-11：darwin-skill 不消费运行数据（Via Negativa 显式标注）；反问 KB 不进 V1.0.0
+- 2026-05-11：V1.0.0 阶段铭文锁死，单签兼任不构成有效授权
+
+### 下次会话进入项目时，按顺序检查
+
+1. 本节「当前阶段」是否仍是 Phase 1？是否有新里程碑？
+2. 「📋 开放问题」第 Q1-Q8 是否有新决议？
+3. 「Phase 触发条件总表」哪一行的触发条件已达成？
+4. 「🎭 关键模块清单」是否有模块从 ⚪/❌ 升级到 ✅？
+5. 是否需要扩写某一章节为深度版？
+6. 是否需要把开放问题转成 Jira 风格的可分配任务？
+
+### 来源与引用（认知史）
+
+- 第一轮（DeepSeek）：测试 Agent 七阶段架构
+- 第二轮（DeepSeek）：认知暗物质 + 10 个反问
+- 第三轮（DeepSeek）：抽象/探索/哲学维度
+- 第四轮（DeepSeek）：全人类 + 全行业视角
+- 第五轮（Claude 补充）：神圣 / 危机 / 临界层 10 个新增
+- 整理框架：八大簇 → 九大簇演进（Claude 整理）
+- 宪章草案：四章 + 三公理 + 五铭文（Claude 草拟）
+- V1.0.0 工程基线：14 agent + 14 skill + utils 49 个 + CI/CD（项目自建）
+- 永久宪章糅合（2026-05-11）：FULL_GUIDE 工程主体 + 全局记忆哲学维度合一
+
+---
+
+*本文档是活的，每次重大决策后须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。改其他章节须经 test-lead review，符合闭环约定 14/15/16。*

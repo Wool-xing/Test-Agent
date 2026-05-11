@@ -1,0 +1,20 @@
+framework: CCPA(加州消费者隐私法案)
+version: 2018 + CPRA 2020 amendments
+applicable_industries: [Any with California residents' data]
+status: skeleton
+checks:
+  - id: 1798.100
+    title: Right to know
+    severity: P0
+    rule: Consumers can request categories + specific PI collected, sold, disclosed in past 12 months.
+    evidence_required: [consumer_request_workflow]
+  - id: 1798.105
+    title: Right to delete
+    severity: P0
+    rule: Verifiable deletion request honored within 45 days; downstream notification.
+    evidence_required: [deletion_workflow, downstream_notify_log]
+  - id: 1798.120
+    title: Right to opt-out of sale
+    severity: P0
+    rule: "'Do Not Sell My Personal Information' link on homepage; opt-out honored."
+    evidence_required: [homepage_screenshot, opt_out_audit]
