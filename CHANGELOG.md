@@ -12,6 +12,23 @@
 
 ## [Unreleased]
 
+### Added(V1.13.0-alpha · README hero 重写 + `tagent demo` + 30 秒 demo 录制脚本 · 2026-05-12)
+
+- **`tagent demo` 子命令**:0 API key / 0 配置一键跑通 4 步——init minimal preset + L1 lint + L2 e2e + 产物清单
+  - 自动 stub LLM + 重置 settings 缓存,避免 `_kernel` 模块加载顺序问题
+  - 产 36+ 文件:Excel 用例 + xmind/markmap/opml 思维导图 + Word 报告 + decision logs
+- **README hero 重写**(双语):
+  - 头 30 秒区:`tagent demo` 作首屏 hook(从 0 到产物 30 秒)
+  - 次屏:`tagent init --preset` 5 选,带 STARTUP.md 引导
+  - 强调 8640 种配置组合 + 6 BugTracker + 6 通知 + 4 层自检 + MCP 6 件套
+- **30 秒 demo 录制脚本**(`docs/assets/demo-script-v1.12.md`):
+  - 逐秒分镜表(0-3s logo / 3-6s init / 6-10s 产物 / 10-14s STARTUP / 14-18s doctor / 18-25s demo / 25-30s github CTA)
+  - Terminalizer + asciinema + OBS 三种录制方案
+  - 渠道适配:Twitter/X · 微信视频号 · 掘金/V2EX · Hacker News(同一份素材 4 平台)
+- **00-导航 同步**:CLI 行加 `demo` 子命令
+- 烟测 `tagent demo` 产 36+ 文件全过 · L1/L3 strict 不破
+- 版本 V1.12.0-alpha → **V1.13.0-alpha**
+
 ### Added(V1.12.0-alpha · `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
 
 - **新模块 `runtime/init/`**:

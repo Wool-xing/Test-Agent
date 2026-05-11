@@ -324,6 +324,85 @@ def uninstall(name: str = typer.Argument(...)):
 
 
 @app.command()
+def demo(
+    out: str = typer.Option("workspace/_demo", "--out", help="demo 产物目录(.env / tagent.yml / STARTUP.md / 测试用例 / 报告)"),
+    preset: str = typer.Option("minimal", "--preset", help="init 用 preset · minimal=离线 0 配置(stub LLM + webhook)"),
+    keep: bool = typer.Option(False, "--keep", help="保留上次产物(默认每次 --overwrite 覆盖)"),
+):
+    """一键跑通完整 demo · 0 配置 · 0 API key · 30 秒看产物(主宪章 §1 §7)."""
+    import os
+    import shutil
+
+    # 先于任何 Kernel/Router 实例化前设环境 + 清 settings 缓存(否则 _kernel 已锁 claude)
+    os.environ["TAGENT_LLM_PROVIDER"] = "stub"
+    os.environ["TAGENT_LLM_PROVIDER_FALLBACK"] = "stub"
+    import runtime.config.settings as _settings_mod
+
+    _settings_mod._settings = None
+    from runtime.api.deps import Kernel as _Kernel
+    demo_kernel = _Kernel()
+
+    from runtime.init.matrix import load_matrix
+    from runtime.init.renderer import render_all
+    from runtime.init.wizard import from_preset
+
+    console.print("[bold cyan]Test-Agent · 一键 demo[/]  (主宪章 §1 §7,0 配置,stub LLM)\n")
+
+    out_path = Path(out)
+    if out_path.exists() and not keep:
+        console.print(f"[dim]清空旧产物 {out_path}[/]")
+        shutil.rmtree(out_path, ignore_errors=True)
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    console.print(f"[bold]Step 1/4 · tagent init --preset {preset}[/]")
+    matrix = load_matrix()
+    answers = from_preset(preset, matrix=matrix)
+    res = render_all(answers, out_path, matrix=matrix, overwrite=True)
+    console.print(f"  ✓ {res.env_path.name}  /  {res.yml_path.name}  /  {res.startup_path.name}")
+
+    console.print("\n[bold]Step 2/4 · tagent doctor --agents (L1 frontmatter lint)[/]")
+    from runtime.healthcheck.agent_smoke import run_smoke
+
+    report = run_smoke()
+    if report.ok:
+        console.print(f"  ✓ agents={report.expert_count}/16  skills={report.skill_count}/≥25")
+    else:
+        console.print(f"  [red]✗ {len(report.issues)} issue(s)[/]")
+        raise typer.Exit(1)
+
+    console.print("\n[bold]Step 3/4 · tagent selftest --e2e (16 agent DAG · stub LLM · 0 成本)[/]")
+    fixture_path = Path("examples/_smoke_prd.md")
+    if not fixture_path.exists():
+        console.print(f"  [red]fixture missing:[/] {fixture_path}")
+        raise typer.Exit(2)
+    art = parse_path(fixture_path)
+    run_id, decision = demo_kernel.submit(art, persist=False)
+    summary = demo_kernel.execute_sync(run_id, decision)
+    total = summary["total"]
+    succ = summary["succeeded"]
+    rate = succ / total if total else 0.0
+    console.print(f"  ✓ DAG executed: {succ}/{total} ok ({rate:.0%})")
+
+    console.print("\n[bold]Step 4/4 · 看产物[/]")
+    artifacts = []
+    for d in (Path("workspace/测试用例"), Path("workspace/测试报告"), Path("workspace/执行日志")):
+        if d.exists():
+            for f in sorted(d.glob("**/*")):
+                if f.is_file() and not f.name.startswith("_"):
+                    artifacts.append(f)
+    if artifacts:
+        for f in artifacts[:12]:
+            console.print(f"  · {f}")
+        if len(artifacts) > 12:
+            console.print(f"  · [dim]... +{len(artifacts) - 12} more[/]")
+    else:
+        console.print("  [yellow](无产物 · 可能脚本依赖未装,跑 `pip install -r 04-配置文件/requirements.txt`)[/]")
+
+    console.print(f"\n[bold green]✓ demo done[/]  配置在 {out_path}  产物在 workspace/")
+    console.print(f"[dim]下一步:`cat {res.startup_path}` 看启动指南;改 `.env` 填占位换真 LLM 跑生产[/]")
+
+
+@app.command()
 def init(
     test_type: str = typer.Option("", "--test-type", help="web/api/mobile/desktop/iot/car/ai_model/security(非交互时填)"),
     platform: str = typer.Option("", "--platform", help="linux/windows/mac/android/ios/embedded"),
