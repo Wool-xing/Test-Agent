@@ -1,0 +1,44 @@
+# terminalizer 配置 · 30s Test-Agent demo
+# 用法:terminalizer record demo --config docs/assets/terminalizer-config.yml
+
+command: bash
+
+cwd: /tmp/tagent-demo
+
+env:
+  recording: true
+  TAGENT_LLM_PROVIDER: stub
+  TAGENT_LLM_PROVIDER_FALLBACK: stub
+  TAGENT_LANG: zh
+  TAGENT_MODE: learn
+
+cols: 100
+rows: 30
+
+repeat: 0
+quality: 70
+
+frameDelay: auto
+maxIdleTime: 800
+
+# 主题
+theme:
+  background: "#1e1e2e"
+  foreground: "#cdd6f4"
+  cursor: "#f5c2e7"
+  black: "#45475a"
+  red: "#f38ba8"
+  green: "#a6e3a1"
+  yellow: "#f9e2af"
+  blue: "#89b4fa"
+  magenta: "#f5c2e7"
+  cyan: "#94e2d5"
+  white: "#bac2de"
+
+watermark: null
+
+cursorStyle: block
+fontFamily: "Cascadia Code, JetBrains Mono, Fira Code, monospace"
+fontSize: 14
+lineHeight: 1.0
+letterSpacing: 0

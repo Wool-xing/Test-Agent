@@ -12,6 +12,24 @@
 
 ## [Unreleased]
 
+### Added(V1.8.0-alpha · build-your-own-x 教学扩 + Marketplace 4 lane · 2026-05-12)
+
+- **精髓库扩**:`_精髓库/build-your-own-x.md`(codecrafters/build-your-own-x curated list 萃取);加 INDEX 条目
+- **教学层 KB 扩 13 大类**(原 12 → 13,加 `13-build-your-own/`):
+  - INDEX + 10 P0 测试相关卡(database/network-stack/web-server/git/search-engine/shell/regex-engine/programming-language/web-browser/bot)
+  - 每卡含 `estimated_time_hours` + 测试映射 + 推荐路径
+- **主 skill**:`03-技能定义/build-your-own-x-explorer.md`(引导式 deep-dive 推荐)
+- **Marketplace 4 lane 系统**(对标 Claude Code 官方):
+  - `marketplace/{skills,agents,mcp,hooks}/` 目录
+  - `marketplace/INDEX.md` + `registry.json` + `_safety_policy.yaml`(4 关安全门 + 3 信任级源)
+  - `runtime/marketplace/`:catalog.py + verifier.py + installer.py + INDEX
+  - 4 关安全门:签名校验(SHA256/ed25519) + 注入扫(复用 §22 scheduler 模块) + 沙箱试跑(Docker network=none) + darwin 评分(≥75)
+- **CLI 加 5 子命令**:`tagent search/list/install/uninstall/verify`
+- **主宪章 §30**:Marketplace 安全栅栏(4 关铁律 + 3 信任级 + safe-by-default + 不复制官方源 + 卸载只归档 + 紧急 kill switch)
+- **主宪章 §31**:教学层扩 13 大类(byox P0/P1/P2 分档 + 预算检查 + essence_only policy)
+- TOC 同步;skill 数升级
+- 版本 V1.7.0-alpha → V1.8.0-alpha
+
 ### Added(V1.7.0-alpha · Karpathy 4 原则 + ECC 测试加固 + Essence 自动汲取 · 2026-05-12)
 
 - **精髓库扩 2 条目**:

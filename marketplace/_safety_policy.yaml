@@ -1,0 +1,61 @@
+# Marketplace 4 关安全门(主宪章 §30)
+# 4 关任一不过 → 拒装 + 落 decisions/
+
+gates:
+  # 关 1:签名校验
+  signature:
+    required: true
+    algorithms: [sha256, ed25519]
+    reject_unsigned: true
+
+  # 关 2:全 prompt 注入扫描
+  prompt_injection_scan:
+    required: true
+    scanner: runtime.scheduler.injection_scan
+    extra_patterns: []      # 用户可加自定义
+
+  # 关 3:沙箱试跑
+  sandbox_dry_run:
+    required: true
+    backend: docker          # docker / podman
+    image: python:3.11-slim
+    duration_seconds: 86400  # 24h 观察(可调,production)
+    deny_network: true       # 沙箱无网络
+    deny_writes_outside: ["/tmp"]
+
+  # 关 4:darwin 评分
+  darwin_score:
+    required: true
+    min_score: 75            # 0-100
+    fallback: dry_run        # 不能跑子 agent 时降级
+
+# 信任级源(默认信任级 → 默认行为)
+trust_tiers:
+  high:
+    sources:
+      - "Anthropic 官方 Claude Code skills repo"
+      - "anthropics/* 官方组织"
+    gates_required: 1        # 仅签名(信任高,跳沙箱节省时间)
+    default_confidence: high
+
+  medium:
+    sources:
+      - "大厂公开 repo(Microsoft / Google / Meta / Alibaba / Tencent ...)"
+    gates_required: 3        # 签名 + 扫 + 沙箱(跳 darwin 评分)
+    default_confidence: medium
+
+  low:
+    sources:
+      - "社区 GitHub PR / 个人 repo"
+    gates_required: 4        # 全 4 关
+    default_confidence: llm-draft-unreviewed
+
+# 卸载策略
+uninstall:
+  archive_only: true         # 主宪章 §22 决策不可逆禁止
+  archive_dir: marketplace/.archive/
+
+# 紧急 kill switch
+emergency_disable:
+  env_var: TAGENT_MARKETPLACE_DISABLE
+  reason_required: true      # 设置时必带原因(落 decisions/)
