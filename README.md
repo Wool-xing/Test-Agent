@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
-[![Self-test](https://img.shields.io/badge/selftest-100%25-brightgreen.svg)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
+[![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](VERSION)
 [![中文](https://img.shields.io/badge/Lang-中文-red.svg)](README.zh-CN.md)
 
 **English** | [简体中文](README.zh-CN.md)
@@ -17,9 +17,11 @@
 
 ```bash
 git clone https://github.com/Wool-xing/Test-Agent.git
-cd Test-Agent && pip install -e .
+bash Test-Agent/install.sh ~/test-agent-project
 
-tagent demo            # 0 API key · 0 config · stub LLM · 30s end-to-end
+# Optional: enable autonomous runtime (alpha — 5 LLM-driven agents wired)
+cd Test-Agent/runtime && pip install -e .
+tagent demo            # 0 API key · stub LLM · 30s end-to-end
 ```
 
 Outputs: test cases (Excel + xmind + markmap + opml) + Word report + decision logs, all under `workspace/`.
@@ -31,7 +33,7 @@ tagent init --preset 国内-web    # or: minimal / saas-web / mobile-android / s
 # → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
 ```
 
-8640 config combinations from a single `matrix.yaml` — change a line in YAML, the wizard picks it up. See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
+Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels (8640 combinations on paper; not all are e2e-validated in this alpha). See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
 
 ---
 
@@ -39,16 +41,18 @@ tagent init --preset 国内-web    # or: minimal / saas-web / mobile-android / s
 
 Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports. Built for QA teams, security researchers, automotive testers, and anyone who wants to **use AI testing while learning the theory behind it**.
 
-- **16 expert agents** — functional · security · mobile · desktop · AI model · automotive · pentest …
-- **32+ reusable skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
+- **16 expert agents** — functional · security · mobile · desktop · AI model · automotive · pentest … (current implementation status: see [ROADMAP.md](ROADMAP.md))
+- **33 business skills + 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
 - **49 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
 - **Multi-LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(local,no vendor lock-in)
-- **6 BugTracker adapters** — Zentao · Jira · GitHub Issues · GitLab Issues · Linear · Webhook(主宪章 §37)
-- **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams(主宪章 §36)
-- **MCP-native** — 6-server suite + 4-gate marketplace
-- **4-layer self-test** — L1 lint · L2 mock CI · L3 real-LLM pre-tag · L4 weekly cron(主宪章 §33)
+- **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
+- **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams
+- **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others under `_pending_servers_v1_2_0_alpha` in `.mcp.json`)
+- **Self-test scaffolding** — L1 lint + L2 mock CI active in CI; L3 real-LLM + L4 weekly cron require `ANTHROPIC_API_KEY` secret (not configured in this repo by default)
 
-## 🚀 Install for production
+## 🚀 Install (alpha)
+
+> ⚠️ This project includes attack-surface utilities (pentest skills / SSRF probes / AI adversarial templates). See [SECURITY.md](SECURITY.md) for authorization requirements before running pentest or AI-adversarial workflows.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
@@ -71,24 +75,11 @@ Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 m
 - **Test design methods**: equivalence-partitioning · boundary-value · decision-table · state-transition · pairwise · orthogonal · exploratory SBTM · risk-based · TDD · BDD · ATDD
 - **Quality gates**: smoke → regression → performance_ci_quick → performance_full → release (5-layer)
 
-Total ≈ **95% coverage** — remaining 5% (DO-178C avionics / HIPAA medical / IEC 61508 industrial) added by your domain experts.
+Coverage is broad across the listed categories above. The **"95%" figure is aspirational, not a measured number** — domain-specific gates (DO-178C avionics / HIPAA medical / IEC 61508 industrial) currently ship as **skeleton** compliance YAML profiles only.
 
-## 🏛️ Charter-Driven
+## 📖 Design Documents
 
-Test-Agent ships with a 31-section **charter** (`CHARTER.md`-equivalent) covering:
-
-- §10–§12 · Soul (3 axioms + 5 inscriptions + 16 key terms)
-- §13–§17 · Architecture (experts / skills / installs / darwin self-evolution / AgentChat / MCP)
-- §18–§21 · Methodology (9-cluster map / test pyramid 2024 / 18 closed-loop rules / 9-industry adapter / 50+ test types / 4 depth levels)
-- §22 · Hermes-inspired (scheduler / subagent / learning-loop / 7 backends / 8 platforms)
-- §23 · Teaching layer (KB 13 categories + anti-hallucination 3 layers + bilingual)
-- §24 · GBrain-inspired (KB self-wiring graph + eval replay + PII scrub)
-- §25–§26 · Pentest & Automotive verticals
-- §27 · Karpathy 4 principles (think-before / simplicity-first / surgical / goal-driven)
-- §28 · ECC test hardening (tdd-workflow / verification-loop / e2e / eval-harness / security-review)
-- §29 · Essence watcher (auto-track upstream OSS for delta extraction)
-- §30 · Marketplace 4-lane (4-gate security)
-- §31 · Build-your-own-X learning layer
+For project design rationale, architecture decisions, and methodology rationale, see [FULL_GUIDE.md](FULL_GUIDE.md). Inspirations from upstream OSS (hermes / gbrain / karpathy / etc.) are credited in [NOTICE.md](NOTICE.md).
 
 ## 📂 Project Structure
 
@@ -97,7 +88,7 @@ Test-Agent/
 ├── 00-项目导航.md           ← 5-dimension category guide
 ├── 01-快速开始/             ← user manual / deploy / config / deliverables
 ├── 02-专家定义/             ← 16 expert agents
-├── 03-技能定义/             ← 34 skills (incl. darwin-skill / karpathy-guidelines upstream)
+├── 03-技能定义/             ← 33 business skills + 3 meta-skills
 ├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
 ├── 05-代码示例/             ← 49 production utils
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
@@ -111,6 +102,11 @@ Test-Agent/
 ├── CHANGELOG.md            ← Version log
 └── LICENSE / SECURITY.md / CONTRIBUTING.md / CODE_OF_CONDUCT.md
 ```
+
+> **Skill Lifecycle (meta-tools)**:
+> - **Current (A · methodology reference)**: Each subdir's SKILL.md serves as skill-design reference material.
+> - **Usable today (B · perspective extension)**: Use `nuwa-skill` to distill new mental-model perspectives (Naval / Munger / Feynman); use `darwin-skill` to optimize perspective skills.
+> - **V2.x Roadmap (C · testing-domain adaptation)**: Re-target nuwa as a test skill/agent distiller; re-target darwin's 8-dim scoring to testing domain.
 
 ## 📚 Documentation
 
@@ -129,9 +125,9 @@ pytest 8.3 · Playwright 1.59 · Appium 5.3 · pywinauto · JMeter 5.6 · Allure
 
 ## 🤝 Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full workflow (sync rules + RACI matrix + 6-layer dependency policy + Karpathy 4 principles).
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution workflow.
 
-Community marketplace contributions (`marketplace/`) go through **4 safety gates**: signature → injection scan → docker sandbox → darwin-skill scoring.
+Community marketplace contributions (`marketplace/`) pass through **4 verification gates** (current implementation): signature presence (planned) → injection-regex scan → AST syntax-parse (V1.x: replace with real Docker sandbox) → frontmatter-presence score (V1.x: swap for real darwin-skill evaluator).
 
 ## 📜 License
 

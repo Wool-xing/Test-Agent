@@ -110,9 +110,9 @@ perf(jmeter): 减少不必要心跳
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
-ls 02-专家定义/[0-9]*.md | wc -l   # 14（或 +N）
-ls 03-技能定义/*.md | grep -v README | wc -l  # 13（或 +N）
-ls 05-代码示例/*.py | wc -l         # 49（或 +N）
+ls 02-专家定义/[0-9]*.md | wc -l   # 16（或 +N）
+ls 03-技能定义/*.md | grep -v README | wc -l  # 33（或 +N,不含 3 个元 skill 子目录）
+ls 05-代码示例/*.py | wc -l         # 49（或 +N,含 __init__.py）
 grep -c "^    [a-z_]+:" 04-配置文件/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
@@ -131,14 +131,14 @@ pytest --collect-only
 | 新增/删除 Agent | `02-专家定义/README.md` + `00-项目导航.md` + `install.sh` agents 数组 + `01-快速开始/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS` |
 | 新增/删除 Skill | `03-技能定义/README.md` + `00-项目导航.md` + `install.sh` skills 数组 + `01-快速开始/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单 |
 | 新增/删除 utils | `05-代码示例/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers + `install.sh` utils 数组 |
-| 数字变化（14/13/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/使用手册/部署说明/install.sh + ci.yml `file-count` job 校验 |
+| 数字变化（16/33+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.sh + ci.yml `file-count` job 校验 |
 | URL/repo 名变化 | grep `Wool-xing/Test-Agent` 全替换 + `install.sh::REPO_URL` + `dependabot.yml` |
 | 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `02-专家定义/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
 
 ### 自动化保障
 
-- `pre-commit`：14/13/49 文件统计 + 私有源 MD 防护 + .env 防护 + gitleaks 凭据扫描 + ruff
-- `.github/workflows/ci.yml`：14/13/49 自校 + Markdown 链接有效性 + utils 导入 + 私有源 MD 防护
+- `pre-commit`：16/33/49 文件统计 + 私有源 MD 防护 + .env 防护 + gitleaks 凭据扫描 + ruff
+- `.github/workflows/ci.yml`：16/33/49 自校 + Markdown 链接有效性 + utils 导入 + 私有源 MD 防护
 - `.github/workflows/codeql.yml`：python + GitHub Actions 安全扫描
 
 ### 提交前自检
@@ -162,7 +162,7 @@ pytest --collect-only
 - **I** = Informed（被通报）
 - 空 = 不参与
 
-### 14 专家代号
+### 16 专家代号
 
 | 代号 | 专家 | 类别 |
 |------|------|------|

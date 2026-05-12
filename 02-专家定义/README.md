@@ -1,8 +1,8 @@
 # 02-专家定义 索引
 
-14 个 Agent，分两类：核心通用流程 + 平台专项扩展。
+**16 个 Agent**,分三类:核心通用流程 + 平台专项扩展 + 垂直领域。
 
-> 顶层导航见根目录 `00-项目导航.md`。
+当前实装状态见根目录 [ROADMAP.md](../ROADMAP.md);顶层导航见 [00-项目导航.md](../00-项目导航.md)。
 
 ---
 
@@ -41,6 +41,17 @@ bug-manager → report-generator → test-lead 决策
 | 12 | `12-视觉游戏测试.md` | **visual-tester** | 游戏 / Canvas / WebGL / Unity / Unreal / OCR / 视觉回归 |
 | 13 | `13-系统集成测试.md` | **system-tester** | IoT / 嵌入式 / 串口 / MQTT / 音视频 / Jaeger / Kafka |
 | 14 | `14-AI模型测试.md` | **ai-tester** | 模型 / AI / LLM / 推理 / 推荐算法 / fairness / 数据漂移 |
+
+---
+
+## 类别 3：垂直领域扩展 2 Agent（V1.x rollout）
+
+| 序号 | Agent 文件 | 角色 | 触发条件（PRD 关键词） |
+|------|-----------|------|----------------------|
+| 15 | `15-渗透测试.md` | **pentest-tester** | 渗透 / 安全测试 / SQL 注入 / XSS / SSRF / 漏洞扫描 / OWASP / 攻击面 |
+| 16 | `16-车载测试.md` | **automotive-tester** | 车载 / 汽车 / CAN-bus / SOME-IP / DoIP / UDS / ASIL / ISO-26262 / HIL / OTA |
+
+⚠️ **运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../SECURITY.md) 武器化代码使用边界)。当前两个 expert 在 V1.x rollout(见 [ROADMAP.md](../ROADMAP.md)),runtime/router 防 mock 改造前不会输出 mock 数据。
 
 ### 路由识别（自动）
 

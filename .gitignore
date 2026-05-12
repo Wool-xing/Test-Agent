@@ -130,3 +130,6 @@ _精髓库/
 # ===== 自检 smoke 临时产物 =====
 workspace/**/_smoke_*
 workspace/测试用例/_smoke_out/
+
+# ===== 内部开发文档（HANDOFF / 内部讨论纪要,不入公开仓）=====
+discussions/internal/

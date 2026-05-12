@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
-[![Self-test](https://img.shields.io/badge/selftest-100%25-brightgreen.svg)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
+[![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](VERSION)
 [![English](https://img.shields.io/badge/Lang-English-blue.svg)](README.md)
 
 [English](README.md) | **简体中文**
@@ -17,9 +17,11 @@
 
 ```bash
 git clone https://github.com/Wool-xing/Test-Agent.git
-cd Test-Agent && pip install -e .
+bash Test-Agent/install.sh ~/test-agent-project
 
-tagent demo            # 0 API key · 0 配置 · stub LLM · 30 秒看完整产物
+# 可选:启用自主运行时 (alpha — 5 个真 LLM-driven agent)
+cd Test-Agent/runtime && pip install -e .
+tagent demo            # 0 API key · stub LLM · 30 秒看完整产物
 ```
 
 产物:测试用例(Excel + xmind + markmap + opml)+ Word 报告 + 决策日志,全在 `workspace/`。
@@ -31,7 +33,7 @@ tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / s
 # → 产 .env + tagent.yml + STARTUP.md(5 步上手指南)
 ```
 
-8640 种配置组合,改 `matrix.yaml` 一行,向导自动列出。见 [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md)。
+矩阵驱动配置:8 测试类型 × 6 平台 × 5 LLM × 6 tracker × 6 通道(理论 8640 组合;并非全部已 e2e 验证)。见 [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md)。
 
 ---
 
@@ -39,16 +41,18 @@ tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / s
 
 Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告,全自主。为 QA 团队、安全研究员、车载测试工程师、以及任何想**用 AI 测试同时学测试理论**的人而生。
 
-- **16 专家 Agent** — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
-- **32+ 可复用 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
+- **16 专家 Agent** — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……(当前实装状态见 [ROADMAP.md](ROADMAP.md))
+- **33 业务 Skill + 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
 - **49 生产工具** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV ……
 - **多 LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(无厂商锁定)
-- **6 BugTracker 适配** — 禅道 · Jira · GitHub Issues · GitLab Issues · Linear · Webhook(主宪章 §37)
-- **6 通知渠道** — 企微 · 飞书 · 钉钉 · Slack · 邮件 · Teams(主宪章 §36)
-- **MCP 原生** — 6 件套 + 4 关 marketplace 安全门
-- **4 层自检** — L1 lint · L2 CI mock · L3 真 LLM pre-tag · L4 周自检(主宪章 §33)
+- **BugTracker** — 1 已实装(禅道);5 计划(Jira · GitHub · GitLab · Linear · Webhook,见 roadmap)
+- **6 通知渠道** — 企微 · 飞书 · 钉钉 · Slack · 邮件 · Teams
+- **MCP 集成** — 6 模块已实现(test-orchestrator 默认启用;其余 5 件套写在 `.mcp.json` 的 `_pending_servers_v1_2_0_alpha` 段)
+- **自检脚手架** — L1 lint + L2 mock CI 已在 CI 激活;L3 真 LLM + L4 周自检需配置 `ANTHROPIC_API_KEY` secret(本仓默认未配)
 
-## 🚀 生产安装
+## 🚀 安装 (alpha)
+
+> ⚠️ 本项目含攻击面工具(渗透 skill / SSRF 探针 / AI 对抗模板)。运行 pentest 或 AI-adversarial 工作流前请阅 [SECURITY.md](SECURITY.md) 中的授权要求。
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
@@ -71,24 +75,11 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 - **用例设计方法**:等价类 · 边界值 · 判定表 · 状态迁移 · 配对 · 正交 · 探索性 SBTM · 风险驱动 · TDD · BDD · ATDD
 - **质量门禁**:冒烟 → 回归 → performance_ci_quick → performance_full → release(5 层)
 
-总覆盖率 ≈ **95%** — 剩 5%(航空 DO-178C / 医疗 HIPAA / 工业 IEC 61508)由领域专家补。
+覆盖面在上述类别广。**「95%」是目标值,不是测量值** — 领域专项门禁(航空 DO-178C / 医疗 HIPAA / 工业 IEC 61508)当前仅以 **skeleton** 合规 YAML 形态提供。
 
-## 🏛️ 宪章驱动
+## 📖 设计文档
 
-Test-Agent 带 31 节**项目宪章**,覆盖:
-
-- §10–§12 · 灵魂底色(三公理 + 五条铭文 + 16 关键术语)
-- §13–§17 · 架构(专家 / 技能 / 按需安装 / darwin 自进化 / AgentChat / MCP)
-- §18–§21 · 方法论(九大簇地图 / 测试金字塔 2024 / 18 闭环约定 / 9 行业适配 / 50+ 测试类型 / 4 深度级)
-- §22 · Hermes 派生(scheduler / subagent / learning-loop / 7 后端 / 8 平台)
-- §23 · 教学层(KB 13 大类 + 反幻觉 3 层 + 双语)
-- §24 · GBrain 派生(KB 自连图谱 + eval 回放 + PII scrub)
-- §25–§26 · 渗透 & 车载垂直
-- §27 · Karpathy 4 原则(先想再写 / 简洁优先 / 外科手术 / 目标驱动)
-- §28 · ECC 测试加固(tdd-workflow / verification-loop / e2e / eval-harness / security-review)
-- §29 · Essence 自动汲取(自动追踪上游开源)
-- §30 · Marketplace 4 lane(4 关安全门)
-- §31 · Build-your-own-X 教学层
+项目设计思路、架构决策、方法论详见 [FULL_GUIDE.md](FULL_GUIDE.md)。上游开源致谢见 [NOTICE.md](NOTICE.md)。
 
 ## 📂 项目结构
 
@@ -97,7 +88,7 @@ Test-Agent/
 ├── 00-项目导航.md           ← 5 维度分类速查
 ├── 01-快速开始/             ← 使用手册 / 部署 / 配置 / 交付物
 ├── 02-专家定义/             ← 16 个专家 Agent
-├── 03-技能定义/             ← 34 个 Skill(含 darwin-skill / karpathy-guidelines upstream)
+├── 03-技能定义/             ← 33 个业务 Skill + 3 个元 Skill
 ├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
 ├── 05-代码示例/             ← 49 个生产工具
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
@@ -111,6 +102,11 @@ Test-Agent/
 ├── CHANGELOG.md            ← 版本日志
 └── LICENSE / SECURITY.md / CONTRIBUTING.md / CODE_OF_CONDUCT.md
 ```
+
+> **Skill 全生命周期(元工具)**:
+> - **现状(A · 方法论参考)**:各子目录 SKILL.md 为 skill 设计参考材料。
+> - **当下可用(B · 人物视角扩展)**:用 `nuwa-skill` 蒸馏新人物视角(Naval / 芒格 / 费曼);用 `darwin-skill` 优化人物视角 skill。
+> - **V2.x 路线图(C · 测试领域适配)**:改造 nuwa 为测试 skill / agent 蒸馏器;改造 darwin 为测试领域 8 维评分。
 
 ## 📚 文档导航
 
@@ -129,9 +125,9 @@ pytest 8.3 · Playwright 1.59 · Appium 5.3 · pywinauto · JMeter 5.6 · Allure
 
 ## 🤝 贡献
 
-详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)(同步铁律 + RACI 矩阵 + 6 层依赖政策 + Karpathy 4 原则)。
+详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
 
-社区 marketplace 贡献(`marketplace/`)走 **4 关安全门**:签名 → 注入扫 → Docker 沙箱 → darwin-skill 评分。
+社区 marketplace 贡献(`marketplace/`)走 **4 验证关**(当前实现):签名存在性检查(计划中)→ 注入正则扫 → AST 语法解析(V1.x:替换为真 Docker 沙箱)→ frontmatter 检测评分(V1.x:替换为真 darwin-skill 评估器)。
 
 ## 📜 许可
 
