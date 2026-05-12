@@ -14,7 +14,7 @@ from loguru import logger
 
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
-from runtime.orchestrator.adapters.experts import execute_node
+from runtime.orchestrator.adapters.experts import execute_node, reset_upstream_cache
 from runtime.router.schema import DAGNode, RoutingDecision
 
 
@@ -41,6 +41,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
+    reset_upstream_cache()  # V1.14 主宪章 §40
     decision = RoutingDecision.model_validate(decision_dict)
     ordered: list[DAGNode] = decision.topological()
     log.info("direct flow start: run_id={} nodes={}", run_id, len(ordered))

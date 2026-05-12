@@ -37,6 +37,16 @@ class Kernel:
     # ---------- run lifecycle ----------
     def submit(self, artifact: TargetArtifact, *, persist: bool = True) -> tuple[str, RoutingDecision]:
         decision = self.decide(artifact)
+        # V1.14 主宪章 §40 — 把原始 artifact 文本注入每节点 inputs,让 AgentRunner 拿得到
+        full_text = artifact.text or ""
+        if not full_text and artifact.path:
+            try:
+                full_text = Path(artifact.path).read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                full_text = ""
+        for node in decision.dag:
+            if "artifact_text" not in node.inputs:
+                node.inputs["artifact_text"] = full_text[:20_000]
         target_summary = (artifact.text or artifact.path or "")[:400]
         if persist:
             try:

@@ -19,6 +19,8 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from loguru import logger
+
 from runtime.orchestrator.adapters.scripts import ScriptResult, list_available_scripts, run_script
 
 # Canonical script mapping. Names without a script run as a no-op step (logged only).
@@ -115,8 +117,55 @@ def _resolve_script(name: str, kind: str) -> str | None:
     return None
 
 
+_upstream_outputs: dict[str, dict] = {}  # 流水线内每 expert 产物缓存,供下游 RunnerContext.upstream
+
+
+def reset_upstream_cache() -> None:
+    """每次新 run 开始前由 flow 调,清空上游产物缓存."""
+    _upstream_outputs.clear()
+
+
 def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: int = 1800) -> StepOutcome:
     inputs = inputs or {}
+
+    # V1.14 真 agent runner 优先(主宪章 §40,5 核心 expert 落地)
+    if kind == "expert":
+        try:
+            from runtime.orchestrator.agents import get_runner
+            from runtime.orchestrator.agents.base import RunnerContext
+            from runtime.config.settings import get_settings
+
+            runner = get_runner(name)
+            if runner is not None:
+                s = get_settings()
+                ctx = RunnerContext(
+                    artifact_text=inputs.get("artifact_text", ""),
+                    upstream=dict(_upstream_outputs),
+                    settings_provider=s.llm_provider,
+                    workspace=s.project_root / "workspace",
+                    lang=inputs.get("lang", "zh"),
+                    mode=inputs.get("mode", "exec"),
+                )
+                import time as _t
+                t0 = _t.time()
+                res = runner.run(ctx)
+                _upstream_outputs[name] = res.output
+                stdout = res.summary or "[agent runner ok]"
+                if res.artifact_path:
+                    stdout += f"\n→ {res.artifact_path}"
+                return StepOutcome(
+                    name=name,
+                    kind=kind,
+                    executed_script=f"agents/{name}",
+                    returncode=0 if res.ok else 1,
+                    stdout=stdout,
+                    stderr=res.error,
+                    duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
+                )
+        except Exception as e:  # noqa: BLE001
+            logger.warning("agent runner {} unavailable, fallback to script map: {}", name, e)
+
+    # Fallback: SCRIPT_MAP(主宪章 §9 已有实现保留)
     script = _resolve_script(name, kind)
     if script is None:
         return StepOutcome(
@@ -144,7 +193,9 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
     for k, v in defaults.items():
         if k not in inputs:  # only materialize fixture for auto-injected defaults
             _ensure_fixture(str(v))
-    args = [f"--{k}={v}" for k, v in merged.items()]
+    # V1.14:`artifact_text` 给 AgentRunner 用,不当 CLI arg(多行文本会炸 argparse)
+    _CLI_EXCLUDE = {"artifact_text", "lang", "mode"}
+    args = [f"--{k}={v}" for k, v in merged.items() if k not in _CLI_EXCLUDE]
     res: ScriptResult = run_script(script, args=args, timeout=timeout)
     return StepOutcome(
         name=name,

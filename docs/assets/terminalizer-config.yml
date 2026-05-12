@@ -1,9 +1,13 @@
-# terminalizer 配置 · 30s Test-Agent demo
-# 用法:terminalizer record demo --config docs/assets/terminalizer-config.yml
+# terminalizer 配置 · V1.14 30s Test-Agent demo
+# 用法:
+#   npm install -g terminalizer
+#   terminalizer record demo --config docs/assets/terminalizer-config.yml
+#   (跑命令,Ctrl+D 结束)
+#   terminalizer render demo --output docs/assets/demo.gif
 
-command: bash
+command: bash scripts/_demo-commands.sh
 
-cwd: /tmp/tagent-demo
+cwd: .
 
 env:
   recording: true
@@ -11,21 +15,24 @@ env:
   TAGENT_LLM_PROVIDER_FALLBACK: stub
   TAGENT_LANG: zh
   TAGENT_MODE: learn
+  PYTHONUTF8: "1"
 
 cols: 100
-rows: 30
+rows: 28
 
 repeat: 0
-quality: 70
+quality: 80
 
 frameDelay: auto
-maxIdleTime: 800
+maxIdleTime: 1200
 
-# 主题
+# Catppuccin Mocha 主题(暗色高对比,手机也看得清)
 theme:
   background: "#1e1e2e"
   foreground: "#cdd6f4"
   cursor: "#f5c2e7"
+  cursorAccent: "#1e1e2e"
+  selection: "#585b70"
   black: "#45475a"
   red: "#f38ba8"
   green: "#a6e3a1"
@@ -34,11 +41,26 @@ theme:
   magenta: "#f5c2e7"
   cyan: "#94e2d5"
   white: "#bac2de"
+  brightBlack: "#585b70"
+  brightRed: "#f38ba8"
+  brightGreen: "#a6e3a1"
+  brightYellow: "#f9e2af"
+  brightBlue: "#89b4fa"
+  brightMagenta: "#f5c2e7"
+  brightCyan: "#94e2d5"
+  brightWhite: "#a6adc8"
 
-watermark: null
+watermark:
+  imagePath: null
+  style:
+    position: absolute
+    right: 15px
+    bottom: 15px
+    width: 100px
+    opacity: 0.6
 
 cursorStyle: block
-fontFamily: "Cascadia Code, JetBrains Mono, Fira Code, monospace"
+fontFamily: "Cascadia Code, JetBrains Mono, Fira Code, Sarasa Mono SC, monospace"
 fontSize: 14
-lineHeight: 1.0
+lineHeight: 1.1
 letterSpacing: 0
