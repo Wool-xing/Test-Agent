@@ -53,13 +53,42 @@ def _k() -> Kernel:
 
 
 def _build_artifact(target: str):
+    """
+    Build TargetArtifact from target string (path / URL / free text).
+
+    Path traversal guard (W3-1, 同 evidence_vault 模式):
+    本地文件读取仅限 project_root 下;外部路径 (e.g. /etc/passwd, ~/.ssh/*)
+    降级为 parse_text 处理(不读文件,只当字符串分析)。
+    """
     from pathlib import Path
 
-    p = Path(target)
+    from loguru import logger
+
     if target.startswith(("http://", "https://")):
         return parse_url(target)
+
+    p = Path(target)
     if p.exists():
-        return parse_path(p)
+        try:
+            from runtime.config.settings import get_settings
+
+            s = get_settings()
+            resolved = p.resolve()
+            project_root = Path(s.project_root).resolve()
+            try:
+                resolved.relative_to(project_root)
+                # 路径在 project_root 下 → 允许读文件
+                return parse_path(resolved)
+            except ValueError:
+                # 路径在 project_root 外 → 拒读文件,降级 parse_text
+                logger.warning(
+                    "path traversal blocked: '{}' resolved to '{}' is outside project_root '{}';"
+                    " treating as plain text",
+                    target, resolved, project_root,
+                )
+        except Exception as e:  # noqa: BLE001
+            logger.warning("path guard failed for '{}', treating as text: {}", target, e)
+
     return parse_text(target)
 
 
