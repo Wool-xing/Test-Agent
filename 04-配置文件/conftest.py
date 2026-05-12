@@ -19,10 +19,21 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# 注入 utils 包到 sys.path（部署后 utils/ 在项目根）
+# 注入 utils 包 + utils 内部模块 到 sys.path
+# 部署后: conftest.py 在 $PROJECT_ROOT/, utils 在 $PROJECT_ROOT/utils/
+# 源码仓: conftest.py 在 04-配置文件/, utils 在 ../05-代码示例/
+# 双场景都加 sys.path,确保 utils 平铺 import (e.g., `from api_retry_util import ...`) 工作
 _PROJECT_ROOT = Path(__file__).parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
+
+_UTILS_CANDIDATES = [
+    _PROJECT_ROOT / "utils",                # 部署后路径
+    _PROJECT_ROOT.parent / "05-代码示例",    # 源码仓路径
+]
+for _utils_dir in _UTILS_CANDIDATES:
+    if _utils_dir.is_dir() and str(_utils_dir) not in sys.path:
+        sys.path.insert(0, str(_utils_dir))
 
 
 # ===== 环境配置 =====
