@@ -24,12 +24,33 @@ class TestLead(AgentRunner):
         )
 
     def user_prompt(self, ctx: RunnerContext) -> str:
+        # 防 mock 闭环 (W3-3): 真 LLM 路径也告知上游 degraded
+        # 让 LLM 看到 degraded 信号后强制 verdict 降级 conditional/no-go,不能输出 go
+        degraded_upstream = [
+            name for name, meta in ctx.upstream_meta.items()
+            if meta.get("degraded")
+        ]
+        degraded_block = ""
+        if degraded_upstream:
+            degraded_block = (
+                f"\n## ⚠ 上游 degraded 警示 (强制约束)\n"
+                f"以下上游 expert 输出降级 (mock 兜底 / LLM 失败 fallback / 未实装 V1.x rollout):\n"
+                f"{degraded_upstream}\n\n"
+                f"**强制要求**:\n"
+                f"1. `verdict` **绝不能输出 'go'** — 因为本次测试数据不完整\n"
+                f"2. `verdict` 应输出 `conditional`(部分数据可信) 或 `no-go`(P0 缺失维度过多)\n"
+                f"3. `known_risks` **必须列出每个 degraded expert 名**及对应未覆盖维度\n"
+                f"4. `rationale` 必须包含「测试数据不完整,基于 {len(degraded_upstream)} 个降级 expert 无法做发版决策」\n"
+                f"5. `fallback_plan` 必须包含「等 V1.x rollout 完成后重跑」\n"
+            )
+
         return (
             f"## 上游全链路产物\n"
             f"- requirements-analyst: {ctx.upstream.get('requirements-analyst', {})}\n\n"
             f"- automation-engineer: {ctx.upstream.get('automation-engineer', {})}\n\n"
             f"- test-executor: {ctx.upstream.get('test-executor', {})}\n\n"
             f"- bug-manager: {ctx.upstream.get('bug-manager', {})}\n\n"
+            f"{degraded_block}\n"
             "## 输出 schema\n"
             "{\n"
             '  "verdict": "go|no-go|conditional",\n'
