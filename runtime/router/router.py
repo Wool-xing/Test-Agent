@@ -26,9 +26,25 @@ class RouterError(RuntimeError):
 def _validate_against_catalog(decision: RoutingDecision, catalog: Catalog) -> list[str]:
     issues: list[str] = []
     known = {e.name for e in catalog.all()}
+
+    # V1.14 防 mock (ROADMAP V1.15): 检查 expert 实装状态
+    # rollout 状态的 expert (env/mobile/visual/system/pentest/auto) router 仍可路由,
+    # 但 issues 列表标 warning + downgrade confidence → orchestrator 跑到时会拒绝并报明确错误
+    try:
+        from runtime.orchestrator.adapters.experts import EXPERT_IMPL_STATUS
+    except ImportError:
+        EXPERT_IMPL_STATUS = {}  # type: ignore
+
     for n in decision.dag:
         if n.kind in ("expert", "skill") and n.name not in known:
             issues.append(f"unknown {n.kind} '{n.name}' (id={n.id})")
+        if n.kind == "expert":
+            status = EXPERT_IMPL_STATUS.get(n.name)
+            if status == "rollout":
+                issues.append(
+                    f"expert '{n.name}' 处于 V1.x rollout (id={n.id}); "
+                    f"test-lead 决策应降级 conditional 或 no-go"
+                )
     try:
         decision.topological()
     except ValueError as e:

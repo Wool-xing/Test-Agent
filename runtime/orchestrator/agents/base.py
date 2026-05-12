@@ -17,7 +17,11 @@ class RunnerContext:
     """每节点跑前由 adapter 注入,带 PRD + 上游产物 + 配置."""
 
     artifact_text: str = ""        # 原始 PRD / target 内容(parsers 给的)
-    upstream: dict[str, Any] = field(default_factory=dict)   # 上游 expert 产物 by name
+    upstream: dict[str, Any] = field(default_factory=dict)   # 上游 expert 产物 by name (RunnerResult.output)
+    upstream_meta: dict[str, dict[str, Any]] = field(default_factory=dict)  # 上游元信息 by name
+                                                                            # {ok: bool, degraded: bool, error: str}
+                                                                            # test-lead 应检查任一 upstream_meta[*].degraded
+                                                                            # → verdict 降级 conditional 而非 go
     settings_provider: str = ""    # 当前 LLM provider(stub 时走 mock)
     workspace: Path = field(default_factory=lambda: Path("workspace"))
     lang: str = "zh"
@@ -36,6 +40,8 @@ class RunnerResult:
     duration_ms: int = 0
     raw_llm_response: str = ""     # debug / learn 模式给用户看
     error: str = ""
+    degraded: bool = False         # True = mock 兜底 / LLM 失败 fallback / JSON 解析错,非真 LLM 输出
+                                   # test-lead 看到任一 degraded → 上线决策不应输出 GO
 
 
 class AgentRunner(abc.ABC):
@@ -61,10 +67,25 @@ class AgentRunner(abc.ABC):
         return ""
 
     def run(self, ctx: RunnerContext) -> RunnerResult:
+        """
+        执行 LLM-driven agent。ok/degraded 语义:
+        - stub/mock 模式: ok=True + degraded=True (mock 兜底,主宪章 §33 selftest 允许)
+        - 真 LLM 成功 + JSON 解析 OK: ok=True + degraded=False (真输出)
+        - 真 LLM 成功但 JSON 解析错: ok=False + degraded=True (LLM 回了但不合规)
+        - exec 模式 LLM 失败 fallback: ok=False + degraded=True (不再假绿)
+
+        test-lead 看到任一上游 degraded → "上线决策"不应输出 GO,改 conditional 或 no-go。
+        """
         t0 = time.time()
+        degraded = False
+        error_msg = ""
+
         if ctx.settings_provider == "stub" or ctx.mode == "mock":
+            # stub/mock 模式: 输出 mock,标 degraded
             output = self.mock_output(ctx)
             raw = "[stub] mock output(主宪章 §33 selftest 兜底)"
+            ok = True
+            degraded = True
         else:
             try:
                 from runtime.subagent.aux_client import aux_client
@@ -77,10 +98,22 @@ class AgentRunner(abc.ABC):
                     max_tokens=1500,
                 )
                 output = self._parse_json(raw)
+                # JSON 解析错误 → ok=False + degraded
+                if "_parse_error" in output:
+                    ok = False
+                    degraded = True
+                    error_msg = output.get("_parse_error", "JSON parse failed")
+                else:
+                    ok = True
+                    degraded = False
             except Exception as e:  # noqa: BLE001
-                logger.warning("{} runner LLM failed: {}; falling back to mock", self.name, e)
+                # exec 模式 LLM 失败 → fallback to mock 但**绝不假绿**: ok=False + degraded=True
+                logger.error("{} runner LLM failed: {}; degraded fallback", self.name, e)
                 output = self.mock_output(ctx)
                 raw = f"[fallback] LLM raised: {e}"
+                ok = False
+                degraded = True
+                error_msg = f"LLM call failed: {e}"
 
         # 落盘(可选)
         artifact_path = self.output_file(ctx)
@@ -90,12 +123,14 @@ class AgentRunner(abc.ABC):
 
         return RunnerResult(
             name=self.name,
-            ok=True,
+            ok=ok,
             output=output,
             artifact_path=artifact_path,
             summary=self.summary(output),
             duration_ms=int((time.time() - t0) * 1000),
             raw_llm_response=raw[:2000],
+            error=error_msg,
+            degraded=degraded,
         )
 
     @staticmethod
