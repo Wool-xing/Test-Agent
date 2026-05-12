@@ -43,9 +43,10 @@ def send_apns(device_token: str, bundle_id: str,
               env: str = "production") -> Dict:
     """
     Apple Push Notification service（HTTP/2，需 JWT 签名）
-    依赖：pip install pyjwt
+    依赖：pip install pyjwt 'httpx[http2]'
     """
     import jwt as pyjwt
+    import httpx
 
     with open(p8_key_path) as f:
         private_key = f.read()
@@ -56,16 +57,16 @@ def send_apns(device_token: str, bundle_id: str,
     host = "api.push.apple.com" if env == "production" else "api.sandbox.push.apple.com"
     payload = {"aps": {"alert": {"title": title, "body": body}}}
 
-    # 实际生产用 hyper / httpx HTTP/2；此处简化
-    r = requests.post(
-        f"https://{host}/3/device/{device_token}",
-        json=payload,
-        headers={
-            "authorization": f"bearer {token}",
-            "apns-topic": bundle_id,
-        },
-        timeout=10,
-    )
+    # APNs 强制 HTTP/2 — 用 httpx (需 'httpx[http2]' 包含 h2 依赖)
+    with httpx.Client(http2=True, timeout=10) as client:
+        r = client.post(
+            f"https://{host}/3/device/{device_token}",
+            json=payload,
+            headers={
+                "authorization": f"bearer {token}",
+                "apns-topic": bundle_id,
+            },
+        )
     return {"status_code": r.status_code, "body": r.text[:200]}
 
 
