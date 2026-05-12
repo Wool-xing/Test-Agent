@@ -12,6 +12,39 @@
 
 ## [Unreleased]
 
+### Added(V1.14.0-alpha · 5 核心 expert 真 LLM 落地 + 录制脚本 · 2026-05-12)
+
+> 起因:战略参谋诚实交底——V1.13 的 selftest 100% PASS 是"骨架通"不是"内涵通",16 expert 里 11 个仍是 no-op。用户授权 C 路线(5 核心 expert 真 LLM)+ B(录制脚本)。
+
+- **`runtime/orchestrator/agents/` 新模块**:
+  - `base.py`:`AgentRunner` ABC + `RunnerContext` + `RunnerResult` + `AGENT_RUNNERS` registry + `@register` + `get_runner`
+  - 5 concrete runner:`requirements_analyst.py` / `automation_engineer.py` / `test_executor.py` / `bug_manager.py` / `test_lead.py`
+  - 每 runner 4 方法:`system_prompt` / `user_prompt(ctx)` / `mock_output(ctx)` / `output_file(ctx)` + `summary()`
+  - **stub provider 自动走 `mock_output`**(CI / selftest 0 成本 0 LLM 调用)
+  - **真 LLM** 时:调 `aux_client.complete()` → 解析 JSON → 落盘 → 给下游
+  - INDEX.md 文档化 5 runner schema + 上下游
+- **adapter wiring**(`runtime/orchestrator/adapters/experts.py`):
+  - `execute_node` 先查 `AGENT_RUNNERS`(优先 V1.14),fallback `SCRIPT_MAP`(主宪章 §9 不破坏)
+  - `_upstream_outputs` 缓存:每 runner 产物给下游 RunnerContext.upstream
+  - `reset_upstream_cache()` 由 flow 每 run 开头调
+  - SCRIPT_MAP 路径排除 `artifact_text/lang/mode` 防多行文本炸 argparse
+- **Kernel.submit 注入 `artifact_text`**(`runtime/api/deps.py`):每 DAG 节点 inputs 自动带原始 PRD 文本(20KB cap)
+- **stub web-system DAG 加 test-lead**(`runtime/router/llm_client.py`):覆盖完整 9 节点 e2e 流程
+- **5 真 runner 产物落盘**:
+  - `workspace/执行日志/requirements_summary.json`(需求摘要 + P0/P1 + 风险区)
+  - `workspace/执行日志/automation_scripts_plan.json`(脚本规划 + fixture 复用)
+  - `workspace/执行日志/execution_plan.json`(4 阶段 + 失败 4 分类 + Flaky 规则)
+  - `workspace/执行日志/bug_drafts.json`(BugTracker-ready Bug 草案 + severity 1-4)
+  - `workspace/执行日志/decisions/final_verdict_*.json`(test-lead go/no-go 决策,标 `requires_human_signoff: true`)
+- **录制脚本**(`scripts/`):
+  - `_demo-commands.sh`:实际 demo 命令序列(被 record-demo-* 调)
+  - `record-demo-asciinema.sh`:`asciinema rec` 自动录,产 .cast 可上传 asciinema.org 或转 GIF/SVG
+  - `record-demo-obs.sh`:OBS / QuickTime 屏幕录制配套(用户摁录制 → 跑此脚本,节奏自动)
+  - `docs/assets/terminalizer-config.yml`:精修 V1.14 配置(Catppuccin Mocha 主题 + UTF-8 + stub LLM env)
+- **主宪章 §40 真 agent 落地 canon**:5 核心 + 11 fallback + 加新 runner 流程 + RunnerContext / RunnerResult 协议
+- 烟测:**9/9 strict PASS · 5 真 runner 产物全落盘**(原 V1.13 8/8 是 3 script + 5 no-op,V1.14 是 5 真 runner + 3 script + 1 no-op)
+- 版本 V1.13.0-alpha → **V1.14.0-alpha**
+
 ### Added(V1.13.0-alpha · README hero 重写 + `tagent demo` + 30 秒 demo 录制脚本 · 2026-05-12)
 
 - **`tagent demo` 子命令**:0 API key / 0 配置一键跑通 4 步——init minimal preset + L1 lint + L2 e2e + 产物清单

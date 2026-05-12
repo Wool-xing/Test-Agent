@@ -125,6 +125,7 @@ def _stub_response(_system: str, user: str) -> str:
             "test-executor",
             "bug-manager",
             "report-generator",
+            "test-lead",  # V1.14 加:走全链路决策(主宪章 §40)
         ]
     nodes = []
     prev = None

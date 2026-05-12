@@ -10,6 +10,7 @@ from prefect.task_runners import ConcurrentTaskRunner
 
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
+from runtime.orchestrator.adapters.experts import reset_upstream_cache
 from runtime.orchestrator.tasks import execute_dag_node
 from runtime.router.schema import DAGNode, RoutingDecision
 
@@ -19,6 +20,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
+    reset_upstream_cache()  # V1.14 主宪章 §40 — 每 run 清 runner 间产物缓存
     decision = RoutingDecision.model_validate(decision_dict)
     ordered: list[DAGNode] = decision.topological()
     log.info("flow start: run_id={} nodes={}", run_id, len(ordered))
