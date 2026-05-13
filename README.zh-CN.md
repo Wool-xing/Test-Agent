@@ -115,7 +115,7 @@ Test-Agent/
 |------|------|
 | **首次用户** | [快速开始](01-快速开始/INDEX.md) → [部署说明](01-快速开始/部署说明.md) |
 | **QA 工程师** | [使用手册](01-快速开始/使用手册.md) → [Skill 目录](03-技能定义/) |
-| **架构师 / SRE** | [架构深度](FULL_GUIDE.md) → [Runtime 模块](runtime/INDEX.md) |
+| **架构师 / SRE** | [架构深度](docs/charter/06-test-architecture.md) → [Runtime 章节](docs/charter/07-runtime-license.md) → [Runtime 模块](runtime/INDEX.md) |
 | **安全研究员** | [渗透专家](02-专家定义/15-渗透测试.md) → [pentest-coordinator](03-技能定义/pentest-coordinator.md) |
 | **车载测试** | [车载专家](02-专家定义/16-车载测试.md) → [ASIL 工作流](03-技能定义/automotive-test.md) |
 | **贡献者** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](marketplace/INDEX.md) |
