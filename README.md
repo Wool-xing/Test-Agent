@@ -93,6 +93,7 @@ Test-Agent/
 ├── 05-代码示例/             ← 49 production utils
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
 ├── runtime/                ← V1.x runtime layer (router / orchestrator / MCP / web / scheduler / subagent / learning_loop / backends / gateway / tutor / essence_watcher / marketplace)
+├── docs/charter/           ← Vision charter (7 split files: vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license)
 ├── docs/theory/            ← 22 teaching KB cards across 13 categories
 ├── profiles/compliance/    ← 10 industry compliance YAML profiles
 ├── marketplace/            ← Community skills / agents / mcp / hooks (4 lanes, 4-gate verify)
