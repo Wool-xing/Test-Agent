@@ -2,14 +2,33 @@
 
 from __future__ import annotations
 
+import pathlib
+
 from runtime.registry.registry import build_catalog
+
+
+# 动态扫源目录而非写死数字 — 项目持续增长 agent/skill,基线会过时
+_PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
+_EXPERTS_DIR = _PROJECT_ROOT / "02-专家定义"
+_SKILLS_DIR = _PROJECT_ROOT / "03-技能定义"
 
 
 def test_catalog_loads_existing_assets():
     cat = build_catalog()
-    # Project charter: 14 experts + 13 skills baseline.
-    assert len(cat.experts) >= 14, f"experts loaded={len(cat.experts)}, expect >=14"
-    assert len(cat.skills) >= 13, f"skills loaded={len(cat.skills)}, expect >=13"
+
+    # 业务 agent 文件: 排除 README,只数 [0-9]*.md
+    src_experts = len(list(_EXPERTS_DIR.glob("[0-9]*.md")))
+    # skill 文件: 排除 README,数顶层 *.md (上游派生子目录另算)
+    src_skills = len(list(_SKILLS_DIR.glob("*.md"))) - 1  # -1 for README.md
+
+    assert len(cat.experts) >= src_experts, (
+        f"experts loaded={len(cat.experts)}, source agents={src_experts} "
+        f"— registry 漏扫,检查 02-专家定义/ 下的 [0-9]*.md 文件"
+    )
+    assert len(cat.skills) >= src_skills, (
+        f"skills loaded={len(cat.skills)}, source skills>={src_skills} "
+        f"— registry 漏扫,检查 03-技能定义/ 下的 *.md 文件"
+    )
     assert "test-lead" in cat.experts, "test-lead expert missing"
 
 

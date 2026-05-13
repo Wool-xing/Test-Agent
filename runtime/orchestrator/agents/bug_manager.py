@@ -24,8 +24,25 @@ class BugManager(AgentRunner):
 
     def user_prompt(self, ctx: RunnerContext) -> str:
         exe = ctx.upstream.get("test-executor", {})
+
+        # 防 mock 闭环: 真 LLM 路径也告知上游 degraded
+        degraded_upstream = [
+            name for name, meta in ctx.upstream_meta.items()
+            if meta.get("degraded")
+        ]
+        degraded_warning = ""
+        if degraded_upstream:
+            degraded_warning = (
+                f"\n## ⚠ 上游 degraded 警示\n"
+                f"以下上游 expert 输出降级 (mock/fallback/未实装): {degraded_upstream}\n"
+                f"请在 bugs 列表**最前面插入一条 P0 警示 bug**,"
+                f"提示「测试数据不完整,不应作为发版决策」,"
+                f"`labels` 含 `degraded` 与 `test-coverage-insufficient`。\n"
+            )
+
         return (
-            f"## 上游执行计划 + 失败(若有)\n{exe}\n\n"
+            f"## 上游执行计划 + 失败(若有)\n{exe}\n"
+            f"{degraded_warning}\n"
             "## 输出 schema\n"
             "{\n"
             '  "bugs": [{"title": "string", "severity": 1, "pri": 1, '
@@ -38,23 +55,51 @@ class BugManager(AgentRunner):
         )
 
     def mock_output(self, ctx: RunnerContext) -> dict[str, Any]:
+        # 防 mock 闭环: 检查上游 degraded
+        degraded_upstream = [
+            name for name, meta in ctx.upstream_meta.items()
+            if meta.get("degraded")
+        ]
+
+        bugs = []
+        # 若上游 degraded → 在 bug 列表最前插入 P0 警示 bug
+        if degraded_upstream:
+            bugs.append({
+                "title": f"⚠ [degraded] 测试数据不完整 · {len(degraded_upstream)} 个 expert 输出降级",
+                "severity": 1,  # P0 阻塞 — 不应作为发版决策依据
+                "pri": 1,
+                "steps": [
+                    "检查上游 expert 实装状态 (ROADMAP.md V1.15-V1.20 rollout)",
+                    "确认 LLM provider 不在 stub mode (settings.llm_provider)",
+                    "若 expert 处于 rollout,等待对应版本完成实装",
+                ],
+                "expected": f"所有 {len(ctx.upstream_meta) or '上游'} expert 输出真 LLM/script 结果",
+                "actual": f"degraded expert: {degraded_upstream}",
+                "impact": "本次 Bug 草案基于不完整数据,不应作为发版决策依据",
+                "labels": ["degraded", "test-coverage-insufficient"],
+            })
+
+        bugs.append({
+            "title": "[selftest mock] 登录连续失败 5 次未触发锁定",
+            "severity": 2,
+            "pri": 2,
+            "steps": ["输入错误密码 5 次", "观察账号状态"],
+            "expected": "第 5 次返回 423 + 锁定 10 分钟",
+            "actual": "未实际跑 - mock data",
+            "impact": "风控规则失效,潜在暴力破解风险",
+            "labels": ["security", "regression"],
+        })
+
+        # summary: degraded 警示 bug 计入 p0
+        summary = {"p0": 1 if degraded_upstream else 0, "p1": 1, "p2": 0, "p3": 0}
+
         return {
-            "bugs": [
-                {
-                    "title": "[selftest mock] 登录连续失败 5 次未触发锁定",
-                    "severity": 2,
-                    "pri": 2,
-                    "steps": ["输入错误密码 5 次", "观察账号状态"],
-                    "expected": "第 5 次返回 423 + 锁定 10 分钟",
-                    "actual": "未实际跑 - mock data",
-                    "impact": "风控规则失效,潜在暴力破解风险",
-                    "labels": ["security", "regression"],
-                }
-            ],
+            "bugs": bugs,
             "tracker": "zentao",
             "submit_strategy": "批量,单次 max 50",
-            "summary": {"p0": 0, "p1": 1, "p2": 0, "p3": 0},
+            "summary": summary,
             "_mode": "mock(stub provider)",
+            "_degraded_upstream": degraded_upstream,
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:

@@ -85,7 +85,13 @@ def get_driver(platform: str, custom_caps: Optional[Dict] = None, use_cloud: boo
     else:
         raise ValueError(f"Unsupported platform: {platform}")
 
-    hub_url = _resolve_hub_url() if not use_cloud else _resolve_hub_url()
+    if use_cloud and not (os.getenv("SAUCELABS_USERNAME") or os.getenv("BROWSERSTACK_USERNAME")):
+        raise RuntimeError(
+            "use_cloud=True 但未配置云真机凭据 "
+            "(需 SAUCELABS_USERNAME+SAUCELABS_ACCESS_KEY 或 "
+            "BROWSERSTACK_USERNAME+BROWSERSTACK_ACCESS_KEY)"
+        )
+    hub_url = _resolve_hub_url()
     logger.info(f"启动 driver: {platform} → {hub_url}")
     driver = webdriver.Remote(hub_url, options=options)
     driver.implicitly_wait(10)
@@ -159,9 +165,26 @@ def _parse_meminfo(output: str) -> Optional[float]:
 
 
 def _parse_gfxinfo_fps(output: str) -> Optional[float]:
-    # 简化版：统计 frame stats 总数 / 时间窗口
-    frames = output.count("PROFILEDATA")
-    return float(frames) if frames else None
+    """
+    粗略统计 gfxinfo framestats 帧数(非精确 FPS)。
+    PROFILEDATA 段下每行 CSV 是一帧;真精确 FPS 需 timestamp 列差。
+    TODO(V2.x): 解析 timestamp 列,计算 (frame_count - 1) / (timestamp[-1] - timestamp[0]) 真 FPS
+    """
+    frame_count = 0
+    in_data = False
+    for line in output.splitlines():
+        stripped = line.strip()
+        if "PROFILEDATA" in stripped:
+            in_data = True
+            continue
+        if in_data:
+            # CSV 行: Flags + 13 timestamps, 逗号分隔
+            parts = stripped.split(",")
+            if len(parts) >= 13 and parts[0].strip().lstrip("-").isdigit():
+                frame_count += 1
+            elif not stripped or "---" in stripped:
+                in_data = False
+    return float(frame_count) if frame_count > 0 else None
 
 
 def collect_ios_perf(bundle_id: str, duration: int = 60) -> list:

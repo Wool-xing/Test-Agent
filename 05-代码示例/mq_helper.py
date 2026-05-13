@@ -58,14 +58,13 @@ class KafkaConsumerSimple:
         )
 
     def poll(self, timeout: float = 10) -> Optional[Dict]:
-        end = time.time() + timeout
-        for msg in self.consumer:
-            return {
-                "topic": msg.topic, "partition": msg.partition, "offset": msg.offset,
-                "key": msg.key, "value": msg.value,
-            }
-            if time.time() > end:
-                break
+        records = self.consumer.poll(timeout_ms=int(timeout * 1000), max_records=1)
+        for _tp, msgs in records.items():
+            for msg in msgs:
+                return {
+                    "topic": msg.topic, "partition": msg.partition, "offset": msg.offset,
+                    "key": msg.key, "value": msg.value,
+                }
         return None
 
     def close(self):

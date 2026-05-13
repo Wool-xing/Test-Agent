@@ -13,7 +13,7 @@ PROVIDER_MODEL_MAP: dict[str, str] = {
     "claude": "anthropic/claude-sonnet-4-6",
     "openai": "openai/gpt-4o",
     "gemini": "gemini/gemini-1.5-pro",
-    "qwen": "openai/qwen-plus",
+    "qwen": "dashscope/qwen-plus",
     "deepseek": "deepseek/deepseek-chat",
     "ollama": "ollama/qwen2.5:7b",
 }

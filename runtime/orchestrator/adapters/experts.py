@@ -40,6 +40,30 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "visual-tester": None,
     "system-tester": None,
     "ai-tester": "ai_validator.py",
+    "pentest-tester": None,        # V1.19 rollout (需 SECURITY.md 武器化授权 wiring)
+    "automotive-tester": None,     # V1.20 rollout
+}
+
+# Expert 实装状态 (V1.14.0-alpha, ROADMAP.md V1.15-V1.20 rollout 节奏)
+# active: 已实装 (真 LLM runner 或 script-backed)
+# rollout: V1.x rollout 待实装 → execute_node 拒绝路由,不输出 mock
+EXPERT_IMPL_STATUS: dict[str, str] = {
+    "test-lead": "active",                  # 真 LLM (agents/test_lead.py)
+    "requirements-analyst": "active",       # 真 LLM
+    "testcase-designer": "active",          # script (excel_generator.py)
+    "env-manager": "rollout",               # V1.15 计划
+    "data-preparer": "active",              # script (data_factory.py)
+    "automation-engineer": "active",        # 真 LLM
+    "test-executor": "active",              # 真 LLM
+    "bug-manager": "active",                # 真 LLM
+    "report-generator": "active",           # script (generate_report.py)
+    "mobile-tester": "rollout",             # V1.16 计划
+    "desktop-tester": "active",             # script (desktop_driver.py)
+    "visual-tester": "rollout",             # V1.17 计划
+    "system-tester": "rollout",             # V1.18 计划
+    "ai-tester": "active",                  # script (ai_validator.py)
+    "pentest-tester": "rollout",            # V1.19 计划 (需武器化授权 wiring)
+    "automotive-tester": "rollout",         # V1.20 计划
 }
 
 SKILL_SCRIPT_MAP: dict[str, str | None] = {
@@ -118,15 +142,45 @@ def _resolve_script(name: str, kind: str) -> str | None:
 
 
 _upstream_outputs: dict[str, dict] = {}  # 流水线内每 expert 产物缓存,供下游 RunnerContext.upstream
+_upstream_meta: dict[str, dict] = {}     # 流水线内每 expert 元信息 (ok/degraded/error),供下游 RunnerContext.upstream_meta
+                                          # 防 mock 闭环: test-lead 看到任一 degraded → 决策降级
 
 
 def reset_upstream_cache() -> None:
     """每次新 run 开始前由 flow 调,清空上游产物缓存."""
     _upstream_outputs.clear()
+    _upstream_meta.clear()
 
 
 def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: int = 1800) -> StepOutcome:
     inputs = inputs or {}
+
+    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 拒绝路由未实装 expert,不输出 mock 数据
+    if kind == "expert":
+        status = EXPERT_IMPL_STATUS.get(name)
+        if status == "rollout":
+            return StepOutcome(
+                name=name,
+                kind=kind,
+                executed_script=None,
+                returncode=2,  # 明确非 0,标记 "未实装" 而非 no-op 兜底
+                stdout="",
+                stderr=(
+                    f"[V1.x rollout] expert '{name}' 未实装 (ROADMAP.md);"
+                    f" router/test-lead 应跳过此 expert,不输出 mock 数据"
+                ),
+                duration_ms=0,
+            )
+        if status is None:
+            return StepOutcome(
+                name=name,
+                kind=kind,
+                executed_script=None,
+                returncode=2,
+                stdout="",
+                stderr=f"unknown expert '{name}', 未在 EXPERT_IMPL_STATUS 注册",
+                duration_ms=0,
+            )
 
     # V1.14 真 agent runner 优先(主宪章 §40,5 核心 expert 落地)
     if kind == "expert":
@@ -141,6 +195,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 ctx = RunnerContext(
                     artifact_text=inputs.get("artifact_text", ""),
                     upstream=dict(_upstream_outputs),
+                    upstream_meta=dict(_upstream_meta),
                     settings_provider=s.llm_provider,
                     workspace=s.project_root / "workspace",
                     lang=inputs.get("lang", "zh"),
@@ -150,6 +205,11 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 t0 = _t.time()
                 res = runner.run(ctx)
                 _upstream_outputs[name] = res.output
+                _upstream_meta[name] = {
+                    "ok": res.ok,
+                    "degraded": res.degraded,
+                    "error": res.error,
+                }
                 stdout = res.summary or "[agent runner ok]"
                 if res.artifact_path:
                     stdout += f"\n→ {res.artifact_path}"

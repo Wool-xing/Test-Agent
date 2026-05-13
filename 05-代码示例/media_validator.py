@@ -63,7 +63,7 @@ def compare_frames(video_a: str, video_b: str, timestamps: List[float],
     """
     在指定时间点抽帧对比两个视频，返回差异帧列表。
     """
-    from utils.visual_helper import compare_images
+    from visual_helper import compare_images
 
     Path(tmp_dir).mkdir(parents=True, exist_ok=True)
     diffs = []

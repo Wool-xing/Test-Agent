@@ -29,6 +29,50 @@ def _store() -> ObjectStore:
     return ObjectStore()
 
 
+def _validate_evidence_path(path_str: str) -> Path:
+    """
+    Path traversal guard for tool_upload_evidence_path.
+
+    Evidence 必须来自 project_root 下 (workspace/ + 子目录) — 防止 LLM/外部 MCP
+    client 通过 path='/etc/passwd' 或 '~/.ssh/id_rsa' 读任意本地文件入 MinIO。
+
+    扩展允许目录: 设 TAGENT_EVIDENCE_EXTRA_DIRS 环境变量 (逗号分隔绝对路径)
+    例如 CI 场景需从 /tmp/ci-artifacts 上传时:
+        export TAGENT_EVIDENCE_EXTRA_DIRS=/tmp/ci-artifacts,/var/log/myapp
+
+    Raises:
+        ValueError: 路径不在允许目录下 (path traversal blocked)
+    """
+    import os
+
+    from runtime.config.settings import get_settings
+
+    s = get_settings()
+    project_root = Path(s.project_root).resolve()
+
+    allowed_roots = [project_root]
+    extra = os.getenv("TAGENT_EVIDENCE_EXTRA_DIRS", "")
+    if extra:
+        for d in extra.split(","):
+            d = d.strip()
+            if d:
+                allowed_roots.append(Path(d).resolve())
+
+    p = Path(path_str).resolve()
+    for root in allowed_roots:
+        try:
+            p.relative_to(root)
+            return p
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"path traversal blocked: '{path_str}' resolved to '{p}' is outside "
+        f"allowed roots {[str(r) for r in allowed_roots]}. "
+        "Set TAGENT_EVIDENCE_EXTRA_DIRS env to expand allowlist."
+    )
+
+
 def _persist_evidence(run_id: str, kind: str, data: bytes, key: str) -> dict:
     """DB insert first, then MinIO upload; if upload fails, rollback DB row.
 
@@ -66,7 +110,12 @@ async def tool_upload_evidence(run_id: str, kind: str, content_b64: str, filenam
 
 @tool_decision_logged("upload_evidence_path")
 async def tool_upload_evidence_path(run_id: str, kind: str, path: str) -> dict:
-    p = Path(path)
+    # Path traversal guard: 拒绝 project_root 外的任意系统路径
+    try:
+        p = _validate_evidence_path(path)
+    except ValueError as e:
+        logger.warning("evidence path traversal blocked: {}", e)
+        return {"error": f"path_blocked: {e}"}
     if not p.is_file():
         return {"error": f"file not found: {path}"}
     data = p.read_bytes()

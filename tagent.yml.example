@@ -1,33 +1,31 @@
 # Test-Agent 配置(safe-by-default 栅栏 · gbrain §1.9 派生)
 #
-# 危险操作 / 自动化 / 影响生产 的功能 **必须显式开启**,否则 destructive-guard 拒绝运行.
-# 复制为 `tagent.yml` 并按需启用.
+# 危险操作 / 自动化 / 影响生产 的功能 **必须显式开启**,否则 destructive-guard 拒绝运行。
+# 复制为 `tagent.yml` 并按需启用。所有未列字段走 runtime 默认值。
+#
+# ╭─────────────────────── SECURITY · 法律 / 合规 ───────────────────────╮
+# │ pentest / 渗透 / 攻击性测试相关字段 = **法律契约**,非技术开关。     │
+# │ 未签授权书或 scope 不清晰 → 严禁开启,后果由使用者承担。              │
+# │ 当前 pentest expert 处 rollout 状态(EXPERT_IMPL_STATUS), runtime    │
+# │ 已阻断;V1.x 激活后 yml gate 才接入真实路由。                         │
+# ╰──────────────────────────────────────────────────────────────────────╯
 
 # ============== 1. 调度器(runtime/scheduler) ==============
 scheduler:
-  enabled: false              # 必须显式 true 才允许后台 tick
-  cron_jobs_allowed: false    # 允许定时调用真模型 + 自动批准
-  max_concurrent_jobs: 1
+  enabled: false              # safety.gate_scheduler_tick: 必显式 true 才允许后台 tick
+  cron_jobs_allowed: false    # safety.gate_cron_auto_approve: 允许定时调真模型 + 自动批准
 
 # ============== 2. Curator 自动维护(runtime/learning_loop) ==============
 curator:
-  enabled: false              # 闲置触发后台 skill 整理
-  interval_hours: 24
-  auto_archive_skills: false  # 即使开了也只归档不删(charter §22)
+  enabled: false              # safety.gate_curator_run: 闲置触发后台 skill 整理
 
 # ============== 3. Eval 捕获(retrieval 质量量化) ==============
 eval:
   capture: false              # TAGENT_EVAL_CAPTURE=1 同效;PII 已自动 scrub
-  max_captures_per_day: 500
 
-# ============== 4. Subagent 并行(runtime/subagent) ==============
-subagent:
-  pool_size: 32
-  allow_aux_provider_override: true
-
-# ============== 5. Backends(runtime/backends 7 后端) ==============
+# ============== 4. Backends(runtime/backends 7 后端) ==============
 backends:
-  # 默认仅 local 允许;远端后端必须显式 opt-in
+  # safety.gate_backend: 默认仅 local 允许;远端后端必须显式 opt-in
   allowed:
     - local
     # - docker
@@ -36,39 +34,34 @@ backends:
     # - modal
     # - daytona
     # - vercel_sandbox
-  allow_arbitrary_exec: false    # 远端后端跑任意 shell 命令必须显式
 
-# ============== 6. Gateway(runtime/gateway 8 平台) ==============
+# ============== 5. Gateway(runtime/gateway 多平台) ==============
 gateway:
-  # 默认无平台启用;接入任意平台必须显式
+  # safety.gate_gateway_platform: 默认无平台启用;接入任意平台必须显式
   enabled_platforms: []
   # 例:
   # enabled_platforms: [telegram, feishu]
 
-# ============== 7. Bug Tracker(charter §12) ==============
+# ============== 6. Bug Tracker(charter §12) ==============
 bug_tracker:
+  # runtime/init/wizard.py + runtime/mcp/defect_tracker 读取
   default: zentao
-  # 多 tracker 并存按 label 路由
   enabled: [zentao]
   # enabled: [zentao, jira, github]
 
-# ============== 8. Profile(行业 / 测试深度合规) ==============
-profile:
-  industry: generic            # generic / saas / finance / medical / industrial / automotive / aviation / ...
-  default_depth_level: L2      # L0/L1/L2/L3/L4(charter §21);L3+ 需双签
-  compliance_profiles: []
-  # 例(L4 极深被测项必触发):
-  # compliance_profiles: [soc2, pci-dss]
+# ============== 7. Pentest 法律契约(rollout · 见 SECURITY 警告) ==============
+# 当前 expert rollout 状态;字段为 V1.x 接入 yml gate 时的契约占位。
+# 未签授权书严禁开启;authorized: true 必须配齐 scope_in / authorization_record。
+pentest:
+  authorized: false                    # 法律授权确认(default refuse · charter §35)
+  scope_in_targets: []                 # 显式 IP/domain/URL 白名单(IN)
+  scope_out_targets: []                # 强制黑名单(覆盖 IN)
+  authorization_record: ""             # 授权书 / SoW 路径(空 → refuse)
+  evidence_dir: workspace/pentest_evidence
 
-# ============== 9. 语言与教学(charter §23) ==============
-tutor:
-  default_lang: zh             # zh / en / zh-en
-  default_mode: exec           # exec / learn / silent
-  feedback_collection: true    # 允许 learn mode "👎 标记错误" 落档
-
-# ============== 10. 危险操作白名单(destructive-guard) ==============
+# ============== 8. 危险操作白名单(destructive-guard) ==============
 destructive_ops:
-  # 默认全 deny;显式 allow 才放行
+  # safety.gate_destructive: 默认全 deny,显式 allow 才放行
   allow_db_truncate: false
   allow_minio_bucket_drop: false
   allow_git_force_push: false

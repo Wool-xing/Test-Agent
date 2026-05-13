@@ -5,6 +5,8 @@ description: "Darwin Skill (达尔文.skill): autonomous skill optimizer inspire
 
 # Darwin Skill
 
+**Modified from upstream [alchaincyf/darwin-skill](https://github.com/alchaincyf/darwin-skill)** (MIT-equivalent upstream README declaration; local LICENSE file added in Test-Agent's distribution). Test-Agent 项目内修订:删除上游 README 的个人推广段;`SKILL.md` 内示例数据(原作者自家 skill 命名前缀)替换为 Test-Agent 业务 skill 名;评分文案中的原作者生态绑定语改为通用项目语境。LICENSE 见同级 `LICENSE` 文件。
+
 > 借鉴 Karpathy autoresearch 的自主实验循环，对 skills 进行持续优化。
 > 核心理念：**评估 → 改进 → 实测验证 → 人类确认 → 保留或回滚 → 生成成果卡片**
 > GitHub: https://github.com/alchaincyf/darwin-skill
@@ -41,7 +43,7 @@ autoresearch 的精髓：
 
 | # | 维度 | 权重 | 评分标准 |
 |---|------|------|---------|
-| 7 | **整体架构** | 15 | 结构层次清晰、不冗余不遗漏、与花叔生态一致 |
+| 7 | **整体架构** | 15 | 结构层次清晰、不冗余不遗漏、与项目目录风格一致 |
 | 8 | **实测表现** | 25 | 用测试prompt跑一遍，输出质量是否符合skill宣称的能力 |
 
 ### 评分规则
@@ -125,8 +127,8 @@ for each skill in 优化范围:
 ┌──────────────────────────┬───────┬──────────────┬──────────────┐
 │ Skill                    │ Score │ 结构短板      │ 效果短板      │
 ├──────────────────────────┼───────┼──────────────┼──────────────┤
-│ huashu-proofreading      │ 78    │ 边界条件      │ 测试prompt2  │
-│ huashu-slides            │ 72    │ 指令具体性    │ baseline持平  │
+│ python-script-gen      │ 78    │ 边界条件      │ 测试prompt2  │
+│ smoke-test            │ 72    │ 指令具体性    │ baseline持平  │
 ├──────────────────────────┼───────┼──────────────┼──────────────┤
 │ 平均                     │ 75    │              │              │
 └──────────────────────────┴───────┴──────────────┴──────────────┘
@@ -214,8 +216,8 @@ for each skill:
 ┌──────────────────────────┬────────┬────────┬────────┐
 │ Skill                    │ Before │ After  │ Δ      │
 ├──────────────────────────┼────────┼────────┼────────┤
-│ huashu-proofreading      │ 78     │ 87     │ +9     │
-│ huashu-slides            │ 72     │ 83     │ +11    │
+│ python-script-gen      │ 78     │ 87     │ +9     │
+│ smoke-test            │ 72     │ 83     │ +11    │
 ├──────────────────────────┼────────┼────────┼────────┤
 │ 平均                     │ 75     │ 85     │ +10    │
 └──────────────────────────┴────────┴────────┴────────┘
@@ -231,9 +233,9 @@ for each skill:
 
 ```tsv
 timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
-2026-03-31T10:00	baseline	huashu-proofreading	-	78	baseline	-	初始评估	full_test
-2026-03-31T10:05	a1b2c3d	huashu-proofreading	78	84	keep	边界条件	补充fallback	full_test
-2026-03-31T10:10	b2c3d4e	huashu-proofreading	84	82	revert	指令具体性	过度细化	dry_run
+2026-03-31T10:00	baseline	python-script-gen	-	78	baseline	-	初始评估	full_test
+2026-03-31T10:05	a1b2c3d	python-script-gen	78	84	keep	边界条件	补充fallback	full_test
+2026-03-31T10:10	b2c3d4e	python-script-gen	84	82	revert	指令具体性	过度细化	dry_run
 ```
 
 新增 `eval_mode` 列：`full_test`（跑了子agent测试）或 `dry_run`（模拟推演）。
@@ -294,7 +296,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 2. **不引入新依赖** — 不添加skill原本没有的scripts或references文件
 3. **每轮只改一个维度** — 避免多个变更导致无法归因
 4. **保持文件大小合理** — 优化后SKILL.md不应超过原始大小的150%
-5. **尊重花叔风格** — 中文为主、简洁为上
+5. **尊重项目风格** — 中文为主、简洁为上
 6. **可回滚** — 所有改动在git分支上，用git revert而非reset --hard
 7. **评分独立性** — 效果维度必须用子agent或至少干跑验证，不能在同一上下文里「改完直接评」
 
@@ -311,7 +313,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 
 ### 单个优化
 ```
-用户："优化 huashu-slides 这个skill"
+用户："优化 smoke-test 这个skill"
 → 只对指定skill执行 Phase 0.5-2
 ```
 

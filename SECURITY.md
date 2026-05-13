@@ -60,6 +60,37 @@
 - [ ] 生产数据**严禁**用于测试
 - [ ] 移动 APP 测试不内置生产证书 / API key
 
+## 武器化代码使用边界
+
+本项目含**攻击面工具**示例,运行前必须取得目标系统**书面授权**:
+
+| 资产 | 类型 |
+|------|------|
+| `02-专家定义/15-渗透测试.md` | 渗透测试 Agent(调用 sqlmap / Metasploit / Hydra 等真实攻击工具) |
+| `03-技能定义/pentest-*.md`(7 项) | 渗透 skill 系列(api / coordinator / exploit / recon / report / vuln / web) |
+| `05-代码示例/api_security_scanner.py` | API 安全扫描器(含 SSRF probe 默认 169.254.169.254 / file:///etc/passwd) |
+| `05-代码示例/ai_adversarial.py` | AI 对抗测试(含 JAILBREAK_PROMPTS + PROMPT_INJECTION_TEMPLATES 模板) |
+| `05-代码示例/security_scanner.py` | 通用安全扫描器(调用 ZAP / Burp) |
+
+**操作者必须**:
+
+- [ ] 仅在**自己拥有 / 经书面授权**的系统上运行上述工具
+- [ ] 在 `tagent.yml` 显式设置 `pentest.authorized: true`(此为操作者自证授权,不构成第三方授权证明)
+- [ ] 遵守所在司法管辖区法律:
+  - **中国**:《刑法》§285-§287(非法侵入 / 破坏 / 非法控制计算机信息系统罪);《网络安全法》§27 / §63
+  - **美国**:Computer Fraud and Abuse Act(CFAA, 18 U.S.C. § 1030)
+  - **欧盟**:NIS2 Directive(EU 2022/2555)
+
+**项目维护者免责**:本项目以 MIT License 提供"原样"代码。误用即攻击;由操作者承担**全部**法律责任,项目维护者不承担连带责任。
+
+## 上游归属与思想-表达分离
+
+针对 `NOTICE.md` 列出的上游条目(尤其上游无 LICENSE 文件 / AGPL 等):
+
+本项目所摘均为**抽象架构观察 / 设计模式 / 工程思想**,不复用上游源代码字面值、字符串常量、API 签名或专有数据结构(idea-expression dichotomy)。
+
+如发现疑似复用,请通过 GitHub Security Advisories 私密通道告知,**立即移除**。
+
 ## 漏洞披露后
 
 - CVE 编号申请（如适用）

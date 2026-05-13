@@ -5,7 +5,7 @@
 
 ## 定位
 
-把 14 专家定义 + 13 Skill + 49 脚本 从"文档+工具箱"升级为"可执行运行时"。
+把 16 专家定义 + 33 业务 Skill + 3 元 Skill + 49 脚本 从"文档+工具箱"升级为"可执行运行时"。
 本层 **不动** `02-专家定义/` `03-技能定义/` `05-代码示例/` 已有内容,仅作调度。
 
 ## 模块清单
@@ -13,7 +13,7 @@
 | 模块 | 路径 | 用途 |
 |------|------|------|
 | AI 路由 | [router/](router/INDEX.md) | 被测物 → 专家+Skill 组合 → DAG |
-| 注册中心 | [registry/](registry/INDEX.md) | 扫描 14 专家 + 13 Skill frontmatter,统一目录 |
+| 注册中心 | [registry/](registry/INDEX.md) | 扫描 16 专家 + 33 业务 Skill + 3 元 Skill frontmatter,统一目录 |
 | Prefect 编排 | [orchestrator/](orchestrator/INDEX.md) | 执行 DAG,断点续跑,产物归档 |
 | FastAPI 入口 | [api/](api/INDEX.md) | `/run` `/status` `/report` `/catalog` |
 | Typer CLI | [cli/](cli/INDEX.md) | `tagent run/status/report/catalog` |

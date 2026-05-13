@@ -12,7 +12,7 @@ REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-xing/Test-Agent.git}"
 REPO_BRANCH="${TEST_AGENT_REPO_BRANCH:-main}"
 
 echo "=========================================="
-echo " Test-Agent 工作流一键部署 V1.0.0"
+echo " Test-Agent 工作流一键部署 V1.14.0-alpha"
 echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="
@@ -98,15 +98,22 @@ mkdir -p "$PROJECT_ROOT"/workspace/自动化脚本/jmeter
 mkdir -p "$PROJECT_ROOT"/workspace/执行日志/{allure-results,jmeter-results,jmeter-report,coverage-report,baselines,history,截图}
 
 # ===== 5. 拷贝 Agent / Skill 定义 =====
-echo "→ 拷贝 Agent 定义（14 个）..."
-for f in 01-测试主管 02-需求分析 03-用例设计 04-环境管理 05-数据准备 06-自动化脚本 07-测试执行 08-Bug管理 09-报告生成 10-移动测试 11-桌面测试 12-视觉游戏测试 13-系统集成测试 14-AI模型测试; do
-    cp "$TEMPLATE_DIR/02-专家定义/${f}.md" "$PROJECT_ROOT/.claude/agents/"
-done
+echo "→ 拷贝 Agent 定义..."
+# Glob 全部 [0-9]*.md (业务 agent),自动覆盖未来新增
+find "$TEMPLATE_DIR/02-专家定义" -maxdepth 1 -name '[0-9]*.md' -exec cp {} "$PROJECT_ROOT/.claude/agents/" \;
+agent_count=$(ls "$PROJECT_ROOT/.claude/agents/"[0-9]*.md 2>/dev/null | wc -l)
+echo "  已部署 $agent_count 个 Agent"
 
-echo "→ 拷贝 Skill 定义（13 个）..."
-for f in smoke-test test-coordinator regression-test testcase-design python-script-gen jmeter-script-gen data-preparation zentao-bug-submission mobile-test desktop-test visual-test system-test ai-test; do
-    cp "$TEMPLATE_DIR/03-技能定义/${f}.md" "$PROJECT_ROOT/.claude/skills/"
+echo "→ 拷贝 Skill 定义..."
+# Glob 顶层业务 skill (排除 README)
+find "$TEMPLATE_DIR/03-技能定义" -maxdepth 1 -name '*.md' ! -name 'README.md' -exec cp {} "$PROJECT_ROOT/.claude/skills/" \;
+# 上游派生子目录 (darwin / karpathy-guidelines / nuwa)
+for subdir in "$TEMPLATE_DIR/03-技能定义"/*/; do
+    [[ -d "$subdir" ]] && cp -r "$subdir" "$PROJECT_ROOT/.claude/skills/"
 done
+skill_md_count=$(ls "$PROJECT_ROOT/.claude/skills/"*.md 2>/dev/null | wc -l)
+skill_dir_count=$(find "$PROJECT_ROOT/.claude/skills/" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l)
+echo "  已部署 $skill_md_count 个业务 Skill + $skill_dir_count 个元 Skill 子目录"
 
 # ===== 6. 配置文件 =====
 echo "→ 拷贝配置文件..."
@@ -141,6 +148,12 @@ done
 echo "→ 拷贝 CI/CD..."
 cp "$TEMPLATE_DIR/06-CICD集成/github-actions-test.yml" "$PROJECT_ROOT/.github/workflows/test.yml"
 cp "$TEMPLATE_DIR/06-CICD集成/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsfile"
+
+# ===== 8.5 顶层法律 / 治理 / 路线图文档 (V1.14 新增) =====
+echo "→ 拷贝法律 / 治理 / 路线图文档..."
+for f in LICENSE NOTICE.md SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md ROADMAP.md README.md README.zh-CN.md CHANGELOG.md VERSION; do
+    [[ -f "$TEMPLATE_DIR/$f" ]] && cp "$TEMPLATE_DIR/$f" "$PROJECT_ROOT/"
+done
 
 # ===== 9. Python 虚拟环境 + 依赖 =====
 cd "$PROJECT_ROOT"

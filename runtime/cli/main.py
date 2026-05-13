@@ -85,6 +85,7 @@ def plan(
 def doctor(
     agents: bool = typer.Option(False, "--agents", help="L1 frontmatter lint + optional --probe LLM ping"),
     probe: bool = typer.Option(False, "--probe", help="L3 真 LLM 每 agent ping 一次(~$0.5,主宪章 §33)"),
+    llm_smoke: bool = typer.Option(False, "--llm-smoke", help="L3 5 秒往返冒烟(单次真 LLM 'Hello → 你好',验首-mile 通路 + 输出 token/cost)"),
 ):
     """Sanity check: settings + catalog + optional DB/MinIO ping + L1/L3 self-check."""
     s = get_settings()
@@ -110,6 +111,24 @@ def doctor(
             console.print(f"[red]FAIL[/] {len(report.issues)} issue(s):")
             for i in report.issues:
                 console.print(f"  - {i}")
+            raise typer.Exit(1)
+
+    if llm_smoke:
+        from runtime.healthcheck.llm_smoke import run_llm_smoke
+
+        console.print("\n[bold]L3 LLM smoke (single round-trip 'Hello → 你好'):[/]")
+        r = run_llm_smoke()
+        mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
+        console.print(f"  {mark} {r.provider} / {r.model}  {r.latency_ms} ms")
+        if r.response:
+            console.print(f"    response: {r.response!r}")
+        if r.prompt_tokens or r.completion_tokens:
+            console.print(f"    tokens:   prompt={r.prompt_tokens} completion={r.completion_tokens}")
+        if r.cost_usd > 0:
+            console.print(f"    cost:     ${r.cost_usd:.6f}")
+        if r.reason:
+            console.print(f"    reason:   {r.reason}")
+        if not r.ok:
             raise typer.Exit(1)
 
     if probe:
@@ -328,14 +347,41 @@ def demo(
     out: str = typer.Option("workspace/_demo", "--out", help="demo 产物目录(.env / tagent.yml / STARTUP.md / 测试用例 / 报告)"),
     preset: str = typer.Option("minimal", "--preset", help="init 用 preset · minimal=离线 0 配置(stub LLM + webhook)"),
     keep: bool = typer.Option(False, "--keep", help="保留上次产物(默认每次 --overwrite 覆盖)"),
+    real_llm: bool = typer.Option(False, "--real-llm", help="真 LLM 路径(读 TAGENT_LLM_PROVIDER + 凭据),16-agent DAG ≈ $1-3 / 60-120s · 默认 stub"),
+    skip_smoke: bool = typer.Option(False, "--skip-smoke", help="--real-llm 前默认先跑 doctor --llm-smoke 探活;此 flag 关闭"),
+    yes: bool = typer.Option(False, "-y", "--yes", help="--real-llm 跳成本确认提示"),
 ):
-    """一键跑通完整 demo · 0 配置 · 0 API key · 30 秒看产物(主宪章 §1 §7)."""
+    """一键跑通完整 demo · 默认 0 配置 stub · `--real-llm` 走真 LLM(主宪章 §1 §7)."""
     import os
     import shutil
 
-    # 先于任何 Kernel/Router 实例化前设环境 + 清 settings 缓存(否则 _kernel 已锁 claude)
-    os.environ["TAGENT_LLM_PROVIDER"] = "stub"
-    os.environ["TAGENT_LLM_PROVIDER_FALLBACK"] = "stub"
+    if real_llm:
+        # --real-llm: 读 env 真凭据,不强制 stub;先 smoke 探活防 16-agent 才发现 LLM 不通
+        provider = os.getenv("TAGENT_LLM_PROVIDER", "(unset → settings 默认)")
+        console.print(f"[bold yellow]⚠ --real-llm 模式[/]  provider={provider}")
+        console.print("  · 真调 LLM ≈ $1-3 / 60-120s(16 agent × 多次调用)")
+        console.print("  · 若 provider unset / 凭据缺,会在 selftest 阶段 raise")
+        if not yes:
+            if not typer.confirm("  继续?(N=退出)", default=False):
+                raise typer.Exit(0)
+
+        if not skip_smoke:
+            from runtime.healthcheck.llm_smoke import run_llm_smoke
+
+            console.print("\n[bold]Pre-flight · doctor --llm-smoke (单次往返探活)[/]")
+            r = run_llm_smoke()
+            mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
+            console.print(f"  {mark} {r.provider} / {r.model}  {r.latency_ms} ms  {r.reason or ''}")
+            if not r.ok:
+                console.print("  [red]LLM 不通 → 退出(不浪费 16-agent 调用)。修配置或加 --skip-smoke 强跑[/]")
+                raise typer.Exit(1)
+            if r.response:
+                console.print(f"    response: {r.response!r}")
+    else:
+        # stub 路径:先于任何 Kernel/Router 实例化前设环境 + 清 settings 缓存(否则 _kernel 已锁 claude)
+        os.environ["TAGENT_LLM_PROVIDER"] = "stub"
+        os.environ["TAGENT_LLM_PROVIDER_FALLBACK"] = "stub"
+
     import runtime.config.settings as _settings_mod
 
     _settings_mod._settings = None
@@ -346,7 +392,8 @@ def demo(
     from runtime.init.renderer import render_all
     from runtime.init.wizard import from_preset
 
-    console.print("[bold cyan]Test-Agent · 一键 demo[/]  (主宪章 §1 §7,0 配置,stub LLM)\n")
+    mode_label = "real LLM" if real_llm else "stub LLM"
+    console.print(f"\n[bold cyan]Test-Agent · 一键 demo[/]  (主宪章 §1 §7,{mode_label})\n")
 
     out_path = Path(out)
     if out_path.exists() and not keep:
@@ -370,7 +417,8 @@ def demo(
         console.print(f"  [red]✗ {len(report.issues)} issue(s)[/]")
         raise typer.Exit(1)
 
-    console.print("\n[bold]Step 3/4 · tagent selftest --e2e (16 agent DAG · stub LLM · 0 成本)[/]")
+    step3_label = "真 LLM · ~$1-3" if real_llm else "stub LLM · 0 成本"
+    console.print(f"\n[bold]Step 3/4 · tagent selftest --e2e (16 agent DAG · {step3_label})[/]")
     fixture_path = Path("examples/_smoke_prd.md")
     if not fixture_path.exists():
         console.print(f"  [red]fixture missing:[/] {fixture_path}")

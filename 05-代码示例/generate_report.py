@@ -68,6 +68,29 @@ def generate_test_report(data: Dict, output_path: str) -> str:
     run.font.color.rgb = RGBColor(0, 128, 0) if verdict == "通过" else RGBColor(255, 0, 0)
     run.bold = True
 
+    # 一(补)、数据完整性警示 — 防 mock 闭环 (V1.14 W3-2b)
+    # test_lead.mock_output 在上游 degraded 时写 _degraded_upstream 列表
+    degraded_upstream = data.get("_degraded_upstream", [])
+    if degraded_upstream:
+        doc.add_heading("⚠ 数据完整性警示", level=1)
+        warning_p = doc.add_paragraph()
+        warning_run = warning_p.add_run(
+            f"本次报告基于不完整测试数据生成。共 {len(degraded_upstream)} 个 expert "
+            f"输出 degraded(mock 兜底 / LLM 失败 / 未实装 V1.x rollout):"
+        )
+        warning_run.font.color.rgb = RGBColor(255, 140, 0)  # 橙色
+        warning_run.bold = True
+        for name in degraded_upstream:
+            item = doc.add_paragraph(style="List Bullet")
+            item.add_run(f"expert '{name}' — 详见 ROADMAP.md V1.x rollout 节奏")
+        impact_p = doc.add_paragraph()
+        impact_run = impact_p.add_run(
+            "→ 上线决策建议: conditional 或 no-go(由 test-lead 判定);"
+            "不应基于此报告直接发版。"
+        )
+        impact_run.bold = True
+        impact_run.font.color.rgb = RGBColor(255, 0, 0)
+
     # 二、缺陷统计
     doc.add_heading("二、缺陷统计", level=1)
     bugs = data.get("bugs", {})
