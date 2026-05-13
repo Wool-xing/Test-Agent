@@ -115,7 +115,7 @@ Test-Agent/
 |----------|------|
 | **First-time user** | [Quick start](01-快速开始/INDEX.md) → [Deploy](01-快速开始/部署说明.md) |
 | **QA engineer** | [User manual](01-快速开始/使用手册.md) → [Skill catalog](03-技能定义/) |
-| **Architect / SRE** | [Architecture deep-dive](FULL_GUIDE.md) → [Runtime](runtime/INDEX.md) |
+| **Architect / SRE** | [Architecture deep-dive](docs/charter/06-test-architecture.md) → [Runtime](docs/charter/07-runtime-license.md) → [Runtime modules](runtime/INDEX.md) |
 | **Security researcher** | [Pentest expert](02-专家定义/15-渗透测试.md) → [pentest-coordinator](03-技能定义/pentest-coordinator.md) |
 | **Automotive tester** | [Automotive expert](02-专家定义/16-车载测试.md) → [ASIL workflow](03-技能定义/automotive-test.md) |
 | **Contributor** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](marketplace/INDEX.md) |

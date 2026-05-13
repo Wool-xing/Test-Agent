@@ -1,7 +1,7 @@
 # runtime 索引
 
 > Test-Agent 运行时层（V1.1.0-alpha 新增）。
-> 顶层导航见根目录 `00-项目导航.md`；完整文档见 `FULL_GUIDE.md`。
+> 顶层导航见根目录 `00-项目导航.md`；runtime 完整章节见 `docs/charter/07-runtime-license.md`；总索引见 `FULL_GUIDE.md`。
 
 ## 定位
 
