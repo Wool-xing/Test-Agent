@@ -93,6 +93,7 @@ Test-Agent/
 ├── 05-代码示例/             ← 49 个生产工具
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
 ├── runtime/                ← V1.x 运行时(router/orchestrator/MCP/web/scheduler/subagent/learning_loop/backends/gateway/tutor/essence_watcher/marketplace)
+├── docs/charter/           ← 愿景宪章(7 子文件: vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license)
 ├── docs/theory/            ← 22 教学 KB 卡片跨 13 大类
 ├── profiles/compliance/    ← 10 行业合规 YAML
 ├── marketplace/            ← 社区 skills / agents / mcp / hooks(4 lane,4 关验证)
