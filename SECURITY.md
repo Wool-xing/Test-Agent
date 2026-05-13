@@ -83,6 +83,22 @@
 
 **项目维护者免责**:本项目以 MIT License 提供"原样"代码。误用即攻击;由操作者承担**全部**法律责任,项目维护者不承担连带责任。
 
+## 测试工具准入控制(utils env-var gate)
+
+本项目 utils 中部分函数具有**副作用 / 命令注入面 / 任意 SQL 执行**(非武器化攻击工具,但误调同样损坏环境)。默认 refuse,需对应环境变量授权:
+
+| utils 文件 | env var | 守护操作 | 额外约束 |
+|------|------|------|------|
+| `05-代码示例/chaos_helper.py` | `TAGENT_CHAOS_AUTHORIZED=1` | 混沌注入 + path / host validation | – |
+| `05-代码示例/db_test_helper.py` | `TAGENT_DB_TEST_AUTHORIZED=1` | `explain_query` / `benchmark_query` / `test_migration` / `test_postgres_backup_restore` | `test_postgres_backup_restore` 额外需 `confirm_destructive=True` kwarg;SQL identifier + cmd 双白名单 |
+| `05-代码示例/desktop_driver.py` | `TAGENT_DESKTOP_AUTHORIZED=1` | `open_macos_app` / `macos_menu` | 平台必须 darwin(非 macOS 自动 refuse);AppleScript identifier 白名单 |
+
+**与武器化代码区分**: 上述 utils 设计用途是**测试**而非**攻击**,但调用时仍执行任意 SQL / shell / AppleScript。env var gate 是误调防护,不豁免操作者的环境隔离责任。
+
+**授权范围**: 仅 dedicated 测试库 / 自有 macOS 测试机 / 隔离环境。生产严禁。
+
+**实现 PR**: chaos_helper #37 / db_test_helper #41 / desktop_driver #44(范式: env gate + opt-in kwarg + platform gate + 输入白名单)。
+
 ## 上游归属与思想-表达分离
 
 针对 `NOTICE.md` 列出的上游条目(尤其上游无 LICENSE 文件 / AGPL 等):
