@@ -91,7 +91,7 @@
 |------|------|------|------|
 | `05-代码示例/chaos_helper.py` | `TAGENT_CHAOS_AUTHORIZED=1` | 混沌注入 + path / host validation | – |
 | `05-代码示例/db_test_helper.py` | `TAGENT_DB_TEST_AUTHORIZED=1` | `explain_query` / `benchmark_query` / `test_migration` / `test_postgres_backup_restore` | `test_postgres_backup_restore` 额外需 `confirm_destructive=True` kwarg;SQL identifier + cmd 双白名单 |
-| `05-代码示例/desktop_driver.py` | `TAGENT_DESKTOP_AUTHORIZED=1` | `open_macos_app` / `macos_menu` | 平台必须 darwin(非 macOS 自动 refuse);AppleScript identifier 白名单 |
+| `05-代码示例/desktop_driver.py` | `TAGENT_DESKTOP_AUTHORIZED=1`(仅 macOS ops) | macOS: `open_macos_app` / `macos_menu`;跨平台: `get_windows_app` / `launch_electron` 路径校验 | macOS ops 需 platform=darwin + AppleScript identifier 白名单;跨平台 driver 接受的 exe / executable 路径必须绝对 + 存在 + 普通文件 + 非 symlink |
 
 **与武器化代码区分**: 上述 utils 设计用途是**测试**而非**攻击**,但调用时仍执行任意 SQL / shell / AppleScript。env var gate 是误调防护,不豁免操作者的环境隔离责任。
 
