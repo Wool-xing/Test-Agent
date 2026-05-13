@@ -35,3 +35,43 @@ selftest:
 
 marketplace:
   enabled: false        # 默认关 · 主宪章 §30 safe-by-default
+
+# ============== SAFETY GATES · safe-by-default(主宪章 §22 / §35 + W5 sprint v2) ==============
+# 危险操作 / 自动化 / 影响生产 的功能 必须显式开启, 否则 destructive-guard 拒绝运行。
+# 详见 SECURITY.md 武器化代码使用边界 + 测试工具准入控制 节。
+
+scheduler:
+  enabled: false              # safety.gate_scheduler_tick: 必显式 true 才允许后台 tick
+  cron_jobs_allowed: false    # safety.gate_cron_auto_approve: 允许定时调真模型 + 自动批准
+
+curator:
+  enabled: false              # safety.gate_curator_run: 闲置触发后台 skill 整理
+
+eval:
+  capture: false              # TAGENT_EVAL_CAPTURE=1 同效; PII 已自动 scrub
+
+backends:
+  allowed:                    # safety.gate_backend: 默认仅 local; 远端必须显式 opt-in
+    - local
+    # - docker
+    # - ssh
+    # - modal
+
+gateway:
+  enabled_platforms: []       # safety.gate_gateway_platform: 默认无平台启用
+  # 例: enabled_platforms: [telegram, feishu]
+
+pentest:
+  # 法律契约(default refuse · charter §35); rollout 阶段 yml gate 占位, V1.x 激活后接入真实路由
+  authorized: false                    # 法律授权确认
+  scope_in_targets: []                 # IP/domain/URL 白名单(IN)
+  scope_out_targets: []                # 强制黑名单(覆盖 IN)
+  authorization_record: ""             # 授权书 / SoW 路径(空 → refuse)
+  evidence_dir: workspace/pentest_evidence
+
+destructive_ops:
+  # safety.gate_destructive: 默认全 deny, 显式 true 才放行
+  allow_db_truncate: false
+  allow_minio_bucket_drop: false
+  allow_git_force_push: false
+  allow_prod_endpoint_call: false

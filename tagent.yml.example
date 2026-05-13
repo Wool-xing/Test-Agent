@@ -1,3 +1,12 @@
+# ╔══════════════════════════════════════════════════════════════════════╗
+# ║ 这是【参考 schema】, 非 runtime 配置文件。改本文件不会生效。         ║
+# ║                                                                      ║
+# ║ 真正生效的配置: 项目根下 `tagent.yml` (跑 `tagent init` 生成)        ║
+# ║ 完整 schema 来源: `04-配置文件/templates/base.tagent.yml.tpl`        ║
+# ║                                                                      ║
+# ║ 想开启 safety gate / 自动化 / 危险操作 → 改 `tagent.yml`,而非本文件 ║
+# ╚══════════════════════════════════════════════════════════════════════╝
+#
 # Test-Agent 配置(safe-by-default 栅栏 · gbrain §1.9 派生)
 #
 # 危险操作 / 自动化 / 影响生产 的功能 **必须显式开启**,否则 destructive-guard 拒绝运行。
@@ -44,10 +53,10 @@ gateway:
 
 # ============== 6. Bug Tracker(charter §12) ==============
 bug_tracker:
-  # runtime/init/wizard.py + runtime/mcp/defect_tracker 读取
-  default: zentao
-  enabled: [zentao]
-  # enabled: [zentao, jira, github]
+  # 由 tagent init wizard 写入; runtime 经 wizard answers 注入, 不直接读 yml
+  # tpl schema 用 primary (单一活跃 tracker); 多 tracker 走 extra
+  primary: zentao
+  # extra: [github]              # 多 tracker 主宪章 §37 路由
 
 # ============== 7. Pentest 法律契约(rollout · 见 SECURITY 警告) ==============
 # 当前 expert rollout 状态;字段为 V1.x 接入 yml gate 时的契约占位。
