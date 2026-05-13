@@ -2,10 +2,20 @@
 """
 桌面应用 driver 工厂 + 进程性能采集
 被引用方：11-桌面测试 agent / desktop-test skill
+
+安全约束（W5-5 加固）：
+    macOS 自动化函数 (open_macos_app / macos_menu) 通过 subprocess 调用
+    `open` / `osascript`, 其中 AppleScript 由 f-string 拼接, 历史上存在
+    AppleScript 注入面 (用户控 app_name / menu / item)。准入控制：
+      - 需环境变量 TAGENT_DESKTOP_AUTHORIZED=1 显式授权。
+      - 平台必须为 darwin (非 macOS 自动 refuse)。
+      - 所有 AppleScript identifier (app name / menu / item) 经正则白名单校验。
+    授权 ONLY 在自有 macOS 测试机。生产 macOS 设备严禁。
 """
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import time
@@ -14,6 +24,48 @@ from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+
+# ===== W5-5 安全 gate =====
+
+GATE_ENV_VAR = "TAGENT_DESKTOP_AUTHORIZED"
+# AppleScript identifier: 首字符字母, 允许字母 / 数字 / 空格 / 下划线 / 点 / 短横, 最长 128 字符
+_AS_IDENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9 _.\-]{0,127}$")
+
+
+def _gate_enabled() -> bool:
+    return os.getenv(GATE_ENV_VAR) == "1"
+
+
+def _require_authorized(op: str) -> None:
+    """桌面自动化操作准入守卫。"""
+    if not _gate_enabled():
+        raise RuntimeError(
+            f"desktop op '{op}' refused: set {GATE_ENV_VAR}=1 to enable. "
+            "Authorize ONLY on macOS test machines you own. "
+            "Risks: subprocess invocation, AppleScript execution, "
+            "arbitrary app launch."
+        )
+
+
+def _require_macos(op: str) -> None:
+    """macOS only 守卫 (非 darwin 平台拒绝)。"""
+    if sys.platform != "darwin":
+        raise RuntimeError(
+            f"desktop op '{op}' is macOS-only (current platform: {sys.platform!r}). "
+            "Use get_windows_app / launch_electron / collect_proc_perf for cross-platform."
+        )
+
+
+def _validate_as_identifier(name: str, kind: str = "identifier") -> str:
+    """AppleScript identifier 白名单校验, 防 AppleScript / shell 注入。"""
+    if not isinstance(name, str) or not _AS_IDENT_RE.fullmatch(name):
+        raise ValueError(
+            f"invalid AppleScript {kind}: {name!r}. allowed pattern: "
+            r"^[A-Za-z][A-Za-z0-9 _.\-]{0,127}$ "
+            "(starts with letter; letters/digits/space/underscore/dot/hyphen only)"
+        )
+    return name
 
 
 # ===== Windows =====
@@ -36,10 +88,16 @@ def get_windows_app(exe_path: Optional[str] = None, backend: str = "uia"):
 # ===== macOS =====
 
 def open_macos_app(app_name: Optional[str] = None) -> str:
-    """启动 macOS 应用（通过 open -a）"""
+    """启动 macOS 应用 (通过 open -a)。
+
+    安全：需 TAGENT_DESKTOP_AUTHORIZED=1 + platform=darwin + app_name 白名单。
+    """
+    _require_authorized("open_macos_app")
+    _require_macos("open_macos_app")
     name = app_name or os.getenv("MAC_APP_NAME")
     if not name:
         raise ValueError("MAC_APP_NAME 未配置")
+    _validate_as_identifier(name, "app name")
     subprocess.run(["open", "-a", name], check=True)
     time.sleep(2)
     logger.info(f"macOS 应用启动: {name}")
@@ -47,7 +105,18 @@ def open_macos_app(app_name: Optional[str] = None) -> str:
 
 
 def macos_menu(app_name: str, menu: str, item: str):
-    """通过 AppleScript 点击 macOS 菜单"""
+    """通过 AppleScript 点击 macOS 菜单。
+
+    安全：
+      - 需 TAGENT_DESKTOP_AUTHORIZED=1 + platform=darwin。
+      - app_name / menu / item 三者均经 AppleScript identifier 白名单校验,
+        防 AppleScript 注入 (历史上 f-string 拼接可逃逸引号执行 do shell script)。
+    """
+    _require_authorized("macos_menu")
+    _require_macos("macos_menu")
+    _validate_as_identifier(app_name, "app name")
+    _validate_as_identifier(menu, "menu name")
+    _validate_as_identifier(item, "menu item")
     script = f'''
         tell application "System Events"
             tell process "{app_name}"
