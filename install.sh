@@ -175,7 +175,25 @@ echo "→ 安装 Python 依赖..."
 export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
 python -m pip install --upgrade pip -q
-pip install -r requirements.txt -q
+
+# W4-5 实测 Windows 修: scikit-image / scikit-learn / opencv-python 等 image 包
+# 需 C/C++ compiler (Meson build) → Windows 无 MSVC 时 fail。
+# 检测 Windows (MINGW/CYGWIN/MSYS), 装时跳过这些可选 image 包, 留 warning。
+case "$(uname -s 2>/dev/null || echo unknown)" in
+    MINGW*|CYGWIN*|MSYS*)
+        echo "→ 检测到 Windows 环境, 跳过需 C 编译器的可选 image 包 (scikit-image / scikit-learn / opencv-python)"
+        echo "  如需视觉测试 (visual-test skill), 装 Visual Studio Build Tools 后手动: pip install scikit-image scikit-learn opencv-python"
+        # 临时 requirements 排除可选 image 包
+        REQ_TMP="$(mktemp -t tagent-req-XXXXXX.txt)"
+        grep -vE '^(scikit-image|scikit-learn|opencv-python|opencv-contrib-python)([= ]|$)' requirements.txt > "$REQ_TMP"
+        pip install -r "$REQ_TMP" -q
+        rm -f "$REQ_TMP"
+        ;;
+    *)
+        pip install -r requirements.txt -q
+        ;;
+esac
+
 playwright install chromium --with-deps 2>/dev/null || echo "⚠️ Playwright deps 安装失败，UI 测试需手动 'playwright install chromium --with-deps'"
 
 # ===== 10. 完成提示 =====
