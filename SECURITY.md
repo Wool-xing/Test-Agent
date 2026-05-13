@@ -68,7 +68,7 @@
 |------|------|
 | `02-专家定义/15-渗透测试.md` | 渗透测试 Agent(调用 sqlmap / Metasploit / Hydra 等真实攻击工具) |
 | `03-技能定义/pentest-*.md`(7 项) | 渗透 skill 系列(api / coordinator / exploit / recon / report / vuln / web) |
-| `05-代码示例/api_security_scanner.py` | API 安全扫描器(含 SSRF probe 默认 169.254.169.254 / file:///etc/passwd) |
+| `05-代码示例/api_security_scanner.py` | API 安全扫描器(SSRF / IDOR / JWT / CSRF; 默认 refuse,需 `TAGENT_PENTEST_AUTHORIZED=1` + AWS metadata 探针需 `confirm_metadata_probe=True`) |
 | `05-代码示例/ai_adversarial.py` | AI 对抗测试(含 JAILBREAK_PROMPTS + PROMPT_INJECTION_TEMPLATES 模板) |
 | `05-代码示例/security_scanner.py` | 通用安全扫描器(调用 ZAP / Burp) |
 
