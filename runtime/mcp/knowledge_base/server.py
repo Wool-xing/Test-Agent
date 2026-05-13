@@ -64,7 +64,20 @@ async def tool_embed(text: str) -> dict:
 
 
 def _is_postgres() -> bool:
-    return get_engine().dialect.name == "postgresql"
+    """检测 backend 是否 PostgreSQL。
+
+    L2-B 加固: db_url 配 postgres 但 psycopg/asyncpg 未装时, get_engine 调
+    create_engine 会 ImportError。此处 try/except 兜底, 视为非 postgres,
+    走 sqlite fallback 分支 (本文件 L83+ 已有 sqlite 分支)。
+    """
+    try:
+        return get_engine().dialect.name == "postgresql"
+    except (ImportError, ModuleNotFoundError):
+        # psycopg / asyncpg 未装 → 视为非 postgres, 走 sqlite fallback
+        return False
+    except Exception:
+        # 其他异常 (连接失败 / dialect 加载失败 等) 也 fallback
+        return False
 
 
 @tool_decision_logged("index_case")
