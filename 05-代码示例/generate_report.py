@@ -19,10 +19,34 @@ logger = logging.getLogger(__name__)
 # ===== Word 报告 =====
 
 def generate_test_report(data: Dict, output_path: str) -> str:
-    """生成 Word 测试报告。data 包含 project_name/version/environment/results/bugs/coverage/risks 等字段。"""
-    from docx import Document
-    from docx.shared import Pt, RGBColor
-    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    """生成 Word 测试报告。data 包含 project_name/version/environment/results/bugs/coverage/risks 等字段。
+
+    依赖 python-docx (可选)。未装时 graceful skip + sentinel 文件标记, DAG 节点不 fail。
+    """
+    try:
+        from docx import Document
+        from docx.shared import Pt, RGBColor
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+    except ImportError:
+        # graceful skip: 缺 python-docx 时写 sentinel + warning, 让 DAG 节点 exit 0
+        # (L2 selftest baseline 修复, generate_report.py n7 节点 ImportError → graceful)
+        logger.warning(
+            "python-docx 未安装, Word 报告跳过生成 (graceful skip)。"
+            "如需 Word 报告: pip install python-docx>=1.1.0。"
+            "L2 selftest 走此分支为预期行为。"
+        )
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        sentinel = Path(output_path).with_suffix(".skipped.txt")
+        sentinel.write_text(
+            "Word report generation skipped: python-docx not installed.\n"
+            f"data summary: project={data.get('project_name', '-')} "
+            f"verdict={data.get('verdict', '-')} "
+            f"pass_rate={data.get('results', {}).get('pass_rate', 0):.1%}\n"
+            "Install python-docx>=1.1.0 to enable full Word report.\n",
+            encoding="utf-8",
+        )
+        logger.info(f"sentinel 文件: {sentinel}")
+        return str(sentinel)
 
     doc = Document()
     # 字体 fallback：微软雅黑 → PingFang SC → Noto Sans CJK SC
