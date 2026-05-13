@@ -366,6 +366,13 @@ def demo(
     """一键跑通完整 demo · 默认 0 配置 stub · `--real-llm` 走真 LLM(主宪章 §1 §7)."""
     import os
     import shutil
+    import sys
+
+    # W4-5 实测 Windows 修: Python 默认 GBK 编码 → demo 输出 ✓ 等字符炸
+    # UnicodeEncodeError。Windows 平台兜底设 UTF-8 (用户未设时), 不覆盖用户显式设置。
+    if sys.platform == "win32":
+        os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+        os.environ.setdefault("PYTHONUTF8", "1")
 
     if real_llm:
         # --real-llm: 读 env 真凭据,不强制 stub;先 smoke 探活防 16-agent 才发现 LLM 不通
