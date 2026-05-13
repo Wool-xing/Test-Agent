@@ -3,7 +3,7 @@
 桌面应用 driver 工厂 + 进程性能采集
 被引用方：11-桌面测试 agent / desktop-test skill
 
-安全约束（W5-5 加固）：
+安全约束（W5-5 加固 + 后续 path 校验扩展）：
     macOS 自动化函数 (open_macos_app / macos_menu) 通过 subprocess 调用
     `open` / `osascript`, 其中 AppleScript 由 f-string 拼接, 历史上存在
     AppleScript 注入面 (用户控 app_name / menu / item)。准入控制：
@@ -11,6 +11,12 @@
       - 平台必须为 darwin (非 macOS 自动 refuse)。
       - 所有 AppleScript identifier (app name / menu / item) 经正则白名单校验。
     授权 ONLY 在自有 macOS 测试机。生产 macOS 设备严禁。
+
+    跨平台 driver 路径校验 (get_windows_app / launch_electron):
+      - 用户控 exe_path / executable_path 经 _validate_executable_path 校验:
+        必须绝对路径 + 存在 + 普通文件 + 非 symlink。
+      - 不加 env gate (基本测试 driver 操作非 offensive); 但拒绝相对路径 + symlink
+        防 CWD 劫持 / link 攻击。
 """
 import json
 import logging
@@ -68,10 +74,39 @@ def _validate_as_identifier(name: str, kind: str = "identifier") -> str:
     return name
 
 
+def _validate_executable_path(path: str, kind: str = "executable path") -> str:
+    """可执行文件路径校验: 绝对路径 + 存在 + 普通文件 + 非 symlink。
+
+    防御面:
+      - 相对路径可被 CWD 劫持 → 强制绝对路径
+      - symlink 可指向任意目标 → 拒绝 symlink (需要符号链时调用方自行 resolve)
+      - 路径不存在 / 是目录 → 显式 ValueError (而非 subprocess 失败时才报)
+    """
+    if not isinstance(path, str) or not path:
+        raise ValueError(f"invalid {kind}: must be non-empty string, got {path!r}")
+    p = Path(path)
+    if not p.is_absolute():
+        raise ValueError(f"invalid {kind}: {path!r} must be absolute path")
+    if p.is_symlink():
+        raise ValueError(
+            f"invalid {kind}: {path!r} is a symlink (rejected to prevent link "
+            "attacks; resolve target manually with Path.resolve() if intentional)"
+        )
+    if not p.exists():
+        raise ValueError(f"invalid {kind}: {path!r} does not exist")
+    if not p.is_file():
+        raise ValueError(f"invalid {kind}: {path!r} is not a regular file")
+    return str(p)
+
+
 # ===== Windows =====
 
 def get_windows_app(exe_path: Optional[str] = None, backend: str = "uia"):
-    """启动 Windows 应用并返回 pywinauto Application"""
+    """启动 Windows 应用并返回 pywinauto Application。
+
+    安全：exe_path 经 _validate_executable_path 校验
+    (绝对路径 + 存在 + 普通文件 + 非 symlink)。
+    """
     try:
         from pywinauto import Application
     except ImportError:
@@ -80,6 +115,7 @@ def get_windows_app(exe_path: Optional[str] = None, backend: str = "uia"):
     path = exe_path or os.getenv("WIN_APP_PATH")
     if not path:
         raise ValueError("WIN_APP_PATH 未配置")
+    path = _validate_executable_path(path, "Windows .exe path")
     app = Application(backend=backend).start(path)
     logger.info(f"Windows 应用启动: {path}")
     return app
@@ -130,7 +166,10 @@ def macos_menu(app_name: str, menu: str, item: str):
 # ===== Electron =====
 
 def launch_electron(executable_path: Optional[str] = None):
-    """启动 Electron 应用，返回 (playwright, app, page)"""
+    """启动 Electron 应用, 返回 (playwright, app, page)。
+
+    安全：executable_path 经 _validate_executable_path 校验。
+    """
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -139,6 +178,7 @@ def launch_electron(executable_path: Optional[str] = None):
     path = executable_path or os.getenv("ELECTRON_APP_PATH")
     if not path:
         raise ValueError("ELECTRON_APP_PATH 未配置")
+    path = _validate_executable_path(path, "Electron executable path")
 
     pw = sync_playwright().start()
     # Playwright Electron API（_impl_obj 是私有，正式用 pw.electron）
