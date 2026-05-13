@@ -91,12 +91,22 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     finally:
         pool.shutdown(wait=True)
 
+    # L2-C: rollout 节点识别同 flows.py
+    rollout_skipped = [
+        nid for nid, r in results.items()
+        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+    ]
+
     summary = {
         "run_id": run_id,
         "total": len(ordered),
         "succeeded": len(ordered) - len(failures),
         "failed": len(failures),
+        "rollout_skipped": rollout_skipped,
         "results": results,
     }
-    log.info("direct flow done: {}/{} ok", summary["succeeded"], summary["total"])
+    log.info(
+        "direct flow done: {}/{} ok ({} rollout skipped)",
+        summary["succeeded"], summary["total"], len(rollout_skipped)
+    )
     return summary

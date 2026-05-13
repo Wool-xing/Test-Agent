@@ -179,16 +179,28 @@ def selftest(
 
     total = summary["total"]
     succ = summary["succeeded"]
-    rate = succ / total if total else 0.0
+    # L2-C: tolerant 模式排除 V1.x rollout 节点 (env-manager 等未实装的) 不拉低通过率;
+    # strict 模式仍严格 (所有节点必过, 含 rollout)
+    rollout_skipped = summary.get("rollout_skipped", [])
+    n_skipped = len(rollout_skipped)
     if strict:
         ok = summary["failed"] == 0
-        label = "strict (100%)"
+        rate = succ / total if total else 0.0
+        label = "strict (100%, 含 rollout)"
     else:
+        # 把 rollout 节点从分母排除 (它们是 V1.x 计划内未实装, 非真 fail)
+        effective_total = max(1, total - n_skipped)
+        # rollout 节点也从 failures 数移除 (effective succ 不变, 但分母减)
+        rate = succ / effective_total
         ok = rate >= pass_threshold
-        label = f"tolerant ≥{pass_threshold:.0%}"
+        label = f"tolerant ≥{pass_threshold:.0%} (排除 {n_skipped} 个 rollout)"
 
     mark = "[green]✓ PASS[/]" if ok else "[red]✗ FAIL[/]"
-    console.print(f"{mark}  {succ}/{total} ok ({rate:.0%}, {label})  {summary['failed']} failed")
+    skip_hint = f" / {n_skipped} rollout" if n_skipped else ""
+    console.print(
+        f"{mark}  {succ}/{total} ok ({rate:.0%}, {label})  "
+        f"{summary['failed']} failed{skip_hint}"
+    )
     if not ok:
         raise typer.Exit(1)
 

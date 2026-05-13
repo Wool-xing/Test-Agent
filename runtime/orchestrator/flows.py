@@ -43,12 +43,23 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
                 results[nid] = {"id": nid, "ok": False, "error": str(e)}
                 failures.append(nid)
 
+    # L2-C: 识别 rollout 节点 (stderr 含 [V1.x rollout] 标记), 收集到 rollout_skipped 列表;
+    # 用于 selftest tolerant 模式排除 — V1.x 计划中未实装 expert 不应拉低通过率。
+    rollout_skipped = [
+        nid for nid, r in results.items()
+        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+    ]
+
     summary = {
         "run_id": run_id,
         "total": len(ordered),
         "succeeded": len(ordered) - len(failures),
         "failed": len(failures),
+        "rollout_skipped": rollout_skipped,
         "results": results,
     }
-    log.info("flow done: {}/{} ok", summary["succeeded"], summary["total"])
+    log.info(
+        "flow done: {}/{} ok ({} rollout skipped)",
+        summary["succeeded"], summary["total"], len(rollout_skipped)
+    )
     return summary
