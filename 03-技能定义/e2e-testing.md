@@ -2,6 +2,7 @@
 name: e2e-testing
 description: "E2E 测试 Skill。Playwright 关键用户流 + 跨浏览器 + 2FA/TOTP/SSO 自动登录 + 视觉回归 + 录屏。派生自 ECC e2e-testing(主宪章 §28)。"
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: production
 ---
 
 # e2e-testing

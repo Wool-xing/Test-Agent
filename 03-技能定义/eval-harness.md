@@ -2,6 +2,7 @@
 name: eval-harness
 description: "Eval 框架 Skill。LLM/AI 系统评测:pass@k / Jaccard@k / top-1 stability / latency Δ。融合 gbrain eval 回放(主宪章 §24)+ ECC eval-harness。"
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: rollout
 ---
 
 # eval-harness

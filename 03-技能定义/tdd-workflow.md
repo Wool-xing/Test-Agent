@@ -2,6 +2,7 @@
 name: tdd-workflow
 description: "TDD 测试驱动开发 Skill。Tests BEFORE code,80%+ 覆盖(unit+integration+E2E),边界+异常+错误场景必覆盖。派生自 ECC 同名 skill(主宪章 §28)。"
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: production
 ---
 
 # tdd-workflow

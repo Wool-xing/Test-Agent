@@ -2,6 +2,7 @@
 name: agent-introspection-debugging
 description: "Agent 自省调试 Skill。LLM 决策 / 工具调用 / 上下文 / token / 状态机透明化。失败用例分析 + 决策回放。派生自 ECC 同名 skill(主宪章 §28)。"
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: vision
 ---
 
 # agent-introspection-debugging

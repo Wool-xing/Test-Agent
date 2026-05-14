@@ -2,6 +2,7 @@
 name: verification-loop
 description: "5-phase 验证循环 Skill:build → typecheck → lint → test → coverage。任意失败 STOP + 修。派生自 ECC 同名 skill(主宪章 §28)。PR 前 / 质量门禁前 / refactor 后必跑。"
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: production
 ---
 
 # verification-loop

@@ -2,6 +2,7 @@
 name: testcase-design
 description: 快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选：默认 Excel（4 Sheet），可选 xmind / markmap / opml 思维导图（V1.9 加），或 --format all 一键产全部。适用于用例评审、快速梳理测试点。
 tools: Read, Write, Grep, Glob
+SKILL_IMPL_STATUS: production
 ---
 
 # 测试用例快速生成

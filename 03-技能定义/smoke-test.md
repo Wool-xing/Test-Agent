@@ -2,6 +2,7 @@
 name: smoke-test
 description: 冒烟测试 Skill，仅执行 P0 核心用例，10 分钟内快速验证主干功能是否正常。门禁通过率 ≥95%（与 test-lead 全栈口径对齐）。适用于代码合并前、每日构建验证、发布前最后确认。
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: production
 ---
 
 # 冒烟测试 Skill（Smoke Test）

@@ -2,6 +2,7 @@
 name: data-preparation
 description: 测试数据准备 Skill。自动生成、注入、清理测试数据（含 JMeter 参数化 CSV），支持边界值/异常值/批量场景。所有实现位于 utils/data_factory.py / utils/data_masking.py / utils/jmeter_csv_exporter.py。
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: script
 ---
 
 # 测试数据准备 Skill

@@ -2,6 +2,7 @@
 name: desktop-test
 description: 桌面应用测试 Skill。Windows EXE / macOS .app / Linux GUI / Electron 应用。底层调用 utils/desktop_driver。
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: script
 ---
 
 # 桌面应用测试 Skill
