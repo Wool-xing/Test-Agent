@@ -101,14 +101,18 @@ jobs:
 
       - name: 验关键 artifacts
         run: |
-          # 主要目录
-          for d in runtime "02-专家定义" "03-技能定义" "05-代码示例"; do
+          # install.sh 实拷范围 (非引擎源 — runtime/ 通过 pip 装而非 cp):
+          # 主要目录: 02-/03-/utils (含 05-代码示例 内文件 rename 到 utils)/.venv
+          for d in "02-专家定义" "03-技能定义" utils .venv; do
             test -d "/tmp/test-target/$d" || { echo "❌ 缺目录: $d"; exit 1; }
           done
-          # 主要文件
-          for f in runtime/cli/main.py ROADMAP.md README.md .env.example; do
+          # 顶层法律 / 治理 / 路线图文档 + CI/CD + .env (从 .env.example rename)
+          for f in ROADMAP.md README.md LICENSE Jenkinsfile .env; do
             test -f "/tmp/test-target/$f" || { echo "❌ 缺文件: $f"; exit 1; }
           done
+          # 验 05-代码示例 内 script 拷到 utils/
+          test -f "/tmp/test-target/utils/generate_report.py" \
+            || { echo "❌ 缺 utils/generate_report.py (05-代码示例 拷贝丢)"; exit 1; }
           echo "✅ install.sh macOS 实跑 OK"
 
       - name: 上传 install.log (失败时排错用)
