@@ -102,18 +102,20 @@ def _stub_response(_system: str, user: str) -> str:
     idx = user.find(marker)
     target_text = user[idx + len(marker) :].lower() if idx >= 0 else user.lower()
     # Order matters: most-specific first to avoid 'api' inside 'mobile-application' style overlap.
+    # 全 5 path 末统一 test-lead 决策(主宪章 §40 + 02-专家定义/README.md 流程
+    # "bug-manager → report-generator → test-lead 决策")
     if any(k in target_text for k in ("apk", "ipa", " android", "\"android", " ios", "\"ios", "mobile-app", " mobile ")):
         target = "mobile-app"
-        experts = ["requirements-analyst", "testcase-designer", "mobile-tester", "test-executor", "bug-manager", "report-generator"]
+        experts = ["requirements-analyst", "testcase-designer", "mobile-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
     elif any(k in target_text for k in (".exe", " exe ", "desktop", "windows", ".msi", ".dmg")):
         target = "desktop-app"
-        experts = ["requirements-analyst", "testcase-designer", "desktop-tester", "test-executor", "bug-manager", "report-generator"]
+        experts = ["requirements-analyst", "testcase-designer", "desktop-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
     elif any(k in target_text for k in ("llm ", " llm", "ai model", "ai-model", "ml model", "model evaluation", "embedding")):
         target = "ai-model"
-        experts = ["requirements-analyst", "testcase-designer", "ai-tester", "test-executor", "bug-manager", "report-generator"]
+        experts = ["requirements-analyst", "testcase-designer", "ai-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
     elif any(k in target_text for k in ("rest api", "rest-api", "grpc", "graphql", " api ", "\"api", "endpoint", "openapi", "swagger")):
         target = "rest-api"
-        experts = ["requirements-analyst", "testcase-designer", "automation-engineer", "test-executor", "bug-manager", "report-generator"]
+        experts = ["requirements-analyst", "testcase-designer", "automation-engineer", "test-executor", "bug-manager", "report-generator", "test-lead"]
     else:
         target = "web-system"
         experts = [
@@ -125,7 +127,7 @@ def _stub_response(_system: str, user: str) -> str:
             "test-executor",
             "bug-manager",
             "report-generator",
-            "test-lead",  # V1.14 加:走全链路决策(主宪章 §40)
+            "test-lead",
         ]
     nodes = []
     prev = None
