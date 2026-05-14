@@ -2,6 +2,7 @@
 name: security-review
 description: "代码安全审查 Skill(非渗透 layer)。每 PR/feature 必跑;OWASP Top 10 5 维自检 + SAST + 凭据检测 + 依赖 CVE。派生自 ECC security-review;补 pentest-* 层之前的源码层安全。"
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: script
 ---
 
 # security-review

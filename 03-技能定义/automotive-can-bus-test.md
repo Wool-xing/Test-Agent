@@ -3,6 +3,7 @@ name: automotive-can-bus-test
 description: 车载总线测试 Skill。CAN / CAN-FD / LIN / FlexRay / Automotive Ethernet(SOME/IP)协议一致性 + 故障注入 + DoIP/UDS 诊断。
 tools: Read, Write, Bash, Grep, Glob
 requires_layer: [base, system]
+SKILL_IMPL_STATUS: rollout
 ---
 
 # automotive-can-bus-test

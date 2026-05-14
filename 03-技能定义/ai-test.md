@@ -2,6 +2,7 @@
 name: ai-test
 description: AI/ML 模型测试 Skill。模型质量 + 数据漂移 + 推理性能 + 公平性 + LLM 应用。底层调用 utils/ai_validator。
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: script
 ---
 
 # AI/ML 模型测试 Skill

@@ -3,6 +3,7 @@ name: automotive-test
 description: 车载主编排 Skill。整车 ECU + ADAS + IVI + V2X 测试流程编排。ISO 26262 ASIL + SOTIF + UN R155/R156 合规驱动。HIL/SIL/MIL/PIL 环路在路。
 tools: Read, Write, Bash, Grep, Glob
 requires_layer: [base, system]
+SKILL_IMPL_STATUS: rollout
 ---
 
 # automotive-test

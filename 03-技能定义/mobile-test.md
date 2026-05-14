@@ -2,6 +2,7 @@
 name: mobile-test
 description: 移动端测试 Skill。Android / iOS 原生 APP + 微信/支付宝/抖音 小程序。支持真机、模拟器、云真机平台。底层调用 utils/mobile_driver 与 utils/miniprogram_runner。
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: rollout
 ---
 
 # 移动端测试 Skill

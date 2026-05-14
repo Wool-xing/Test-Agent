@@ -2,6 +2,7 @@
 name: regression-test
 description: 回归测试 Skill。执行 P0+P1 全量用例，对比历史结果，检测 Flaky 测试，含 JMeter 性能验证。适用于迭代发布前的完整回归。
 tools: Read, Write, Bash, Grep, Glob
+SKILL_IMPL_STATUS: production
 ---
 
 # 回归测试 Skill（Regression Test）
