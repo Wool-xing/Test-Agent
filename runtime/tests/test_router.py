@@ -35,8 +35,11 @@ def test_router_starts_with_requirements_analyst():
     assert ordered[0].name == "requirements-analyst"
 
 
-def test_router_ends_with_report_generator():
+def test_router_ends_with_test_lead_decision():
+    """DAG 末节点 = test-lead 决策(主宪章 §40 + 02-专家定义/README.md 流程
+    "bug-manager → report-generator → test-lead 决策")。report-generator 倒数第二。"""
     art = TargetArtifact(kind="text", text="generic web system")
     decision = route(art, client=LLMClient(provider="stub", fallback="stub"))
     ordered = decision.topological()
-    assert ordered[-1].name == "report-generator"
+    assert ordered[-1].name == "test-lead", f"DAG 末节点应 test-lead 决策, 实 {ordered[-1].name}"
+    assert ordered[-2].name == "report-generator", f"末-1 应 report-generator, 实 {ordered[-2].name}"
