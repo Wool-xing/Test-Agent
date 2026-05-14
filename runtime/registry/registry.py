@@ -29,6 +29,9 @@ EntryKind = Literal["expert", "skill"]
 
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n(.*)$", re.DOTALL)
 
+# 合法 impl_status (与 02-专家定义/*.md / 03-技能定义/*.md frontmatter 严同步)
+_VALID_IMPL_STATUS = {"production", "script", "rollout", "vision"}
+
 
 @dataclass(slots=True)
 class CatalogEntry:
@@ -38,9 +41,18 @@ class CatalogEntry:
     tools: list[str] = field(default_factory=list)
     source_path: str = ""
     raw_body: str = ""
+    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺):
+    # 从 frontmatter EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS 解析,执行层据此拒绝路由未实装项。
+    # 合法值: production / script / rollout / vision / unknown(frontmatter 缺失或值非法时)。
+    impl_status: str = "unknown"
 
     def short(self) -> dict:
-        return {"kind": self.kind, "name": self.name, "description": self.description}
+        return {
+            "kind": self.kind,
+            "name": self.name,
+            "description": self.description,
+            "impl_status": self.impl_status,
+        }
 
 
 @dataclass(slots=True)
@@ -98,6 +110,14 @@ def _entry_from_file(path: Path, kind: EntryKind) -> CatalogEntry | None:
         tools = [t.strip() for t in tools_raw.split(",") if t.strip()]
     else:
         tools = []
+    # V1.14 防 mock: 按 kind 选对应 frontmatter key,缺失或非法值降级 unknown
+    status_key = "EXPERT_IMPL_STATUS" if kind == "expert" else "SKILL_IMPL_STATUS"
+    status_raw = meta.get(status_key, "")
+    impl_status = str(status_raw).strip().lower() if status_raw else ""
+    if impl_status not in _VALID_IMPL_STATUS:
+        if impl_status:
+            logger.debug("{} {} {}={!r} 非法,降级 unknown", kind, name, status_key, status_raw)
+        impl_status = "unknown"
     return CatalogEntry(
         kind=kind,
         name=str(name),
@@ -105,6 +125,7 @@ def _entry_from_file(path: Path, kind: EntryKind) -> CatalogEntry | None:
         tools=tools,
         source_path=str(path),
         raw_body=body,
+        impl_status=impl_status,
     )
 
 

@@ -66,7 +66,7 @@
 
 | # | Expert | LLM-driven 实装范围(minimum viable) | 目标版本 | 状态 |
 |---|--------|------------------------------------|---------|------|
-| 0 | (前置) runtime/router 防 mock | router 检测未实装 expert,返回明确错误,不输出 mock | V1.15.0-alpha 启动 | planned |
+| 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0-alpha+1 | **done** (PR X4) |
 | 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0-alpha | planned |
 | 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0-alpha | planned |
 | 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0-alpha | planned |
@@ -80,7 +80,7 @@
 
 **节奏**: 与 6 expert 同步推进(同 V1.15-V1.20 窗口);domain 优先级:1) 通用平台(mobile / visual / system / eval-harness)→ 2) Automotive → 3) Pentest。
 **完成标准**: 每 skill 接 LLM 真调用 + utils 实装(非纯文档);通过 3 个测试 prompt 验证。
-**前置**: 同 expert — runtime/router 防 mock 改造(V1.15 Day 0)+ skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤。
+**前置**: ~~runtime/router 防 mock 改造 + skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤~~ **已完成 V1.14.0-alpha+1 (PR X4)** — registry parse frontmatter + orchestrator.execute_node 拒 rollout/vision/unknown skill (returncode=2)。
 
 ### 通用平台 4 skill
 
@@ -143,12 +143,15 @@
 
 ## 防 mock 承诺
 
-**每个 expert 实装完成前,runtime/router 拒绝路由该 expert,返回明确"未实装"错误**。
+**每个 expert / skill 实装完成前,runtime/router + orchestrator 拒绝路由,返回明确"未实装"错误**。
 
 **绝不输出 mock 数据糊弄用户。**
 
-V1.15 Day 0 启动 router 防 mock 改造前,V1.14.0-alpha 用户:
-- 路由 6 个 in-rollout expert 时会**收到明确说明**,而非伪装成"已运行"的 mock 输出
+V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
+- **registry 单源**: catalog 解析 `02-专家定义/*.md` `EXPERT_IMPL_STATUS` + `03-技能定义/*.md` `SKILL_IMPL_STATUS` frontmatter,实装状态来源唯一
+- **router 软警告**: `_validate_against_catalog` 检测 rollout / vision / unknown → 加 issues 并降 confidence 0.3
+- **orchestrator 硬拒**: `execute_node` 对 expert / skill 任意 rollout / vision / unknown 返回 `returncode=2` + stderr "未实装",绝不走 no-op "documented step recorded" 假成功路径
+- 用户路由 6 个 in-rollout expert / 16 个 in-rollout skill / 2 个 vision skill 时**收到明确说明**,而非伪装成"已运行"的 mock 输出
 - 详情见 [02-专家定义/01-测试主管.md](02-专家定义/01-测试主管.md) 路由表注释
 
 ---
@@ -158,7 +161,8 @@ V1.15 Day 0 启动 router 防 mock 改造前,V1.14.0-alpha 用户:
 | 版本 | 日期 | 完成项 | active expert 数 |
 |------|------|--------|----------------|
 | V1.14.0-alpha | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
-| V1.15.0-alpha | TBD | router 防 mock + env-manager LLM-driven minimum viable | 11/16 |
+| V1.14.0-alpha+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
+| V1.15.0-alpha | TBD | env-manager LLM-driven minimum viable(router 防 mock 已落地于 V1.14+1) | 11/16 |
 | V1.16.0-alpha | TBD | mobile-tester LLM-driven minimum viable | 12/16 |
 | V1.17.0-alpha | TBD | visual-tester LLM-driven minimum viable | 13/16 |
 | V1.18.0-alpha | TBD | system-tester LLM-driven minimum viable | 14/16 |
