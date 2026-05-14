@@ -54,6 +54,10 @@ ALL_RUNNERS: list[tuple[str, list[str]]] = [
         "mobile-tester",  # V1.16.0-alpha
         ["project_name", "target_platform", "test_cases", "device_commands", "test_environment", "mobile_specific", "risks", "confidence"],
     ),
+    (
+        "visual-tester",  # V1.17.0-alpha
+        ["project_name", "visual_target_type", "visual_test_points", "comparison_scripts", "tolerance", "baseline_strategy", "risks", "confidence"],
+    ),
 ]
 
 
