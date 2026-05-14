@@ -1,14 +1,14 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.16.0-alpha
-> - **expert 12/16 active**(7 production + 5 script);4 处于 V1.x rollout。
+> 当前状态:V1.17.0-alpha
+> - **expert 13/16 active**(8 production + 5 script);3 处于 V1.x rollout。
 > - **skill 14/32 active**(7 production + 7 script);16 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 
-## 当前活跃 expert (12 / 16)
+## 当前活跃 expert (13 / 16)
 
-### 7 真 LLM-driven (已上线)
+### 8 真 LLM-driven (已上线)
 
 | Expert | 职责 |
 |--------|------|
@@ -19,6 +19,7 @@
 | `bug-manager` | Bug 提交与追踪 |
 | `env-manager` | 环境检查清单 + 准备步骤(V1.15.0-alpha minimum viable) |
 | `mobile-tester` | 移动测试用例 + ADB/Xcode 命令清单(V1.16.0-alpha minimum viable) |
+| `visual-tester` | 视觉测试点 + 对比脚本片段 + 容差配置(V1.17.0-alpha minimum viable) |
 
 ### 5 script-backed (已上线)
 
@@ -71,7 +72,7 @@
 | 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0-alpha+1 | **done** (PR X4) |
 | 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0-alpha | **done** (runtime/orchestrator/agents/env_manager.py) |
 | 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0-alpha | **done** (runtime/orchestrator/agents/mobile_tester.py) |
-| 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0-alpha | planned |
+| 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0-alpha | **done** (runtime/orchestrator/agents/visual_tester.py) |
 | 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0-alpha | planned |
 | 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0-alpha | planned (需 SECURITY.md 武器化代码授权 wiring 实装) |
 | 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | V1.20.0-alpha | planned |
@@ -166,7 +167,7 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.14.0-alpha+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
 | V1.15.0-alpha | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |
 | V1.16.0-alpha | 2026-05-15 | mobile-tester LLM-driven minimum viable (runtime/orchestrator/agents/mobile_tester.py;LLM 读 PRD + Android/iOS 上下文 → test_cases + device_commands + mobile_specific 结构化 JSON) | 12/16 |
-| V1.17.0-alpha | TBD | visual-tester LLM-driven minimum viable | 13/16 |
+| V1.17.0-alpha | 2026-05-15 | visual-tester LLM-driven minimum viable (runtime/orchestrator/agents/visual_tester.py;LLM 读 PRD + UI 描述 → visual_test_points + comparison_scripts + tolerance + baseline_strategy 结构化 JSON) | 13/16 |
 | V1.18.0-alpha | TBD | system-tester LLM-driven minimum viable | 14/16 |
 | V1.19.0-alpha | TBD | pentest-tester LLM-driven minimum viable + 武器化授权 wiring | 15/16 |
 | V1.20.0-alpha | TBD | automotive-tester LLM-driven minimum viable | 16/16 (V1.x rollout 完成) |
