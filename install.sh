@@ -76,8 +76,16 @@ echo "→ 使用 Python: $PYTHON_BIN ($("$PYTHON_BIN" --version 2>&1))"
 TEMPLATE_DIR="$(mktemp -d)/Test-Agent工作流搭建"
 # （restore_user_data trap 已在前置 idempotency 段统一处理）
 
-echo "→ 克隆模板..."
-git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$TEMPLATE_DIR"
+# CI dev mode: 设 TEST_AGENT_LOCAL_SRC=<path> 用本地源代码,跳过 git clone
+# (用于 GitHub Actions macos-real-install / linux-real-install job 验当前 PR 改动,
+# 而非 fetch default branch)。Production 用户不设此 env, 走 git clone 路径。
+if [[ -n "${TEST_AGENT_LOCAL_SRC:-}" ]]; then
+    echo "→ [dev mode] 复制本地源代码: $TEST_AGENT_LOCAL_SRC → $TEMPLATE_DIR"
+    cp -R "$TEST_AGENT_LOCAL_SRC" "$TEMPLATE_DIR"
+else
+    echo "→ 克隆模板..."
+    git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$TEMPLATE_DIR"
+fi
 
 # ===== 3. 安装 Claude Code =====
 if ! command -v claude >/dev/null 2>&1; then
@@ -108,8 +116,11 @@ echo "→ 拷贝 Skill 定义..."
 # Glob 顶层业务 skill (排除 README)
 find "$TEMPLATE_DIR/03-技能定义" -maxdepth 1 -name '*.md' ! -name 'README.md' -exec cp {} "$PROJECT_ROOT/.claude/skills/" \;
 # 上游派生子目录 (darwin / karpathy-guidelines / nuwa)
+# 注: 用 "${subdir%/}" 去 trailing / — macOS BSD cp 上 `cp -r darwin-skill/ dest/`
+# 会展开内容到 dest/, 而非把 darwin-skill 整目录拷过去 (与 GNU cp 行为不同)。
+# Linux GNU cp 上两种语法等价, 但 macOS 必须去 / 才能保证子目录结构。
 for subdir in "$TEMPLATE_DIR/03-技能定义"/*/; do
-    [[ -d "$subdir" ]] && cp -r "$subdir" "$PROJECT_ROOT/.claude/skills/"
+    [[ -d "$subdir" ]] && cp -r "${subdir%/}" "$PROJECT_ROOT/.claude/skills/"
 done
 skill_md_count=$(ls "$PROJECT_ROOT/.claude/skills/"*.md 2>/dev/null | wc -l)
 skill_dir_count=$(find "$PROJECT_ROOT/.claude/skills/" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l)
