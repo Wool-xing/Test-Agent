@@ -1,14 +1,14 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.14.0-alpha
-> - **expert 10/16 active**(5 production + 5 script);6 处于 V1.x rollout。
+> 当前状态:V1.15.0-alpha
+> - **expert 11/16 active**(6 production + 5 script);5 处于 V1.x rollout。
 > - **skill 14/32 active**(7 production + 7 script);16 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 
-## 当前活跃 expert (10 / 16)
+## 当前活跃 expert (11 / 16)
 
-### 5 真 LLM-driven (已上线)
+### 6 真 LLM-driven (已上线)
 
 | Expert | 职责 |
 |--------|------|
@@ -17,6 +17,7 @@
 | `automation-engineer` | Web/API 脚本编写 + 性能测试编排 |
 | `test-executor` | 测试执行与监控 |
 | `bug-manager` | Bug 提交与追踪 |
+| `env-manager` | 环境检查清单 + 准备步骤(V1.15.0-alpha minimum viable) |
 
 ### 5 script-backed (已上线)
 
@@ -67,7 +68,7 @@
 | # | Expert | LLM-driven 实装范围(minimum viable) | 目标版本 | 状态 |
 |---|--------|------------------------------------|---------|------|
 | 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0-alpha+1 | **done** (PR X4) |
-| 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0-alpha | planned |
+| 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0-alpha | **done** (runtime/orchestrator/agents/env_manager.py) |
 | 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0-alpha | planned |
 | 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0-alpha | planned |
 | 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0-alpha | planned |
@@ -162,7 +163,7 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 |------|------|--------|----------------|
 | V1.14.0-alpha | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
 | V1.14.0-alpha+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
-| V1.15.0-alpha | TBD | env-manager LLM-driven minimum viable(router 防 mock 已落地于 V1.14+1) | 11/16 |
+| V1.15.0-alpha | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |
 | V1.16.0-alpha | TBD | mobile-tester LLM-driven minimum viable | 12/16 |
 | V1.17.0-alpha | TBD | visual-tester LLM-driven minimum viable | 13/16 |
 | V1.18.0-alpha | TBD | system-tester LLM-driven minimum viable | 14/16 |
