@@ -73,6 +73,51 @@ jobs:
           scandir: '.'
           additional_files: 'install.sh'
 
+  # ===== 3b. install.sh macOS 真机端到端 (本 session V1.14.0-alpha+1 新加) =====
+  # 用 GitHub Actions macos-latest runner 实跑 install.sh, 验 ROADMAP "Mac 真机"挂账。
+  # 关键: 设 TEST_AGENT_LOCAL_SRC 跳过 git clone, 用 PR 当前改动而非 fetch default branch。
+  macos-real-install:
+    name: install.sh macOS 端到端 (实跑)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: 跑 install.sh /tmp/test-target (LOCAL_SRC=PR)
+        env:
+          TEST_AGENT_LOCAL_SRC: ${{ github.workspace }}
+          # macOS runner 自带 git/bash/curl, npm 用于 claude-code (会装但允许失败,
+          # CI 不验 npm 安装链, 仅验 install.sh 主流程 + Python venv)
+          CI: "true"
+        run: |
+          mkdir -p /tmp/test-target
+          set -o pipefail
+          bash install.sh /tmp/test-target 2>&1 | tee /tmp/install.log
+          echo "INSTALL_EXIT=${PIPESTATUS[0]}"
+          test "${PIPESTATUS[0]}" -eq 0
+
+      - name: 验关键 artifacts
+        run: |
+          # 主要目录
+          for d in runtime "02-专家定义" "03-技能定义" "05-代码示例"; do
+            test -d "/tmp/test-target/$d" || { echo "❌ 缺目录: $d"; exit 1; }
+          done
+          # 主要文件
+          for f in runtime/cli/main.py ROADMAP.md README.md .env.example; do
+            test -f "/tmp/test-target/$f" || { echo "❌ 缺文件: $f"; exit 1; }
+          done
+          echo "✅ install.sh macOS 实跑 OK"
+
+      - name: 上传 install.log (失败时排错用)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-install-log
+          path: /tmp/install.log
+
   # ===== 4. YAML / JSON 语法 =====
   config-syntax:
     name: 配置文件语法

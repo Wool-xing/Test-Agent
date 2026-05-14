@@ -76,8 +76,16 @@ echo "→ 使用 Python: $PYTHON_BIN ($("$PYTHON_BIN" --version 2>&1))"
 TEMPLATE_DIR="$(mktemp -d)/Test-Agent工作流搭建"
 # （restore_user_data trap 已在前置 idempotency 段统一处理）
 
-echo "→ 克隆模板..."
-git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$TEMPLATE_DIR"
+# CI dev mode: 设 TEST_AGENT_LOCAL_SRC=<path> 用本地源代码,跳过 git clone
+# (用于 GitHub Actions macos-real-install / linux-real-install job 验当前 PR 改动,
+# 而非 fetch default branch)。Production 用户不设此 env, 走 git clone 路径。
+if [[ -n "${TEST_AGENT_LOCAL_SRC:-}" ]]; then
+    echo "→ [dev mode] 复制本地源代码: $TEST_AGENT_LOCAL_SRC → $TEMPLATE_DIR"
+    cp -R "$TEST_AGENT_LOCAL_SRC" "$TEMPLATE_DIR"
+else
+    echo "→ 克隆模板..."
+    git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$TEMPLATE_DIR"
+fi
 
 # ===== 3. 安装 Claude Code =====
 if ! command -v claude >/dev/null 2>&1; then
