@@ -27,12 +27,12 @@ def test_registry_impl_status_no_unknown():
 
 
 def test_registry_expert_status_counts():
-    """Expert 16 = 6 production + 5 script + 5 rollout (V1.15.0-alpha env-manager LLM-driven 落地后)。"""
+    """Expert 16 = 7 production + 5 script + 4 rollout (V1.16.0-alpha mobile-tester LLM-driven 落地后)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.experts.values())
-    assert counts.get("production", 0) == 6, f"expert production 应 6,实 {counts.get('production')}"
+    assert counts.get("production", 0) == 7, f"expert production 应 7,实 {counts.get('production')}"
     assert counts.get("script", 0) == 5, f"expert script 应 5,实 {counts.get('script')}"
-    assert counts.get("rollout", 0) == 5, f"expert rollout 应 5,实 {counts.get('rollout')}"
+    assert counts.get("rollout", 0) == 4, f"expert rollout 应 4,实 {counts.get('rollout')}"
 
 
 def test_registry_skill_status_counts():
@@ -61,10 +61,11 @@ def _mk_decision(*dag_specs: tuple[str, str, str]) -> RoutingDecision:
 
 
 def test_router_flags_rollout_expert():
+    # V1.16+ mobile-tester 已 production, 改用 visual-tester (V1.17 rollout)
     cat = get_catalog()
-    dec = _mk_decision(("n1", "expert", "mobile-tester"))
+    dec = _mk_decision(("n1", "expert", "visual-tester"))
     issues = router._validate_against_catalog(dec, cat)
-    assert any("mobile-tester" in i and "rollout" in i for i in issues), issues
+    assert any("visual-tester" in i and "rollout" in i for i in issues), issues
 
 
 def test_router_flags_rollout_skill():
