@@ -58,6 +58,8 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 ```
 
+**Expected duration**: ~10-15 min on global PyPI; ~10-15 min on CN networks (Tsinghua mirror auto-configured if `LANG=zh_*` or timezone `+0800`). Override via `export PIP_INDEX_URL=<url>` before running.
+
 Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 mins of hand-editing.
 
 ## 🎯 5 Key Capabilities

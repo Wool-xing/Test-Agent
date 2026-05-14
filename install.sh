@@ -170,11 +170,31 @@ else
     source .venv/bin/activate
 fi
 
-echo "→ 安装 Python 依赖..."
 # Windows GBK 默认编码读 UTF-8 requirements 会 UnicodeDecodeError；强制 UTF-8 mode
 export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
+
+# ===== W7+ install 加速 (PR #62) =====
+# (A) CN 网络自动用清华 PyPI 镜像: 跨境 → 国内, 跨境路径提速
+# (E) 文档化预期时长 + verbose pip 输出 (用户首次见进度而非黑屏)
+# (B uv 待 upstream 修: 实测 uv + Tsinghua 组合协同有 bug, 未达预期 10x)
+if [[ -z "${PIP_INDEX_URL:-}" ]]; then
+    is_cn=0
+    case "${LANG:-}" in zh*|*CN*|*GB*) is_cn=1 ;; esac
+    [[ "$(date +%z 2>/dev/null)" == "+0800" ]] && is_cn=1
+    if [[ $is_cn -eq 1 ]]; then
+        echo "→ 检测到 CN 环境, 用清华 PyPI 镜像加速 (export PIP_INDEX_URL=... 可覆盖)"
+        export PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+        export PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn
+    fi
+fi
+
 python -m pip install --upgrade pip -q
+
+# 注: 实测 uv + Tsinghua mirror 组合**未带来** 10x 加速 (uv 与 mirror 协同有 bug).
+# 改回 pip + 镜像. uv 待 upstream / 改用 PyPI 原站时再启.
+INSTALLER="pip"
+echo "→ 用 pip 装 Python 依赖 (首次约 5-15 min, CN 网已自动配清华镜像加速)..."
 
 # W4-5 实测 Windows 修: scikit-image / scikit-learn / opencv-python 等 image 包
 # 需 C/C++ compiler (Meson build) → Windows 无 MSVC 时 fail。
@@ -186,11 +206,11 @@ case "$(uname -s 2>/dev/null || echo unknown)" in
         # 临时 requirements 排除可选 image 包
         REQ_TMP="$(mktemp -t tagent-req-XXXXXX.txt)"
         grep -vE '^(scikit-image|scikit-learn|opencv-python|opencv-contrib-python)([= ]|$)' requirements.txt > "$REQ_TMP"
-        pip install -r "$REQ_TMP" -q
+        $INSTALLER install -r "$REQ_TMP"
         rm -f "$REQ_TMP"
         ;;
     *)
-        pip install -r requirements.txt -q
+        $INSTALLER install -r requirements.txt
         ;;
 esac
 
