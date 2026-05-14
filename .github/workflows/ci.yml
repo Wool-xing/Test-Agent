@@ -125,11 +125,10 @@ jobs:
           skill_md_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
           skill_dir_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
           echo "deployed: agent=$agent_n, skill.md=$skill_md_n, skill.dir=$skill_dir_n"
-          # 软下限校验 (catalog frontmatter 单源真相: 5 prod+5 script+6 rollout=16 / 7+7+16+2=32),
-          # 不卡 ==, 因 macOS bash glob 行为对 hidden / dotdir 处理与 Linux 略异。
-          test "$agent_n" -ge 16 || { echo "❌ agent 数 $agent_n < 16 (源仓 16)"; exit 1; }
-          test "$skill_md_n" -ge 32 || { echo "❌ skill .md 数 $skill_md_n < 32 (源仓 32)"; exit 1; }
-          test "$skill_dir_n" -ge 3 || { echo "❌ skill meta 子目录数 $skill_dir_n < 3 (源仓 darwin/karpathy/nuwa)"; exit 1; }
+          # 严格 == 校验 (与 catalog frontmatter 单源真相对齐: 16 agent / 32 skill.md / 3 meta subdir)
+          test "$agent_n" -eq 16 || { echo "❌ agent 数 $agent_n ≠ 16"; exit 1; }
+          test "$skill_md_n" -eq 32 || { echo "❌ skill .md 数 $skill_md_n ≠ 32"; exit 1; }
+          test "$skill_dir_n" -eq 3 || { echo "❌ skill meta 子目录数 $skill_dir_n ≠ 3 (期望 darwin/karpathy/nuwa)"; exit 1; }
           # 验 05-代码示例 内 script rename 到 utils/
           test -f "/tmp/test-target/utils/generate_report.py" \
             || { echo "❌ 缺 utils/generate_report.py (05-代码示例 拷贝丢)"; exit 1; }

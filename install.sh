@@ -116,8 +116,11 @@ echo "→ 拷贝 Skill 定义..."
 # Glob 顶层业务 skill (排除 README)
 find "$TEMPLATE_DIR/03-技能定义" -maxdepth 1 -name '*.md' ! -name 'README.md' -exec cp {} "$PROJECT_ROOT/.claude/skills/" \;
 # 上游派生子目录 (darwin / karpathy-guidelines / nuwa)
+# 注: 用 "${subdir%/}" 去 trailing / — macOS BSD cp 上 `cp -r darwin-skill/ dest/`
+# 会展开内容到 dest/, 而非把 darwin-skill 整目录拷过去 (与 GNU cp 行为不同)。
+# Linux GNU cp 上两种语法等价, 但 macOS 必须去 / 才能保证子目录结构。
 for subdir in "$TEMPLATE_DIR/03-技能定义"/*/; do
-    [[ -d "$subdir" ]] && cp -r "$subdir" "$PROJECT_ROOT/.claude/skills/"
+    [[ -d "$subdir" ]] && cp -r "${subdir%/}" "$PROJECT_ROOT/.claude/skills/"
 done
 skill_md_count=$(ls "$PROJECT_ROOT/.claude/skills/"*.md 2>/dev/null | wc -l)
 skill_dir_count=$(find "$PROJECT_ROOT/.claude/skills/" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l)
