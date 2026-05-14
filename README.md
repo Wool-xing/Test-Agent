@@ -41,8 +41,8 @@ Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 c
 
 Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports. Built for QA teams, security researchers, automotive testers, and anyone who wants to **use AI testing while learning the theory behind it**.
 
-- **16 expert agents** — functional · security · mobile · desktop · AI model · automotive · pentest … (current implementation status: see [ROADMAP.md](ROADMAP.md))
-- **33 business skills + 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
+- **16 expert agents** (5 production + 5 script + 6 rollout — see [ROADMAP.md](ROADMAP.md)) — functional · security · mobile · desktop · AI model · automotive · pentest …
+- **32 business skills** (7 production + 7 script + 16 rollout + 2 vision — see [ROADMAP.md](ROADMAP.md)) **+ 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
 - **49 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
 - **Multi-LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(local,no vendor lock-in)
 - **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
@@ -89,8 +89,8 @@ For project design rationale, architecture decisions, and methodology rationale,
 Test-Agent/
 ├── 00-项目导航.md           ← 5-dimension category guide
 ├── 01-快速开始/             ← user manual / deploy / config / deliverables
-├── 02-专家定义/             ← 16 expert agents
-├── 03-技能定义/             ← 33 business skills + 3 meta-skills
+├── 02-专家定义/             ← 16 expert agents (5 production + 5 script + 6 rollout)
+├── 03-技能定义/             ← 32 business skills (7 production + 7 script + 16 rollout + 2 vision) + 3 meta-skills
 ├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
 ├── 05-代码示例/             ← 49 production utils
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins

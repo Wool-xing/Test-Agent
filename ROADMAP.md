@@ -1,7 +1,10 @@
 # Test-Agent V1.x ROADMAP
 
-> 项目终态目标:每个 expert 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.14.0-alpha — 10 expert active,6 expert 处于 V1.x rollout。
+> 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
+> 当前状态:V1.14.0-alpha
+> - **expert 10/16 active**(5 production + 5 script);6 处于 V1.x rollout。
+> - **skill 14/32 active**(7 production + 7 script);16 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
+> - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 
 ## 当前活跃 expert (10 / 16)
 
@@ -27,6 +30,34 @@
 
 ---
 
+## 当前活跃 skill (14 / 32)
+
+### 7 production (已上线)
+
+| Skill | 类别 |
+|-------|------|
+| `tdd-workflow` | TDD 工作流 |
+| `e2e-testing` | E2E 测试 |
+| `regression-test` | 回归测试 |
+| `smoke-test` | 冒烟测试 |
+| `testcase-design` | 用例设计 |
+| `test-coordinator` | 测试流程编排 |
+| `verification-loop` | 5-phase 验证循环 |
+
+### 7 script-backed (已上线)
+
+| Skill | 工具栈 |
+|-------|--------|
+| `ai-test` | eval-harness AI 模型测试(utils/ai_validator) |
+| `data-preparation` | Faker / data_masking / jmeter CSV |
+| `desktop-test` | desktop_driver(pywinauto / AppleScript) |
+| `jmeter-script-gen` | JMeter JMX 生成 |
+| `python-script-gen` | pytest 脚本生成(Playwright + requests) |
+| `security-review` | OWASP Top 10 + SAST + 依赖 CVE |
+| `zentao-bug-submission` | BugTracker adapter(默认禅道,主宪章 §12) |
+
+---
+
 ## V1.x rollout — 6 expert LLM-driven minimum viable 实装路线
 
 **节奏**: 一周 1 expert,共 6 周。每完成 1 个,active 数字 +1,README 同步。
@@ -42,6 +73,54 @@
 | 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0-alpha | planned |
 | 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0-alpha | planned (需 SECURITY.md 武器化代码授权 wiring 实装) |
 | 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | V1.20.0-alpha | planned |
+
+---
+
+## V1.x rollout — 16 skill 实装路线
+
+**节奏**: 与 6 expert 同步推进(同 V1.15-V1.20 窗口);domain 优先级:1) 通用平台(mobile / visual / system / eval-harness)→ 2) Automotive → 3) Pentest。
+**完成标准**: 每 skill 接 LLM 真调用 + utils 实装(非纯文档);通过 3 个测试 prompt 验证。
+**前置**: 同 expert — runtime/router 防 mock 改造(V1.15 Day 0)+ skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤。
+
+### 通用平台 4 skill
+
+| Skill | 范围 | 关联 expert |
+|-------|------|-------------|
+| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester |
+| `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester |
+| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester |
+| `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) |
+
+### Pentest 7 skill(需 SECURITY.md 武器化授权 wiring 实装)
+
+| Skill | 范围 |
+|-------|------|
+| `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) |
+| `pentest-recon` | 侦察(被动+主动信息收集) |
+| `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) |
+| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) |
+| `pentest-api` | API 渗透(OWASP API Top 10 2023) |
+| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) |
+| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) |
+
+### Automotive 5 skill
+
+| Skill | 范围 |
+|-------|------|
+| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) |
+| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP |
+| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) |
+| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 |
+| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) |
+
+---
+
+## V2.x vision — 2 skill(暂留方法论参考形态)
+
+| Skill | 当前形态 | V2 路线 |
+|-------|----------|---------|
+| `agent-introspection-debugging` | 方法论参考(主宪章 §28) | LLM 决策回放 + 工具调用透明化实装 |
+| `build-your-own-x-explorer` | 教学引导参考(主宪章 §31) | 与 docs/theory/ 22 KB 卡片联动检索引擎 |
 
 ---
 
