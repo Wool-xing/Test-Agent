@@ -44,27 +44,26 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "automotive-tester": None,     # V1.20 rollout
 }
 
-# Expert 实装状态 (V1.14.0-alpha, ROADMAP.md V1.15-V1.20 rollout 节奏)
-# active: 已实装 (真 LLM runner 或 script-backed)
-# rollout: V1.x rollout 待实装 → execute_node 拒绝路由,不输出 mock
-EXPERT_IMPL_STATUS: dict[str, str] = {
-    "test-lead": "active",                  # 真 LLM (agents/test_lead.py)
-    "requirements-analyst": "active",       # 真 LLM
-    "testcase-designer": "active",          # script (excel_generator.py)
-    "env-manager": "rollout",               # V1.15 计划
-    "data-preparer": "active",              # script (data_factory.py)
-    "automation-engineer": "active",        # 真 LLM
-    "test-executor": "active",              # 真 LLM
-    "bug-manager": "active",                # 真 LLM
-    "report-generator": "active",           # script (generate_report.py)
-    "mobile-tester": "rollout",             # V1.16 计划
-    "desktop-tester": "active",             # script (desktop_driver.py)
-    "visual-tester": "rollout",             # V1.17 计划
-    "system-tester": "rollout",             # V1.18 计划
-    "ai-tester": "active",                  # script (ai_validator.py)
-    "pentest-tester": "rollout",            # V1.19 计划 (需武器化授权 wiring)
-    "automotive-tester": "rollout",         # V1.20 计划
-}
+# V1.14 防 mock 单源 (ROADMAP V1.15 Day 0 承诺):
+# 实装状态读 registry catalog (02-专家定义/03-技能定义 *.md frontmatter
+# EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS),避免 hardcoded dict 与 .md 双源漂移。
+#
+# 合法值 (registry._VALID_IMPL_STATUS 同步):
+#   - production: 真 LLM-driven runner (orchestrator/agents/*.py) 已实装
+#   - script: 真 script-backed (05-代码示例/*.py) 已实装
+#   - rollout: V1.x rollout 待实装 → execute_node 拒绝路由,不输出 mock
+#   - vision: V2.x 方法论参考 → 同 rollout 处理
+#   - unknown: frontmatter 缺失/非法值 → 同 rollout 处理 (fail closed)
+
+
+def _get_impl_status(name: str, kind: str) -> str:
+    """单源读 catalog。kind: "expert" | "skill"。catalog 找不到 → "unknown" (fail closed)。"""
+    from runtime.registry.registry import get_catalog
+
+    cat = get_catalog()
+    registry = cat.experts if kind == "expert" else cat.skills
+    entry = registry.get(name)
+    return entry.impl_status if entry else "unknown"
 
 SKILL_SCRIPT_MAP: dict[str, str | None] = {
     "smoke-test": None,
@@ -155,10 +154,11 @@ def reset_upstream_cache() -> None:
 def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: int = 1800) -> StepOutcome:
     inputs = inputs or {}
 
-    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 拒绝路由未实装 expert,不输出 mock 数据
-    if kind == "expert":
-        status = EXPERT_IMPL_STATUS.get(name)
-        if status == "rollout":
+    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 拒绝路由未实装 expert/skill,不输出 mock 数据
+    # 单源 = 02-专家定义/03-技能定义 .md frontmatter (registry catalog)
+    if kind in ("expert", "skill"):
+        status = _get_impl_status(name, kind)
+        if status in ("rollout", "vision"):
             return StepOutcome(
                 name=name,
                 kind=kind,
@@ -166,28 +166,31 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 returncode=2,  # 明确非 0,标记 "未实装" 而非 no-op 兜底
                 stdout="",
                 stderr=(
-                    f"[V1.x rollout] expert '{name}' 未实装 (ROADMAP.md);"
-                    f" router/test-lead 应跳过此 expert,不输出 mock 数据"
+                    f"[V1.x {status}] {kind} '{name}' 未实装 (ROADMAP.md);"
+                    f" router/test-lead 应跳过此 {kind},不输出 mock 数据"
                 ),
                 duration_ms=0,
             )
-        if status is None:
+        if status == "unknown":
             return StepOutcome(
                 name=name,
                 kind=kind,
                 executed_script=None,
                 returncode=2,
                 stdout="",
-                stderr=f"unknown expert '{name}', 未在 EXPERT_IMPL_STATUS 注册",
+                stderr=(
+                    f"unknown {kind} '{name}' (catalog frontmatter "
+                    f"{'EXPERT' if kind == 'expert' else 'SKILL'}_IMPL_STATUS 缺失或非法)"
+                ),
                 duration_ms=0,
             )
 
     # V1.14 真 agent runner 优先(主宪章 §40,5 核心 expert 落地)
     if kind == "expert":
         try:
+            from runtime.config.settings import get_settings
             from runtime.orchestrator.agents import get_runner
             from runtime.orchestrator.agents.base import RunnerContext
-            from runtime.config.settings import get_settings
 
             runner = get_runner(name)
             if runner is not None:

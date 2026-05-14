@@ -25,26 +25,28 @@ class RouterError(RuntimeError):
 
 def _validate_against_catalog(decision: RoutingDecision, catalog: Catalog) -> list[str]:
     issues: list[str] = []
-    known = {e.name for e in catalog.all()}
 
-    # V1.14 防 mock (ROADMAP V1.15): 检查 expert 实装状态
-    # rollout 状态的 expert (env/mobile/visual/system/pentest/auto) router 仍可路由,
-    # 但 issues 列表标 warning + downgrade confidence → orchestrator 跑到时会拒绝并报明确错误
-    try:
-        from runtime.orchestrator.adapters.experts import EXPERT_IMPL_STATUS
-    except ImportError:
-        EXPERT_IMPL_STATUS = {}  # type: ignore
-
+    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 检查 expert / skill 实装状态
+    # 单源: catalog entry.impl_status (02-专家定义/03-技能定义 .md frontmatter)
+    # rollout / vision / unknown 状态 router 仍可路由,但 issues 列表标 warning + downgrade confidence
+    # → orchestrator execute_node 跑到时会硬拒并报明确错误 (returncode=2),不输出 mock 数据
     for n in decision.dag:
-        if n.kind in ("expert", "skill") and n.name not in known:
+        if n.kind not in ("expert", "skill"):
+            continue
+        entry = catalog.lookup(n.name)
+        if entry is None or entry.kind != n.kind:
             issues.append(f"unknown {n.kind} '{n.name}' (id={n.id})")
-        if n.kind == "expert":
-            status = EXPERT_IMPL_STATUS.get(n.name)
-            if status == "rollout":
-                issues.append(
-                    f"expert '{n.name}' 处于 V1.x rollout (id={n.id}); "
-                    f"test-lead 决策应降级 conditional 或 no-go"
-                )
+            continue
+        if entry.impl_status in ("rollout", "vision"):
+            issues.append(
+                f"{n.kind} '{n.name}' 处于 V1.x {entry.impl_status} (id={n.id}); "
+                f"test-lead 决策应降级 conditional 或 no-go"
+            )
+        elif entry.impl_status == "unknown":
+            issues.append(
+                f"{n.kind} '{n.name}' frontmatter "
+                f"{'EXPERT' if n.kind == 'expert' else 'SKILL'}_IMPL_STATUS 缺失或非法 (id={n.id})"
+            )
     try:
         decision.topological()
     except ValueError as e:
