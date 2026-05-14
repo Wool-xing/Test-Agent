@@ -332,11 +332,13 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: 安装运行时 + pytest 依赖
+      - name: 安装 runtime 最小依赖 (不装 04-配置文件/requirements.txt — 避 pytest-bdd 7.0 与 pytest 8.3 冲突)
         run: |
           python -m pip install --upgrade pip
-          pip install -r 04-配置文件/requirements.txt 2>&1 | tail -10 || true
-          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect pytest pytest-asyncio
+          # runtime/ 依赖 (与 selftest-mock 一致)
+          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect
+          # pytest core (排除 pytest-bdd / pytest-playwright 等用户场景 plugin, 避免 _pytest.nodes iterparentnodeids 冲突)
+          pip install pytest pytest-asyncio
 
       - name: pytest runtime/tests/ (排除 test_router_real 真 LLM)
         env:
@@ -345,5 +347,6 @@ jobs:
         run: |
           python -m pytest runtime/tests/ \
             --ignore=runtime/tests/test_router_real.py \
+            -p no:cacheprovider \
             -v --tb=short
           echo "✅ pytest 单元测试全过"
