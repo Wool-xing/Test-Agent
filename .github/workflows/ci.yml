@@ -101,19 +101,36 @@ jobs:
 
       - name: 验关键 artifacts
         run: |
-          # install.sh 实拷范围 (非引擎源 — runtime/ 通过 pip 装而非 cp):
-          # 主要目录: 02-/03-/utils (含 05-代码示例 内文件 rename 到 utils)/.venv
-          for d in "02-专家定义" "03-技能定义" utils .venv; do
+          # install.sh 实际部署结构 (非源仓 mirror, 而是 Claude Code 项目脚手架):
+          #   02-专家定义/[0-9]*.md → .claude/agents/   (Claude Code subagent 路径)
+          #   03-技能定义/*.md → .claude/skills/        (Claude Code skill 路径)
+          #   05-代码示例/*.py → utils/
+          #   utils/ 原内容 → utils/
+          #   04-配置文件/{conftest.py,pytest.ini,.mcp.json,requirements.txt} → PROJECT_ROOT/
+          #   04-配置文件/.env.example → PROJECT_ROOT/.env (rename)
+          #   06-CICD集成/* → .github/workflows/test.yml + Jenkinsfile
+          #   顶层 LICENSE/ROADMAP/README/... → PROJECT_ROOT/
+          #   .venv/ 新建 + pip 装依赖
+          # runtime/ 不拷 (引擎源, V2 通过 pip 装独立分发)
+          for d in .claude/agents .claude/skills utils .venv; do
             test -d "/tmp/test-target/$d" || { echo "❌ 缺目录: $d"; exit 1; }
           done
-          # 顶层法律 / 治理 / 路线图文档 + CI/CD + .env (从 .env.example rename)
-          for f in ROADMAP.md README.md LICENSE Jenkinsfile .env; do
+          for f in ROADMAP.md README.md LICENSE Jenkinsfile .env \
+                   conftest.py pytest.ini .mcp.json requirements.txt \
+                   .github/workflows/test.yml; do
             test -f "/tmp/test-target/$f" || { echo "❌ 缺文件: $f"; exit 1; }
           done
-          # 验 05-代码示例 内 script 拷到 utils/
+          # 验数量 (与 frontmatter 单源对齐: 16 agent + 32 skill .md + 3 meta subdirs)
+          agent_n=$(find /tmp/test-target/.claude/agents -maxdepth 1 -name '[0-9]*.md' | wc -l | tr -d ' ')
+          skill_md_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+          skill_dir_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
+          test "$agent_n" -eq 16 || { echo "❌ agent 数 $agent_n ≠ 16"; exit 1; }
+          test "$skill_md_n" -eq 32 || { echo "❌ skill .md 数 $skill_md_n ≠ 32"; exit 1; }
+          test "$skill_dir_n" -eq 3 || { echo "❌ skill meta 子目录数 $skill_dir_n ≠ 3"; exit 1; }
+          # 验 05-代码示例 内 script rename 到 utils/
           test -f "/tmp/test-target/utils/generate_report.py" \
             || { echo "❌ 缺 utils/generate_report.py (05-代码示例 拷贝丢)"; exit 1; }
-          echo "✅ install.sh macOS 实跑 OK"
+          echo "✅ install.sh macOS 实跑 OK (agent=$agent_n, skill.md=$skill_md_n, skill.dir=$skill_dir_n)"
 
       - name: 上传 install.log (失败时排错用)
         if: failure()
