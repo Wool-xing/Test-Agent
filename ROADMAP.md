@@ -37,14 +37,19 @@
 
 ---
 
-## 当前活跃 skill (14 / 32)
+## 当前活跃 skill (24 / 32)
 
-### 7 production (已上线)
+### 17 production (已上线)
 
 | Skill | 类别 |
 |-------|------|
 | `tdd-workflow` | TDD 工作流 |
 | `e2e-testing` | E2E 测试 |
+| `automotive-test` | 车载主编排(V1.31.0-alpha · automotive batch) |
+| `automotive-can-bus-test` | CAN总线测试(V1.31.0-alpha) |
+| `automotive-adas-scenario` | ADAS场景库(V1.31.0-alpha) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
 | `regression-test` | 回归测试 |
 | `smoke-test` | 冒烟测试 |
 | `testcase-design` | 用例设计 |
@@ -115,11 +120,21 @@
 
 | Skill | 范围 |
 |-------|------|
-| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) |
-| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP |
-| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) |
-| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 |
-| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) |
+| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (V1.31.0-alpha · automotive batch) |
+| `automotive-can-bus-test` | CAN总线测试(V1.31.0-alpha) |
+| `automotive-adas-scenario` | ADAS场景库(V1.31.0-alpha) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
+| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (V1.31.0-alpha · automotive batch) |
+| `automotive-adas-scenario` | ADAS场景库(V1.31.0-alpha) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
+| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (V1.31.0-alpha · automotive batch) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
+| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (V1.31.0-alpha · automotive batch) |
+| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) | **done** (V1.31.0-alpha · automotive batch) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
 
 ---
 

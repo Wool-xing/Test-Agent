@@ -3,7 +3,7 @@ name: automotive-ota-update-test
 description: OTA 升级测试 Skill。包签名 + 差分 + A/B 分区 + 断电恢复 + 行车安全 + 回退;UN R156 / GB 44496-2024 合规。
 tools: Read, Write, Bash, Grep, Glob
 requires_layer: [base, system]
-SKILL_IMPL_STATUS: rollout
+SKILL_IMPL_STATUS: production
 ---
 
 # automotive-ota-update-test

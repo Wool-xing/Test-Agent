@@ -25,5 +25,10 @@ from runtime.orchestrator.agents.base import (  # noqa: F401
 
 # 触发注册 (每个模块加载时 @register_skill 注册到 SKILL_RUNNERS)
 from runtime.orchestrator.skills import (  # noqa: F401,E402
+    automotive_adas_scenario,
+    automotive_can_bus_test,
+    automotive_hil_loop_test,
+    automotive_ota_update_test,
+    automotive_test,
     pentest_coordinator,
 )

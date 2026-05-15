@@ -3,7 +3,7 @@ name: automotive-adas-scenario
 description: ADAS 场景库测试 Skill。仿真(VTD/CarMaker/CARLA)+ 封闭场地;ODD 边界 + 极端场景;SOTIF(ISO 21448)合规。
 tools: Read, Write, Bash, Grep, Glob
 requires_layer: [base, system]
-SKILL_IMPL_STATUS: rollout
+SKILL_IMPL_STATUS: production
 ---
 
 # automotive-adas-scenario
