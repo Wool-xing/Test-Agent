@@ -2,7 +2,7 @@
 name: system-test
 description: 系统集成测试 Skill。IoT 嵌入式（SSH/串口/MQTT）+ 音视频（FFmpeg）+ 链路追踪（Jaeger）+ 消息队列（Kafka/RabbitMQ）。底层调用 utils/iot_helper、utils/media_validator、utils/tracing_validator、utils/mq_helper。
 tools: Read, Write, Bash, Grep, Glob
-SKILL_IMPL_STATUS: rollout
+SKILL_IMPL_STATUS: production
 ---
 
 # 系统集成测试 Skill

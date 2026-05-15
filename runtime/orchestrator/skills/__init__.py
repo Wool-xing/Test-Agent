@@ -1,17 +1,9 @@
-"""Real LLM-driven skill runners (V1.21.0-alpha · ROADMAP skill rollout 起点).
+"""Real LLM-driven skill runners (V1.31.0-alpha · ALL 14/14 rollout complete).
 
-每个 runner 把 03-技能定义/*.md 的 skill 描述变成可执行的 LLM 调用:
-- 读上游产物 → 拼 prompt → 调 LLM → 解析输出 → 落产物 → 给下游
-
-skill runner 复用 agents/base.py 的 AgentRunner 抽象 + RunnerContext + RunnerResult
-(skill 与 expert 接口 100% 同, 仅 registry 独立 SKILL_RUNNERS 区分路由)。
-
-1 核心 runner (V1.21.0-alpha 起点):
-- pentest-coordinator (V1.21.0-alpha, ROADMAP skill rollout #1 落地 — minimum viable;
-  渗透流程主编排: LLM 读 PRD + 授权 + scope → 5 阶段并发计划 (recon / vuln / exploit
-  / post-exploit / report) + 子 skill 调用顺序 + 授权前置检查 evidence)
-
-剩余 15 rollout skill 走 SCRIPT_MAP fallback (主宪章 §9 已有实现保留)。
+16 production runners across 3 domains:
+- General: mobile-test, visual-test, system-test, eval-harness
+- Pentest: pentest-coordinator, pentest-recon, pentest-vuln, pentest-exploit, pentest-api, pentest-web, pentest-report
+- Automotive: automotive-test, automotive-can-bus-test, automotive-adas-scenario, automotive-ota-update-test, automotive-hil-loop-test
 """
 
 from runtime.orchestrator.agents.base import (  # noqa: F401
@@ -23,7 +15,22 @@ from runtime.orchestrator.agents.base import (  # noqa: F401
     register_skill,
 )
 
-# 触发注册 (每个模块加载时 @register_skill 注册到 SKILL_RUNNERS)
+# Trigger registration (each module registered via @register_skill on import)
 from runtime.orchestrator.skills import (  # noqa: F401,E402
+    automotive_adas_scenario,
+    automotive_can_bus_test,
+    automotive_hil_loop_test,
+    automotive_ota_update_test,
+    automotive_test,
+    eval_harness,
+    mobile_test,
+    pentest_api,
     pentest_coordinator,
+    pentest_exploit,
+    pentest_recon,
+    pentest_report,
+    pentest_vuln,
+    pentest_web,
+    system_test,
+    visual_test,
 )

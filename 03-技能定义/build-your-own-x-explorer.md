@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: vision
 
 # build-your-own-x-explorer
 
-派生自 `_精髓库/build-your-own-x.md` + `docs/theory/13-build-your-own/`。
-
 ## 触发
 
 - 用户在 learn mode 下问"为什么这么测?"+ 答案触及底层(DB/网络/正则/解析)

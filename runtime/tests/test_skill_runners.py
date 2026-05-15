@@ -38,6 +38,22 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
             "confidence",
         ],
     ),
+    (
+        "pentest-exploit",
+        ["project_name","run_id","sandbox","domains","outputs","risks","confidence"],
+    ),
+    (
+        "pentest-api",
+        ["project_name","run_id","api_categories","openapi_driven","outputs","risks","confidence"],
+    ),
+    (
+        "pentest-web",
+        ["project_name","run_id","owasp_categories","auth_auto","outputs","risks","confidence"],
+    ),
+    (
+        "pentest-report",
+        ["project_name","run_id","sections","findings","pii_scrub","outputs","risks","confidence"],
+    ),
 ]
 
 

@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: script
 
 # security-review
 
-派生自 `_精髓库/everything-claude-code.md` § 2.5。
-
 ## 与 pentest-* 的区别(避免重复)
 
 | Skill | 时机 | 层 |

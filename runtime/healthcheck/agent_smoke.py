@@ -24,7 +24,7 @@ REQUIRED_SKILL = ("name", "description")
 
 EXPERT_FNAME_RE = re.compile(r"^(\d{2})-[^.]+\.md$")
 EXPECTED_AGENTS = 16
-EXPECTED_SKILLS_MIN = 25
+EXPECTED_SKILLS_MIN = 32
 
 UPSTREAM_SKILL_DIRS = {"darwin-skill", "karpathy-guidelines"}
 
@@ -50,7 +50,7 @@ class SmokeReport:
         return not self.issues
 
     def render(self) -> str:
-        head = f"agents={self.expert_count}/{EXPECTED_AGENTS}  skills={self.skill_count}/≥{EXPECTED_SKILLS_MIN}"
+        head = f"agents={self.expert_count}/{EXPECTED_AGENTS}  skills={self.skill_count}/{EXPECTED_SKILLS_MIN}"
         if self.ok:
             return f"[OK] {head}  no issues"
         body = "\n".join(f"  - {i}" for i in self.issues)
@@ -113,7 +113,7 @@ def check_skills(skills_dir: Path) -> tuple[list[Issue], int]:
         issues.extend(_check_frontmatter_present(meta, REQUIRED_SKILL, p))
         count += 1
     if count < EXPECTED_SKILLS_MIN:
-        issues.append(Issue(path=str(skills_dir), field="count", reason=f"expected ≥{EXPECTED_SKILLS_MIN} skills, got {count}"))
+        issues.append(Issue(path=str(skills_dir), field="count", reason=f"expected ={EXPECTED_SKILLS_MIN} skills, got {count}"))
     return issues, count
 
 

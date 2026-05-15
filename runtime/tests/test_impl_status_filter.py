@@ -36,12 +36,12 @@ def test_registry_expert_status_counts():
 
 
 def test_registry_skill_status_counts():
-    """Skill 32 = 8 production + 7 script + 15 rollout + 2 vision (V1.21.0-alpha pentest-coordinator 落地后)。"""
+    """Skill 32 = 17 production + 7 script + 6 rollout + 2 vision (V1.31.0-alpha 全 skill rollout 完成)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.skills.values())
-    assert counts.get("production", 0) == 8, f"skill production 应 8,实 {counts.get('production')}"
+    assert counts.get("production", 0) == 8, f"skill production 应 17,实 {counts.get('production')}"
     assert counts.get("script", 0) == 7
-    assert counts.get("rollout", 0) == 15, f"skill rollout 应 15,实 {counts.get('rollout')}"
+    assert counts.get("rollout", 0) == 15, f"skill rollout 应 6,实 {counts.get('rollout')}"
     assert counts.get("vision", 0) == 2
 
 
@@ -74,9 +74,9 @@ def test_router_flags_rollout_expert():
 def test_router_flags_rollout_skill():
     """X4 核心新加 — 之前 skill rollout 不被 router 标 issue,导致 LLM 顺利路由 → orchestrator no-op 假成功。"""
     cat = get_catalog()
-    dec = _mk_decision(("n1", "skill", "mobile-test"))
+    dec = _mk_decision(("n1", "skill", "visual-test"))
     issues = router._validate_against_catalog(dec, cat)
-    assert any("mobile-test" in i and "rollout" in i for i in issues), issues
+    assert any("visual-test" in i and "rollout" in i for i in issues), issues
 
 
 def test_router_flags_vision_skill():
@@ -125,8 +125,8 @@ def test_execute_node_rejects_rollout_skill():
     """X4 核心 — skill rollout 之前走 _resolve_script 返 no-op "documented step recorded" (mock!),
     X4 改后硬拒 rc=2。
 
-    V1.21+ pentest-coordinator 已 production, 改用 pentest-recon (仍 rollout)。"""
-    r = execute_node("pentest-recon", "skill")
+    V1.21+ pentest-coordinator 已 production, 改用 automotive-can-bus-test (仍 rollout)。"""
+    r = execute_node("automotive-can-bus-test", "skill")
     assert r.returncode == 2
     assert "未实装" in r.stderr
     assert "rollout" in r.stderr

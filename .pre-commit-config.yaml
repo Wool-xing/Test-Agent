@@ -37,12 +37,12 @@ repos:
         # 扫描所有暂存内容，发现 API key/密码/token 即阻断 commit
         # 自定义规则可在项目根放 .gitleaks.toml 覆盖默认规则
 
-  # ===== 安全：禁止提交私有源 MD =====
+  # ===== 安全：禁止提交敏感本地文档 =====
   - repo: local
     hooks:
       - id: forbid-private-source
-        name: 禁止提交 Test-Agent工作流搭建.md（私有源文档）
-        entry: bash -c 'if git diff --cached --name-only | grep -q "Test-Agent工作流搭建.md"; then echo "❌ 禁止提交私有源 MD（已在 .gitignore）"; exit 1; fi'
+        name: 禁止提交敏感本地文档（已在 .gitignore）
+        entry: bash -c 'if git diff --cached --name-only | grep -q "Test-Agent工作流搭建.md"; then echo "❌ 禁止提交敏感本地文档（已在 .gitignore）"; exit 1; fi'
         language: system
         pass_filenames: false
         always_run: true
@@ -54,10 +54,10 @@ repos:
         pass_filenames: false
         always_run: true
 
-      # 防精髓库误入(主宪章 §29 + V1.10 铁律):_精髓库/ 是私有跨项目知识,绝不入 Test-Agent repo
+      # 防上游引用误入(主宪章 §29 + V1.10 铁律):上游参考是私有跨项目知识,绝不入 Test-Agent repo
       - id: forbid-essence-library
-        name: 禁止提交 _精髓库/ 路径（私有跨项目知识）
-        entry: bash -c 'M=$(git diff --cached --name-only | grep -E "(^|/)_?精髓库(/|$)" || true); if [ -n "$M" ]; then echo "❌ 禁止提交私有精髓库内容(主宪章 §29 + V1.10 铁律)"; echo "命中文件:"; echo "$M"; echo "处置:git rm --cached <file> && 移出 repo(精髓库应在 D:/项目文件/_精髓库/)"; exit 1; fi'
+        name: 禁止提交 upstream 参考路径（私有跨项目知识）
+        entry: bash -c 'M=$(git diff --cached --name-only | grep -E "(^|/)_?精髓库(/|$)" || true); if [ -n "$M" ]; then echo "❌ 禁止提交私有上游参考内容(主宪章 §29 + V1.10 铁律)"; echo "命中文件:"; echo "$M"; echo "处置:git rm --cached <file> && 移出 repo"; exit 1; fi'
         language: system
         pass_filenames: false
         always_run: true
@@ -65,7 +65,7 @@ repos:
       # 文件统计校验（防误删 agent/skill/utils）
       - id: file-count-check
         name: Agents/Skills/Utils 数量校验
-        entry: bash -c 'A=$(ls 02-专家定义/[0-9]*.md 2>/dev/null | wc -l); S=$(ls 03-技能定义/*.md 2>/dev/null | grep -v README | wc -l); U=$(ls 05-代码示例/*.py 2>/dev/null | wc -l); [ "$A" = "16" ] || { echo "❌ Agents 数量异常（期 16，实 $A）"; exit 1; }; [ "$S" -ge "25" ] || { echo "❌ Skills 数量异常（期 ≥25，实 $S）"; exit 1; }; [ "$U" = "49" ] || { echo "❌ Utils 数量异常（期 49，实 $U）"; exit 1; }; echo "✅ 文件统计正确"'
+        entry: bash -c 'A=$(ls 02-专家定义/[0-9]*.md 2>/dev/null | wc -l); S=$(ls 03-技能定义/*.md 2>/dev/null | grep -v README | wc -l); U=$(ls 05-代码示例/*.py 2>/dev/null | wc -l); [ "$A" = "16" ] || { echo "❌ Agents 数量异常（期 16，实 $A）"; exit 1; }; [ "$S" -eq "32" ] || { echo "❌ Skills 数量异常（期 32，实 $S）"; exit 1; }; [ "$U" = "49" ] || { echo "❌ Utils 数量异常（期 49，实 $U）"; exit 1; }; echo "✅ 文件统计正确"'
         language: system
         pass_filenames: false
         always_run: true

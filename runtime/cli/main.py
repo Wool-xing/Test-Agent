@@ -108,7 +108,7 @@ def doctor(
         console.print("\n[bold]L1 frontmatter lint:[/]")
         report = run_smoke()
         if report.ok:
-            console.print(f"[green]OK[/] agents={report.expert_count}/16 skills={report.skill_count}/≥25")
+            console.print(f"[green]OK[/] agents={report.expert_count}/16 skills={report.skill_count}/32")
         else:
             console.print(f"[red]FAIL[/] {len(report.issues)} issue(s):")
             for i in report.issues:
@@ -318,7 +318,7 @@ def install(
     lane: str = typer.Argument(...),
     source: str = typer.Option(..., "--source", help="path to skill .md / agent .md / mcp config / hook"),
     tier: str = typer.Option("low", "--tier"),
-    version: str = typer.Option("1.0.0", "--version"),
+    version: str = typer.Option("1.23.0", "--version"),
 ):
     """Install marketplace entry through 4 safety gates."""
     import hashlib
@@ -433,7 +433,7 @@ def demo(
 
     report = run_smoke()
     if report.ok:
-        console.print(f"  ✓ agents={report.expert_count}/16  skills={report.skill_count}/≥25")
+        console.print(f"  ✓ agents={report.expert_count}/16  skills={report.skill_count}/32")
     else:
         console.print(f"  [red]✗ {len(report.issues)} issue(s)[/]")
         raise typer.Exit(1)

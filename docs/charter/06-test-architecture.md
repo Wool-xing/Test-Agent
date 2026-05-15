@@ -52,7 +52,7 @@
 | L1 | **需求阶段** | `requirements-analyst` 双轨输出（MD + JSON）+ 风险矩阵 | 弱（评审） |
 | L2 | **设计阶段** | `testcase-designer` 等价类/边界值/状态迁移/配对测试 + 风险矩阵 | 弱（评审） |
 | L3 | **IDE 编码时** | ruff + mypy + IDE 实时提示 | 强（编辑器红线） |
-| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 14/14/49 文件统计 | 强（阻断 commit） |
+| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 16/32/49 文件统计 | 强（阻断 commit） |
 | L5 | **PR gate** | CodeQL + pip-audit + safety + ci.yml 全套 | 强（阻断合入） |
 | L6 | **静态分析** | Bandit（Python SAST）+ ZAP/Burp Pro（DAST） | 中（发现/修） |
 | L7 | **契约测试** | `utils/contract_test.py` consumer-side / provider-side | 强（CI 阻断） |
@@ -133,8 +133,8 @@
 
 | Phase | 触发条件 | 标志性交付 |
 |------|---------|----------|
-| **Phase 1**（当前 V1.0.0） | 概念宪章成 + 工程基线就绪 | 14 agent + 14 skill + AgentChat + Bug 多适配 + 按需安装 + darwin-skill 集成 |
-| **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 |
+| **Phase 1**（已完成 V1.0.0-V1.26.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 起步 | 16 expert (11p+5s) + 32 skill (10p+7s+13r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
+| **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 + skill rollout 继续 |
 | **Phase 3** | Phase 2 全交付 + 接入 ≥ 2 行业 | 合成监控 + canary/feature flag + 统一 dashboard + 沉默故障 + 缺席者注入 |
 | **Phase 4** | 接入合规行业（金融/医疗/司法）| 证据链司法可采信打包 + 数字考古学家 + AI 测试深化 |
 | **Phase 5** | 多语种多文化接入需求 | 神圣性守护 + 禁忌矩阵 + 跨文化 i18n |

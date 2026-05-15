@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: vision
 
 # agent-introspection-debugging
 
-派生自 `_精髓库/everything-claude-code.md` § 2.6。
-
 ## 触发
 
 - Agent 行为奇怪(过度调用 / 卡死 / 输出乱)

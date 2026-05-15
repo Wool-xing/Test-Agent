@@ -15,7 +15,7 @@ from runtime.config.settings import get_settings
 
 SYSTEM_PROMPT = """You are an essence extractor for the Test-Agent project.
 
-Given (a) the existing essence card in _精髓库/ and (b) the latest README + key files
+Given (a) the existing reference card in upstream and (b) the latest README + key files
 from upstream, produce a SHORT delta report:
 
 OUTPUT JSON only:
@@ -36,7 +36,7 @@ if the change is branding / business / unrelated.
 
 def _essence_dir() -> Path:
     s = get_settings()
-    return s.project_root.parent / "_精髓库"
+    return s.project_root.parent / "_upstream_refs"
 
 
 def _owner_repo(url: str) -> tuple[str, str]:
@@ -116,7 +116,7 @@ def write_update_report(essence_name: str, repo_url: str, prev_sha: str | None, 
         f"## New test methodology\n" + "\n".join(f"- {s}" for s in delta.get("new_test_methodology", [])) + "\n\n"
         f"## Evidence(原文引用)\n" + "\n".join(f"> {e}" for e in delta.get("evidence", [])) + "\n\n"
         f"---\n"
-        f"**Action required**: 用户审 → 改 `confidence: high/medium/low` + 填 `reviewer/last_reviewed`;若 applies_to_test_agent → 触发 Test-Agent 集成 PR;否则仅入 _精髓库 即结束。\n",
+        f"**Action required**: 用户审 → 改 `confidence: high/medium/low` + 填 `reviewer/last_reviewed`;若 applies_to_test_agent → 触发 Test-Agent 集成 PR;否则仅入 upstream 即结束。\n",
         encoding="utf-8",
     )
     return target

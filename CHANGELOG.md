@@ -14,6 +14,9 @@
 
 _后续累积变更入此节;切版本时移到下方版本节。_
 
+> ⚠️ **V1.15.0-alpha 至 V1.23.0-alpha (2026-05-15 ~ 2026-05-16) 共 9 版条目待补**。
+> 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表与 `git log`。
+
 ---
 
 ## [v1.14.0-alpha] - 2026-05-12
@@ -101,7 +104,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ### Fixed(V1.11.0-alpha · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
 
 - **同步铁律(§1)执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
-  - `00-项目导航.md` · `02-专家定义/{01,07,08,09}.md` · `02-专家定义/README.md` · `03-技能定义/{README,test-coordinator,zentao-bug-submission}.md` · `04-配置文件/mcp-server-impl.md` · `05-代码示例/{README.md,api_retry_util.py}` · `06-CICD集成/{INDEX,CICD集成说明}.md` · `01-快速开始/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md` · 私有源
+  - `00-项目导航.md` · `02-专家定义/{01,07,08,09}.md` · `02-专家定义/README.md` · `03-技能定义/{README,test-coordinator,zentao-bug-submission}.md` · `04-配置文件/mcp-server-impl.md` · `05-代码示例/{README.md,api_retry_util.py}` · `06-CICD集成/{INDEX,CICD集成说明}.md` · `01-快速开始/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
 - **adapter 修 V1.10 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
   - 现 `tagent selftest --e2e --strict` **100% PASS 8/8**(原 88% 7/8)
   - generate_report.py 默认注入 `--data=workspace/执行日志/_selftest_summary.json`,fixture 自动生成
@@ -123,9 +126,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `tagent doctor --agents [--probe]`:L1 + 可选 L3 LLM ping 16 agent
   - `tagent selftest --e2e [--strict] [--pass-threshold 0.80]`:整体 e2e
 - **`LLMClient.complete()`**:plain text completion(原仅 `complete_json`),probe 用
-- **精髓库三重防线(主宪章 §34)**:
-  - `.gitignore` 加 `_精髓库/` + `**/_精髓库/`
-  - pre-commit hook `forbid-essence-library`(diff --cached 含路径即 reject)
+- **上游引用三重防线(主宪章 §34)**:
+  - `.gitignore` 加 upstream 排除规则
+  - pre-commit hook 防止误入(主宪章 §29 + V1.10 铁律)
   - CI file-count job 双校验
 - **字体粗细统一(主宪章 §35)**:`docs/STYLE.md`(标题 ≤3 级,`**bold**` 仅 3 场景,中英空格)
 - **补缺顶级 INDEX**:`docs/INDEX.md` + `examples/INDEX.md` + `profiles/INDEX.md` + `scripts/INDEX.md`
@@ -157,7 +160,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added(V1.8.0-alpha · build-your-own-x 教学扩 + Marketplace 4 lane · 2026-05-12)
 
-- **精髓库扩**:`_精髓库/build-your-own-x.md`(codecrafters/build-your-own-x curated list 萃取);加 INDEX 条目
+- **上游参考扩**:`build-your-own-x.md`(codecrafters/build-your-own-x curated list 萃取);加 INDEX 条目
 - **教学层 KB 扩 13 大类**(原 12 → 13,加 `13-build-your-own/`):
   - INDEX + 10 P0 测试相关卡(database/network-stack/web-server/git/search-engine/shell/regex-engine/programming-language/web-browser/bot)
   - 每卡含 `estimated_time_hours` + 测试映射 + 推荐路径
@@ -175,9 +178,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added(V1.7.0-alpha · Karpathy 4 原则 + ECC 测试加固 + Essence 自动汲取 · 2026-05-12)
 
-- **精髓库扩 2 条目**:
-  - `_精髓库/karpathy-skills.md`(125k★ · LLM 写代码 4 原则元层)
-  - `_精髓库/everything-claude-code.md`(179k★ · AI agent harness 性能优化 200 skill / 53 agent / Homunculus instincts / Selective install)
+- **上游参考扩 2 条目**:
+  - `karpathy-skills.md`(125k★ · LLM 写代码 4 原则元层)
+  - `everything-claude-code.md`(179k★ · AI agent harness 性能优化 200 skill / 53 agent / Homunculus instincts / Selective install)
 - **Karpathy 4 原则**(主宪章 §27,元层贯穿):Think Before / Simplicity First / Surgical Changes / Goal-Driven Execution;`03-技能定义/karpathy-guidelines/SKILL.md` 部署 upstream 原文(类 darwin-skill 不改本地)
 - **ECC 6 测试 skill 入库**(对测试有用的,§28):
   - `tdd-workflow` · TDD 80%+ 覆盖
@@ -188,8 +191,8 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `agent-introspection-debugging` · 决策回放 + OTel + token + 上下文
 - **Essence 自动汲取**(主宪章 §29):`runtime/essence_watcher/`
   - parser + tracker(gh API)+ delta_extractor(aux LLM)+ runner
-  - 周期跑;新 commit → LLM 萃取 delta → 写 `_精髓库/{name}.update_{date}.md` 标 `llm-draft-unreviewed` 待审
-  - `_精髓库_apply_policy.example.yaml`:auto_propose / essence_only / never 三档
+  - 周期跑;新 commit → LLM 萃取 delta → 写 upstream update 文件 标 `llm-draft-unreviewed` 待审
+  - `apply_policy.example.yaml`:auto_propose / essence_only / never 三档
   - safe-by-default:`tagent.yml essence_watcher.enabled: true` 才跑
 - **主宪章新增 3 节**:§27 Karpathy 4 原则 / §28 ECC 测试加固 / §29 Essence 自动汲取 + TOC 同步
 - 数字:14 skill → **32**(原 14 + 7 pentest + 5 automotive + 6 ECC) + `karpathy-guidelines/SKILL.md` upstream 1 个
@@ -197,7 +200,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added(V1.6.0-alpha · 渗透&安全 + 车载&自动驾驶 双垂直专家+skill 集 · 2026-05-12)
 
-- **精髓库扩**:`_精髓库/pentest-ai-agents.md` 合并萃取 pentagi(黑盒)+ shannon(白盒);10 节;含对比表+应用 checklist
+- **上游参考扩**:`pentest-ai-agents.md` 合并萃取 pentagi(黑盒)+ shannon(白盒);10 节;含对比表+应用 checklist
 - **2 新专家**:
   - `02-专家定义/15-渗透测试.md` `pentest-tester`(白盒+黑盒+5 攻击域 + Static-Dynamic Correlation + PoC-only)
   - `02-专家定义/16-车载测试.md` `automotive-tester`(ISO 26262 + AUTOSAR + HIL/SIL/MIL/PIL + ADAS + OTA + V2X)
@@ -214,7 +217,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added(V1.5.0-alpha · GBrain-inspired 强化 + 跨项目精髓库扩 · 2026-05-12)
 
-- **精髓库扩**:`D:/项目文件/_精髓库/gbrain.md`(完整 10 节萃取,300+ 行)+ INDEX 更新
+- **上游参考扩**:`gbrain.md`(完整 10 节萃取,300+ 行)+ INDEX 更新
 - **KB 自连图谱**:`runtime/tutor/graph.py`,零 LLM 抽取 typed link(6 种边:related_to/superseded_by/extends/prerequisite_of/contradicts/tool_implements);BFS walk + backlink-boosted ranking。实测 12 卡 → 40 edges + 44 nodes
 - **eval 回放**:`runtime/tutor/eval_replay.py`,`TAGENT_EVAL_CAPTURE=1` opt-in;PII 自动 scrub(email/phone/SSN/API-key/card 6 类正则);replay 3 数(Jaccard@k/top-1 stability/latency Δ);默认 off
 - **safe-by-default yaml 栅栏**:`runtime/config/safety.py` + `tagent.yml.example`;scheduler/curator/backends/gateway/destructive_ops 默认 deny;`assert_allowed` / `gate_*` 工厂函数;缺配置 → `SafeByDefaultBlocked` 异常
@@ -243,7 +246,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added(V1.3.0-alpha · Hermes-inspired 5 模块 + 跨项目精髓库 · 2026-05-11)
 
-- **跨项目精髓库**:`D:/项目文件/_精髓库/`
+- **跨项目上游参考**:已建立
   - `INDEX.md`:精髓库索引
   - `hermes-agent.md`:NousResearch/hermes-agent 完整精髓萃取(8 节,300+ 行;思想+模式+反模式+迁移 checklist)
 - **5 新 runtime 模块**(派生 hermes 精髓):
@@ -279,7 +282,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 - **主宪章扩展(memory `project_test_agent_workflow.md`)**:原 §0-§9 + How to apply 1-6 **字符级保留**;新增 §10-§20 仅承载规则/要求/约束(剔除示例/枚举/参考表):
   - §10 灵魂底色:三公理 + 五条铭文 + V1.0.0 锁死 + 双签解锁条件
-  - §11 FULL_GUIDE.md 定位补充(优先级链:memory ＞ 私有源 ＞ FULL_GUIDE ＞ README)
+  - §11 FULL_GUIDE.md 定位补充(优先级链:memory ＞ FULL_GUIDE ＞ README)
   - §12 多 Bug Tracker(默认 zentao + 扩展位 `BugTrackerBase` 契约)
   - §13 按需安装 + 运行时补装铁律
   - §14 darwin-skill 自进化(棘轮 + Via Negativa 不消费运行数据)
@@ -356,7 +359,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 W1+W2+W3 合并提交：上架前必修安全 + 数字漂移修复 + URL 统一 + 信息架构重塑（FULL_GUIDE/INDEX/SPDX/gitleaks）。
 后续 W4 博客 + Show HN 准备 待执行。
 
-> 注：本仓库 GitHub Actions CI 已配 `permissions: contents: read` 最小权限（F3）；CodeQL 显式声明 per-job 权限。pre-commit 已含 `detect-private-key` + 私有源 MD 防护 + .env 防护 + 14/13/49 文件统计。
+> 注：本仓库 GitHub Actions CI 已配 `permissions: contents: read` 最小权限（F3）；CodeQL 显式声明 per-job 权限。pre-commit 已含 `detect-private-key` + .env 防护 + 14/13/49 文件统计。
 
 ---
 
