@@ -6,12 +6,20 @@
 skill runner 复用 agents/base.py 的 AgentRunner 抽象 + RunnerContext + RunnerResult
 (skill 与 expert 接口 100% 同, 仅 registry 独立 SKILL_RUNNERS 区分路由)。
 
-1 核心 runner (V1.21.0-alpha 起点):
+3 核心 runner (V1.21.0-alpha 起点 + V1.23.0-alpha + V1.24.0-alpha):
 - pentest-coordinator (V1.21.0-alpha, ROADMAP skill rollout #1 落地 — minimum viable;
   渗透流程主编排: LLM 读 PRD + 授权 + scope → 5 阶段并发计划 (recon / vuln / exploit
   / post-exploit / report) + 子 skill 调用顺序 + 授权前置检查 evidence)
+- mobile-test (V1.23.0-alpha, ROADMAP skill rollout #2 落地 — minimum viable;
+  移动端执行编排: LLM 读 PRD + 上游 mobile-tester 产物 → 6 阶段执行计划
+  (设备就绪 / Appium / 用例批次 / 性能采集 / Monkey / 报告归档)
+  + 质量门禁 + 跨平台并行策略)
+- visual-test (V1.24.0-alpha, ROADMAP skill rollout #3 落地 — minimum viable;
+  视觉测试编排: LLM 读 PRD + 上游 visual-tester 产物 → 5 阶段执行计划
+  (环境检查 / 模板图准备 / 视觉冒烟 / 视觉回归 / 报告归档)
+  + 质量门禁 + 多分辨率策略)
 
-剩余 15 rollout skill 走 SCRIPT_MAP fallback (主宪章 §9 已有实现保留)。
+剩余 13 rollout skill 走 SCRIPT_MAP fallback (主宪章 §9 已有实现保留)。
 """
 
 from runtime.orchestrator.agents.base import (  # noqa: F401
@@ -25,5 +33,7 @@ from runtime.orchestrator.agents.base import (  # noqa: F401
 
 # 触发注册 (每个模块加载时 @register_skill 注册到 SKILL_RUNNERS)
 from runtime.orchestrator.skills import (  # noqa: F401,E402
+    mobile_test,
     pentest_coordinator,
+    visual_test,
 )

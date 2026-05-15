@@ -38,6 +38,37 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
             "confidence",
         ],
     ),
+    (
+        "mobile-test",  # V1.23.0-alpha (skill rollout #2)
+        [
+            "project_name",
+            "run_id",
+            "target_platform",
+            "phases",
+            "quality_gates",
+            "cross_platform",
+            "cloud_device",
+            "mobile_specific_checks",
+            "outputs",
+            "risks",
+            "confidence",
+        ],
+    ),
+    (
+        "visual-test",  # V1.24.0-alpha (skill rollout #3)
+        [
+            "project_name",
+            "run_id",
+            "visual_target_type",
+            "phases",
+            "quality_gates",
+            "multi_resolution",
+            "game_specific",
+            "outputs",
+            "risks",
+            "confidence",
+        ],
+    ),
 ]
 
 
