@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from loguru import logger
@@ -75,6 +76,14 @@ class LLMClient:
             kwargs["response_format"] = {"type": "json_object"}
         if max_tokens is not None:
             kwargs["max_tokens"] = max_tokens
+        # 通用 OpenAI 兼容端点支持: TAGENT_LLM_API_BASE + TAGENT_LLM_API_KEY (任厂商即插即用)
+        # 厂商标准 key env (ANTHROPIC_API_KEY / OPENAI_API_KEY / DASHSCOPE_API_KEY ...) 由 litellm 自动识别, 此处不重复处理
+        api_base = os.environ.get("TAGENT_LLM_API_BASE")
+        if api_base:
+            kwargs["api_base"] = api_base
+        api_key = os.environ.get("TAGENT_LLM_API_KEY")
+        if api_key:
+            kwargs["api_key"] = api_key
         resp = litellm.completion(**kwargs)
         return resp["choices"][0]["message"]["content"]
 
@@ -102,9 +111,22 @@ def _stub_response(_system: str, user: str) -> str:
     idx = user.find(marker)
     target_text = user[idx + len(marker) :].lower() if idx >= 0 else user.lower()
     # Order matters: most-specific first to avoid 'api' inside 'mobile-application' style overlap.
-    # 全 5 path 末统一 test-lead 决策(主宪章 §40 + 02-专家定义/README.md 流程
+    # 全 9 path 末统一 test-lead 决策(主宪章 §40 + 02-专家定义/README.md 流程
     # "bug-manager → report-generator → test-lead 决策")
-    if any(k in target_text for k in ("apk", "ipa", " android", "\"android", " ios", "\"ios", "mobile-app", " mobile ")):
+    # experts list 元素: str(kind=expert) | (name, kind) tuple(支持 skill 节点)
+    if any(k in target_text for k in ("can-bus", "can bus", " ecu ", "adas", "v2x", " ota ", "asil", "iso 26262", "iso-26262", "automotive", "vehicle", "车载", "汽车")):
+        target = "automotive"
+        experts = ["requirements-analyst", "testcase-designer", "automotive-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
+    elif any(k in target_text for k in ("pentest", "penetration test", "sql injection", " xss ", " ssrf ", "owasp", "security testing", "渗透", "渗透测试")):
+        target = "pentest"
+        experts = [("pentest-coordinator", "skill"), "requirements-analyst", "testcase-designer", "pentest-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
+    elif any(k in target_text for k in ("canvas", "webgl", " ocr ", "visual regression", "screenshot diff", "视觉回归", "图像对比")):
+        target = "visual-system"
+        experts = ["requirements-analyst", "testcase-designer", "visual-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
+    elif any(k in target_text for k in (" mqtt", "kafka", "rabbitmq", "jaeger", " iot ", "embedded", "modbus", "串口", "serial port")):
+        target = "system-integration"
+        experts = ["requirements-analyst", "testcase-designer", "env-manager", "system-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
+    elif any(k in target_text for k in ("apk", "ipa", " android", "\"android", " ios", "\"ios", "mobile-app", " mobile ")):
         target = "mobile-app"
         experts = ["requirements-analyst", "testcase-designer", "mobile-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
     elif any(k in target_text for k in (".exe", " exe ", "desktop", "windows", ".msi", ".dmg")):
@@ -132,10 +154,14 @@ def _stub_response(_system: str, user: str) -> str:
     nodes = []
     prev = None
     for i, exp in enumerate(experts):
+        if isinstance(exp, tuple):
+            exp_name, exp_kind = exp
+        else:
+            exp_name, exp_kind = exp, "expert"
         node = {
             "id": f"n{i}",
-            "kind": "expert",
-            "name": exp,
+            "kind": exp_kind,
+            "name": exp_name,
             "depends_on": [prev] if prev else [],
             "inputs": {},
             "on_failure": "retry",
