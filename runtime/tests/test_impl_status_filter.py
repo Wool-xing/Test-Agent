@@ -27,12 +27,12 @@ def test_registry_impl_status_no_unknown():
 
 
 def test_registry_expert_status_counts():
-    """Expert 16 = 10 production + 5 script + 1 rollout (V1.19.0-alpha pentest-tester LLM-driven 落地后)。"""
+    """Expert 16 = 11 production + 5 script + 0 rollout (V1.20.0-alpha automotive-tester 落地后,V1.x rollout 收尾)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.experts.values())
-    assert counts.get("production", 0) == 10, f"expert production 应 10,实 {counts.get('production')}"
+    assert counts.get("production", 0) == 11, f"expert production 应 11,实 {counts.get('production')}"
     assert counts.get("script", 0) == 5, f"expert script 应 5,实 {counts.get('script')}"
-    assert counts.get("rollout", 0) == 1, f"expert rollout 应 1,实 {counts.get('rollout')}"
+    assert counts.get("rollout", 0) == 0, f"expert rollout 应 0 (V1.x rollout 收尾),实 {counts.get('rollout')}"
 
 
 def test_registry_skill_status_counts():
@@ -61,11 +61,14 @@ def _mk_decision(*dag_specs: tuple[str, str, str]) -> RoutingDecision:
 
 
 def test_router_flags_rollout_expert():
-    # V1.19+ pentest-tester 已 production, 改用 automotive-tester (V1.20 rollout)
+    # V1.20 V1.x rollout 收尾,所有 expert production/script。
+    # rollout 分支覆盖通过 skill 层 (test_router_flags_rollout_skill,16 skill 仍 rollout)。
+    # unknown 分支覆盖通过 test_router_flags_unknown_entity。
+    # 此 test 保留为占位,改测 unknown expert (走相同 hard-block 分支)。
     cat = get_catalog()
-    dec = _mk_decision(("n1", "expert", "automotive-tester"))
+    dec = _mk_decision(("n1", "expert", "phantom-automotive-future"))
     issues = router._validate_against_catalog(dec, cat)
-    assert any("automotive-tester" in i and "rollout" in i for i in issues), issues
+    assert any("phantom-automotive-future" in i and "unknown" in i for i in issues), issues
 
 
 def test_router_flags_rollout_skill():
@@ -108,11 +111,14 @@ def test_router_passes_production_clean():
 
 
 def test_execute_node_rejects_rollout_expert():
-    """expert rollout (e.g., automotive-tester) → rc=2 + stderr "未实装"。"""
-    r = execute_node("automotive-tester", "expert")
+    """V1.20 V1.x rollout 收尾,无 rollout expert。
+    rollout 分支覆盖通过 test_execute_node_rejects_rollout_skill (16 skill 仍 rollout)。
+    expert hard-block 路径覆盖通过 test_execute_node_rejects_unknown_expert (同分支)。
+    此 test 保留 + 改用 unknown expert 触发同 returncode=2 hard-block。
+    """
+    r = execute_node("phantom-future-expert", "expert")
     assert r.returncode == 2
-    assert "未实装" in r.stderr
-    assert "rollout" in r.stderr
+    assert "unknown expert" in r.stderr
 
 
 def test_execute_node_rejects_rollout_skill():
