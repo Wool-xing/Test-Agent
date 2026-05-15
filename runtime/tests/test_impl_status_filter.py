@@ -27,12 +27,12 @@ def test_registry_impl_status_no_unknown():
 
 
 def test_registry_expert_status_counts():
-    """Expert 16 = 8 production + 5 script + 3 rollout (V1.17.0-alpha visual-tester LLM-driven 落地后)。"""
+    """Expert 16 = 9 production + 5 script + 2 rollout (V1.18.0-alpha system-tester LLM-driven 落地后)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.experts.values())
-    assert counts.get("production", 0) == 8, f"expert production 应 8,实 {counts.get('production')}"
+    assert counts.get("production", 0) == 9, f"expert production 应 9,实 {counts.get('production')}"
     assert counts.get("script", 0) == 5, f"expert script 应 5,实 {counts.get('script')}"
-    assert counts.get("rollout", 0) == 3, f"expert rollout 应 3,实 {counts.get('rollout')}"
+    assert counts.get("rollout", 0) == 2, f"expert rollout 应 2,实 {counts.get('rollout')}"
 
 
 def test_registry_skill_status_counts():
@@ -61,11 +61,11 @@ def _mk_decision(*dag_specs: tuple[str, str, str]) -> RoutingDecision:
 
 
 def test_router_flags_rollout_expert():
-    # V1.17+ visual-tester 已 production, 改用 system-tester (V1.18 rollout)
+    # V1.18+ system-tester 已 production, 改用 pentest-tester (V1.19 rollout)
     cat = get_catalog()
-    dec = _mk_decision(("n1", "expert", "system-tester"))
+    dec = _mk_decision(("n1", "expert", "pentest-tester"))
     issues = router._validate_against_catalog(dec, cat)
-    assert any("system-tester" in i and "rollout" in i for i in issues), issues
+    assert any("pentest-tester" in i and "rollout" in i for i in issues), issues
 
 
 def test_router_flags_rollout_skill():
