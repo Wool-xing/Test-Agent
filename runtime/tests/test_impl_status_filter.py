@@ -36,12 +36,12 @@ def test_registry_expert_status_counts():
 
 
 def test_registry_skill_status_counts():
-    """Skill 32 = 7 production + 7 script + 16 rollout + 2 vision (X2 PR #64 口径)。"""
+    """Skill 32 = 8 production + 7 script + 15 rollout + 2 vision (V1.21.0-alpha pentest-coordinator 落地后)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.skills.values())
-    assert counts.get("production", 0) == 7
+    assert counts.get("production", 0) == 8, f"skill production 应 8,实 {counts.get('production')}"
     assert counts.get("script", 0) == 7
-    assert counts.get("rollout", 0) == 16
+    assert counts.get("rollout", 0) == 15, f"skill rollout 应 15,实 {counts.get('rollout')}"
     assert counts.get("vision", 0) == 2
 
 
@@ -123,8 +123,10 @@ def test_execute_node_rejects_rollout_expert():
 
 def test_execute_node_rejects_rollout_skill():
     """X4 核心 — skill rollout 之前走 _resolve_script 返 no-op "documented step recorded" (mock!),
-    X4 改后硬拒 rc=2。"""
-    r = execute_node("pentest-coordinator", "skill")
+    X4 改后硬拒 rc=2。
+
+    V1.21+ pentest-coordinator 已 production, 改用 pentest-recon (仍 rollout)。"""
+    r = execute_node("pentest-recon", "skill")
     assert r.returncode == 2
     assert "未实装" in r.stderr
     assert "rollout" in r.stderr

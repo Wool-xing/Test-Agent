@@ -228,6 +228,50 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
         except Exception as e:  # noqa: BLE001
             logger.warning("agent runner {} unavailable, fallback to script map: {}", name, e)
 
+    # V1.21 真 skill runner 优先 (ROADMAP skill rollout 起点)
+    # 与 expert runner 接口同, 仅 registry 独立 SKILL_RUNNERS
+    if kind == "skill":
+        try:
+            from runtime.config.settings import get_settings
+            from runtime.orchestrator.skills import get_skill_runner
+            from runtime.orchestrator.agents.base import RunnerContext
+
+            runner = get_skill_runner(name)
+            if runner is not None:
+                s = get_settings()
+                ctx = RunnerContext(
+                    artifact_text=inputs.get("artifact_text", ""),
+                    upstream=dict(_upstream_outputs),
+                    upstream_meta=dict(_upstream_meta),
+                    settings_provider=s.llm_provider,
+                    workspace=s.project_root / "workspace",
+                    lang=inputs.get("lang", "zh"),
+                    mode=inputs.get("mode", "exec"),
+                )
+                import time as _t
+                t0 = _t.time()
+                res = runner.run(ctx)
+                _upstream_outputs[name] = res.output
+                _upstream_meta[name] = {
+                    "ok": res.ok,
+                    "degraded": res.degraded,
+                    "error": res.error,
+                }
+                stdout = res.summary or "[skill runner ok]"
+                if res.artifact_path:
+                    stdout += f"\n→ {res.artifact_path}"
+                return StepOutcome(
+                    name=name,
+                    kind=kind,
+                    executed_script=f"skills/{name}",
+                    returncode=0 if res.ok else 1,
+                    stdout=stdout,
+                    stderr=res.error,
+                    duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
+                )
+        except Exception as e:  # noqa: BLE001
+            logger.warning("skill runner {} unavailable, fallback to script map: {}", name, e)
+
     # Fallback: SCRIPT_MAP(主宪章 §9 已有实现保留)
     script = _resolve_script(name, kind)
     if script is None:
