@@ -3,8 +3,7 @@
 每个 runner 把 02-专家定义/*.md 的角色描述变成可执行的 LLM 调用:
 - 读上游产物 → 拼 prompt → 调 LLM → 解析输出 → 落产物 → 给下游
 
-10 核心 runner(V1.14 5 个 + V1.15 env-manager + V1.16 mobile-tester + V1.17 visual-tester
-+ V1.18 system-tester + V1.19 pentest-tester):
+11 核心 runner(V1.x rollout 收尾,所有 LLM-driven expert 已实装):
 - requirements-analyst (V1.14)
 - automation-engineer (V1.14)
 - test-executor (V1.14)
@@ -16,8 +15,11 @@
 - system-tester (V1.18.0-alpha, ROADMAP rollout #4 落地 — minimum viable)
 - pentest-tester (V1.19.0-alpha, ROADMAP rollout #5 落地 — minimum viable;
   仅输出测试计划文本, 不调外部攻击工具;真执行守护已在 utils 层 env gate)
+- automotive-tester (V1.20.0-alpha, ROADMAP rollout #6 落地 — minimum viable;
+  V1.x rollout 收尾;ASIL 评估 + HIL 测试 + ADAS 场景 + OTA + 合规矩阵)
 
-未实现的 6 个 expert 仍走 SCRIPT_MAP no-op 兜底(主宪章 §9 已有实现不破坏)。
+剩余 5 个 expert 走 SCRIPT_MAP script-backed (主宪章 §9 已有实现:
+testcase-designer / data-preparer / report-generator / desktop-tester / ai-tester)。
 """
 
 from runtime.orchestrator.agents.base import AGENT_RUNNERS, AgentRunner, RunnerContext, get_runner  # noqa: F401
@@ -34,4 +36,5 @@ from runtime.orchestrator.agents import (  # noqa: F401,E402
     visual_tester,
     system_tester,
     pentest_tester,
+    automotive_tester,
 )
