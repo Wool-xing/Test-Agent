@@ -41,10 +41,10 @@ tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / s
 
 Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告,全自主。为 QA 团队、安全研究员、车载测试工程师、以及任何想**用 AI 测试同时学测试理论**的人而生。
 
-- **16 专家 Agent** (5 production + 5 script + 6 rollout——见 [ROADMAP.md](ROADMAP.md)) — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
-- **32 业务 Skill** (7 production + 7 script + 16 rollout + 2 vision——见 [ROADMAP.md](ROADMAP.md)) **+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
+- **16 专家 Agent** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
+- **32 业务 Skill** (8 production + 7 script + 15 rollout + 2 vision——见 [ROADMAP.md](ROADMAP.md)) **+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
 - **49 生产工具** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV ……
-- **多 LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(无厂商锁定)
+- **多 LLM(任厂商即插即用)** — 内置 6 厂商 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI 兼容兜底通道** 接其他任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 变量, 零代码改动. 速查手册: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 已实装(禅道);5 计划(Jira · GitHub · GitLab · Linear · Webhook,见 roadmap)
 - **6 通知渠道** — 企微 · 飞书 · 钉钉 · Slack · 邮件 · Teams
 - **MCP 集成** — 6 模块已实现(test-orchestrator 默认启用;其余 5 件套写在 `.mcp.json` 的 `_pending_servers_v1_2_0_alpha` 段)
@@ -66,7 +66,7 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 
 1. **全平台** — Web / API / Android / iOS / 微信小程序 / Windows EXE / macOS / Linux / Electron / 游戏 / IoT / 音视频 / AI/LLM / 区块链 / 车载
 2. **全协议** — HTTP(S) / gRPC / WebSocket / TCP / UDP / GraphQL / SOAP / MQTT / SSH / 串口 / Kafka / RabbitMQ / Modbus / CAN-bus / SOME-IP / DoIP / UDS
-3. **多 LLM 无锁定** — `tagent model` 切换 Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama
+3. **多 LLM 无锁定(任厂商)** — `tagent model` 切换 6 内置 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama), 加 **OpenAI 兼容兜底** 接其他任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 零代码. 见 [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 4. **边用边学** — `--mode learn` 每步输出含**理论引用**(22 卡跨 13 大类:工具 / 编程 / 基础理论 / 策略 / 方法 / 协议 / 平台 / 门禁 / 安全 / AI 测试 / 合规 / 流程 / Build-Your-Own)
 5. **safe-by-default** — 沙箱 / PII 脱敏 / 运行时 Prompt 注入扫描 / 4 关 Marketplace 验证 / decisions 审计链
 
