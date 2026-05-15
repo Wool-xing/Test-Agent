@@ -125,8 +125,8 @@ def test_execute_node_rejects_rollout_skill():
     """X4 核心 — skill rollout 之前走 _resolve_script 返 no-op "documented step recorded" (mock!),
     X4 改后硬拒 rc=2。
 
-    V1.21+ pentest-coordinator 已 production, 改用 pentest-recon (仍 rollout)。"""
-    r = execute_node("pentest-recon", "skill")
+    V1.28+ pentest-recon 已 production, 改用 pentest-vuln (仍 rollout)。"""
+    r = execute_node("pentest-vuln", "skill")
     assert r.returncode == 2
     assert "未实装" in r.stderr
     assert "rollout" in r.stderr

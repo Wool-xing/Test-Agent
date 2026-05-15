@@ -104,7 +104,7 @@
 | Skill | 范围 | 状态 |
 |-------|------|------|
 | `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0-alpha · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
-| `pentest-recon` | 侦察(被动+主动信息收集) |
+| `pentest-recon` | 侦察(被动+主动信息收集) | **done** (V1.28.0-alpha · runtime/orchestrator/skills/pentest_recon.py · 7 步骤编排 + 授权前置 + scope 防护) |
 | `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) |
 | `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) |
 | `pentest-api` | API 渗透(OWASP API Top 10 2023) |
