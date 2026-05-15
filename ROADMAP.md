@@ -106,10 +106,10 @@
 | `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0-alpha · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
 | `pentest-recon` | 侦察(被动+主动信息收集) |
 | `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) |
-| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) |
-| `pentest-api` | API 渗透(OWASP API Top 10 2023) |
-| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) |
-| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) |
+| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) | **done** (V1.30.0-alpha · pentest batch 2) |
+| `pentest-api` | API 渗透(OWASP API Top 10 2023) | **done** (V1.30.0-alpha · pentest batch 2) |
+| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) | **done** (V1.30.0-alpha · pentest batch 2) |
+| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) | **done** (V1.30.0-alpha · pentest batch 2) |
 
 ### Automotive 5 skill
 

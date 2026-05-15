@@ -36,12 +36,12 @@ def test_registry_expert_status_counts():
 
 
 def test_registry_skill_status_counts():
-    """Skill 32 = 8 production + 7 script + 15 rollout + 2 vision (V1.21.0-alpha pentest-coordinator 落地后)。"""
+    """Skill 32 = 12 production + 7 script + 11 rollout + 2 vision (V1.30.0-alpha pentest batch 2 落地后)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.skills.values())
-    assert counts.get("production", 0) == 8, f"skill production 应 8,实 {counts.get('production')}"
+    assert counts.get("production", 0) == 8, f"skill production 应 12,实 {counts.get('production')}"
     assert counts.get("script", 0) == 7
-    assert counts.get("rollout", 0) == 15, f"skill rollout 应 15,实 {counts.get('rollout')}"
+    assert counts.get("rollout", 0) == 15, f"skill rollout 应 11,实 {counts.get('rollout')}"
     assert counts.get("vision", 0) == 2
 
 
