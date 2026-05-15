@@ -3,7 +3,7 @@ name: automotive-hil-loop-test
 description: HIL/SIL/MIL/PIL 环路在路 Skill。真 ECU + 仿真外设(传感器/执行器);ASIL C/D 必经;故障注入 + 极端工况。
 tools: Read, Write, Bash, Grep, Glob
 requires_layer: [base, system]
-SKILL_IMPL_STATUS: rollout
+SKILL_IMPL_STATUS: production
 ---
 
 # automotive-hil-loop-test

@@ -243,7 +243,7 @@ claude
 
 ```text
 your-test-project/
-├── .claude/{agents,skills}/           ← 14 agent + 14 skill（13 业务 + darwin-skill）
+├── .claude/{agents,skills}/           ← 16 agent + 32 skill（业务） + 3 元 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
 ├── utils/                             ← 49 个 .py + __init__

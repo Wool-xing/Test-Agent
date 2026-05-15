@@ -27,7 +27,6 @@ reading_en: ["https://build-your-own.org/database/"]
 
 # 从零写一个数据库
 
-派生自 `_精髓库/build-your-own-x.md` § Database。
 
 ## 对测试工作有什么用?
 

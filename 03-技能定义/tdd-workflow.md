@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: production
 
 # tdd-workflow
 
-派生自 `_精髓库/everything-claude-code.md` § 2.1。
-
 ## 触发
 
 - 新功能 / 修 bug / 重构 / 加 API endpoint / 新组件

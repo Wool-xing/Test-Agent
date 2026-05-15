@@ -2,7 +2,7 @@
 name: visual-test
 description: 视觉/游戏测试 Skill。基于图像识别（Airtest）+ OCR + SSIM 对比。适合游戏、Canvas/WebGL、富图形界面。底层调用 utils/visual_helper。
 tools: Read, Write, Bash, Grep, Glob
-SKILL_IMPL_STATUS: rollout
+SKILL_IMPL_STATUS: production
 ---
 
 # 视觉/游戏测试 Skill

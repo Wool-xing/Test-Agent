@@ -1,10 +1,11 @@
 """tagent config — LLM provider 配置管理 (V1.22.0-alpha · Step 2 多模型 onboarding).
 
-4 子命令:
+5 子命令:
   list       — 列内置 6 + B 路径兼容样例
   show       — 显当前 .env 配置 (key 全脱敏)
   use        — 路径 A: 切到内置 provider, 写 TAGENT_LLM_PROVIDER + 厂商 key 占位
   use-compat — 路径 B: OpenAI 兼容兜底通道 (任厂商即插即用)
+  unset      — 移除 .env 中指定 key (V1.25.0-alpha)
 
 env 文件优先级: CWD/.env → 仓根/.env. 写前必备份 .env.bak.
 """
@@ -192,3 +193,26 @@ def cmd_use_compat(
     typer.echo(f"   TAGENT_LLM_API_KEY={_mask(key)}")
     typer.echo("")
     typer.echo("验路由: tagent demo")
+
+
+@config_app.command("unset")
+def cmd_unset(
+    key: str = typer.Argument(..., help="要移除的 key (TAGENT_LLM_PROVIDER / TAGENT_LLM_API_BASE / TAGENT_LLM_API_KEY / 厂商 key)"),
+) -> None:
+    """移除 .env 中指定 key (自动备份 .env.bak)."""
+    env_path = _find_env_file()
+    if not env_path.exists():
+        typer.echo(f"❌ .env 不存在: {env_path.resolve()}")
+        raise typer.Exit(2)
+
+    env = _parse_env(env_path)
+    if key not in env:
+        typer.echo(f"⚠️  key 不存在: {key} (当前 env 中未设)")
+        raise typer.Exit(0)
+
+    old_value = _mask(env[key]) if key.endswith("KEY") or key.endswith("API_KEY") else env[key]
+    del env[key]
+    _write_env(env_path, env)
+    typer.echo(f"✅ 已移除 {key} (原值: {old_value})")
+    typer.echo(f"   备份: {env_path}.bak")
+    typer.echo(f"   下一步: tagent config use <provider> 重设, 或 tagent config show 验证")

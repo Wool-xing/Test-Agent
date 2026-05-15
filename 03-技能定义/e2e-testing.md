@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: production
 
 # e2e-testing
 
-派生自 `_精髓库/everything-claude-code.md` § 2.3 + `pentest-web` § 2FA。
-
 ## 触发
 
 - 任何用户可见功能

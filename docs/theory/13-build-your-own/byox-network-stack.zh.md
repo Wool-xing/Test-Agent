@@ -27,7 +27,6 @@ reading_en: ["https://saminiir.com/lets-code-tcp-ip-stack-1/"]
 
 # 从零写网络栈
 
-派生自 `_精髓库/build-your-own-x.md` § Network Stack。
 
 ## 对测试工作
 

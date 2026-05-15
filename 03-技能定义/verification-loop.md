@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: production
 
 # verification-loop
 
-派生自 `_精髓库/everything-claude-code.md` § 2.2。
-
 ## 触发
 
 - feature 完成后

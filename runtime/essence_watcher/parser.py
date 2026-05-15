@@ -1,4 +1,4 @@
-"""Parse _精髓库/INDEX.md to extract (name, repo_url) tuples."""
+"""Parse upstream reference INDEX to extract (name, repo_url) tuples."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from runtime.config.settings import get_settings
 @dataclass(slots=True)
 class EssenceEntry:
     name: str
-    file: str  # relative path within _精髓库
+    file: str  # relative path within upstream reference
     repo_urls: list[str]  # may have multiple(pentest-ai-agents has 2)
 
 
@@ -22,8 +22,8 @@ TABLE_ROW_RE = re.compile(r"^\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|(.+)\|(.+)\|\s*$")
 
 def _essence_dir() -> Path:
     s = get_settings()
-    # _精髓库 sits sibling to project root
-    return s.project_root.parent / "_精髓库"
+    # upstream reference dir sits sibling to project root
+    return s.project_root.parent / "_upstream_refs"
 
 
 def parse_index(index_path: Path | None = None) -> list[EssenceEntry]:

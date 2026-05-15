@@ -6,6 +6,9 @@
 
 ## 🌐 全链路覆盖矩阵（三视角）
 
+> ⚠️ **状态标记释义**：✅ = 定义/工具链已存在（含 utils + agent .md + skill .md），不保证已端到端真 LLM 验证。
+> 完整实装状态见 [ROADMAP.md](../../ROADMAP.md) frontmatter `IMPL_STATUS`。
+
 ### 矩阵 A：产品形态覆盖
 
 | 产品形态 | 工具栈 | 责任 Agent | 关联 Skill | 状态 |

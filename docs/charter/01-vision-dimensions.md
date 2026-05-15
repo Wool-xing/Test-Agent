@@ -21,8 +21,8 @@
 | `01-快速开始/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
 | `01-快速开始/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
 | `01-快速开始/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
-| `02-专家定义/` | 14 个 .md（9 核心 + 5 平台扩展） + README 索引 | Agent 定义文件 | 开发人员 |
-| `03-技能定义/` | 14 个 Skill 文件（13 业务 + darwin-skill 自进化）+ README 索引 | 可复用测试技能 | 开发人员 |
+| `02-专家定义/` | 16 个 .md（9 核心 + 5 平台 + 2 垂直） + README 索引 | Agent 定义文件 | 开发人员 |
+| `03-技能定义/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
 | `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
 | `05-代码示例/` | utils（49 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
@@ -127,7 +127,7 @@
 
 ## 🚀 核心特性
 
-### 13 位专家 + 1 位协调者（核心 8 + 平台扩展 5 + test-lead）
+### 16 位专家（核心 9 + 平台扩展 5 + 垂直领域 2）
 
 | 角色 | 职责 |
 |------|------|
@@ -141,31 +141,30 @@
 | bug-manager | Bug 提交（5 适配器：禅道/Jira/GitHub/Linear/Webhook）、生命周期追踪、回归验证 |
 | report-generator | Allure + JMeter HTML + Word + 多端通知（企微/飞书/钉钉/Slack/邮件/Teams，curl 直连） |
 | mobile-tester / desktop-tester / visual-tester / system-tester / ai-tester | 平台扩展 5 位专家 |
+| pentest-tester / automotive-tester | 垂直领域 2 位专家（渗透安全 + 车载/自动驾驶） |
 
-### 14 个执行技能（13 业务 + 1 自进化）
+### 32 个业务 Skill + 3 个元 Skill
 
-**核心 8 个**：
+**通用流程 8 个**：
 
-- `smoke-test`：10 分钟 P0 冒烟（含 1 分钟缓冲，门禁 95%）
+- `smoke-test`：10 分钟 P0 冒烟（门禁 95%）
 - `test-coordinator`：完整流程编排
 - `regression-test`：P0+P1 回归 + Flaky 检测 + JMeter 性能验证
-- `testcase-design`：4 Sheet Excel 用例
+- `testcase-design`：4 Sheet Excel 用例 + 多格式导出
 - `python-script-gen`：pytest UI/API 脚本
 - `jmeter-script-gen`：JMeter JMX 脚本（CI quick / full 双模式）
 - `data-preparation`：测试数据 + JMeter 参数化 CSV
-- `bug-submission`：Bug 规范提交（按 `BUG_TRACKER` 自动路由 5 套 tracker）
+- `zentao-bug-submission`：Bug 规范提交（按 `BUG_TRACKER` 自动路由 5 套 tracker）
 
-**平台扩展 5 个**：
+**平台扩展 5 个**：`mobile-test` / `desktop-test` / `visual-test` / `system-test` / `ai-test`
 
-- `mobile-test`：Android / iOS / 微信小程序（Appium + 微信 CLI）
-- `desktop-test`：Windows EXE / macOS GUI / Electron（pywinauto + Playwright Electron）
-- `visual-test`：游戏 / 视觉回归 / OCR（Airtest + OpenCV + Tesseract）
-- `system-test`：IoT / 音视频 / 链路追踪 / MQ（SSH+串口+MQTT+FFmpeg+Jaeger+Kafka）
-- `ai-test`：模型质量 / 数据漂移 / 公平性 / LLM 评估
+**垂直领域 12 个**：渗透安全 7（pentest-coordinator/recon/vuln/exploit/web/api/report）+ 车载 5（automotive-test/can-bus/adas/hil-loop/ota）
 
-**自进化 1 个**（独立于业务测试）：
+**ECC 测试加固 6 个**：`tdd-workflow` / `e2e-testing` / `verification-loop` / `eval-harness` / `security-review` / `agent-introspection-debugging`
 
-- `darwin-skill`：skill 自身优化引擎（双重评估 + 棘轮机制 + git 回滚 + 人在回路）。借鉴 Karpathy autoresearch，对上述 13 个业务 skill 持续打分、改进、验证。详见后文「🧬 Skills 自进化机制」
+**探索 + 元工具 4 个**：`build-your-own-x-explorer` + `karpathy-guidelines` + `darwin-skill` + `nuwa-skill`
+
+> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [03-技能定义/README.md](../../03-技能定义/README.md)。
 
 ### 工程级质量门禁（分层）
 
