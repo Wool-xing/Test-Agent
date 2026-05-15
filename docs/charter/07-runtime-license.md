@@ -4,9 +4,9 @@
 内容与原 FULL_GUIDE.md 对应段完全一致, 仅拆不动语义。
 -->
 
-## 🧠 V1.1.0-alpha 运行时层(`runtime/`)
+## 🧠 V1.23.0-alpha 运行时层(`runtime/`)
 
-> 已有 14 专家 / 13 Skill / 49 脚本**不动**(宪章铁律),`runtime/` 仅作可执行调度层。
+> 已有 16 专家 / 32 Skill / 49 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
 
 ### 模块拓扑
@@ -104,16 +104,17 @@ uvicorn runtime.api.main:app --port 8800
 - 5 类典型输入(web/api/mobile/desktop/ai-model)stub 路由 = 5/5(100%)
 - M1 门槛:多模型真测 ≥85%;不达 → 双模型投票
 
-### 与 14 专家 / 13 Skill / 49 脚本的关系
+### 与 16 专家 / 32 Skill / 49 utils 的关系
 
 | 项 | 关系 |
 |----|------|
-| 14 专家 `.md` | **不动**。`registry` 扫 frontmatter,`router` 喂 LLM 选用 |
-| 13 Skill `.md` | **不动**。同上 |
-| 49 脚本 `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
+| 16 专家 `.md` | **不动**。`registry` 扫 frontmatter,`router` 喂 LLM 选用 |
+| 32 Skill `.md` | **不动**。同上 |
+| 49 utils `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
 | `utils/` 通知/Bug | 复用 `generate_report.py` / `zentao_bug_manager.py` |
 
 任何专家/Skill/脚本**新增**或**修改**仍按宪章 §1 同步铁律走;`runtime/` 是新增 **调度** 层,不重复实现专家逻辑。
+V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增执行能力,详见 [ROADMAP.md](../../ROADMAP.md)。
 
 ---
 
@@ -130,39 +131,34 @@ uvicorn runtime.api.main:app --port 8800
 
 ## 🗺️ 项目当前状态与下次会话快速指引
 
-### 当前阶段（最后更新：2026-05-11）
+### 当前阶段（最后更新：2026-05-16）
 
-- **Phase**：Phase 1（V1.0.0 工程基线 + 概念宪章已成）
-- **关键已交付**：14 agent + 14 skill + AgentChat + Bug 多适配 + 按需安装（含运行时补装） + darwin-skill 集成
+- **Phase**：Phase 2 前期（V1.26.0-alpha · expert rollout 收尾 + skill rollout 进行中 4/14）
+- **关键已交付**：16 expert (11p+5s) · 32 skill (10p+7s+13r+2v) · AgentChat · Bug 多适配 · 按需安装 · darwin-skill · MCP 6 件套 · Marketplace · 教学层 · 多 LLM config · 4 SkillRunner 落地
+- **活跃 PR**：4 skill rollout + 1 深审修复（2026-05-16）
 
 ### 历史关键决议
 
-- 2026-05-11：宪章四章 + 三公理 + 五铭文起草完成（基于 DeepSeek 四轮 + Claude 整理）
-- 2026-05-11：FULL_GUIDE.md 糅合全局记忆，确立永久宪章地位
-- 2026-05-11：darwin-skill 不消费运行数据（Via Negativa 显式标注）；反问 KB 不进 V1.0.0
-- 2026-05-11：V1.0.0 阶段铭文锁死，单签兼任不构成有效授权
+- 2026-05-11：宪章四章 + 三公理 + 五铭文起草完成
+- 2026-05-11：FULL_GUIDE.md 确立永久宪章地位
+- 2026-05-11：darwin-skill 不消费运行数据（Via Negativa）；反问 KB 不进 V1.0.0
+- 2026-05-12 ~ 2026-05-14：V1.1-V1.14 runtime 层 + 教学层 + Marketplace + 渗透/车载 + Hermes + GBrain + Karpathy + ECC
+- 2026-05-15 ~ 2026-05-16：V1.15-V1.26 13 版迭代 — 11 expert 真 LLM-driven 落地 + 4 SkillRunner 生产落地 + 多 LLM config + 深审修复
 
 ### 下次会话进入项目时，按顺序检查
 
-1. 本节「当前阶段」是否仍是 Phase 1？是否有新里程碑？
-2. 「📋 开放问题」第 Q1-Q8 是否有新决议？
-3. 「Phase 触发条件总表」哪一行的触发条件已达成？
-4. 「🎭 关键模块清单」是否有模块从 ⚪/❌ 升级到 ✅？
-5. 是否需要扩写某一章节为深度版？
-6. 是否需要把开放问题转成 Jira 风格的可分配任务？
+1. 本节「当前阶段」是否有新里程碑？
+2. 「Phase 触发条件总表」哪一行的触发条件已达成？
+3. ROADMAP.md skill rollout 进度
+4. 是否有新 charter 缺口需回写？
 
 ### 来源与引用（认知史）
 
-- 第一轮（DeepSeek）：测试 Agent 七阶段架构
-- 第二轮（DeepSeek）：认知暗物质 + 10 个反问
-- 第三轮（DeepSeek）：抽象/探索/哲学维度
-- 第四轮（DeepSeek）：全人类 + 全行业视角
-- 第五轮（Claude 补充）：神圣 / 危机 / 临界层 10 个新增
-- 整理框架：八大簇 → 九大簇演进（Claude 整理）
-- 宪章草案：四章 + 三公理 + 五铭文（Claude 草拟）
-- V1.0.0 工程基线：14 agent + 14 skill + utils 49 个 + CI/CD（项目自建）
-- 永久宪章糅合（2026-05-11）：FULL_GUIDE 工程主体 + 全局记忆哲学维度合一
+- 第一至五轮（DeepSeek + Claude）：测试 Agent 架构 + 九大簇
+- V1.0.0 工程基线：14 agent + 14 skill + 49 utils + CI/CD
+- V1.1.0-alpha ~ V1.26.0-alpha：runtime + 11 agent runner + 4 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
+- 永久宪章糅合（2026-05-11/14/16）：FULL_GUIDE 工程主体 + 全局记忆哲学维度 + 持续回写
 
 ---
 
-*本文档是活的，每次重大决策后须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。改其他章节须经 test-lead review，符合闭环约定 14/15/16。*
+*本文档是活的，每次重大决策后须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。改其他章节须经 test-lead review。*
