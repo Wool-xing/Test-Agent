@@ -165,3 +165,24 @@ def register(name: str):
 def get_runner(name: str) -> AgentRunner | None:
     cls = AGENT_RUNNERS.get(name)
     return cls() if cls else None
+
+
+# Skill runner registry (V1.21.0-alpha — skill LLM-driven rollout 基础设施).
+# SkillRunner 接口与 AgentRunner 100% 一致 (system_prompt / user_prompt /
+# mock_output / summary / output_file / run), 仅 registry 独立, 避免 expert/skill
+# 同名冲突,且让 catalog / router / orchestrator 按 kind 路由清晰。
+SKILL_RUNNERS: dict[str, type[AgentRunner]] = {}
+
+
+def register_skill(name: str):
+    def deco(cls: type[AgentRunner]):
+        cls.name = name
+        SKILL_RUNNERS[name] = cls
+        return cls
+
+    return deco
+
+
+def get_skill_runner(name: str) -> AgentRunner | None:
+    cls = SKILL_RUNNERS.get(name)
+    return cls() if cls else None
