@@ -1,11 +1,21 @@
-"""Real LLM-driven skill runners (V1.31.0-alpha ¡¤ ALL 14/14 rollout complete).
+"""Real LLM-driven skill runners (V1.31.0-alpha Â· ALL 14/14 rollout complete).
 
 16 production runners across 3 domains:
 - General: mobile-test, visual-test, system-test, eval-harness
 - Pentest: pentest-coordinator, pentest-recon, pentest-vuln, pentest-exploit, pentest-api, pentest-web, pentest-report
 - Automotive: automotive-test, automotive-can-bus-test, automotive-adas-scenario, automotive-ota-update-test, automotive-hil-loop-test
 """
-from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, RunnerResult, SKILL_RUNNERS, get_skill_runner, register_skill  # noqa: F401
+
+from runtime.orchestrator.agents.base import (  # noqa: F401
+    AgentRunner,
+    RunnerContext,
+    RunnerResult,
+    SKILL_RUNNERS,
+    get_skill_runner,
+    register_skill,
+)
+
+# Trigger registration (each module registered via @register_skill on import)
 from runtime.orchestrator.skills import (  # noqa: F401,E402
     automotive_adas_scenario,
     automotive_can_bus_test,
