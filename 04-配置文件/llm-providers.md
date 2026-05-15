@@ -4,6 +4,22 @@
 
 ---
 
+## 🚀 30 秒了解
+
+- **是什么**: 配置 Test-Agent 后端 LLM 的速查手册. 国内国外 11+ 厂商可用.
+- **几步上手**:
+  1. 选厂商 (路径 A 内置 6 / 路径 B 兼容 5+)
+  2. 复制对应 export
+  3. `tagent demo` 验路由
+- **实测有效** (V1.21.0-alpha): Claude / OpenAI / Gemini / DeepSeek / Qwen / Ollama / **智谱 GLM** (路径 B 实测 20/20 准, 见 PR #79)
+- **适用场景**:
+  - 离线本地 = Ollama / Qwen
+  - 国内合规 = 智谱 / 豆包 / 通义
+  - 性价比 = DeepSeek / Kimi
+  - 主备 fallback = 多 provider 接管 (见 §3)
+
+---
+
 ## 0 · 两条接入路径
 
 | 路径 | 适用 | 配置 env |

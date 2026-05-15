@@ -44,7 +44,7 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 - **16 expert agents** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — functional · security · mobile · desktop · AI model · automotive · pentest …
 - **32 business skills** (8 production + 7 script + 15 rollout + 2 vision — see [ROADMAP.md](ROADMAP.md)) **+ 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
 - **49 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
-- **Multi-LLM** — Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama(local,no vendor lock-in)
+- **Multi-LLM (any provider, plug-and-play)** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI-compatible fallback channel** for any other provider (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) via 3 env vars, zero code change. Cookbook: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
 - **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams
 - **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others under `_pending_servers_v1_2_0_alpha` in `.mcp.json`)
@@ -66,7 +66,7 @@ Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 m
 
 1. **All-platform** — Web / API / Android / iOS / WeChat-miniprogram / Windows EXE / macOS / Linux / Electron / game / IoT / audio-video / AI/LLM / blockchain / 车载
 2. **All-protocol** — HTTP(S) / gRPC / WebSocket / TCP / UDP / GraphQL / SOAP / MQTT / SSH / serial / Kafka / RabbitMQ / Modbus / CAN-bus / SOME-IP / DoIP / UDS
-3. **Multi-LLM no lock-in** — switch with `tagent model` between Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama
+3. **Multi-LLM no lock-in (any provider)** — 6 built-in providers via `tagent model` (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) plus **OpenAI-compatible fallback** for any other (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) — 3 env vars, zero code change. See [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 4. **Learn while using** — `--mode learn` outputs every step with theory references (22 KB cards across 13 domains: tools / coding / foundation / strategy / methods / protocols / platforms / gates / security / AI testing / compliance / process / build-your-own)
 5. **Safe-by-default** — sandboxed exec / PII scrub / runtime prompt-injection scan / 4-gate marketplace verify / decisions audit trail
 
