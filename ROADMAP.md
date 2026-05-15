@@ -85,7 +85,7 @@
 
 ---
 
-## V1.x rollout — 16 skill 实装路线
+## V1.x rollout — 16 skill 实装路线（含已完成 2 + 剩余 14）
 
 **节奏**: skill rollout 起点 V1.21.0-alpha (SkillRunner 基础设施 + pentest-coordinator 首落地);后续 1 skill / PR 推进。
 **完成标准**: 每 skill 接 LLM 真调用 (mock_output schema 覆盖 + production 升级 + ALL_SKILL_RUNNERS 锁规则同步)。
@@ -178,5 +178,7 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.18.0-alpha | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
 | V1.19.0-alpha | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
 | V1.20.0-alpha | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) | 16/16 expert (V1.x rollout 完成) |
+| V1.21.0-alpha | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) | 16 expert + 9/32 production skill (14 rollout 待) |
+| V1.22.0-alpha | 2026-05-16 | **tagent config CLI** — 多模型 onboarding Step 2 (config use / use-compat / list / current 子命令 + LiteLLM provider registry) | 16 expert + 9/32 production skill (14 rollout 待) |
 | V1.23.0-alpha | 2026-05-16 | **skill rollout #2** — mobile-test skill 生产落地 (runtime/orchestrator/skills/mobile_test.py · 6 阶段编排 + 质量门禁 + 跨平台并行) | 16 expert + 9/32 production skill (14 rollout 待) |
 | V2.0.0 | TBD | V2.x 路线图启动:Skill Lifecycle 元工具改造 + 6 expert 深化 | 16/16 + V2 |

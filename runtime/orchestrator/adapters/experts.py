@@ -40,8 +40,8 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "visual-tester": None,
     "system-tester": None,
     "ai-tester": "ai_validator.py",
-    "pentest-tester": None,        # V1.19 rollout (需 SECURITY.md 武器化授权 wiring)
-    "automotive-tester": None,     # V1.20 rollout
+    "pentest-tester": None,        # V1.19 production (V1.x rollout 收尾)
+    "automotive-tester": None,     # V1.20 production (V1.x rollout 收尾)
 }
 
 # V1.14 防 mock 单源 (ROADMAP V1.15 Day 0 承诺):
