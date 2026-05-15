@@ -1,9 +1,9 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.21.0-alpha (**expert rollout 收尾 + skill rollout 起点 — 基础设施 + 首 skill 落地**)
+> 当前状态:V1.23.0-alpha (**expert rollout 收尾 + skill rollout 进行中（2/14）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
-> - **skill 15/32 active**(8 production + 7 script);15 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
+> - **skill 16/32 active**(9 production + 7 script);14 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 > - **V1.21.0-alpha 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 14 实装。
 
@@ -161,7 +161,7 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 - **registry 单源**: catalog 解析 `02-专家定义/*.md` `EXPERT_IMPL_STATUS` + `03-技能定义/*.md` `SKILL_IMPL_STATUS` frontmatter,实装状态来源唯一
 - **router 软警告**: `_validate_against_catalog` 检测 rollout / vision / unknown → 加 issues 并降 confidence 0.3
 - **orchestrator 硬拒**: `execute_node` 对 expert / skill 任意 rollout / vision / unknown 返回 `returncode=2` + stderr "未实装",绝不走 no-op "documented step recorded" 假成功路径
-- 用户路由 6 个 in-rollout expert / 16 个 in-rollout skill / 2 个 vision skill 时**收到明确说明**,而非伪装成"已运行"的 mock 输出
+- 用户路由 0 个 in-rollout expert / 14 个 in-rollout skill / 2 个 vision skill 时**收到明确说明**,而非伪装成"已运行"的 mock 输出
 - 详情见 [02-专家定义/01-测试主管.md](02-专家定义/01-测试主管.md) 路由表注释
 
 ---
@@ -178,5 +178,5 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.18.0-alpha | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
 | V1.19.0-alpha | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
 | V1.20.0-alpha | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) | 16/16 expert (V1.x rollout 完成) |
-| V1.21.0-alpha | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions). 解锁 14 rollout skill 后续流水线. | 16 expert + 8/32 production skill (15 rollout 待) |
+| V1.23.0-alpha | 2026-05-16 | **skill rollout #2** — mobile-test skill 生产落地 (runtime/orchestrator/skills/mobile_test.py · 6 阶段编排 + 质量门禁 + 跨平台并行) | 16 expert + 9/32 production skill (14 rollout 待) |
 | V2.0.0 | TBD | V2.x 路线图启动:Skill Lifecycle 元工具改造 + 6 expert 深化 | 16/16 + V2 |

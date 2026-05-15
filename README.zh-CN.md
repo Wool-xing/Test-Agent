@@ -42,7 +42,7 @@ tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / s
 Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告,全自主。为 QA 团队、安全研究员、车载测试工程师、以及任何想**用 AI 测试同时学测试理论**的人而生。
 
 - **16 专家 Agent** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
-- **32 业务 Skill** (8 production + 7 script + 15 rollout + 2 vision——见 [ROADMAP.md](ROADMAP.md)) **+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
+- **32 业务 Skill** (9 production + 7 script + 14 rollout + 2 vision——见 [ROADMAP.md](ROADMAP.md)) **+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
 - **49 生产工具** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV ……
 - **多 LLM(任厂商即插即用)** — 内置 6 厂商 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI 兼容兜底通道** 接其他任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 变量, 零代码改动. 速查手册: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 已实装(禅道);5 计划(Jira · GitHub · GitLab · Linear · Webhook,见 roadmap)
@@ -89,8 +89,8 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 Test-Agent/
 ├── 00-项目导航.md           ← 5 维度分类速查
 ├── 01-快速开始/             ← 使用手册 / 部署 / 配置 / 交付物
-├── 02-专家定义/             ← 16 个专家 Agent (5 production + 5 script + 6 rollout)
-├── 03-技能定义/             ← 32 个业务 Skill (7 production + 7 script + 16 rollout + 2 vision) + 3 个元 Skill
+├── 02-专家定义/             ← 16 个专家 Agent (11 production + 5 script + 0 rollout)
+├── 03-技能定义/             ← 32 个业务 Skill (9 production + 7 script + 14 rollout + 2 vision) + 3 个元 Skill
 ├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
 ├── 05-代码示例/             ← 49 个生产工具
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
