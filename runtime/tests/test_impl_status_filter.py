@@ -27,12 +27,12 @@ def test_registry_impl_status_no_unknown():
 
 
 def test_registry_expert_status_counts():
-    """Expert 16 = 9 production + 5 script + 2 rollout (V1.18.0-alpha system-tester LLM-driven 落地后)。"""
+    """Expert 16 = 10 production + 5 script + 1 rollout (V1.19.0-alpha pentest-tester LLM-driven 落地后)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.experts.values())
-    assert counts.get("production", 0) == 9, f"expert production 应 9,实 {counts.get('production')}"
+    assert counts.get("production", 0) == 10, f"expert production 应 10,实 {counts.get('production')}"
     assert counts.get("script", 0) == 5, f"expert script 应 5,实 {counts.get('script')}"
-    assert counts.get("rollout", 0) == 2, f"expert rollout 应 2,实 {counts.get('rollout')}"
+    assert counts.get("rollout", 0) == 1, f"expert rollout 应 1,实 {counts.get('rollout')}"
 
 
 def test_registry_skill_status_counts():
@@ -61,11 +61,11 @@ def _mk_decision(*dag_specs: tuple[str, str, str]) -> RoutingDecision:
 
 
 def test_router_flags_rollout_expert():
-    # V1.18+ system-tester 已 production, 改用 pentest-tester (V1.19 rollout)
+    # V1.19+ pentest-tester 已 production, 改用 automotive-tester (V1.20 rollout)
     cat = get_catalog()
-    dec = _mk_decision(("n1", "expert", "pentest-tester"))
+    dec = _mk_decision(("n1", "expert", "automotive-tester"))
     issues = router._validate_against_catalog(dec, cat)
-    assert any("pentest-tester" in i and "rollout" in i for i in issues), issues
+    assert any("automotive-tester" in i and "rollout" in i for i in issues), issues
 
 
 def test_router_flags_rollout_skill():
@@ -108,8 +108,8 @@ def test_router_passes_production_clean():
 
 
 def test_execute_node_rejects_rollout_expert():
-    """expert rollout (e.g., pentest-tester) → rc=2 + stderr "未实装"。"""
-    r = execute_node("pentest-tester", "expert")
+    """expert rollout (e.g., automotive-tester) → rc=2 + stderr "未实装"。"""
+    r = execute_node("automotive-tester", "expert")
     assert r.returncode == 2
     assert "未实装" in r.stderr
     assert "rollout" in r.stderr

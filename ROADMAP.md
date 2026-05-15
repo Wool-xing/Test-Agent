@@ -1,14 +1,14 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.18.0-alpha
-> - **expert 14/16 active**(9 production + 5 script);2 处于 V1.x rollout。
+> 当前状态:V1.19.0-alpha
+> - **expert 15/16 active**(10 production + 5 script);1 处于 V1.x rollout。
 > - **skill 14/32 active**(7 production + 7 script);16 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 
-## 当前活跃 expert (14 / 16)
+## 当前活跃 expert (15 / 16)
 
-### 9 真 LLM-driven (已上线)
+### 10 真 LLM-driven (已上线)
 
 | Expert | 职责 |
 |--------|------|
@@ -21,6 +21,7 @@
 | `mobile-tester` | 移动测试用例 + ADB/Xcode 命令清单(V1.16.0-alpha minimum viable) |
 | `visual-tester` | 视觉测试点 + 对比脚本片段 + 容差配置(V1.17.0-alpha minimum viable) |
 | `system-tester` | IoT/串口/MQTT 测试用例 + 命令清单 + 协议特定配置(V1.18.0-alpha minimum viable) |
+| `pentest-tester` | 5 攻击域渗透测试计划 + 工具清单 + PoC plan(V1.19.0-alpha minimum viable;仅输出计划文本,真执行守护在 utils 层 env gate) |
 
 ### 5 script-backed (已上线)
 
@@ -75,7 +76,7 @@
 | 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0-alpha | **done** (runtime/orchestrator/agents/mobile_tester.py) |
 | 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0-alpha | **done** (runtime/orchestrator/agents/visual_tester.py) |
 | 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0-alpha | **done** (runtime/orchestrator/agents/system_tester.py) |
-| 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0-alpha | planned (需 SECURITY.md 武器化代码授权 wiring 实装) |
+| 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0-alpha | **done** (runtime/orchestrator/agents/pentest_tester.py;仅输出计划文本,真执行守护已在 utils 层 `api_security_scanner.py` / `ai_adversarial.py` 用 TAGENT_PENTEST_AUTHORIZED env gate;法律责任在操作者侧,见 SECURITY.md L84) |
 | 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | V1.20.0-alpha | planned |
 
 ---
@@ -170,6 +171,6 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.16.0-alpha | 2026-05-15 | mobile-tester LLM-driven minimum viable (runtime/orchestrator/agents/mobile_tester.py;LLM 读 PRD + Android/iOS 上下文 → test_cases + device_commands + mobile_specific 结构化 JSON) | 12/16 |
 | V1.17.0-alpha | 2026-05-15 | visual-tester LLM-driven minimum viable (runtime/orchestrator/agents/visual_tester.py;LLM 读 PRD + UI 描述 → visual_test_points + comparison_scripts + tolerance + baseline_strategy 结构化 JSON) | 13/16 |
 | V1.18.0-alpha | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
-| V1.19.0-alpha | TBD | pentest-tester LLM-driven minimum viable + 武器化授权 wiring | 15/16 |
+| V1.19.0-alpha | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
 | V1.20.0-alpha | TBD | automotive-tester LLM-driven minimum viable | 16/16 (V1.x rollout 完成) |
 | V2.0.0 | TBD | V2.x 路线图启动:Skill Lifecycle 元工具改造 + 6 expert 深化 | 16/16 + V2 |
