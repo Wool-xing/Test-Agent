@@ -1,11 +1,11 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.21.0-alpha (**expert rollout 收尾 + skill rollout 起点 — 基础设施 + 首 skill 落地**)
+> 当前状态:V1.26.0-alpha (**expert rollout 收尾 + skill rollout 进行中（4/12）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
-> - **skill 15/32 active**(8 production + 7 script);15 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
+> - **skill 17/32 active**(10 production + 7 script);13 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
-> - **V1.21.0-alpha 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 14 实装。
+> - **V1.21.0-alpha 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 12 实装。
 
 ## 当前活跃 expert (16 / 16) — V1.x rollout 收尾
 
@@ -37,9 +37,9 @@
 
 ---
 
-## 当前活跃 skill (14 / 32)
+## 当前活跃 skill (15 / 32)
 
-### 7 production (已上线)
+### 8 production (已上线)
 
 | Skill | 类别 |
 |-------|------|
@@ -50,6 +50,7 @@
 | `testcase-design` | 用例设计 |
 | `test-coordinator` | 测试流程编排 |
 | `verification-loop` | 5-phase 验证循环 |
+| `system-test` | 系统集成编排(V1.26.0-alpha · skill rollout #4) |
 
 ### 7 script-backed (已上线)
 
@@ -96,7 +97,7 @@
 |-------|------|-------------|------|
 | `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | rollout |
 | `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | rollout |
-| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | rollout |
+| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | **done** (V1.26.0-alpha · runtime/orchestrator/skills/system_test.py · 6 阶段编排 + 质量门禁 + 子场景路由) |
 | `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | rollout |
 
 ### Pentest 7 skill(需 SECURITY.md 武器化授权 wiring 实装)
@@ -177,4 +178,6 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.19.0-alpha | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
 | V1.20.0-alpha | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) | 16/16 expert (V1.x rollout 完成) |
 | V1.21.0-alpha | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions). 解锁 14 rollout skill 后续流水线. | 16 expert + 8/32 production skill (15 rollout 待) |
+| V1.23.0-alpha | 2026-05-16 | **skill rollout #2** — mobile-test skill 生产落地 (runtime/orchestrator/skills/mobile_test.py · 6 阶段编排) | 16 expert + 9/32 production skill |
+| V1.26.0-alpha | 2026-05-16 | **skill rollout #4** — system-test skill 生产落地 (runtime/orchestrator/skills/system_test.py · 6 阶段编排 + 质量门禁 + 子场景路由) | 16 expert + 9/32 production skill |
 | V2.0.0 | TBD | V2.x 路线图启动:Skill Lifecycle 元工具改造 + 6 expert 深化 | 16/16 + V2 |

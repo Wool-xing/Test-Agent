@@ -38,6 +38,20 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
             "confidence",
         ],
     ),
+    (
+        "system-test",  # V1.26.0-alpha (skill rollout #4)
+        [
+            "project_name",
+            "run_id",
+            "sub_scenarios",
+            "phases",
+            "quality_gates",
+            "sub_scenario_routing",
+            "outputs",
+            "risks",
+            "confidence",
+        ],
+    ),
 ]
 
 
