@@ -39,7 +39,7 @@
 
 - ✅ **依赖 CVE 扫描**：`pip-audit` + `safety` 在 CI 自动跑
 - ✅ **Dependabot 周扫描**：每周一自动检测 + PR 升级
-- ✅ **私有源 MD 隔离**：`.gitignore` 排除归属源文档
+- ✅ **敏感文档隔离**：`.gitignore` 排除归属源文档
 - ✅ **凭证保护**：
   - `.env` 严禁提交（`.gitignore` 排除）
   - GitHub Secrets 加密存储

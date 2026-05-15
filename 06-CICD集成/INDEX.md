@@ -16,7 +16,7 @@
 
 | 配置位置 | 用途 | 谁跑 |
 |---------|------|-----|
-| `.github/workflows/ci.yml` | **本仓库自身 CI**：Ruff / 模板自检 / 文件统计 / 私有源防护 / 链接校验 | GitHub Actions（本 repo） |
+| `.github/workflows/ci.yml` | **本仓库自身 CI**：Ruff / 模板自检 / 文件统计 / 敏感文件防护 / 链接校验 | GitHub Actions（本 repo） |
 | `.github/workflows/codeql.yml` | **本仓库自身 CodeQL**：python + actions 安全扫描 | GitHub Actions（本 repo） |
 | `06-CICD集成/github-actions-test.yml` | **用户分发模板**：用户 fork/部署后跑业务测试 | 用户自己的 repo |
 | `06-CICD集成/jenkins-pipeline.groovy` | **用户分发模板**：Jenkins 流水线 | 用户自己的 Jenkins |

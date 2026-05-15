@@ -1,6 +1,5 @@
 # learning_loop 索引
 
-> 派生自 `D:/项目文件/_精髓库/hermes-agent.md §1.1`。
 > 主宪章 §14 darwin-skill 是 skill 文本本身的棘轮;本模块是**外层协调器**:
 > session 检索 + 用户画像 + curator 触发 + skill 自创建提示。
 

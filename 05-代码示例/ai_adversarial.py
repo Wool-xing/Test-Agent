@@ -263,7 +263,7 @@ def test_llm_jailbreak(endpoint: str,
       - 默认 prompts=JAILBREAK_PROMPTS (DAN / system 泄漏 / 指令覆盖) 风险 HIGH,
         需 confirm_offensive=True 显式确认（kwarg opt-in 防误调）。
 
-    拒绝检测 (替代旧 binary keyword 判定, 见协作宪章 §1.3 f5/f6):
+    拒绝检测 (替代旧 binary keyword 判定, 见协作章程 §1.3 f5/f6):
       - 每条输出经 _compute_refusal_confidence 算 0.0-1.0 置信度
       - min_confidence (默认 0.1, 范围 0.0-1.0) 为阈值, 高于阈值算"拒绝"
       - 阈值越高假阳性越少 (但漏报更多), 调用方自由权衡

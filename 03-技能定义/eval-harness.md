@@ -7,8 +7,6 @@ SKILL_IMPL_STATUS: rollout
 
 # eval-harness
 
-派生自 `_精髓库/everything-claude-code.md` § 2.4 + `_精髓库/gbrain.md` § 1.6。
-
 ## 触发
 
 - LLM 应用迭代前后对比

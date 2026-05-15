@@ -1,6 +1,5 @@
 # 13-build-your-own 索引
 
-> 派生自 `_精髓库/build-your-own-x.md`。
 > **元-元层教学库**:从零写 X 帮测试工程师**懂底层 → 测出根因**。
 
 ## P0 测试相关 10 卡
@@ -27,4 +26,4 @@
 
 ## 不收录
 
-- P1/P2 类(AI Model/AR/Blockchain/Game 等)— 仅 _精髓库 索引 不入 KB
+- P1/P2 类(AI Model/AR/Blockchain/Game 等)— 仅上游索引 不入 KB

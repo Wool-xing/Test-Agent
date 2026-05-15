@@ -1,6 +1,5 @@
 # backends 索引
 
-> 派生自 `D:/项目文件/_精髓库/hermes-agent.md §1.4`。
 > Agent **不绑笔记本**:7 后端任选,Serverless hibernate 几乎零成本。
 
 ## 7 后端

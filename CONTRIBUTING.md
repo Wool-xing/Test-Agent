@@ -122,7 +122,7 @@ pytest --collect-only
 
 ## 同步铁律（项目宪章 §1）
 
-任一文档/代码改动 → 必须同步到所有引用方+`Test-Agent工作流搭建.md` 私有源（私有源不上传 GitHub，但本地必须保持与公开版一致），并加 `CHANGELOG.md` 条目。
+任一文档/代码改动 → 必须同步到所有引用方，并加 `CHANGELOG.md` 条目。
 
 ### 联动改动清单速查
 
@@ -137,8 +137,8 @@ pytest --collect-only
 
 ### 自动化保障
 
-- `pre-commit`：16/33/49 文件统计 + 私有源 MD 防护 + .env 防护 + gitleaks 凭据扫描 + ruff
-- `.github/workflows/ci.yml`：16/33/49 自校 + Markdown 链接有效性 + utils 导入 + 私有源 MD 防护
+- `pre-commit`：16/33/49 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
+- `.github/workflows/ci.yml`：16/33/49 自校 + Markdown 链接有效性 + utils 导入
 - `.github/workflows/codeql.yml`：python + GitHub Actions 安全扫描
 
 ### 提交前自检

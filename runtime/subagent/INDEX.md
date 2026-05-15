@@ -1,7 +1,5 @@
 # subagent 索引
 
-> 派生自 `D:/项目文件/_精髓库/hermes-agent.md §1.3`。
-
 ## 规则(主宪章 §22)
 
 - **隔离 client**:子代理用 `auxiliary` LLM client,永不污染主 session prompt cache

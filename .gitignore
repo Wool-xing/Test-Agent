@@ -121,6 +121,9 @@ pip-wheel-metadata/
 
 # ===== 私有源文档（个人归属，不公开）=====
 Test-Agent工作流搭建.md
+00-协作宪章.md
+灵感笔记.md
+_精髓库_apply_policy.example.yaml
 
 # ===== 私有精髓库（跨项目知识，绝不公开 · 主宪章 §29 + V1.10 §34）=====
 # 正确位置:D:/项目文件/_精髓库/(repo 外)。若误 cp 进 repo,pre-commit hook 二次拦截
