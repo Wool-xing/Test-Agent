@@ -38,6 +38,19 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
             "confidence",
         ],
     ),
+    (
+        "pentest-vuln",  # V1.29.0-alpha (pentest skill rollout #3)
+        [
+            "project_name",
+            "run_id",
+            "source_available",
+            "mode",
+            "domains",
+            "outputs",
+            "risks",
+            "confidence",
+        ],
+    ),
 ]
 
 
