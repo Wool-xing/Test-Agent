@@ -77,6 +77,9 @@ def _decisions_log(record: dict) -> Path:
 def _provider_available(provider: str) -> bool:
     if provider == "stub":
         return False
+    # 通用 OpenAI 兼容: TAGENT_LLM_API_KEY 设 = 任厂商即插即用 (国内+国外不限)
+    if os.getenv("TAGENT_LLM_API_KEY"):
+        return True
     keys = {
         "claude": "ANTHROPIC_API_KEY",
         "openai": "OPENAI_API_KEY",

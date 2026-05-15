@@ -17,6 +17,10 @@ from runtime.router.schema import TargetArtifact
         ("我有一个 APK 文件需要做 Android 移动端测试", "mobile-app", "mobile-tester"),
         ("desktop windows exe app", "desktop-app", "desktop-tester"),
         ("AI LLM model evaluation", "ai-model", "ai-tester"),
+        ("Canvas WebGL OCR 视觉回归 screenshot diff", "visual-system", "visual-tester"),
+        ("IoT 嵌入式 MQTT Kafka Jaeger 串口 modbus", "system-integration", "system-tester"),
+        ("pentest SQL injection XSS SSRF OWASP 渗透测试", "pentest", "pentest-tester"),
+        ("车载 ECU ADAS CAN-bus V2X OTA ASIL automotive", "automotive", "automotive-tester"),
     ],
 )
 def test_router_picks_platform_expert(text, expected_type, expected_expert):
@@ -26,6 +30,15 @@ def test_router_picks_platform_expert(text, expected_type, expected_expert):
     assert decision.detected_target_type == expected_type
     names = [n.name for n in decision.dag]
     assert expected_expert in names, f"missing {expected_expert} in {names}"
+
+
+def test_router_pentest_includes_coordinator_skill():
+    """pentest path 头节点 = pentest-coordinator (kind=skill, V1.21 SkillRunner 首接入)."""
+    art = TargetArtifact(kind="text", text="pentest SQL injection penetration test")
+    decision = route(art, client=LLMClient(provider="stub", fallback="stub"))
+    ordered = decision.topological()
+    assert ordered[0].name == "pentest-coordinator", f"pentest 头节点应 pentest-coordinator, 实 {ordered[0].name}"
+    assert ordered[0].kind == "skill", f"pentest-coordinator kind 应 skill, 实 {ordered[0].kind}"
 
 
 def test_router_starts_with_requirements_analyst():
