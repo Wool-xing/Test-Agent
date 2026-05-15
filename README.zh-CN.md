@@ -66,7 +66,7 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 
 1. **全平台** — Web / API / Android / iOS / 微信小程序 / Windows EXE / macOS / Linux / Electron / 游戏 / IoT / 音视频 / AI/LLM / 区块链 / 车载
 2. **全协议** — HTTP(S) / gRPC / WebSocket / TCP / UDP / GraphQL / SOAP / MQTT / SSH / 串口 / Kafka / RabbitMQ / Modbus / CAN-bus / SOME-IP / DoIP / UDS
-3. **多 LLM 无锁定(任厂商)** — `tagent model` 切换 6 内置 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama), 加 **OpenAI 兼容兜底** 接其他任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 零代码. 见 [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
+3. **多 LLM 无锁定(任厂商)** — `tagent config use <name>` 切换 6 内置 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama), `tagent config use-compat` 接 **OpenAI 兼容兜底** 任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 零代码. 见 [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 4. **边用边学** — `--mode learn` 每步输出含**理论引用**(22 卡跨 13 大类:工具 / 编程 / 基础理论 / 策略 / 方法 / 协议 / 平台 / 门禁 / 安全 / AI 测试 / 合规 / 流程 / Build-Your-Own)
 5. **safe-by-default** — 沙箱 / PII 脱敏 / 运行时 Prompt 注入扫描 / 4 关 Marketplace 验证 / decisions 审计链
 

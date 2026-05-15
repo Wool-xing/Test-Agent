@@ -11,9 +11,11 @@ from rich.table import Table
 
 from runtime.api.deps import Kernel
 from runtime.api.parsers import parse_path, parse_text, parse_url
+from runtime.cli.config import config_app
 from runtime.config.settings import get_settings
 
 app = typer.Typer(add_completion=False, help="Test-Agent Runtime CLI")
+app.add_typer(config_app, name="config")
 console = Console()
 _kernel = Kernel()
 

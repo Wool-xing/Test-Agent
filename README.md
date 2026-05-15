@@ -66,7 +66,7 @@ Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 m
 
 1. **All-platform** — Web / API / Android / iOS / WeChat-miniprogram / Windows EXE / macOS / Linux / Electron / game / IoT / audio-video / AI/LLM / blockchain / 车载
 2. **All-protocol** — HTTP(S) / gRPC / WebSocket / TCP / UDP / GraphQL / SOAP / MQTT / SSH / serial / Kafka / RabbitMQ / Modbus / CAN-bus / SOME-IP / DoIP / UDS
-3. **Multi-LLM no lock-in (any provider)** — 6 built-in providers via `tagent model` (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) plus **OpenAI-compatible fallback** for any other (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) — 3 env vars, zero code change. See [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
+3. **Multi-LLM no lock-in (any provider)** — 6 built-in providers via `tagent config use <name>` (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) plus **OpenAI-compatible fallback** via `tagent config use-compat` for any other (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) — 3 env vars, zero code change. See [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 4. **Learn while using** — `--mode learn` outputs every step with theory references (22 KB cards across 13 domains: tools / coding / foundation / strategy / methods / protocols / platforms / gates / security / AI testing / compliance / process / build-your-own)
 5. **Safe-by-default** — sandboxed exec / PII scrub / runtime prompt-injection scan / 4-gate marketplace verify / decisions audit trail
 

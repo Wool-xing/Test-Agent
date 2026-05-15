@@ -1,0 +1,194 @@
+"""tagent config — LLM provider 配置管理 (V1.22.0-alpha · Step 2 多模型 onboarding).
+
+4 子命令:
+  list       — 列内置 6 + B 路径兼容样例
+  show       — 显当前 .env 配置 (key 全脱敏)
+  use        — 路径 A: 切到内置 provider, 写 TAGENT_LLM_PROVIDER + 厂商 key 占位
+  use-compat — 路径 B: OpenAI 兼容兜底通道 (任厂商即插即用)
+
+env 文件优先级: CWD/.env → 仓根/.env. 写前必备份 .env.bak.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import typer
+
+config_app = typer.Typer(add_completion=False, help="LLM provider 配置 (路径 A 内置 6 + 路径 B 兼容任厂商)")
+
+BUILTIN_PROVIDERS: dict[str, dict[str, str | None]] = {
+    "claude": {
+        "env_key": "ANTHROPIC_API_KEY",
+        "model": "anthropic/claude-sonnet-4-6",
+        "url": "https://console.anthropic.com/",
+    },
+    "openai": {
+        "env_key": "OPENAI_API_KEY",
+        "model": "openai/gpt-4o",
+        "url": "https://platform.openai.com/",
+    },
+    "gemini": {
+        "env_key": "GEMINI_API_KEY",
+        "model": "gemini/gemini-1.5-pro",
+        "url": "https://aistudio.google.com/apikey",
+    },
+    "deepseek": {
+        "env_key": "DEEPSEEK_API_KEY",
+        "model": "deepseek/deepseek-chat",
+        "url": "https://platform.deepseek.com/",
+    },
+    "qwen": {
+        "env_key": "DASHSCOPE_API_KEY",
+        "model": "dashscope/qwen-plus",
+        "url": "https://dashscope.aliyun.com/",
+    },
+    "ollama": {
+        "env_key": None,
+        "model": "ollama/qwen2.5:7b",
+        "url": "http://localhost:11434",
+    },
+}
+
+COMPAT_EXAMPLES: dict[str, str] = {
+    "zhipu (智谱)": "https://open.bigmodel.cn/api/paas/v4 · glm-4-flash",
+    "doubao (豆包)": "https://ark.cn-beijing.volces.com/api/v3 · doubao-pro",
+    "kimi (Moonshot)": "https://api.moonshot.cn/v1 · moonshot-v1-8k",
+    "baichuan (百川)": "https://api.baichuan-ai.com/v1 · Baichuan2-Turbo",
+    "xunfei (讯飞)": "https://spark-api-open.xf-yun.com/v1 · 4.0Ultra",
+}
+
+TRACKED_KEYS = (
+    "TAGENT_LLM_PROVIDER",
+    "TAGENT_LLM_API_BASE",
+    "TAGENT_LLM_API_KEY",
+)
+
+VENDOR_KEYS = (
+    "ANTHROPIC_API_KEY",
+    "OPENAI_API_KEY",
+    "GEMINI_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "DASHSCOPE_API_KEY",
+)
+
+
+def _find_env_file(cwd: Path | None = None) -> Path:
+    """优先 CWD/.env. 不存仍返回此路径 (调用者据存在性决定写/读)."""
+    base = cwd or Path.cwd()
+    return base / ".env"
+
+
+def _parse_env(path: Path) -> dict[str, str]:
+    if not path.exists():
+        return {}
+    result: dict[str, str] = {}
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        result[key.strip()] = value.strip().strip('"').strip("'")
+    return result
+
+
+def _write_env(path: Path, env: dict[str, str]) -> None:
+    """写 env 文件. 已存则先备份 .env.bak (覆盖). 保留 insertion 序."""
+    if path.exists():
+        backup = path.with_name(path.name + ".bak")
+        backup.write_bytes(path.read_bytes())
+    lines = [f"{key}={value}" for key, value in env.items() if value is not None]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _mask(secret: str) -> str:
+    if not secret or len(secret) < 8:
+        return "***"
+    return f"{secret[:4]}...{secret[-4:]}"
+
+
+@config_app.command("list")
+def cmd_list() -> None:
+    """列内置 6 厂商 (路径 A) + B 路径兼容样例."""
+    typer.echo("📦 内置 provider (路径 A · litellm 直连):")
+    for name, spec in BUILTIN_PROVIDERS.items():
+        env_hint = spec["env_key"] or "(无需 key, 本地)"
+        model = spec["model"] or ""
+        typer.echo(f"  {name:10s} model={model:40s} key_env={env_hint}")
+    typer.echo("")
+    typer.echo("🌐 兼容 provider (路径 B · OpenAI 协议兜底, 用 'use-compat'):")
+    for name, info in COMPAT_EXAMPLES.items():
+        typer.echo(f"  {name:18s} {info}")
+    typer.echo("")
+    typer.echo("📖 完整 cookbook: 04-配置文件/llm-providers.md")
+
+
+@config_app.command("show")
+def cmd_show() -> None:
+    """显当前 .env (TAGENT_LLM_* + 厂商 key 全脱敏)."""
+    env_path = _find_env_file()
+    typer.echo(f"📄 .env: {env_path.resolve()}")
+    if not env_path.exists():
+        typer.echo("  (文件不存, 用 'tagent config use <provider>' 创建)")
+        return
+    env = _parse_env(env_path)
+    for key in TRACKED_KEYS:
+        value = env.get(key, "")
+        if key.endswith("KEY"):
+            value = _mask(value) if value else ""
+        typer.echo(f"  {key}={value or '(未设)'}")
+    for vendor_key in VENDOR_KEYS:
+        if vendor_key in env:
+            typer.echo(f"  {vendor_key}={_mask(env[vendor_key])}")
+
+
+@config_app.command("use")
+def cmd_use(
+    provider: str = typer.Argument(..., help=f"内置 6 之一: {', '.join(BUILTIN_PROVIDERS.keys())}"),
+) -> None:
+    """路径 A: 切到指定内置 provider, 写 .env."""
+    if provider not in BUILTIN_PROVIDERS:
+        typer.echo(f"❌ 未知 provider: {provider}")
+        typer.echo(f"   可用: {', '.join(BUILTIN_PROVIDERS.keys())}")
+        typer.echo("   兼容 provider 请用 'tagent config use-compat'")
+        raise typer.Exit(2)
+
+    spec = BUILTIN_PROVIDERS[provider]
+    env_path = _find_env_file()
+    env = _parse_env(env_path)
+    env["TAGENT_LLM_PROVIDER"] = provider
+    env.pop("TAGENT_LLM_API_BASE", None)
+    env.pop("TAGENT_LLM_API_KEY", None)
+    vendor_key = spec["env_key"]
+    if vendor_key and vendor_key not in env:
+        env[vendor_key] = "<your-key-here>"
+
+    _write_env(env_path, env)
+    typer.echo(f"✅ 写 {env_path}: TAGENT_LLM_PROVIDER={provider}")
+    if vendor_key:
+        typer.echo(f"⚠️  请填 {vendor_key} 真实 key 后再 'tagent demo' 验路由")
+        typer.echo(f"   注册: {spec['url']}")
+    else:
+        typer.echo(f"   {provider} 本地运行, 请启 {spec['url']} 服务")
+
+
+@config_app.command("use-compat")
+def cmd_use_compat(
+    base: str = typer.Option(..., "--base", help="OpenAI 兼容 endpoint URL"),
+    key: str = typer.Option(..., "--key", help="API key"),
+    model: str = typer.Option(..., "--model", help="model 名 (不含 openai/ 前缀)"),
+) -> None:
+    """路径 B: OpenAI 兼容兜底通道 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …)."""
+    env_path = _find_env_file()
+    env = _parse_env(env_path)
+    env["TAGENT_LLM_PROVIDER"] = f"openai/{model}"
+    env["TAGENT_LLM_API_BASE"] = base
+    env["TAGENT_LLM_API_KEY"] = key
+
+    _write_env(env_path, env)
+    typer.echo(f"✅ 写 {env_path}: 路径 B 通用通道")
+    typer.echo(f"   TAGENT_LLM_PROVIDER=openai/{model}")
+    typer.echo(f"   TAGENT_LLM_API_BASE={base}")
+    typer.echo(f"   TAGENT_LLM_API_KEY={_mask(key)}")
+    typer.echo("")
+    typer.echo("验路由: tagent demo")
