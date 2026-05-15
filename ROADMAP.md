@@ -37,9 +37,9 @@
 
 ---
 
-## 当前活跃 skill (14 / 32)
+## 当前活跃 skill (16 / 32)
 
-### 7 production (已上线)
+### 9 production (已上线)
 
 | Skill | 类别 |
 |-------|------|
@@ -50,6 +50,8 @@
 | `testcase-design` | 用例设计 |
 | `test-coordinator` | 测试流程编排 |
 | `verification-loop` | 5-phase 验证循环 |
+| `pentest-coordinator` | 渗透总编排(V1.21.0-alpha · skill rollout 首落地) |
+| `mobile-test` | 移动端执行编排(V1.23.0-alpha · skill rollout #2) |
 
 ### 7 script-backed (已上线)
 
@@ -94,12 +96,12 @@
 
 | Skill | 范围 | 关联 expert | 状态 |
 |-------|------|-------------|------|
-| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | rollout |
+| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | **done** (V1.23.0-alpha · runtime/orchestrator/skills/mobile_test.py · 6 阶段编排 + 质量门禁 + 跨平台并行) |
 | `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | rollout |
 | `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | rollout |
 | `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | rollout |
 
-### Pentest 7 skill(需 SECURITY.md 武器化授权 wiring 实装)
+### Pentest 7 skill(1 production / 6 rollout · 需 SECURITY.md 武器化授权 wiring 实装)
 
 | Skill | 范围 | 状态 |
 |-------|------|------|
