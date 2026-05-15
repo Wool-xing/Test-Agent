@@ -1,6 +1,6 @@
-"""9 个 LLM-driven AgentRunner 专项 unit test (V1.16-followup).
+"""10 个 LLM-driven AgentRunner 专项 unit test (V1.16-followup).
 
-覆盖 3 维度 × 9 runner = 27 case (参数化):
+覆盖 3 维度 × 10 runner = 30 case (参数化):
 - registration: @register("name") + __init__.py import 双链路 → get_runner(name) 非空
   (防 __init__.py 漏 import 致 silent fallback no-op)
 - mock_output schema: 必填 top-level keys 全在
@@ -61,6 +61,10 @@ ALL_RUNNERS: list[tuple[str, list[str]]] = [
     (
         "system-tester",  # V1.18.0-alpha
         ["project_name", "system_target_type", "test_cases", "device_commands", "protocol_specific", "test_environment", "risks", "confidence"],
+    ),
+    (
+        "pentest-tester",  # V1.19.0-alpha
+        ["project_name", "test_mode", "target_scope", "recon_phase", "vuln_assessment_phase", "exploit_plan", "reporting", "risks", "confidence"],
     ),
 ]
 
