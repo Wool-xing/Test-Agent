@@ -25,5 +25,6 @@ from runtime.orchestrator.agents.base import (  # noqa: F401
 
 # 触发注册 (每个模块加载时 @register_skill 注册到 SKILL_RUNNERS)
 from runtime.orchestrator.skills import (  # noqa: F401,E402
+    eval_harness,
     pentest_coordinator,
 )

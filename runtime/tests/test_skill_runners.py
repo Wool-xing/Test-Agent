@@ -38,6 +38,21 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
             "confidence",
         ],
     ),
+    (
+        "eval-harness",  # V1.27.0-alpha (skill rollout #5)
+        [
+            "project_name",
+            "run_id",
+            "eval_target",
+            "model_version",
+            "safety_checks",
+            "phases",
+            "quality_gates",
+            "outputs",
+            "risks",
+            "confidence",
+        ],
+    ),
 ]
 
 
