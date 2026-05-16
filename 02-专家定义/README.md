@@ -51,7 +51,7 @@ bug-manager → report-generator → test-lead 决策
 | 15 | `15-渗透测试.md` | **pentest-tester** | 渗透 / 安全测试 / SQL 注入 / XSS / SSRF / 漏洞扫描 / OWASP / 攻击面 |
 | 16 | `16-车载测试.md` | **automotive-tester** | 车载 / 汽车 / CAN-bus / SOME-IP / DoIP / UDS / ASIL / ISO-26262 / HIL / OTA |
 
-⚠️ **运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../SECURITY.md) 武器化代码使用边界)。16 expert 全部 production（V1.x rollout 收尾），0 处于 rollout。runtime/router + orchestrator 防 mock 已落地，不会输出 mock 数据。详见 [ROADMAP.md](../ROADMAP.md)。
+⚠️ **运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../SECURITY.md) 武器化代码使用边界)。16 expert 全部 active (11 production + 5 script)，0 处于 rollout。runtime/router + orchestrator 防 mock 已落地，不会输出 mock 数据。详见 [ROADMAP.md](../ROADMAP.md)。
 
 ### 路由识别（自动）
 
