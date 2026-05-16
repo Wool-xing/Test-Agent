@@ -1,12 +1,14 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { postRunFile, postRunText, postRunUrl, RunCreated } from "@/api";
+import { Lightbulb, X } from "lucide-react";
 
 type Mode = "text" | "file" | "url";
 
 export default function UploadPage() {
   const [mode, setMode] = useState<Mode>("text");
+  const [showGuide, setShowGuide] = useState(!localStorage.getItem("tagent_onboarded"));
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -33,9 +35,25 @@ export default function UploadPage() {
       <h2 id="upload-heading" className="text-2xl font-bold mb-4">
         新建测试任务
       </h2>
-      <p className="text-sm text-slate-600 mb-6">
+      <p className="text-sm text-slate-600 mb-4">
         支持文本指令、文件上传(PDF/Word/MD/exe/APK/IPA/Docker)、或被测系统 URL。
       </p>
+
+      {showGuide && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-medium flex items-center gap-1.5"><Lightbulb className="w-4 h-4" /> Quick Start</span>
+            <button onClick={() => { setShowGuide(false); localStorage.setItem("tagent_onboarded", "1"); }} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+          </div>
+          <ol className="list-decimal list-inside space-y-1 text-slate-600">
+            <li>Enter a test target (e.g. "Login page at https://example.com")</li>
+            <li>Click <strong>Start Test</strong> — AI plans & runs the test</li>
+            <li>Watch progress in real-time → view report</li>
+            <li>Go to <strong>Settings</strong> to add your LLM API key for smarter results</li>
+            <li>Check <strong>System Check</strong> to verify everything works</li>
+          </ol>
+        </div>
+      )}
 
       <fieldset className="mb-4" role="radiogroup" aria-labelledby="mode-legend">
         <legend id="mode-legend" className="text-sm font-medium mb-2">
