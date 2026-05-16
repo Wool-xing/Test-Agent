@@ -1,0 +1,18 @@
+{
+  "appId": "com.testagent.mobile",
+  "appName": "Test-Agent",
+  "webDir": "../runtime/web/dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#3b82f6"
+    }
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "test-agent-mobile",
+  "version": "1.32.0",
+  "description": "Test-Agent Mobile — AI Testing Framework for iOS & Android",
+  "scripts": {
+    "build": "cd ../runtime/web && npm run build",
+    "sync:ios": "npx cap sync ios",
+    "sync:android": "npx cap sync android",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android",
+    "build:all": "npm run build && npx cap sync"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0"
+  }
+}

@@ -36,3 +36,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </React.StrictMode>,
 );
+
+// Register service worker for PWA / offline
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
+}
