@@ -14,6 +14,7 @@ from runtime import __version__
 from runtime.api.deps import Kernel
 from runtime.api.models import CatalogResponse, RunCreateText, RunCreated, RunStatus as RunStatusModel
 from runtime.api.parsers import parse_path, parse_text, parse_url
+from runtime.config.settings import get_settings
 
 app = FastAPI(title="Test-Agent Runtime", version=__version__)
 app.add_middleware(
@@ -126,6 +127,25 @@ def report(run_id: str) -> JSONResponse:
     if res is None:
         raise HTTPException(status_code=404, detail="run not finished or unknown")
     return JSONResponse(res)
+
+
+@app.post("/feedback")
+def submit_feedback(payload: dict) -> dict:
+    """Accept user feedback from desktop/web UI. Logs to workspace/feedback/."""
+    import json as _json
+    from datetime import datetime, timezone
+
+    fb_dir = get_settings().workspace_dir / "feedback"
+    fb_dir.mkdir(parents=True, exist_ok=True)
+    entry = {
+        **payload,
+        "received_at": datetime.now(timezone.utc).isoformat(),
+    }
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    fname = fb_dir / f"feedback-{ts}.json"
+    fname.write_text(_json.dumps(entry, indent=2, ensure_ascii=False), encoding="utf-8")
+    logger.info("feedback saved: {}", fname)
+    return {"status": "ok", "saved_to": str(fname)}
 
 
 def _run_in_background(run_id: str, decision) -> None:
