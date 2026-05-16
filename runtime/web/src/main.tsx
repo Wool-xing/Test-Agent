@@ -10,6 +10,8 @@ import CatalogPage from "./pages/CatalogPage";
 import SettingsPage from "./pages/SettingsPage";
 import DoctorPage from "./pages/DoctorPage";
 import FeedbackPage from "./pages/FeedbackPage";
+import DashboardPage from "./pages/DashboardPage";
+import HistoryPage from "./pages/HistoryPage";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -28,6 +30,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/doctor" element={<DoctorPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/history" element={<HistoryPage />} />
             <Route path="/feedback" element={<FeedbackPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
