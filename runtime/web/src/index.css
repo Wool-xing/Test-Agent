@@ -26,3 +26,14 @@ body {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
+
+/* Mobile responsive — bottom nav on small screens */
+@media (max-width: 640px) {
+  header nav ul { gap: 0.5rem; font-size: 0.75rem; }
+  main { padding: 0.75rem; }
+}
+
+/* Safe area for notch phones (iOS) */
+@supports (padding: env(safe-area-inset-bottom)) {
+  footer { padding-bottom: env(safe-area-inset-bottom); }
+}
