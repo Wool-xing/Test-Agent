@@ -1,4 +1,4 @@
-"""automotive-hil-loop-test · HIL/SIL/MIL/PIL 环路编排 (V1.31.0-alpha)."""
+"""automotive-hil-loop-test · HIL/SIL/MIL/PIL 环路编排 (V1.31.0)."""
 from __future__ import annotations
 from pathlib import Path
 from typing import Any

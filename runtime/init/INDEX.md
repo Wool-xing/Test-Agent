@@ -1,4 +1,4 @@
-# runtime/init/ 索引(V1.12.0-alpha)
+# runtime/init/ 索引(V1.12.0)
 
 > `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 主宪章 §1 一键部署。
 

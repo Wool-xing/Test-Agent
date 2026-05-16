@@ -1,4 +1,4 @@
-"""automotive-test skill · 整车测试主编排 (V1.31.0-alpha batch).
+"""automotive-test skill · 整车测试主编排 (V1.31.0 batch).
 
 10 阶段: HARA+ASIL → 静态 MISRA → 单元 MC/DC → SIL/PIL → HIL → CAN → ADAS → OTA → 合规 → 报告
 """

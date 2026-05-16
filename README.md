@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
-[![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](VERSION)
+[![Status: alpha](https://img.shields.io/badge/status-orange.svg)](VERSION)
 [![中文](https://img.shields.io/badge/Lang-中文-red.svg)](README.zh-CN.md)
 
 **English** | [简体中文](README.zh-CN.md)

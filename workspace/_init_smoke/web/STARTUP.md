@@ -1,7 +1,7 @@
 # Test-Agent 启动指南(由 `tagent init` 生成)
 
 > 配置:**Web 系统测试** · Linux(Ubuntu/Debian/CentOS) · LLM=claude · BugTracker=github · 通知=Slack Incoming Webhook
-> 生成于 2026-05-12 04:22:26 · Test-Agent 1.12.0-alpha
+> 生成于 2026-05-12 04:22:26 · Test-Agent 1.12.0
 
 ## 1. 填占位(必做)
 

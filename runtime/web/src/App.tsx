@@ -9,7 +9,7 @@ export default function App() {
           <h1 className="text-lg font-semibold flex items-center gap-2">
             <Beaker className="w-5 h-5" aria-hidden="true" />
             <span>Test-Agent · Runtime</span>
-            <span className="text-xs text-slate-500">v1.2.0-alpha</span>
+            <span className="text-xs text-slate-500">v1.31.0</span>
           </h1>
           <nav aria-label="Primary">
             <ul className="flex gap-4 text-sm">

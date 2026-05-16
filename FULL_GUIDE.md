@@ -6,8 +6,8 @@
 
 **项目代号**：`test-agent-team`（全英文）
 **项目目录名**：`Test-Agent`（中文别名 `Test-Agent团队`）
-**当前阶段**：Phase 2 前期（V1.31.0-alpha · 16 expert + 23/32 skill production + 0 rollout + 2 vision；V1.x rollout 收尾）
-**版本**：V1.31.0-alpha（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
+**当前阶段**：Phase 2 前期（V1.31.0 · 16 expert + 23/32 skill production + 0 rollout + 2 vision；V1.x rollout 收尾）
+**版本**：V1.31.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-05-16
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
 
@@ -27,7 +27,7 @@
 | 04 | [skills-bugtracker](docs/charter/04-skills-bugtracker.md) | Skills 自进化机制 + Bug Tracker 多适配器 |
 | 05 | [install-deploy](docs/charter/05-install-deploy.md) | 按需安装 + 架构图 + 快速开始 + 工作流 + 技术栈 + 闭环 + 升级 + 协作 + 跨 AI |
 | 06 | [test-architecture](docs/charter/06-test-architecture.md) | 测试架构深度 + 关键反问 + 开放问题 + 术语表 |
-| 07 | [runtime-license](docs/charter/07-runtime-license.md) | V1.26.0-alpha 运行时层 + LICENSE / CHANGELOG / 项目当前状态 |
+| 07 | [runtime-license](docs/charter/07-runtime-license.md) | V1.26.0 运行时层 + LICENSE / CHANGELOG / 项目当前状态 |
 
 ## 跨文件链接迁移指引
 

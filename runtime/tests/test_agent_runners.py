@@ -47,27 +47,27 @@ ALL_RUNNERS: list[tuple[str, list[str]]] = [
         ["verdict", "rationale", "metrics", "known_risks", "fallback_plan", "summary_zh", "requires_human_signoff", "signoff_owner"],
     ),
     (
-        "env-manager",  # V1.15.0-alpha
+        "env-manager",  # V1.15.0
         ["project_name", "target_env", "env_checks", "prep_steps", "dependencies", "risks", "confidence"],
     ),
     (
-        "mobile-tester",  # V1.16.0-alpha
+        "mobile-tester",  # V1.16.0
         ["project_name", "target_platform", "test_cases", "device_commands", "test_environment", "mobile_specific", "risks", "confidence"],
     ),
     (
-        "visual-tester",  # V1.17.0-alpha
+        "visual-tester",  # V1.17.0
         ["project_name", "visual_target_type", "visual_test_points", "comparison_scripts", "tolerance", "baseline_strategy", "risks", "confidence"],
     ),
     (
-        "system-tester",  # V1.18.0-alpha
+        "system-tester",  # V1.18.0
         ["project_name", "system_target_type", "test_cases", "device_commands", "protocol_specific", "test_environment", "risks", "confidence"],
     ),
     (
-        "pentest-tester",  # V1.19.0-alpha
+        "pentest-tester",  # V1.19.0
         ["project_name", "test_mode", "target_scope", "recon_phase", "vuln_assessment_phase", "exploit_plan", "reporting", "risks", "confidence"],
     ),
     (
-        "automotive-tester",  # V1.20.0-alpha (V1.x rollout 收尾)
+        "automotive-tester",  # V1.20.0 (V1.x rollout 收尾)
         ["project_name", "vehicle_subsystem", "asil_assessment", "test_cases", "bus_test_plan", "adas_scenarios", "ota_plan", "compliance_matrix", "test_environment", "risks", "confidence"],
     ),
 ]

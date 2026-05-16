@@ -1,4 +1,4 @@
-# runtime/web 索引(V1.2.0-alpha MVP)
+# runtime/web 索引(V1.2.0 MVP)
 
 > Web UI for `runtime/api`. 4 页:Upload / Run Status / Report / Catalog。
 > 被测项级别 §21 **L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。

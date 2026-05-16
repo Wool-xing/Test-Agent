@@ -1,4 +1,4 @@
-# 配置模板库索引(V1.12.0-alpha)
+# 配置模板库索引(V1.12.0)
 
 > `tagent init` 交互向导从本目录读取模板 + matrix · 5 分钟生成 `.env` + `tagent.yml` + `STARTUP.md`。
 

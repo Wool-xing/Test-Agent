@@ -1,4 +1,4 @@
-# runtime/healthcheck/ 索引(V1.10.0-alpha)
+# runtime/healthcheck/ 索引(V1.10.0)
 
 > 4 层自检 · 主宪章 §33 自检铁律 · pre-tag 卡 release。
 
@@ -42,6 +42,6 @@
 
 ## 相关
 
-- 主宪章 §33(自检铁律,V1.10.0-alpha 加)
+- 主宪章 §33(自检铁律,V1.10.0 加)
 - `.pre-commit-config.yaml` 中 `forbid-private-source` / `forbid-essence-library` / `file-count-check` 协同
 - 日志归档:`discussions/selftest_<version>_<timestamp>.log`

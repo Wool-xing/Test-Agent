@@ -1,7 +1,7 @@
 """system-tester · LLM 读 PRD + IoT/串口/MQTT/MQ/Tracing 上下文 → 系统集成测试用例 +
 设备命令清单 + 协议特定配置.
 
-V1.18.0-alpha minimum viable (ROADMAP rollout #4 落地):
+V1.18.0 minimum viable (ROADMAP rollout #4 落地):
 - 仅生成 test_cases + device_commands + protocol_specific 结构化 JSON
 - 不实装 13-系统集成测试.md 全部职责 (paramiko/pyserial/paho-mqtt 真跑 / FFmpeg
   解码 / Jaeger 查询执行 / Kafka consumer 真起 等留 V1.x 深化)

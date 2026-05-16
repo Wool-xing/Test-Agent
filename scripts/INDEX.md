@@ -1,4 +1,4 @@
-# scripts/ 索引(V1.10.0-alpha)
+# scripts/ 索引(V1.10.0)
 
 > 运维 / 分析 / 数据导出脚本 · 不属于运行时 · 不进入 tagent CLI。
 

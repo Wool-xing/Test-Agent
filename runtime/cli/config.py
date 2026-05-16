@@ -1,11 +1,11 @@
-"""tagent config — LLM provider 配置管理 (V1.22.0-alpha · Step 2 多模型 onboarding).
+"""tagent config — LLM provider 配置管理 (V1.22.0 · Step 2 多模型 onboarding).
 
 5 子命令:
   list       — 列内置 6 + B 路径兼容样例
   show       — 显当前 .env 配置 (key 全脱敏)
   use        — 路径 A: 切到内置 provider, 写 TAGENT_LLM_PROVIDER + 厂商 key 占位
   use-compat — 路径 B: OpenAI 兼容兜底通道 (任厂商即插即用)
-  unset      — 移除 .env 中指定 key (V1.25.0-alpha)
+  unset      — 移除 .env 中指定 key (V1.25.0)
 
 env 文件优先级: CWD/.env → 仓根/.env. 写前必备份 .env.bak.
 """

@@ -1,4 +1,4 @@
-"""tagent config CLI 测试 (V1.22.0-alpha · 4 子命令 list/show/use/use-compat)."""
+"""tagent config CLI 测试 (V1.22.0 · 4 子命令 list/show/use/use-compat)."""
 
 from __future__ import annotations
 

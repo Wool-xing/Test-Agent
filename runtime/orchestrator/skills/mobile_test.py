@@ -1,6 +1,6 @@
 """mobile-test skill · LLM 读上游 mobile-tester 产物 → 6 阶段移动端执行编排.
 
-V1.23.0-alpha minimum viable (ROADMAP skill rollout #2 落地):
+V1.23.0 minimum viable (ROADMAP skill rollout #2 落地):
 - LLM 读 PRD + 上游 mobile-tester expert 产物 → 6 阶段执行计划
   (设备就绪 / Appium / 用例批次 / 性能采集 / Monkey / 报告归档)
   + 质量门禁 + 跨平台并行策略

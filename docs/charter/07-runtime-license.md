@@ -4,7 +4,7 @@
 内容与原 FULL_GUIDE.md 对应段完全一致, 仅拆不动语义。
 -->
 
-## 🧠 V1.23.0-alpha 运行时层(`runtime/`)
+## 🧠 V1.23.0 运行时层(`runtime/`)
 
 > 已有 16 专家 / 32 Skill / 49 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
@@ -121,7 +121,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 ## 📜 LICENSE / CHANGELOG / CONTRIBUTING / SECURITY
 
 - **LICENSE**：MIT（详见 [`LICENSE`](LICENSE)）
-- **CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.31.0-alpha 含 17 版累积 / expert rollout 收尾 / skill rollout 全 14/14 完成）
+- **CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.31.0 含 17 版累积 / expert rollout 收尾 / skill rollout 全 14/14 完成）
 - **VERSION**：详见 [`VERSION`](VERSION)
 - **CONTRIBUTING**：详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)（含同步铁律 + RACI 矩阵）
 - **SECURITY**：详见 [`SECURITY.md`](SECURITY.md)（漏洞报告流程 + GitHub Security Advisories 入口）
@@ -133,7 +133,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 
 ### 当前阶段（最后更新：2026-05-16）
 
-- **Phase**：Phase 2 前期（V1.31.0-alpha · expert rollout 收尾 + skill rollout 完成 14/14）
+- **Phase**：Phase 2 前期（V1.31.0 · expert rollout 收尾 + skill rollout 完成 14/14）
 - **关键已交付**：16 expert (11p+5s) · 32 skill (23p+7s+0r+2v) · AgentChat · Bug 多适配 · 按需安装 · darwin-skill · MCP 6 件套 · Marketplace · 教学层 · 多 LLM config · 16 SkillRunner 全落地
 - **活跃 PR**：无（V1.31 rollout 完成，2026-05-16）
 
@@ -156,7 +156,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 
 - 第一至五轮（DeepSeek + Claude）：测试 Agent 架构 + 九大簇
 - V1.0.0 工程基线：14 agent + 14 skill + 49 utils + CI/CD（历史基线）
-- V1.1.0-alpha ~ V1.31.0-alpha：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
+- V1.1.0 ~ V1.31.0：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
 - 永久宪章糅合（2026-05-11/14/16）：FULL_GUIDE 工程主体 + 全局记忆哲学维度 + 持续回写
 
 ---

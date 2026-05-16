@@ -1,4 +1,4 @@
-"""Multi-format test-case exporters · V1.9.0-alpha.
+"""Multi-format test-case exporters · V1.9.0.
 
 By default: Excel 4 Sheet(`utils/excel_generator.py`,已有).
 New formats: xmind / markmap / opml / freemind / plantuml(按用户选).

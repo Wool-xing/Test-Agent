@@ -1,5 +1,5 @@
 {
-  "_comment": "MCP 服务配置。V1.2.0-alpha 起 M2 实现 6 件套(主宪章 §16)。filesystem 始终启用。其他 6 件 server 注释段保留,需启用时取消注释。",
+  "_comment": "MCP 服务配置。V1.2.0 起 M2 实现 6 件套(主宪章 §16)。filesystem 始终启用。其他 6 件 server 注释段保留,需启用时取消注释。",
   "mcpServers": {
     "filesystem": {
       "command": "npx",
