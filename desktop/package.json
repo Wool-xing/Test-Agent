@@ -1,0 +1,26 @@
+{
+  "name": "test-agent-desktop",
+  "version": "1.31.0",
+  "description": "Test-Agent Desktop — AI Testing Framework GUI",
+  "author": "Test-Agent Team",
+  "license": "MIT",
+  "main": "out/electron/main.js",
+  "scripts": {
+    "dev": "npm run build:electron && electron .",
+    "build:electron": "tsc -p electron/tsconfig.json",
+    "build:renderer": "cd ../runtime/web && npm run build",
+    "build:all": "npm run build:electron && npm run build:renderer",
+    "pack": "npm run build:all && electron-builder --dir",
+    "dist": "npm run build:all && electron-builder",
+    "dist:win": "npm run build:all && electron-builder --win",
+    "dist:mac": "npm run build:all && electron-builder --mac"
+  },
+  "devDependencies": {
+    "electron": "^36.0.0",
+    "electron-builder": "^26.0.0",
+    "typescript": "^5.7.0"
+  },
+  "build": {
+    "extends": "./electron-builder.yml"
+  }
+}

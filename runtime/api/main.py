@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -15,6 +16,12 @@ from runtime.api.models import CatalogResponse, RunCreateText, RunCreated, RunSt
 from runtime.api.parsers import parse_path, parse_text, parse_url
 
 app = FastAPI(title="Test-Agent Runtime", version=__version__)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 _kernel = Kernel()
 _run_results: dict[str, dict] = {}
 

@@ -107,6 +107,15 @@ target/
 *.key
 *.crt
 *.p12
+
+# ===== Desktop build artifacts =====
+desktop/out/
+desktop/node_modules/
+dist-python/
+dist-electron/
+*.exe
+*.dmg
+*.AppImage
 *.pfx
 *.jks
 id_rsa
