@@ -133,7 +133,7 @@
 
 | Phase | 触发条件 | 标志性交付 |
 |------|---------|----------|
-| **Phase 1**（已完成 V1.0.0-V1.26.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 起步 | 16 expert (11p+5s) + 32 skill (10p+7s+13r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
+| **Phase 1**（已完成 V1.0.0-V1.31.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 完成 | 16 expert (11p+5s) + 32 skill (23p+7s+0r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
 | **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 + skill rollout 继续 |
 | **Phase 3** | Phase 2 全交付 + 接入 ≥ 2 行业 | 合成监控 + canary/feature flag + 统一 dashboard + 沉默故障 + 缺席者注入 |
 | **Phase 4** | 接入合规行业（金融/医疗/司法）| 证据链司法可采信打包 + 数字考古学家 + AI 测试深化 |

@@ -90,7 +90,7 @@ Test-Agent/
 ├── 00-项目导航.md           ← 5-dimension category guide
 ├── 01-快速开始/             ← user manual / deploy / config / deliverables
 ├── 02-专家定义/             ← 16 expert agents (11 production + 5 script, V1.x rollout 收尾)
-├── 03-技能定义/             ← 32 business skills (8 production + 7 script + 15 rollout + 2 vision) + 3 meta-skills
+├── 03-技能定义/             ← 32 business skills (23 production + 7 script + 0 rollout + 2 vision) + 3 meta-skills
 ├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
 ├── 05-代码示例/             ← 49 production utils
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
