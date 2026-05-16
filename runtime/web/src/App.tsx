@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { Beaker, Upload, BookOpen, Settings, Stethoscope } from "lucide-react";
+import { Beaker, Upload, BookOpen, Settings, Stethoscope, MessageSquare } from "lucide-react";
 
 export default function App() {
   return (
@@ -35,6 +35,12 @@ export default function App() {
                 <NavLink to="/settings" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
                   <Settings className="inline w-4 h-4 mr-1" aria-hidden="true" />
                   Settings
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/feedback" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
+                  <MessageSquare className="inline w-4 h-4 mr-1" aria-hidden="true" />
+                  Feedback
                 </NavLink>
               </li>
             </ul>
