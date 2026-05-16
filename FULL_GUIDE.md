@@ -4,11 +4,10 @@
 > 简明入口 → [README.md](README.md) ；按职责分类速查 → [00-项目导航.md](00-项目导航.md)。
 > **维护原则**：决策入档、开放问题入档、不打脸的承诺才写。重大决策须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。
 
-**项目代号**：`test-agent-team`（全英文）
-**项目目录名**：`Test-Agent`（中文别名 `Test-Agent团队`）
+**项目名称**：`Test-Agent`（内部代号 `test-agent-team`）
 **当前阶段**：Phase 2 前期（V1.32.0 · 16 expert + 23/32 skill production + 0 rollout + 2 vision；V1.x rollout 收尾）
 **版本**：V1.32.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
-**更新日期**：2026-05-16
+**更新日期**：2026-05-17
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
 
 ---

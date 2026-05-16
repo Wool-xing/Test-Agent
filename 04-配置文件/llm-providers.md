@@ -11,7 +11,7 @@
   1. 选厂商 (路径 A 内置 6 / 路径 B 兼容 5+)
   2. 复制对应 export
   3. `tagent demo` 验路由
-- **实测有效** (V1.21.0): Claude / OpenAI / Gemini / DeepSeek / Qwen / Ollama / **智谱 GLM** (路径 B 实测 20/20 准, 见 PR #79)
+- **实测有效** (V1.32.0): Claude / OpenAI / Gemini / DeepSeek / Qwen / Ollama / **智谱 GLM** (路径 B 实测 20/20 准, 见 PR #79)
 - **适用场景**:
   - 离线本地 = Ollama / Qwen
   - 国内合规 = 智谱 / 豆包 / 通义
