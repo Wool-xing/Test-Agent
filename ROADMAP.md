@@ -1,11 +1,11 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.32.0 (**expert rollout 收尾 + skill rollout 完成（14/14）**)
+> 当前状态:V1.32.0 (**expert rollout 收尾 + skill rollout 完成（16/16）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
-> - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 12 实装。
+> - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 全 16 实装 (V1.21-V1.31)。
 
 ## 当前活跃 expert (16 / 16) — V1.x rollout 收尾
 
@@ -37,9 +37,9 @@
 
 ---
 
-## 当前活跃 skill (24 / 32)
+## 当前活跃 skill — 基础 (含 rollout 总计 30/32 active)
 
-### 17 production (已上线)
+### 23 production (已上线，本节约 13 核心 + rollout 表 10)
 
 | Skill | 类别 |
 |-------|------|
@@ -89,7 +89,7 @@
 
 ---
 
-## V1.x rollout — 16 skill 实装路线（含已完成 3 + 剩余 13）
+## V1.x rollout — 16 skill 实装路线（已全部完成）
 
 **节奏**: skill rollout 起点 V1.21.0 (SkillRunner 基础设施 + pentest-coordinator 首落地);后续 1 skill / PR 推进。
 **完成标准**: 每 skill 接 LLM 真调用 (mock_output schema 覆盖 + production 升级 + ALL_SKILL_RUNNERS 锁规则同步)。
@@ -100,18 +100,18 @@
 
 | Skill | 范围 | 关联 expert | 状态 |
 |-------|------|-------------|------|
-| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | rollout |
-| `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | rollout |
-| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | rollout |
+| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | **done** (V1.23.0 · runtime/orchestrator/skills/mobile_test.py) |
+| `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | **done** (V1.24.0 · runtime/orchestrator/skills/visual_test.py) |
+| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | **done** (V1.26.0 · runtime/orchestrator/skills/system_test.py) |
 | `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | **done** (V1.27.0 · runtime/orchestrator/skills/eval_harness.py · 5 阶段编排 + 质量门禁 + 安全护栏) |
 
-### Pentest 7 skill(1 production / 6 rollout · 需 SECURITY.md 武器化授权 wiring 实装)
+### Pentest 7 skill（已全部完成 · SECURITY.md 武器化授权 wiring 已实装）
 
 | Skill | 范围 | 状态 |
 |-------|------|------|
 | `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0 · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
-| `pentest-recon` | 侦察(被动+主动信息收集) |
-| `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) |
+| `pentest-recon` | 侦察(被动+主动信息收集) | **done** (V1.25.0) |
+| `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) | **done** (V1.25.0) |
 | `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) | **done** (V1.30.0 · pentest batch 2) |
 | `pentest-api` | API 渗透(OWASP API Top 10 2023) | **done** (V1.30.0 · pentest batch 2) |
 | `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) | **done** (V1.30.0 · pentest batch 2) |
@@ -122,20 +122,10 @@
 | Skill | 范围 |
 |-------|------|
 | `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (V1.31.0 · automotive batch) |
-| `automotive-can-bus-test` | CAN总线测试(V1.31.0) |
-| `automotive-adas-scenario` | ADAS场景库(V1.31.0) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
 | `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (V1.31.0 · automotive batch) |
-| `automotive-adas-scenario` | ADAS场景库(V1.31.0) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
 | `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (V1.31.0 · automotive batch) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
-| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (V1.31.0 · automotive batch) |
 | `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) | **done** (V1.31.0 · automotive batch) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
+| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (V1.31.0 · automotive batch) |
 
 ---
 

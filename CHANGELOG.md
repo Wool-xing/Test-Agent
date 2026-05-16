@@ -18,7 +18,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ## [v1.32.0] - 2026-05-17
 
 > **V1.15.0 → V1.32.0 (2026-05-15 ~ 2026-05-17) 共 17 版累积**。
-> expert rollout 收尾 (V1.15-V1.20) + skill rollout 全 14/14 完成 (V1.21-V1.31)。
+> expert rollout 收尾 (V1.15-V1.20) + skill rollout 全 16/16 完成 (V1.21-V1.31)。
 > 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表。
 
 ### Added (V1.15-V1.20 · expert rollout 收尾 — 6 expert 真 LLM 落地)
@@ -30,12 +30,12 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `system_tester.py` (V1.18) · 系统集成 — IoT/串口/MQTT/音视频/追踪/消息队列
   - `pentest_tester.py` (V1.19) · 渗透安全 — 5 攻击域 + recon/vuln/exploit/reporting 4 阶段
   - `automotive_tester.py` (V1.20) · 车载/自动驾驶 — ISO 26262 ASIL + CAN/LIN/FlexRay + ECU/ADAS/IVI/V2X
-- expert 16/16 **全 production** (11 production + 5 script, 0 rollout)
+- expert 16/16 **全 active** (11 production + 5 script, 0 rollout)
 
-### Added (V1.21-V1.31 · skill rollout — 14 skill LLM-driven 全落地)
+### Added (V1.21-V1.31 · skill rollout — 16 skill LLM-driven 全落地)
 
 - **SkillRunner 基础设施** (V1.21): `runtime/orchestrator/skills/__init__.py` + `SKILL_RUNNERS` registry + `@register_skill` deco
-- **14 skill runner LLM-driven** (`runtime/orchestrator/skills/`):
+- **16 skill runner LLM-driven** (`runtime/orchestrator/skills/`):
   - pentest-coordinator (V1.21) · 渗透流程主编排 (5 阶段 + 授权检查 + 子代理池)
   - mobile-test (V1.23) · Android/iOS 双平台 + 小程序
   - visual-test (V1.24) · Airtest + OCR + SSIM 视觉对比
