@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { Beaker, Upload, BookOpen, Settings, Stethoscope, MessageSquare } from "lucide-react";
+import { Beaker, Upload, BookOpen, Settings, Stethoscope, MessageSquare, BarChart3, Clock } from "lucide-react";
 
 export default function App() {
   return (
@@ -23,6 +23,18 @@ export default function App() {
                 <NavLink to="/catalog" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
                   <BookOpen className="inline w-4 h-4 mr-1" aria-hidden="true" />
                   Catalog
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
+                  <BarChart3 className="inline w-4 h-4 mr-1" aria-hidden="true" />
+                  Dashboard
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/history" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
+                  <Clock className="inline w-4 h-4 mr-1" aria-hidden="true" />
+                  History
                 </NavLink>
               </li>
               <li>
