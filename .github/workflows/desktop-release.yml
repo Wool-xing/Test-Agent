@@ -29,7 +29,9 @@ jobs:
           pip install pyinstaller
 
       - name: Build Python backend
-        run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
+        run: |
+          echo "=== DEBUG ===" && ls desktop/entrypoint.py && ls desktop/pyinstaller/*.spec
+          pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
 
       - name: Build Web UI
         working-directory: runtime/web
@@ -68,7 +70,9 @@ jobs:
           pip install pyinstaller
 
       - name: Build Python backend
-        run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
+        run: |
+          echo "=== DEBUG ===" && ls desktop/entrypoint.py && ls desktop/pyinstaller/*.spec
+          pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
 
       - name: Build Web UI
         working-directory: runtime/web
