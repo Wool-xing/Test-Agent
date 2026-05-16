@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
-[![Status: alpha](https://img.shields.io/badge/status-orange.svg)](VERSION)
+[![Status: stable](https://img.shields.io/badge/status-brightgreen.svg)](VERSION)
 [![English](https://img.shields.io/badge/Lang-English-blue.svg)](README.md)
 
 [English](README.md) | **简体中文**
@@ -19,7 +19,7 @@
 git clone https://github.com/Wool-xing/Test-Agent.git
 bash Test-Agent/install.sh ~/test-agent-project
 
-# 可选:启用自主运行时 (alpha — 5 个真 LLM-driven agent)
+# 可选:启用自主运行时 (16 个真 LLM-driven agent)
 cd Test-Agent/runtime && pip install -e .
 tagent demo            # 0 API key · stub LLM · 30 秒看完整产物
 ```
@@ -50,7 +50,7 @@ Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测�
 - **MCP 集成** — 6 模块已实现(test-orchestrator 默认启用;其余 5 件套写在 `.mcp.json` 的 `_pending_servers_v1_2_0_alpha` 段)
 - **自检脚手架** — L1 lint + L2 mock CI 已在 CI 激活;L3 真 LLM + L4 周自检需配置 `ANTHROPIC_API_KEY` secret(本仓默认未配)
 
-## 🚀 安装 (alpha)
+## 🚀 安装
 
 > ⚠️ 本项目含攻击面工具(渗透 skill / SSRF 探针 / AI 对抗模板)。运行 pentest 或 AI-adversarial 工作流前请阅 [SECURITY.md](SECURITY.md) 中的授权要求。
 

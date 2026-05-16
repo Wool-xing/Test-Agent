@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/Wool-xing/Test-Agent?style=social)](https://github.com/Wool-xing/Test-Agent/stargazers)
-[![Status: alpha](https://img.shields.io/badge/status-orange.svg)](VERSION)
+[![Status: stable](https://img.shields.io/badge/status-brightgreen.svg)](VERSION)
 [![中文](https://img.shields.io/badge/Lang-中文-red.svg)](README.zh-CN.md)
 
 **English** | [简体中文](README.zh-CN.md)
@@ -19,7 +19,7 @@
 git clone https://github.com/Wool-xing/Test-Agent.git
 bash Test-Agent/install.sh ~/test-agent-project
 
-# Optional: enable autonomous runtime (alpha — 5 LLM-driven agents wired)
+# Optional: enable autonomous runtime (16 LLM-driven agents)
 cd Test-Agent/runtime && pip install -e .
 tagent demo            # 0 API key · stub LLM · 30s end-to-end
 ```
@@ -33,7 +33,7 @@ tagent init --preset 国内-web    # or: minimal / saas-web / mobile-android / s
 # → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
 ```
 
-Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels (8640 combinations on paper; not all are e2e-validated in this alpha). See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
+Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels (8640 combinations on paper; not all are e2e-validated in this release). See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
 
 ---
 
@@ -50,7 +50,7 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 - **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others under `_pending_servers_v1_2_0_alpha` in `.mcp.json`)
 - **Self-test scaffolding** — L1 lint + L2 mock CI active in CI; L3 real-LLM + L4 weekly cron require `ANTHROPIC_API_KEY` secret (not configured in this repo by default)
 
-## 🚀 Install (alpha)
+## 🚀 Install
 
 > ⚠️ This project includes attack-surface utilities (pentest skills / SSRF probes / AI adversarial templates). See [SECURITY.md](SECURITY.md) for authorization requirements before running pentest or AI-adversarial workflows.
 
