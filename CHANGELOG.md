@@ -14,8 +14,67 @@
 
 _后续累积变更入此节;切版本时移到下方版本节。_
 
-> ⚠️ **V1.15.0-alpha 至 V1.23.0-alpha (2026-05-15 ~ 2026-05-16) 共 9 版条目待补**。
-> 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表与 `git log`。
+---
+
+## [v1.31.0-alpha] - 2026-05-16
+
+> **V1.15.0-alpha → V1.31.0-alpha (2026-05-15 ~ 2026-05-16) 共 17 版累积**。
+> expert rollout 收尾 (V1.15-V1.20) + skill rollout 全 14/14 完成 (V1.21-V1.31)。
+> 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表。
+
+### Added (V1.15-V1.20 · expert rollout 收尾 — 6 expert 真 LLM 落地)
+
+- **6 expert runner LLM-driven** (`runtime/orchestrator/agents/`):
+  - `env_manager.py` (V1.15) · 测试环境管理 — LLM 读 PRD → env_checks + prep_steps + dependencies + risks
+  - `mobile_tester.py` (V1.16) · 移动端 — Android/iOS 原生 + 小程序
+  - `visual_tester.py` (V1.17) · 视觉/游戏 — 图像识别 + OCR + AI 视觉对比
+  - `system_tester.py` (V1.18) · 系统集成 — IoT/串口/MQTT/音视频/追踪/消息队列
+  - `pentest_tester.py` (V1.19) · 渗透安全 — 5 攻击域 + recon/vuln/exploit/reporting 4 阶段
+  - `automotive_tester.py` (V1.20) · 车载/自动驾驶 — ISO 26262 ASIL + CAN/LIN/FlexRay + ECU/ADAS/IVI/V2X
+- expert 16/16 **全 production** (11 production + 5 script, 0 rollout)
+
+### Added (V1.21-V1.31 · skill rollout — 14 skill LLM-driven 全落地)
+
+- **SkillRunner 基础设施** (V1.21): `runtime/orchestrator/skills/__init__.py` + `SKILL_RUNNERS` registry + `@register_skill` deco
+- **14 skill runner LLM-driven** (`runtime/orchestrator/skills/`):
+  - pentest-coordinator (V1.21) · 渗透流程主编排 (5 阶段 + 授权检查 + 子代理池)
+  - mobile-test (V1.23) · Android/iOS 双平台 + 小程序
+  - visual-test (V1.24) · Airtest + OCR + SSIM 视觉对比
+  - pentest-recon + pentest-vuln (V1.25) · 侦察 + 漏洞 (5 攻击域 hybrid)
+  - system-test (V1.26) · IoT/音视频/追踪/消息队列 4 场景
+  - eval-harness (V1.27) · pass@k / Jaccard@k / top-1 stability / latency + 安全护栏
+  - pentest-api + pentest-web (V1.28) · API 安全 + Web 应用安全
+  - pentest-exploit + pentest-report (V1.29) · PoC 验证 + 报告生成
+  - automotive-test + automotive-can-bus-test (V1.30) · 10 阶段主编排 + CAN 协议测试
+  - automotive-adas-scenario + automotive-ota-update-test + automotive-hil-loop-test (V1.31) · ADAS 场景 + OTA 升级 + HIL 环测
+- skill 23/32 production + 7 script + 0 rollout + 2 vision
+
+### Added (V1.22 · CLI + 多 provider)
+
+- **tagent config CLI** (`runtime/cli/config.py`): `tagent config use/set/unset/list/show`
+- **多 provider 通用 env 通道**: `LLM_PROVIDER` + `LLM_API_KEY` + `LLM_MODEL` 通用 env, 6 provider 内置 (claude/openai/gemini/qwen/deepseek/ollama)
+- Stub 扩 4 path 支持 vendor-neutral 多厂商 routing
+
+### Added (MCP 6 件套 · V1.2.0-alpha)
+
+- `runtime/mcp/` 6 MCP server: test-orchestrator / protocol-adapter / evidence-vault / defect-tracker / knowledge-base / compliance-checker
+
+### Added (Web UI · V1.2.0-alpha)
+
+- `runtime/web/` 4 页: Upload / Run Status / Report / Catalog (React 18 + Vite 5 + shadcn/ui + TanStack Query v5)
+
+### Changed
+
+- **数字升级**: 14 expert → 16 expert, 14 skill → 32 skill
+- **防 mock 双 layer** (V1.14.0-alpha+1): registry 单源 frontmatter + router warn + orchestrator hard block
+- vendor-neutral 命名规范 (禁 zhipu/deepseek/openai 厂商名)
+- README/ROADMAP 数字诚实化 (多轮校准)
+
+### Fixed
+
+- 深审 32 发现全修 (3 CRITICAL + 14 HIGH + 8 MEDIUM + 5 LOW)
+- 私源泄漏清洗 (3 文件 + ~80 引用)
+- 版本号全同步: VERSION / FULL_GUIDE / runtime/__init__.py / pyproject.toml
 
 ---
 
