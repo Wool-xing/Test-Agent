@@ -6,8 +6,8 @@
 
 **项目代号**：`test-agent-team`（全英文）
 **项目目录名**：`Test-Agent`（中文别名 `Test-Agent团队`）
-**当前阶段**：Phase 2 前期（V1.26.0-alpha · 16 expert + 4/14 skill production；rollout 进行中）
-**版本**：V1.26.0-alpha（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
+**当前阶段**：Phase 2 前期（V1.31.0-alpha · 16 expert + 14/14 skill production；rollout 完成）
+**版本**：V1.31.0-alpha（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-05-16
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
 

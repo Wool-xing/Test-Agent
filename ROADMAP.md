@@ -1,9 +1,9 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.27.0-alpha (**expert rollout 收尾 + skill rollout 进行中（5/9）**)
+> 当前状态:V1.31.0-alpha (**expert rollout 收尾 + skill rollout 完成（14/14）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
-> - **skill 16/32 active**(9 production + 7 script);14 处于 V1.x rollout;2 暂为 V2 vision 方法论参考。
+> - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 > - **V1.21.0-alpha 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 12 实装。
 
@@ -175,7 +175,7 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 - **registry 单源**: catalog 解析 `02-专家定义/*.md` `EXPERT_IMPL_STATUS` + `03-技能定义/*.md` `SKILL_IMPL_STATUS` frontmatter,实装状态来源唯一
 - **router 软警告**: `_validate_against_catalog` 检测 rollout / vision / unknown → 加 issues 并降 confidence 0.3
 - **orchestrator 硬拒**: `execute_node` 对 expert / skill 任意 rollout / vision / unknown 返回 `returncode=2` + stderr "未实装",绝不走 no-op "documented step recorded" 假成功路径
-- 用户路由 0 个 in-rollout expert / 14 个 in-rollout skill / 2 个 vision skill 时**收到明确说明**,而非伪装成"已运行"的 mock 输出
+- 用户路由 0 个 in-rollout expert / 0 个 in-rollout skill / 2 个 vision skill 时**收到明确说明**,而非伪装成"已运行"的 mock 输出
 - 详情见 [02-专家定义/01-测试主管.md](02-专家定义/01-测试主管.md) 路由表注释
 
 ---

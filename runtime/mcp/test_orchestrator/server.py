@@ -1,7 +1,7 @@
 """mcp-test-orchestrator MCP server.
 
 Tools:
-  - catalog():         list 14 experts + 14 skills
+  - catalog():         list 16 experts + 32 skills
   - plan(target):      run router only, return DAG decision
   - run(target):       router + orchestrator, return execution summary
   - status(run_id):    fetch in-memory run status
@@ -147,7 +147,7 @@ def build_server():
     TOOLS = [
         Tool(
             name="catalog",
-            description="List 14 experts + 14 skills loaded from 02-专家定义/* + 03-技能定义/*.",
+            description="List 16 experts + 32 skills loaded from 02-专家定义/* + 03-技能定义/*.",
             inputSchema={"type": "object", "properties": {}, "additionalProperties": False},
         ),
         Tool(

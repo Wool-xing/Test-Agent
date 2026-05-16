@@ -2,7 +2,7 @@
 
 Expert/Skill execution model:
 
-- The 14 experts and 13 skills live as markdown. They are designed for Claude Code
+- The 16 experts and 32 skills live as markdown. They are designed for Claude Code
   agents to load and execute. Outside of Claude Code, we treat each expert as a
   declarative description and execute its CANONICAL SCRIPT mapping (below).
 - A handful of experts have a strong default script. The rest fall back to

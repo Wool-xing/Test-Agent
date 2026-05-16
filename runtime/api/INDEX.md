@@ -15,7 +15,7 @@
 | POST | `/run` | 多格式上传(PDF/Word/MD/exe/APK/IPA/Docker/口头指令),返回 run_id |
 | GET | `/status/{run_id}` | SSE 流式状态(DAG 实时进度) |
 | GET | `/report/{run_id}` | 报告下载(PDF/Word/HTML/JSON/XML/CSV) |
-| GET | `/catalog` | 列 14 专家 + 13 Skill |
+| GET | `/catalog` | 列 16 专家 + 32 Skill |
 
 ## 输入解析器
 

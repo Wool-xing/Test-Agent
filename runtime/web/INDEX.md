@@ -23,7 +23,7 @@
 | `/` | Upload(多格式:PDF/Word/MD/exe/APK/IPA/Docker/URL/口头) |
 | `/runs/:run_id` | Run Status(SSE 流式 DAG 实时进度) |
 | `/runs/:run_id/report` | Report(执行结果+证据+缺陷链接) |
-| `/catalog` | 14 专家 + 14 skill 目录 |
+| `/catalog` | 16 专家 + 32 skill 目录 |
 
 ## 启动
 
