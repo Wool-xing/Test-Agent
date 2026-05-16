@@ -1,8 +1,8 @@
-# runtime/orchestrator/agents/ 索引(V1.14.0)
+# runtime/orchestrator/agents/ 索引(V1.32.0)
 
-> 真 LLM-driven expert runner · 5 核心 expert 落地 · 主宪章 §40 真 agent 落地 canon。
+> 真 LLM-driven expert runner · 16 核心 expert 全落地 · 主宪章 §40 真 agent 落地 canon。
 
-## 已实现 5 runner(V1.14)
+## 已实现 16 runner(V1.32)
 
 | Runner | 角色源 | 上游 | 产物 |
 |--------|--------|------|------|
@@ -12,7 +12,7 @@
 | `bug-manager` | 02-专家定义/08-Bug管理.md | test-executor | `bug_drafts.json`(BugTracker-ready) |
 | `test-lead` | 02-专家定义/01-测试主管.md | 全链路 | `final_verdict_*.json`(上线决策) |
 
-## 11 未实现(V1.14 沿用 SCRIPT_MAP 兜底)
+## 0 未实现(V1.32 rollout 完成)
 
 - test-lead 自身已实现(用全链路上游),其他 11 个:env-manager / data-preparer(scripted)/ testcase-designer(scripted)/ report-generator(scripted)/ mobile-tester / desktop-tester(scripted)/ visual-tester / system-tester / ai-tester(scripted)/ 渗透 / 车载
 - **5 个有 script 真跑**(testcase-designer / data-preparer / report-generator / desktop-tester / ai-tester)→ SCRIPT_MAP 兜
@@ -43,7 +43,7 @@
 ## 主宪章
 
 - §33 自检铁律(L1+L2+L3+L4)
-- §40 真 agent 落地 canon(V1.14 加)
+- §40 真 agent 落地 canon(V1.32 加)
 - §9 已有实现不动 — 5 个 SCRIPT_MAP 兜底 expert 不动
 - §10 第 5 铭文:test-lead 决策 `requires_human_signoff: true`
 
@@ -51,4 +51,4 @@
 
 - 上一级:[`../INDEX.md`](../INDEX.md)
 - adapter:[`../adapters/experts.py`](../adapters/experts.py)`execute_node` 先查 AGENT_RUNNERS,fallback SCRIPT_MAP
-- 测试:`tagent selftest --e2e` 自动覆盖 5 runner 的 mock 路径
+- 测试:`tagent selftest --e2e` 自动覆盖 16 runner 的 mock 路径

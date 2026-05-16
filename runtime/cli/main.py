@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 from pathlib import Path
 
 import typer
@@ -14,9 +16,18 @@ from runtime.api.parsers import parse_path, parse_text, parse_url
 from runtime.cli.config import config_app
 from runtime.config.settings import get_settings
 
+# Fix Unicode and SSL on Windows
+if sys.platform == "win32":
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+    # Suppress SSL verification errors from corporate proxies / missing certs
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 app = typer.Typer(add_completion=False, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
-console = Console()
+console = Console(force_terminal=True)
 _kernel = Kernel()
 
 
@@ -318,7 +329,7 @@ def install(
     lane: str = typer.Argument(...),
     source: str = typer.Option(..., "--source", help="path to skill .md / agent .md / mcp config / hook"),
     tier: str = typer.Option("low", "--tier"),
-    version: str = typer.Option("1.23.0", "--version"),
+    version: str = typer.Option("1.32.0", "--version"),
 ):
     """Install marketplace entry through 4 safety gates."""
     import hashlib

@@ -12,7 +12,7 @@ REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-xing/Test-Agent.git}"
 REPO_BRANCH="${TEST_AGENT_REPO_BRANCH:-main}"
 
 echo "=========================================="
-echo " Test-Agent 工作流一键部署 V1.31.0"
+echo " Test-Agent 工作流一键部署 V1.32.0"
 echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="
@@ -160,7 +160,7 @@ echo "→ 拷贝 CI/CD..."
 cp "$TEMPLATE_DIR/06-CICD集成/github-actions-test.yml" "$PROJECT_ROOT/.github/workflows/test.yml"
 cp "$TEMPLATE_DIR/06-CICD集成/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsfile"
 
-# ===== 8.5 顶层法律 / 治理 / 路线图文档 (V1.14 新增) =====
+# ===== 8.5 顶层法律 / 治理 / 路线图文档 =====
 echo "→ 拷贝法律 / 治理 / 路线图文档..."
 for f in LICENSE NOTICE.md SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md ROADMAP.md README.md README.zh-CN.md CHANGELOG.md VERSION; do
     [[ -f "$TEMPLATE_DIR/$f" ]] && cp "$TEMPLATE_DIR/$f" "$PROJECT_ROOT/"
