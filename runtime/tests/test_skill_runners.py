@@ -54,6 +54,50 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
         "pentest-report",
         ["project_name","run_id","sections","findings","pii_scrub","outputs","risks","confidence"],
     ),
+    (
+        "pentest-recon",  # V1.31.0-alpha
+        ["project_name","run_id","target","authorization","outputs","risks","confidence"],
+    ),
+    (
+        "pentest-vuln",  # V1.31.0-alpha
+        ["project_name","run_id","source_available","mode","domains","outputs","risks","confidence"],
+    ),
+    (
+        "mobile-test",  # V1.23.0-alpha
+        ["project_name","run_id","target_platform","phases","outputs","risks","confidence"],
+    ),
+    (
+        "visual-test",  # V1.23.0-alpha
+        ["project_name","run_id","visual_target_type","phases","outputs","risks","confidence"],
+    ),
+    (
+        "system-test",  # V1.31.0-alpha
+        ["project_name","run_id","sub_scenarios","phases","outputs","risks","confidence"],
+    ),
+    (
+        "eval-harness",  # V1.27.0-alpha
+        ["project_name","run_id","eval_target","model_version","baseline_version","safety_checks","outputs","risks","confidence"],
+    ),
+    (
+        "automotive-test",  # V1.31.0-alpha
+        ["project_name","run_id","vehicle_subsystem","asil_level","phases","sub_skills","outputs","risks","confidence"],
+    ),
+    (
+        "automotive-can-bus-test",  # V1.31.0-alpha
+        ["project_name","run_id","protocols","checks","outputs","risks","confidence"],
+    ),
+    (
+        "automotive-adas-scenario",  # V1.31.0-alpha
+        ["project_name","run_id","categories","odd_levels","simulation","outputs","risks","confidence"],
+    ),
+    (
+        "automotive-ota-update-test",  # V1.31.0-alpha
+        ["project_name","run_id","checks","compliance","outputs","risks","confidence"],
+    ),
+    (
+        "automotive-hil-loop-test",  # V1.31.0-alpha
+        ["project_name","run_id","loops","asil_required","fault_injection","platform","outputs","risks","confidence"],
+    ),
 ]
 
 
