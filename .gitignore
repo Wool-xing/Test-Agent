@@ -132,7 +132,7 @@ coverage.xml
 pip-wheel-metadata/
 
 # ===== 私有源文档（个人归属，不公开）=====
-Test-Agent工作流搭建.md
+Test-Agent.md
 00-协作宪章.md
 灵感笔记.md
 _精髓库_apply_policy.example.yaml

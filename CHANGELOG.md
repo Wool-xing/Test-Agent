@@ -1,12 +1,11 @@
 # Changelog
 
-本文件记录 Test-Agent 工作流项目的所有可见变更。
+本文件记录 Test-Agent 项目的所有可见变更。
 
 格式参考 [Keep a Changelog 1.1.0](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning 2.0.0](https://semver.org/lang/zh-CN/)。
 
-> 项目代号：`test-agent-team`（全英文内部代号）
-> 中文别名：`Test-Agent 工作流搭建`
+> 项目名称：`Test-Agent`（内部代号 `test-agent-team`）
 
 ---
 
@@ -16,9 +15,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
-## [v1.32.0] - 2026-05-16
+## [v1.32.0] - 2026-05-17
 
-> **V1.15.0 → V1.32.0 (2026-05-15 ~ 2026-05-16) 共 17 版累积**。
+> **V1.15.0 → V1.32.0 (2026-05-15 ~ 2026-05-17) 共 17 版累积**。
 > expert rollout 收尾 (V1.15-V1.20) + skill rollout 全 14/14 完成 (V1.21-V1.31)。
 > 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表。
 

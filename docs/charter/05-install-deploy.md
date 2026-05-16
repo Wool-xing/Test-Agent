@@ -149,7 +149,7 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 
 # 或先 clone 再本地跑
 git clone https://github.com/Wool-xing/Test-Agent.git
-bash Test-Agent工作流搭建/install.sh /path/to/your-test-project
+bash Test-Agent/install.sh /path/to/your-test-project
 ```
 
 > 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `01-快速开始/部署说明.md`。

@@ -131,11 +131,11 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 
 ## 🗺️ 项目当前状态与下次会话快速指引
 
-### 当前阶段（最后更新：2026-05-16）
+### 当前阶段（最后更新：2026-05-17）
 
 - **Phase**：Phase 2 前期（V1.32.0 · expert rollout 收尾 + skill rollout 完成 14/14）
 - **关键已交付**：16 expert (11p+5s) · 32 skill (23p+7s+0r+2v) · AgentChat · Bug 多适配 · 按需安装 · darwin-skill · MCP 6 件套 · Marketplace · 教学层 · 多 LLM config · 16 SkillRunner 全落地
-- **活跃 PR**：无（V1.31 rollout 完成，2026-05-16）
+- **活跃 PR**：无（V1.32.0 release，2026-05-17）
 
 ### 历史关键决议
 
@@ -143,7 +143,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 - 2026-05-11：FULL_GUIDE.md 确立永久宪章地位
 - 2026-05-11：darwin-skill 不消费运行数据（Via Negativa）；反问 KB 不进 V1.0.0
 - 2026-05-12 ~ 2026-05-14：V1.1-V1.14 runtime 层 + 教学层 + Marketplace + 渗透/车载 + Hermes + GBrain + Karpathy + ECC
-- 2026-05-15 ~ 2026-05-16：V1.15-V1.26 13 版迭代 — 11 expert 真 LLM-driven 落地 + 4 SkillRunner 生产落地 + 多 LLM config + 深审修复
+- 2026-05-15 ~ 2026-05-17：V1.15-V1.32 18 版迭代 — 16 expert 全 production + 23 SkillRunner 生产落地 + 多 LLM config + 深审修复 + GUI + Dashboard + Mobile
 
 ### 下次会话进入项目时，按顺序检查
 
