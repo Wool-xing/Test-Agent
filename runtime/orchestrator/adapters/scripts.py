@@ -46,7 +46,16 @@ def run_script(script_filename: str, args: list[str] | None = None, *, timeout: 
     cmd = [sys.executable, str(script_path), *(args or [])]
     logger.info("running script: {}", " ".join(cmd))
     start = time.monotonic()
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, check=False)
+    proc = subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout,
+        check=False,
+        env={**__import__("os").environ, "PYTHONIOENCODING": "utf-8"},
+    )
     dur_ms = int((time.monotonic() - start) * 1000)
     return ScriptResult(
         script=script_filename,
