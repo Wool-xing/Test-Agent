@@ -4,7 +4,7 @@
 内容与原 FULL_GUIDE.md 对应段完全一致, 仅拆不动语义。
 -->
 
-## 🧠 V1.23.0 运行时层(`runtime/`)
+## 🧠 V1.32.0 运行时层(`runtime/`)
 
 > 已有 16 专家 / 32 Skill / 49 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。

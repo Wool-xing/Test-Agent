@@ -27,7 +27,7 @@
 | 04 | [skills-bugtracker](docs/charter/04-skills-bugtracker.md) | Skills 自进化机制 + Bug Tracker 多适配器 |
 | 05 | [install-deploy](docs/charter/05-install-deploy.md) | 按需安装 + 架构图 + 快速开始 + 工作流 + 技术栈 + 闭环 + 升级 + 协作 + 跨 AI |
 | 06 | [test-architecture](docs/charter/06-test-architecture.md) | 测试架构深度 + 关键反问 + 开放问题 + 术语表 |
-| 07 | [runtime-license](docs/charter/07-runtime-license.md) | V1.26.0 运行时层 + LICENSE / CHANGELOG / 项目当前状态 |
+| 07 | [runtime-license](docs/charter/07-runtime-license.md) | V1.32.0 运行时层 + LICENSE / CHANGELOG / 项目当前状态 |
 
 ## 跨文件链接迁移指引
 
