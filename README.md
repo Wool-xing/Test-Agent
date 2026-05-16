@@ -76,6 +76,12 @@ No Python/Node/Docker required. Download the installer for your platform and sta
 4. **Learn while using** — `--mode learn` outputs every step with theory references (22 KB cards across 13 domains: tools / coding / foundation / strategy / methods / protocols / platforms / gates / security / AI testing / compliance / process / build-your-own)
 5. **Safe-by-default** — sandboxed exec / PII scrub / runtime prompt-injection scan / 4-gate marketplace verify / decisions audit trail
 
+## 📸 Screenshots
+
+| Upload | Dashboard | Catalog | History |
+|--------|-----------|---------|---------|
+| ![Upload](docs/assets/screenshots/upload.png) | ![Dashboard](docs/assets/screenshots/dashboard.png) | ![Catalog](docs/assets/screenshots/catalog.png) | ![History](docs/assets/screenshots/history.png) |
+
 ## 📊 Coverage
 
 - **Product types**: Web · API · Mobile · Desktop · IoT · AI · Blockchain · Vehicle · Embedded · Serverless
