@@ -1,6 +1,6 @@
 # 🤖 Test-Agent
 
-> **AI Testing Agent Framework · Open-Source · Multi-LLM · 5-second setup**
+> **AI Testing Agent Framework · Open-Source · Multi-LLM · One-command deploy**
 
 [![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
@@ -17,7 +17,7 @@
 
 ```bash
 git clone https://github.com/Wool-xing/Test-Agent.git
-bash Test-Agent/install.sh ~/test-agent-project
+cd Test-Agent && bash install.sh ~/test-agent-project
 
 # Optional: enable autonomous runtime (16 LLM-driven agents)
 cd Test-Agent/runtime && pip install -e .
@@ -29,7 +29,7 @@ Outputs: test cases (Excel + xmind + markmap + opml) + Word report + decision lo
 Ready to run on your project?
 
 ```bash
-tagent init --preset 国内-web    # or: minimal / saas-web / mobile-android / security-pentest
+tagent init --preset saas-web     # or: minimal / mobile-android / security-pentest
 # → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
 ```
 
@@ -47,7 +47,7 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 - **Multi-LLM (any provider, plug-and-play)** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI-compatible fallback channel** for any other provider (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) via 3 env vars, zero code change. Cookbook: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
 - **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams
-- **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others under `_pending_servers_v1_2_0_alpha` in `.mcp.json`)
+- **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others ready to enable in `.mcp.json`)
 - **Self-test scaffolding** — L1 lint + L2 mock CI active in CI; L3 real-LLM + L4 weekly cron require `ANTHROPIC_API_KEY` secret (not configured in this repo by default)
 
 ## 🚀 Install
@@ -61,6 +61,12 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 **Expected duration**: ~10-15 min on global PyPI; ~10-15 min on CN networks (Tsinghua mirror auto-configured if `LANG=zh_*` or timezone `+0800`). Override via `export PIP_INDEX_URL=<url>` before running.
 
 Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 mins of hand-editing.
+
+## 🖥 Desktop App (Windows + macOS)
+
+[![Download](https://img.shields.io/badge/Download-Latest%20Release-blue)](https://github.com/Wool-xing/Test-Agent/releases)
+
+No Python/Node/Docker required. Download the installer for your platform and start testing immediately.
 
 ## 🎯 5 Key Capabilities
 
