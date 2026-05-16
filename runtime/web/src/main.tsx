@@ -7,6 +7,8 @@ import UploadPage from "./pages/UploadPage";
 import RunStatusPage from "./pages/RunStatusPage";
 import ReportPage from "./pages/ReportPage";
 import CatalogPage from "./pages/CatalogPage";
+import SettingsPage from "./pages/SettingsPage";
+import DoctorPage from "./pages/DoctorPage";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -23,6 +25,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/runs/:run_id" element={<RunStatusPage />} />
             <Route path="/runs/:run_id/report" element={<ReportPage />} />
             <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/doctor" element={<DoctorPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

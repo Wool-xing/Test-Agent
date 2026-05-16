@@ -49,7 +49,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Test-Agent-Windows
-          path: dist-electron/Test-Agent-Setup-*.exe
+          path: dist-electron/*.exe
 
   build-macos:
     runs-on: macos-latest
@@ -105,7 +105,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            Test-Agent-Windows/Test-Agent-Setup-*.exe
+            Test-Agent-Windows/*.exe
             Test-Agent-macOS/Test-Agent-*.dmg
           draft: true
           generate_release_notes: true

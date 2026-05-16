@@ -1,6 +1,17 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Download } from "lucide-react";
 import { getReport } from "@/api";
+
+function downloadJSON(data: unknown, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function ReportPage() {
   const { run_id } = useParams<{ run_id: string }>();
@@ -24,9 +35,17 @@ export default function ReportPage() {
 
   return (
     <section aria-labelledby="report-heading" className="max-w-4xl">
-      <h2 id="report-heading" className="text-2xl font-bold mb-2">
-        Report · <code>{run_id}</code>
-      </h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 id="report-heading" className="text-2xl font-bold">
+          Report · <code>{run_id}</code>
+        </h2>
+        <button
+          onClick={() => downloadJSON(report, `tagent-report-${run_id}.json`)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg hover:bg-slate-50"
+        >
+          <Download className="w-4 h-4" /> Export JSON
+        </button>
+      </div>
       <div className="flex gap-4 text-sm text-slate-600 mb-6">
         <span>
           succeeded=<strong>{String(report.succeeded ?? 0)}</strong>

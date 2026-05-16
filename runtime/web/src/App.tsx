@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { Beaker, Upload, BookOpen } from "lucide-react";
+import { Beaker, Upload, BookOpen, Settings, Stethoscope } from "lucide-react";
 
 export default function App() {
   return (
@@ -8,21 +8,33 @@ export default function App() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-semibold flex items-center gap-2">
             <Beaker className="w-5 h-5" aria-hidden="true" />
-            <span>Test-Agent · Runtime</span>
-            <span className="text-xs text-slate-500">v1.31.0</span>
+            <span>Test-Agent</span>
+            <span className="text-xs text-slate-500">v1.32.0</span>
           </h1>
           <nav aria-label="Primary">
             <ul className="flex gap-4 text-sm">
               <li>
                 <NavLink to="/" end className={({ isActive }) => (isActive ? "font-semibold" : "")}>
                   <Upload className="inline w-4 h-4 mr-1" aria-hidden="true" />
-                  上传
+                  Upload
                 </NavLink>
               </li>
               <li>
                 <NavLink to="/catalog" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
                   <BookOpen className="inline w-4 h-4 mr-1" aria-hidden="true" />
-                  目录
+                  Catalog
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/doctor" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
+                  <Stethoscope className="inline w-4 h-4 mr-1" aria-hidden="true" />
+                  Check
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/settings" className={({ isActive }) => (isActive ? "font-semibold" : "")}>
+                  <Settings className="inline w-4 h-4 mr-1" aria-hidden="true" />
+                  Settings
                 </NavLink>
               </li>
             </ul>
@@ -34,7 +46,7 @@ export default function App() {
       </main>
       <footer className="border-t mt-auto" role="contentinfo">
         <div className="container mx-auto px-4 py-3 text-xs text-slate-500">
-          Test-Agent runtime · charter §16 MCP · §21 L2 · MIT License
+          Test-Agent v1.32.0 · MIT License
         </div>
       </footer>
     </div>
