@@ -1,0 +1,23 @@
+{
+  "project_name": "selftest",
+  "run_id": "016-000013",
+  "protocols": [
+    "CAN",
+    "CAN-FD",
+    "SOME-IP"
+  ],
+  "checks": [
+    "proto_conformance",
+    "dbc_parse",
+    "timing",
+    "fault_injection"
+  ],
+  "outputs": {
+    "can_dir": "workspace/automotive/can/"
+  },
+  "risks": [
+    "CAN 总线物理层干扰致误判"
+  ],
+  "confidence": "medium",
+  "_mode": "mock"
+}

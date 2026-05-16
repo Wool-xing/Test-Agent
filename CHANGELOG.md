@@ -16,9 +16,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
-## [v1.31.0-alpha] - 2026-05-16
+## [v1.31.0] - 2026-05-16
 
-> **V1.15.0-alpha → V1.31.0-alpha (2026-05-15 ~ 2026-05-16) 共 17 版累积**。
+> **V1.15.0 → V1.31.0 (2026-05-15 ~ 2026-05-16) 共 17 版累积**。
 > expert rollout 收尾 (V1.15-V1.20) + skill rollout 全 14/14 完成 (V1.21-V1.31)。
 > 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表。
 
@@ -55,18 +55,18 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **多 provider 通用 env 通道**: `LLM_PROVIDER` + `LLM_API_KEY` + `LLM_MODEL` 通用 env, 6 provider 内置 (claude/openai/gemini/qwen/deepseek/ollama)
 - Stub 扩 4 path 支持 vendor-neutral 多厂商 routing
 
-### Added (MCP 6 件套 · V1.2.0-alpha)
+### Added (MCP 6 件套 · V1.2.0)
 
 - `runtime/mcp/` 6 MCP server: test-orchestrator / protocol-adapter / evidence-vault / defect-tracker / knowledge-base / compliance-checker
 
-### Added (Web UI · V1.2.0-alpha)
+### Added (Web UI · V1.2.0)
 
 - `runtime/web/` 4 页: Upload / Run Status / Report / Catalog (React 18 + Vite 5 + shadcn/ui + TanStack Query v5)
 
 ### Changed
 
 - **数字升级**: 14 expert → 16 expert, 14 skill → 32 skill
-- **防 mock 双 layer** (V1.14.0-alpha+1): registry 单源 frontmatter + router warn + orchestrator hard block
+- **防 mock 双 layer** (V1.14.0+1): registry 单源 frontmatter + router warn + orchestrator hard block
 - vendor-neutral 命名规范 (禁 zhipu/deepseek/openai 厂商名)
 - README/ROADMAP 数字诚实化 (多轮校准)
 
@@ -78,11 +78,11 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
-## [v1.14.0-alpha] - 2026-05-12
+## [v1.14.0] - 2026-05-12
 
-> **首次正式版本切节**(W7-2, 2026-05-14): V1.1.0-alpha 到 V1.14.0-alpha 共 13 个内部 alpha 累积归入本节。后续新变更入 [Unreleased]。
+> **首次正式版本切节**(W7-2, 2026-05-14): V1.1.0 到 V1.14.0 共 13 个内部 alpha 累积归入本节。后续新变更入 [Unreleased]。
 
-### Added(V1.14.0-alpha · 5 核心 expert 真 LLM 落地 + 录制脚本 · 2026-05-12)
+### Added(V1.14.0 · 5 核心 expert 真 LLM 落地 + 录制脚本 · 2026-05-12)
 
 > 起因:战略参谋诚实交底——V1.13 的 selftest 100% PASS 是"骨架通"不是"内涵通",16 expert 里 11 个仍是 no-op。用户授权 C 路线(5 核心 expert 真 LLM)+ B(录制脚本)。
 
@@ -113,9 +113,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `docs/assets/terminalizer-config.yml`:精修 V1.14 配置(Catppuccin Mocha 主题 + UTF-8 + stub LLM env)
 - **主宪章 §40 真 agent 落地 canon**:5 核心 + 11 fallback + 加新 runner 流程 + RunnerContext / RunnerResult 协议
 - 烟测:**9/9 strict PASS · 5 真 runner 产物全落盘**(原 V1.13 8/8 是 3 script + 5 no-op,V1.14 是 5 真 runner + 3 script + 1 no-op)
-- 版本 V1.13.0-alpha → **V1.14.0-alpha**
+- 版本 V1.13.0 → **V1.14.0**
 
-### Added(V1.13.0-alpha · README hero 重写 + `tagent demo` + 30 秒 demo 录制脚本 · 2026-05-12)
+### Added(V1.13.0 · README hero 重写 + `tagent demo` + 30 秒 demo 录制脚本 · 2026-05-12)
 
 - **`tagent demo` 子命令**:0 API key / 0 配置一键跑通 4 步——init minimal preset + L1 lint + L2 e2e + 产物清单
   - 自动 stub LLM + 重置 settings 缓存,避免 `_kernel` 模块加载顺序问题
@@ -130,9 +130,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - 渠道适配:Twitter/X · 微信视频号 · 掘金/V2EX · Hacker News(同一份素材 4 平台)
 - **00-导航 同步**:CLI 行加 `demo` 子命令
 - 烟测 `tagent demo` 产 36+ 文件全过 · L1/L3 strict 不破
-- 版本 V1.12.0-alpha → **V1.13.0-alpha**
+- 版本 V1.12.0 → **V1.13.0**
 
-### Added(V1.12.0-alpha · `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
+### Added(V1.12.0 · `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
 
 - **新模块 `runtime/init/`**:
   - `matrix.py`:`load_matrix()` 加载 `04-配置文件/templates/matrix.yaml`(单源真理)
@@ -158,9 +158,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **STARTUP.md 启动指南**:含填占位清单 + 装依赖 hint + 健康检查 + 烟雾跑通命令 + 推荐 skill 顺序 + 出错对照表
 - 烟测:5 preset × 全过 + 8 测试类型组合全过
 - L1 + L3 strict 不破:agents=16/16 skills=32/≥25 + selftest 8/8 100%
-- 版本 V1.11.0-alpha → **V1.12.0-alpha**
+- 版本 V1.11.0 → **V1.12.0**
 
-### Fixed(V1.11.0-alpha · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
+### Fixed(V1.11.0 · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
 
 - **同步铁律(§1)执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
   - `00-项目导航.md` · `02-专家定义/{01,07,08,09}.md` · `02-专家定义/README.md` · `03-技能定义/{README,test-coordinator,zentao-bug-submission}.md` · `04-配置文件/mcp-server-impl.md` · `05-代码示例/{README.md,api_retry_util.py}` · `06-CICD集成/{INDEX,CICD集成说明}.md` · `01-快速开始/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
@@ -171,9 +171,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - §36 多端通知 canon(扩 §6,6 渠道权威清单 + env 字段 + 业务语言铁律)
   - §37 BugTracker canon(扩 §12,6 adapter 权威清单 + measurement env + 措辞规范)
   - §10 五铭文 + §6 MCP 接入:"三端通知" → "多端通知"
-- VERSION:1.10.0-alpha → **1.11.0-alpha**
+- VERSION:1.10.0 → **1.11.0**
 
-### Added(V1.10.0-alpha · 4 层自检 + 精髓库三重防线 + 字体粗细 · 2026-05-12)
+### Added(V1.10.0 · 4 层自检 + 精髓库三重防线 + 字体粗细 · 2026-05-12)
 
 - **4 层自检铁律(主宪章 §33)**:
   - L1 frontmatter lint(无 LLM):`runtime/healthcheck/agent_smoke.py` + pre-push hook
@@ -193,10 +193,10 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **补缺顶级 INDEX**:`docs/INDEX.md` + `examples/INDEX.md` + `profiles/INDEX.md` + `scripts/INDEX.md`
 - **pre-tag hook**:`scripts/git-pre-tag.sh` 卡 `git tag v1.x`(7 天内必须有 L3 log)
 - **fixture**:`examples/_smoke_prd.md` 触发完整 16 agent DAG
-- 主宪章扩 §33/§34/§35;VERSION 1.9.0-alpha → **1.10.0-alpha**
+- 主宪章扩 §33/§34/§35;VERSION 1.9.0 → **1.10.0**
 - 烟雾测试:L1 16/16+32/≥25 全过;L2 stub e2e 88% PASS(7/8 节点)
 
-### Added(V1.9.0-alpha · 用例多格式导出 · 用户自选 · 2026-05-12)
+### Added(V1.9.0 · 用例多格式导出 · 用户自选 · 2026-05-12)
 
 - **`runtime/exporters/` 新模块**(对标主宪章 §5 多格式 I/O):
   - `base.py`:`TestCaseTree` + `TestCaseNode` IR + `Exporter` ABC + `REGISTRY` + `@register` 装饰器
@@ -215,9 +215,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **保留**:Excel 4-Sheet(`utils/excel_generator.py`)不动,§27 简洁优先
 - **扩展点 P2 留位**:freemind / plantuml / mermaid-mindmap(按需加)
 - 烟雾测试:3 exporter × sample TestCaseTree 全过(content.json 解析正常 / OPML XML 解析正常 / Markmap frontmatter 完整)
-- 版本 V1.8.0-alpha → V1.9.0-alpha
+- 版本 V1.8.0 → V1.9.0
 
-### Added(V1.8.0-alpha · build-your-own-x 教学扩 + Marketplace 4 lane · 2026-05-12)
+### Added(V1.8.0 · build-your-own-x 教学扩 + Marketplace 4 lane · 2026-05-12)
 
 - **上游参考扩**:`build-your-own-x.md`(codecrafters/build-your-own-x curated list 萃取);加 INDEX 条目
 - **教学层 KB 扩 13 大类**(原 12 → 13,加 `13-build-your-own/`):
@@ -233,9 +233,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **主宪章 §30**:Marketplace 安全栅栏(4 关铁律 + 3 信任级 + safe-by-default + 不复制官方源 + 卸载只归档 + 紧急 kill switch)
 - **主宪章 §31**:教学层扩 13 大类(byox P0/P1/P2 分档 + 预算检查 + essence_only policy)
 - TOC 同步;skill 数升级
-- 版本 V1.7.0-alpha → V1.8.0-alpha
+- 版本 V1.7.0 → V1.8.0
 
-### Added(V1.7.0-alpha · Karpathy 4 原则 + ECC 测试加固 + Essence 自动汲取 · 2026-05-12)
+### Added(V1.7.0 · Karpathy 4 原则 + ECC 测试加固 + Essence 自动汲取 · 2026-05-12)
 
 - **上游参考扩 2 条目**:
   - `karpathy-skills.md`(125k★ · LLM 写代码 4 原则元层)
@@ -255,9 +255,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - safe-by-default:`tagent.yml essence_watcher.enabled: true` 才跑
 - **主宪章新增 3 节**:§27 Karpathy 4 原则 / §28 ECC 测试加固 / §29 Essence 自动汲取 + TOC 同步
 - 数字:14 skill → **32**(原 14 + 7 pentest + 5 automotive + 6 ECC) + `karpathy-guidelines/SKILL.md` upstream 1 个
-- 版本 V1.6.0-alpha → V1.7.0-alpha
+- 版本 V1.6.0 → V1.7.0
 
-### Added(V1.6.0-alpha · 渗透&安全 + 车载&自动驾驶 双垂直专家+skill 集 · 2026-05-12)
+### Added(V1.6.0 · 渗透&安全 + 车载&自动驾驶 双垂直专家+skill 集 · 2026-05-12)
 
 - **上游参考扩**:`pentest-ai-agents.md` 合并萃取 pentagi(黑盒)+ shannon(白盒);10 节;含对比表+应用 checklist
 - **2 新专家**:
@@ -272,18 +272,18 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **主宪章 §2 升级**:专家 14 → 16(核心 9 + 平台扩展 7)
 - **TOC 同步**:加 §25 §26
 - 数字:14 expert → **16** | 14 skill → **26**(7 pentest + 5 automotive 新增)
-- 版本 V1.5.0-alpha → V1.6.0-alpha
+- 版本 V1.5.0 → V1.6.0
 
-### Added(V1.5.0-alpha · GBrain-inspired 强化 + 跨项目精髓库扩 · 2026-05-12)
+### Added(V1.5.0 · GBrain-inspired 强化 + 跨项目精髓库扩 · 2026-05-12)
 
 - **上游参考扩**:`gbrain.md`(完整 10 节萃取,300+ 行)+ INDEX 更新
 - **KB 自连图谱**:`runtime/tutor/graph.py`,零 LLM 抽取 typed link(6 种边:related_to/superseded_by/extends/prerequisite_of/contradicts/tool_implements);BFS walk + backlink-boosted ranking。实测 12 卡 → 40 edges + 44 nodes
 - **eval 回放**:`runtime/tutor/eval_replay.py`,`TAGENT_EVAL_CAPTURE=1` opt-in;PII 自动 scrub(email/phone/SSN/API-key/card 6 类正则);replay 3 数(Jaccard@k/top-1 stability/latency Δ);默认 off
 - **safe-by-default yaml 栅栏**:`runtime/config/safety.py` + `tagent.yml.example`;scheduler/curator/backends/gateway/destructive_ops 默认 deny;`assert_allowed` / `gate_*` 工厂函数;缺配置 → `SafeByDefaultBlocked` 异常
 - **主宪章 §24**:GBrain-inspired 强化(自连图谱 + 混合检索 + eval 回放 + safe-by-default + PII 单源)+ TOC 同步
-- 版本 V1.4.0-alpha → V1.5.0-alpha
+- 版本 V1.4.0 → V1.5.0
 
-### Added(V1.4.0-alpha · 教学层 · 用户边用边学 · 2026-05-12)
+### Added(V1.4.0 · 教学层 · 用户边用边学 · 2026-05-12)
 
 - **主宪章 §23 教学层准则**:exec(老手)/learn(新手)双模式 + 反幻觉 3 层 + 双语切换 + 持续累积
 - **Theory KB**:`docs/theory/`,12 大类目录(工具/编程/基础理论/策略/方法/协议/平台/门禁/安全/AI测试/合规/流程)
@@ -301,9 +301,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **CLI**:`tagent run --mode exec|learn|silent --lang zh|en|zh-en`
 - **API**:`POST /run/text?mode=&lang=` query 参数
 - **反幻觉**:实测 unknown-id 正确标记"该领域未收录,慎用"
-- 版本 V1.3.0-alpha → V1.4.0-alpha
+- 版本 V1.3.0 → V1.4.0
 
-### Added(V1.3.0-alpha · Hermes-inspired 5 模块 + 跨项目精髓库 · 2026-05-11)
+### Added(V1.3.0 · Hermes-inspired 5 模块 + 跨项目精髓库 · 2026-05-11)
 
 - **跨项目上游参考**:已建立
   - `INDEX.md`:精髓库索引
@@ -315,9 +315,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `runtime/backends/`:7 执行后端(`local/docker/ssh/singularity/modal/daytona/vercel_sandbox`);统一 `BaseExecutionEnv` 7 方法;Modal/Daytona 提供 serverless hibernate
   - `runtime/gateway/`:多平台 messaging(`telegram/discord/slack/wechat/feishu/dingtalk/email/webhook` 8 平台);统一 `Platform.send/configure`;`session.py` 跨平台对话连续
 - **主宪章 §22**:Hermes-inspired 扩展能力章节(规则化);TOC 同步更新
-- 版本 V1.2.0-alpha → V1.3.0-alpha
+- 版本 V1.2.0 → V1.3.0
 
-### Added(V1.2.0-alpha · M2 MCP 6 件套 + Web UI + 真模型路由 + 飞轮回灌 · 2026-05-11)
+### Added(V1.2.0 · M2 MCP 6 件套 + Web UI + 真模型路由 + 飞轮回灌 · 2026-05-11)
 
 - **MCP 6 件套全部实现**(主宪章 §16):
   - `runtime/mcp/test_orchestrator/`:包装 runtime/router + orchestrator,5 工具(catalog/plan/run/status/report);Claude Code 可直接调用
@@ -335,9 +335,9 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - §21 L2 必测项:Playwright E2E 7 用例(功能+边界+异常+兼容+可访问性);axe-core a11y 0 critical 门槛
   - 配套 vite 代理 `/api` → FastAPI(:8800)
 - **`.mcp.json` 升级**:启用 `filesystem` + `test-orchestrator`;其他 5 件套写入 `_pending_servers_v1_2_0_alpha` 段供按需启用
-- 版本 V1.1.0-alpha → V1.2.0-alpha
+- 版本 V1.1.0 → V1.2.0
 
-### Added(V1.1.0-alpha · 宪章合一 · darwin-skill 入库 · 2026-05-11)
+### Added(V1.1.0 · 宪章合一 · darwin-skill 入库 · 2026-05-11)
 
 - **主宪章扩展(memory `project_test_agent_workflow.md`)**:原 §0-§9 + How to apply 1-6 **字符级保留**;新增 §10-§20 仅承载规则/要求/约束(剔除示例/枚举/参考表):
   - §10 灵魂底色:三公理 + 五条铭文 + V1.0.0 锁死 + 双签解锁条件
@@ -356,7 +356,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **darwin-skill 入库**:`03-技能定义/darwin-skill/` 完整部署(SKILL.md + scripts/ + templates/ + assets/ + docs/),upstream 原文不改;13 Skill → 14 Skill
 - **FULL_GUIDE.md 优化**:三公理/铭文 + 18 闭环段替换为"已迁主宪章 §X"指引(避免双份维护);Bug Tracker / 按需安装 / darwin / AgentChat 详节保留作为深度参考;附 runtime 章节(M1-11 留存)
 
-### Added(V1.1.0-alpha · 运行时层)
+### Added(V1.1.0 · 运行时层)
 
 - **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 49 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
   - `runtime/router/`:AI 路由(LiteLLM 多厂商:Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)。被测物 → 专家+Skill DAG。含 stub provider 供 CI 离线测,准确率 5/5 类型(web/api/mobile/desktop/ai-model)

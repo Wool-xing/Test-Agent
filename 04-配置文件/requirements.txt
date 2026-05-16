@@ -143,13 +143,13 @@ safety==3.0.1                      # [稳定层] 依赖 CVE 检查
 # - kubectl（K8s 混沌测试）
 
 # ============================================================
-# V1.1.0-alpha 运行时层(`runtime/`)依赖 — 全部 [可选]
+# V1.1.0 运行时层(`runtime/`)依赖 — 全部 [可选]
 # 仅启用 V1.1.0 运行时(AI 路由+Prefect+飞轮+FastAPI/CLI)时安装
 # 完整列表见 runtime/pyproject.toml
 # ============================================================
 
 # ===== [可选 · runtime 核心] =====
-# mcp>=1.0.0                       # V1.2.0-alpha MCP SDK(6 件套 server:test-orchestrator/protocol-adapter/evidence-vault/defect-tracker/knowledge-base/compliance-checker)
+# mcp>=1.0.0                       # V1.2.0 MCP SDK(6 件套 server:test-orchestrator/protocol-adapter/evidence-vault/defect-tracker/knowledge-base/compliance-checker)
 # litellm>=1.55.0                  # 多厂商 LLM 路由(Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)
 # prefect>=2.20.0,<3.0             # 编排引擎(可选,Direct 执行器在 prefect 缺席时自动接管)
 # fastapi>=0.115.0                 # HTTP 入口

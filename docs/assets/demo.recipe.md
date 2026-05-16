@@ -32,7 +32,7 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 
 ```
 [0s]   tagent --version
-       v1.8.0-alpha
+       v1.8.0
 
 [3s]   tagent run "测试 https://playwright.dev 首页+导航 → 验证标题+CTA 按钮" --mode learn --lang zh
        

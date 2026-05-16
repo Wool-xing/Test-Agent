@@ -1,4 +1,4 @@
-"""LLM-driven SkillRunner 专项 unit test (V1.21.0-alpha — skill rollout 起点).
+"""LLM-driven SkillRunner 专项 unit test (V1.21.0 — skill rollout 起点).
 
 照 test_agent_runners.py pattern (V1.16-followup 锁规则) 同构:
 覆盖 3 维度 × N skill_runner = 3N case (参数化):
@@ -25,7 +25,7 @@ from runtime.orchestrator.skills import SKILL_RUNNERS, get_skill_runner
 # 不含下划线开头字段 (e.g., _mode 是 stub 标志, 非业务字段)
 ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
     (
-        "pentest-coordinator",  # V1.21.0-alpha (skill rollout 起点)
+        "pentest-coordinator",  # V1.21.0 (skill rollout 起点)
         [
             "project_name",
             "run_id",
@@ -55,47 +55,47 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
         ["project_name","run_id","sections","findings","pii_scrub","outputs","risks","confidence"],
     ),
     (
-        "pentest-recon",  # V1.31.0-alpha
+        "pentest-recon",  # V1.31.0
         ["project_name","run_id","target","authorization","outputs","risks","confidence"],
     ),
     (
-        "pentest-vuln",  # V1.31.0-alpha
+        "pentest-vuln",  # V1.31.0
         ["project_name","run_id","source_available","mode","domains","outputs","risks","confidence"],
     ),
     (
-        "mobile-test",  # V1.23.0-alpha
+        "mobile-test",  # V1.23.0
         ["project_name","run_id","target_platform","phases","outputs","risks","confidence"],
     ),
     (
-        "visual-test",  # V1.23.0-alpha
+        "visual-test",  # V1.23.0
         ["project_name","run_id","visual_target_type","phases","outputs","risks","confidence"],
     ),
     (
-        "system-test",  # V1.31.0-alpha
+        "system-test",  # V1.31.0
         ["project_name","run_id","sub_scenarios","phases","outputs","risks","confidence"],
     ),
     (
-        "eval-harness",  # V1.27.0-alpha
+        "eval-harness",  # V1.27.0
         ["project_name","run_id","eval_target","model_version","baseline_version","safety_checks","outputs","risks","confidence"],
     ),
     (
-        "automotive-test",  # V1.31.0-alpha
+        "automotive-test",  # V1.31.0
         ["project_name","run_id","vehicle_subsystem","asil_level","phases","sub_skills","outputs","risks","confidence"],
     ),
     (
-        "automotive-can-bus-test",  # V1.31.0-alpha
+        "automotive-can-bus-test",  # V1.31.0
         ["project_name","run_id","protocols","checks","outputs","risks","confidence"],
     ),
     (
-        "automotive-adas-scenario",  # V1.31.0-alpha
+        "automotive-adas-scenario",  # V1.31.0
         ["project_name","run_id","categories","odd_levels","simulation","outputs","risks","confidence"],
     ),
     (
-        "automotive-ota-update-test",  # V1.31.0-alpha
+        "automotive-ota-update-test",  # V1.31.0
         ["project_name","run_id","checks","compliance","outputs","risks","confidence"],
     ),
     (
-        "automotive-hil-loop-test",  # V1.31.0-alpha
+        "automotive-hil-loop-test",  # V1.31.0
         ["project_name","run_id","loops","asil_required","fault_injection","platform","outputs","risks","confidence"],
     ),
 ]

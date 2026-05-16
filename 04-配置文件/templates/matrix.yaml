@@ -1,4 +1,4 @@
-# tagent init 单源真理矩阵(V1.12.0-alpha)
+# tagent init 单源真理矩阵(V1.12.0)
 #
 # 测试类型 × 平台 × LLM provider × BugTracker × 通知渠道 → 生成 .env + tagent.yml + STARTUP.md
 # 加新选项:补这里 + 看 wizard 自动列出。

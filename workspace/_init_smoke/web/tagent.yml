@@ -1,4 +1,4 @@
-# Test-Agent 1.12.0-alpha · 由 `tagent init` 生成于 2026-05-12 04:22:26
+# Test-Agent 1.12.0 · 由 `tagent init` 生成于 2026-05-12 04:22:26
 # 这是项目级配置(超出 .env 范围的运行时行为);可被 ~/.tagent/config.yml 用户级配置覆盖。
 
 project:

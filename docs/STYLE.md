@@ -1,6 +1,6 @@
 # 文档样式约定(STYLE.md)
 
-> Test-Agent 全仓 Markdown 文档统一约定 · V1.10.0-alpha 起强制 · pre-commit markdownlint 卡 MD001 / MD036。
+> Test-Agent 全仓 Markdown 文档统一约定 · V1.10.0 起强制 · pre-commit markdownlint 卡 MD001 / MD036。
 
 ---
 

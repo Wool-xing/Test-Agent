@@ -1,11 +1,11 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.31.0-alpha (**expert rollout 收尾 + skill rollout 完成（14/14）**)
+> 当前状态:V1.31.0 (**expert rollout 收尾 + skill rollout 完成（14/14）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
-> - **V1.21.0-alpha 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 12 实装。
+> - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 后续 12 实装。
 
 ## 当前活跃 expert (16 / 16) — V1.x rollout 收尾
 
@@ -18,12 +18,12 @@
 | `automation-engineer` | Web/API 脚本编写 + 性能测试编排 |
 | `test-executor` | 测试执行与监控 |
 | `bug-manager` | Bug 提交与追踪 |
-| `env-manager` | 环境检查清单 + 准备步骤(V1.15.0-alpha minimum viable) |
-| `mobile-tester` | 移动测试用例 + ADB/Xcode 命令清单(V1.16.0-alpha minimum viable) |
-| `visual-tester` | 视觉测试点 + 对比脚本片段 + 容差配置(V1.17.0-alpha minimum viable) |
-| `system-tester` | IoT/串口/MQTT 测试用例 + 命令清单 + 协议特定配置(V1.18.0-alpha minimum viable) |
-| `pentest-tester` | 5 攻击域渗透测试计划 + 工具清单 + PoC plan(V1.19.0-alpha minimum viable;仅输出计划文本,真执行守护在 utils 层 env gate) |
-| `automotive-tester` | ASIL 评估 + HIL 测试 + ADAS 场景 + OTA 升级 + 合规矩阵(V1.20.0-alpha minimum viable;V1.x rollout 收尾) |
+| `env-manager` | 环境检查清单 + 准备步骤(V1.15.0 minimum viable) |
+| `mobile-tester` | 移动测试用例 + ADB/Xcode 命令清单(V1.16.0 minimum viable) |
+| `visual-tester` | 视觉测试点 + 对比脚本片段 + 容差配置(V1.17.0 minimum viable) |
+| `system-tester` | IoT/串口/MQTT 测试用例 + 命令清单 + 协议特定配置(V1.18.0 minimum viable) |
+| `pentest-tester` | 5 攻击域渗透测试计划 + 工具清单 + PoC plan(V1.19.0 minimum viable;仅输出计划文本,真执行守护在 utils 层 env gate) |
+| `automotive-tester` | ASIL 评估 + HIL 测试 + ADAS 场景 + OTA 升级 + 合规矩阵(V1.20.0 minimum viable;V1.x rollout 收尾) |
 
 ### 5 script-backed (已上线)
 
@@ -45,17 +45,17 @@
 |-------|------|
 | `tdd-workflow` | TDD 工作流 |
 | `e2e-testing` | E2E 测试 |
-| `automotive-test` | 车载主编排(V1.31.0-alpha · automotive batch) |
-| `automotive-can-bus-test` | CAN总线测试(V1.31.0-alpha) |
-| `automotive-adas-scenario` | ADAS场景库(V1.31.0-alpha) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
+| `automotive-test` | 车载主编排(V1.31.0 · automotive batch) |
+| `automotive-can-bus-test` | CAN总线测试(V1.31.0) |
+| `automotive-adas-scenario` | ADAS场景库(V1.31.0) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
 | `regression-test` | 回归测试 |
 | `smoke-test` | 冒烟测试 |
 | `testcase-design` | 用例设计 |
 | `test-coordinator` | 测试流程编排 |
 | `verification-loop` | 5-phase 验证循环 |
-| `eval-harness` | LLM 评测编排(V1.27.0-alpha · skill rollout #5) |
+| `eval-harness` | LLM 评测编排(V1.27.0 · skill rollout #5) |
 
 ### 7 script-backed (已上线)
 
@@ -79,22 +79,22 @@
 
 | # | Expert | LLM-driven 实装范围(minimum viable) | 目标版本 | 状态 |
 |---|--------|------------------------------------|---------|------|
-| 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0-alpha+1 | **done** (PR X4) |
-| 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0-alpha | **done** (runtime/orchestrator/agents/env_manager.py) |
-| 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0-alpha | **done** (runtime/orchestrator/agents/mobile_tester.py) |
-| 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0-alpha | **done** (runtime/orchestrator/agents/visual_tester.py) |
-| 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0-alpha | **done** (runtime/orchestrator/agents/system_tester.py) |
-| 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0-alpha | **done** (runtime/orchestrator/agents/pentest_tester.py;仅输出计划文本,真执行守护已在 utils 层 `api_security_scanner.py` / `ai_adversarial.py` 用 TAGENT_PENTEST_AUTHORIZED env gate;法律责任在操作者侧,见 SECURITY.md L84) |
-| 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | V1.20.0-alpha | **done** (runtime/orchestrator/agents/automotive_tester.py;ASIL 评估 + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) |
+| 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0+1 | **done** (PR X4) |
+| 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0 | **done** (runtime/orchestrator/agents/env_manager.py) |
+| 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0 | **done** (runtime/orchestrator/agents/mobile_tester.py) |
+| 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0 | **done** (runtime/orchestrator/agents/visual_tester.py) |
+| 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0 | **done** (runtime/orchestrator/agents/system_tester.py) |
+| 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0 | **done** (runtime/orchestrator/agents/pentest_tester.py;仅输出计划文本,真执行守护已在 utils 层 `api_security_scanner.py` / `ai_adversarial.py` 用 TAGENT_PENTEST_AUTHORIZED env gate;法律责任在操作者侧,见 SECURITY.md L84) |
+| 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | V1.20.0 | **done** (runtime/orchestrator/agents/automotive_tester.py;ASIL 评估 + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) |
 
 ---
 
 ## V1.x rollout — 16 skill 实装路线（含已完成 3 + 剩余 13）
 
-**节奏**: skill rollout 起点 V1.21.0-alpha (SkillRunner 基础设施 + pentest-coordinator 首落地);后续 1 skill / PR 推进。
+**节奏**: skill rollout 起点 V1.21.0 (SkillRunner 基础设施 + pentest-coordinator 首落地);后续 1 skill / PR 推进。
 **完成标准**: 每 skill 接 LLM 真调用 (mock_output schema 覆盖 + production 升级 + ALL_SKILL_RUNNERS 锁规则同步)。
-**前置**: ~~runtime/router 防 mock 改造 + skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤~~ **已完成 V1.14.0-alpha+1 (PR X4)** — registry parse frontmatter + orchestrator.execute_node 拒 rollout/vision/unknown skill (returncode=2)。
-**基础设施**: **V1.21.0-alpha 完成** — `runtime/orchestrator/skills/__init__.py` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 skill runner (放在 SCRIPT_MAP fallback 前)。
+**前置**: ~~runtime/router 防 mock 改造 + skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤~~ **已完成 V1.14.0+1 (PR X4)** — registry parse frontmatter + orchestrator.execute_node 拒 rollout/vision/unknown skill (returncode=2)。
+**基础设施**: **V1.21.0 完成** — `runtime/orchestrator/skills/__init__.py` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 skill runner (放在 SCRIPT_MAP fallback 前)。
 
 ### 通用平台 4 skill
 
@@ -103,39 +103,39 @@
 | `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | rollout |
 | `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | rollout |
 | `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | rollout |
-| `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | **done** (V1.27.0-alpha · runtime/orchestrator/skills/eval_harness.py · 5 阶段编排 + 质量门禁 + 安全护栏) |
+| `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | **done** (V1.27.0 · runtime/orchestrator/skills/eval_harness.py · 5 阶段编排 + 质量门禁 + 安全护栏) |
 
 ### Pentest 7 skill(1 production / 6 rollout · 需 SECURITY.md 武器化授权 wiring 实装)
 
 | Skill | 范围 | 状态 |
 |-------|------|------|
-| `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0-alpha · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
+| `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0 · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
 | `pentest-recon` | 侦察(被动+主动信息收集) |
 | `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) |
-| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) | **done** (V1.30.0-alpha · pentest batch 2) |
-| `pentest-api` | API 渗透(OWASP API Top 10 2023) | **done** (V1.30.0-alpha · pentest batch 2) |
-| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) | **done** (V1.30.0-alpha · pentest batch 2) |
-| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) | **done** (V1.30.0-alpha · pentest batch 2) |
+| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) | **done** (V1.30.0 · pentest batch 2) |
+| `pentest-api` | API 渗透(OWASP API Top 10 2023) | **done** (V1.30.0 · pentest batch 2) |
+| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) | **done** (V1.30.0 · pentest batch 2) |
+| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) | **done** (V1.30.0 · pentest batch 2) |
 
 ### Automotive 5 skill
 
 | Skill | 范围 |
 |-------|------|
-| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (V1.31.0-alpha · automotive batch) |
-| `automotive-can-bus-test` | CAN总线测试(V1.31.0-alpha) |
-| `automotive-adas-scenario` | ADAS场景库(V1.31.0-alpha) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
-| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (V1.31.0-alpha · automotive batch) |
-| `automotive-adas-scenario` | ADAS场景库(V1.31.0-alpha) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
-| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (V1.31.0-alpha · automotive batch) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0-alpha) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
-| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (V1.31.0-alpha · automotive batch) |
-| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) | **done** (V1.31.0-alpha · automotive batch) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0-alpha) |
+| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (V1.31.0 · automotive batch) |
+| `automotive-can-bus-test` | CAN总线测试(V1.31.0) |
+| `automotive-adas-scenario` | ADAS场景库(V1.31.0) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
+| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (V1.31.0 · automotive batch) |
+| `automotive-adas-scenario` | ADAS场景库(V1.31.0) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
+| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (V1.31.0 · automotive batch) |
+| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
+| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (V1.31.0 · automotive batch) |
+| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) | **done** (V1.31.0 · automotive batch) |
+| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
 
 ---
 
@@ -171,7 +171,7 @@
 
 **绝不输出 mock 数据糊弄用户。**
 
-V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
+V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 - **registry 单源**: catalog 解析 `02-专家定义/*.md` `EXPERT_IMPL_STATUS` + `03-技能定义/*.md` `SKILL_IMPL_STATUS` frontmatter,实装状态来源唯一
 - **router 软警告**: `_validate_against_catalog` 检测 rollout / vision / unknown → 加 issues 并降 confidence 0.3
 - **orchestrator 硬拒**: `execute_node` 对 expert / skill 任意 rollout / vision / unknown 返回 `returncode=2` + stderr "未实装",绝不走 no-op "documented step recorded" 假成功路径
@@ -184,23 +184,23 @@ V1.14.0-alpha+1 (PR X4) 起,双 layer 防 mock 已落地:
 
 | 版本 | 日期 | 完成项 | active expert 数 |
 |------|------|--------|----------------|
-| V1.14.0-alpha | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
-| V1.14.0-alpha+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
-| V1.15.0-alpha | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |
-| V1.16.0-alpha | 2026-05-15 | mobile-tester LLM-driven minimum viable (runtime/orchestrator/agents/mobile_tester.py;LLM 读 PRD + Android/iOS 上下文 → test_cases + device_commands + mobile_specific 结构化 JSON) | 12/16 |
-| V1.17.0-alpha | 2026-05-15 | visual-tester LLM-driven minimum viable (runtime/orchestrator/agents/visual_tester.py;LLM 读 PRD + UI 描述 → visual_test_points + comparison_scripts + tolerance + baseline_strategy 结构化 JSON) | 13/16 |
-| V1.18.0-alpha | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
-| V1.19.0-alpha | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
-| V1.20.0-alpha | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) | 16/16 expert (V1.x rollout 完成) |
-| V1.21.0-alpha | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions). 解锁 14 rollout skill 后续流水线. | 16 expert + 8/32 production (15 rollout 待) |
-| V1.22.0-alpha | 2026-05-16 | **tagent config CLI** — 多模型 onboarding Step 2 (runtime/cli/config.py · 6 provider 内置 + 厂商配置 cookbook + use/set/unset/list/show 子命令). **多 provider 通用 env 通道** (LLM_PROVIDER + LLM_API_KEY + LLM_MODEL) + stub 扩 4 path. | 16 expert + 8/32 production |
-| V1.23.0-alpha | 2026-05-16 | **skill rollout #2** — mobile-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/mobile_test.py · Android/iOS 双平台 + 小程序支持) | 16 expert + 9/32 production |
-| V1.24.0-alpha | 2026-05-16 | **skill rollout #3** — visual-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/visual_test.py · Airtest + OCR + SSIM 视觉对比) | 16 expert + 10/32 production |
-| V1.25.0-alpha | 2026-05-16 | **skill rollout #4** — pentest-recon + pentest-vuln 双 skill LLM-driven 生产落地 (侦察: 端口/子域/服务指纹 + 漏洞: 5 攻击域 hybrid SAST+blackbox) | 16 expert + 12/32 production |
-| V1.26.0-alpha | 2026-05-16 | **skill rollout #5** — system-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/system_test.py · IoT/音视频/追踪/消息队列 4 场景) | 16 expert + 13/32 production |
-| V1.27.0-alpha | 2026-05-16 | **skill rollout #6** — eval-harness skill LLM-driven 生产落地 (runtime/orchestrator/skills/eval_harness.py · pass@k / Jaccard@k / top-1 stability / latency 4 指标 + 安全护栏) | 16 expert + 14/32 production |
-| V1.28.0-alpha | 2026-05-16 | **skill rollout #7** — pentest-api + pentest-web 双 skill LLM-driven 生产落地 (API: OWASP API Top 10 + REST/GraphQL/gRPC/WebSocket · Web: OWASP Top 10 + ASVS + 2FA 自动登录) | 16 expert + 16/32 production |
-| V1.29.0-alpha | 2026-05-16 | **skill rollout #8** — pentest-exploit + pentest-report 双 skill LLM-driven 生产落地 (exploit: 沙箱内验证 PoC + 不可破坏性约束 · report: working PoC 嵌入 + CWE/CVSS/PoC/修复 4 维) | 16 expert + 18/32 production |
-| V1.30.0-alpha | 2026-05-16 | **skill rollout #9** — automotive-test + automotive-can-bus-test 双 skill LLM-driven 生产落地 (主编排: 10 阶段 HARA→报告 · CAN: CAN/CAN-FD/SOME-IP 协议一致性 + dbc 解析) | 16 expert + 20/32 production |
-| V1.31.0-alpha | 2026-05-16 | **skill rollout #10 (收尾)** — automotive-adas-scenario + automotive-ota-update-test + automotive-hil-loop-test 3 skill LLM-driven 生产落地 (ADAS: AEB/ACC/LKA + CARLA 仿真 · OTA: 6 校验 + UN R156/GB 44496 合规 · HIL: MIL/SIL/HIL 三环 + dSPACE). **V1.x rollout 完成 — 23/32 production + 7 script + 0 rollout + 2 vision.** | 16 expert + 23/32 production (0 rollout 待) |
+| V1.14.0 | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
+| V1.14.0+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
+| V1.15.0 | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |
+| V1.16.0 | 2026-05-15 | mobile-tester LLM-driven minimum viable (runtime/orchestrator/agents/mobile_tester.py;LLM 读 PRD + Android/iOS 上下文 → test_cases + device_commands + mobile_specific 结构化 JSON) | 12/16 |
+| V1.17.0 | 2026-05-15 | visual-tester LLM-driven minimum viable (runtime/orchestrator/agents/visual_tester.py;LLM 读 PRD + UI 描述 → visual_test_points + comparison_scripts + tolerance + baseline_strategy 结构化 JSON) | 13/16 |
+| V1.18.0 | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
+| V1.19.0 | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
+| V1.20.0 | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) | 16/16 expert (V1.x rollout 完成) |
+| V1.21.0 | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions). 解锁 14 rollout skill 后续流水线. | 16 expert + 8/32 production (15 rollout 待) |
+| V1.22.0 | 2026-05-16 | **tagent config CLI** — 多模型 onboarding Step 2 (runtime/cli/config.py · 6 provider 内置 + 厂商配置 cookbook + use/set/unset/list/show 子命令). **多 provider 通用 env 通道** (LLM_PROVIDER + LLM_API_KEY + LLM_MODEL) + stub 扩 4 path. | 16 expert + 8/32 production |
+| V1.23.0 | 2026-05-16 | **skill rollout #2** — mobile-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/mobile_test.py · Android/iOS 双平台 + 小程序支持) | 16 expert + 9/32 production |
+| V1.24.0 | 2026-05-16 | **skill rollout #3** — visual-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/visual_test.py · Airtest + OCR + SSIM 视觉对比) | 16 expert + 10/32 production |
+| V1.25.0 | 2026-05-16 | **skill rollout #4** — pentest-recon + pentest-vuln 双 skill LLM-driven 生产落地 (侦察: 端口/子域/服务指纹 + 漏洞: 5 攻击域 hybrid SAST+blackbox) | 16 expert + 12/32 production |
+| V1.26.0 | 2026-05-16 | **skill rollout #5** — system-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/system_test.py · IoT/音视频/追踪/消息队列 4 场景) | 16 expert + 13/32 production |
+| V1.27.0 | 2026-05-16 | **skill rollout #6** — eval-harness skill LLM-driven 生产落地 (runtime/orchestrator/skills/eval_harness.py · pass@k / Jaccard@k / top-1 stability / latency 4 指标 + 安全护栏) | 16 expert + 14/32 production |
+| V1.28.0 | 2026-05-16 | **skill rollout #7** — pentest-api + pentest-web 双 skill LLM-driven 生产落地 (API: OWASP API Top 10 + REST/GraphQL/gRPC/WebSocket · Web: OWASP Top 10 + ASVS + 2FA 自动登录) | 16 expert + 16/32 production |
+| V1.29.0 | 2026-05-16 | **skill rollout #8** — pentest-exploit + pentest-report 双 skill LLM-driven 生产落地 (exploit: 沙箱内验证 PoC + 不可破坏性约束 · report: working PoC 嵌入 + CWE/CVSS/PoC/修复 4 维) | 16 expert + 18/32 production |
+| V1.30.0 | 2026-05-16 | **skill rollout #9** — automotive-test + automotive-can-bus-test 双 skill LLM-driven 生产落地 (主编排: 10 阶段 HARA→报告 · CAN: CAN/CAN-FD/SOME-IP 协议一致性 + dbc 解析) | 16 expert + 20/32 production |
+| V1.31.0 | 2026-05-16 | **skill rollout #10 (收尾)** — automotive-adas-scenario + automotive-ota-update-test + automotive-hil-loop-test 3 skill LLM-driven 生产落地 (ADAS: AEB/ACC/LKA + CARLA 仿真 · OTA: 6 校验 + UN R156/GB 44496 合规 · HIL: MIL/SIL/HIL 三环 + dSPACE). **V1.x rollout 完成 — 23/32 production + 7 script + 0 rollout + 2 vision.** | 16 expert + 23/32 production (0 rollout 待) |
 | V2.0.0 | TBD | V2.x 路线图启动 | 16/16 + V2 |

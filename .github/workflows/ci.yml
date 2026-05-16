@@ -73,7 +73,7 @@ jobs:
           scandir: '.'
           additional_files: 'install.sh'
 
-  # ===== 3b. install.sh macOS 真机端到端 (本 session V1.14.0-alpha+1 新加) =====
+  # ===== 3b. install.sh macOS 真机端到端 (本 session V1.14.0+1 新加) =====
   # 用 GitHub Actions macos-latest runner 实跑 install.sh, 验 ROADMAP "Mac 真机"挂账。
   # 关键: 设 TEST_AGENT_LOCAL_SRC 跳过 git clone, 用 PR 当前改动而非 fetch default branch。
   macos-real-install:

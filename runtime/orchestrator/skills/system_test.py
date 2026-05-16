@@ -1,6 +1,6 @@
 """system-test skill · LLM 读上游 system-tester 产物 → 6 阶段系统集成测试编排.
 
-V1.26.0-alpha minimum viable (ROADMAP skill rollout #4 落地):
+V1.26.0 minimum viable (ROADMAP skill rollout #4 落地):
 - LLM 读 PRD + 上游 system-tester expert 产物 → 6 阶段执行计划
   (环境检查 / IoT 测试 / 音视频校验 / 链路追踪 / 消息队列 / 报告归档)
   + 质量门禁 + 子场景路由策略

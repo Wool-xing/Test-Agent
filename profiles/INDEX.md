@@ -1,4 +1,4 @@
-# profiles/ 索引(V1.10.0-alpha)
+# profiles/ 索引(V1.10.0)
 
 > 行业合规 profile 配置 · 测试时按行业自动加载额外规则。
 

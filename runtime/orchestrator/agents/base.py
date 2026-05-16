@@ -167,7 +167,7 @@ def get_runner(name: str) -> AgentRunner | None:
     return cls() if cls else None
 
 
-# Skill runner registry (V1.21.0-alpha — skill LLM-driven rollout 基础设施).
+# Skill runner registry (V1.21.0 — skill LLM-driven rollout 基础设施).
 # SkillRunner 接口与 AgentRunner 100% 一致 (system_prompt / user_prompt /
 # mock_output / summary / output_file / run), 仅 registry 独立, 避免 expert/skill
 # 同名冲突,且让 catalog / router / orchestrator 按 kind 路由清晰。

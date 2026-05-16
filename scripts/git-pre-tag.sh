@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pre-tag hook · 卡 `git tag v1.x` 命令,没跑过 L3 selftest 拒绝(主宪章 §33,V1.10.0-alpha)
+# pre-tag hook · 卡 `git tag v1.x` 命令,没跑过 L3 selftest 拒绝(主宪章 §33,V1.10.0)
 #
 # 安装:
 #   ln -sf $(pwd)/scripts/git-pre-tag.sh .git/hooks/pre-tag
