@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Stethoscope, Check, X, Loader2 } from "lucide-react";
 
+const BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8800";
+
 interface CheckItem {
   name: string;
   status: "pending" | "ok" | "skip" | "fail";
@@ -21,7 +23,7 @@ export default function DoctorPage() {
 
     // Catalog check
     try {
-      const res = await fetch("http://localhost:8800/catalog");
+      const res = await fetch(`${BASE}/catalog`);
       if (res.ok) {
         const data = await res.json();
         results.push({ name: "Catalog", status: "ok", detail: `${data.counts?.experts || 0} experts + ${data.counts?.skills || 0} skills` });
@@ -34,7 +36,7 @@ export default function DoctorPage() {
 
     // Health check
     try {
-      const res = await fetch("http://localhost:8800/health");
+      const res = await fetch(`${BASE}/health`);
       if (res.ok) {
         const data = await res.json();
         results.push({ name: "Backend", status: "ok", detail: `v${data.version}` });
