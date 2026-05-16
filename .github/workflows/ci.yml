@@ -272,11 +272,11 @@ jobs:
 
       - name: 验证 .gitignore 排除源 MD
         run: |
-          if [ -f "Test-Agent工作流搭建.md" ]; then
+          if [ -f "Test-Agent.md" ]; then
             echo "❌ 敏感本地文档不应出现在仓库"
             exit 1
           fi
-          grep "Test-Agent工作流搭建.md" .gitignore || \
+          grep "Test-Agent.md" .gitignore || \
             { echo "❌ .gitignore 未排除源 MD"; exit 1; }
           echo "✅ 敏感本地文档受保护"
 
