@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, Search, Eye, Download, Share2 } from "lucide-react";
+import { Clock, Search, Eye, Share2 } from "lucide-react";
 
 interface RunMeta {
   run_id: string;
@@ -123,7 +123,7 @@ export default function HistoryPage() {
 
       {filtered.length > 0 && (
         <p className="text-xs text-slate-400">
-          {selected.size === 0 ? "Select 2 runs to compare and export" : selected.size === 2 ? "2 selected — click Export & Compare" : `Select 1 more to compare (${2 - selected.size()} left)`}
+          {selected.size === 0 ? "Select 2 runs to compare and export" : selected.size === 2 ? "2 selected — click Export & Compare" : `Select 1 more to compare (${2 - selected.size} left)`}
         </p>
       )}
     </div>
