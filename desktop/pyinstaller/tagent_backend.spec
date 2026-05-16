@@ -5,9 +5,8 @@ import os
 import sys
 from pathlib import Path
 
-SPEC_DIR = os.path.dirname(os.path.abspath(SPECPATH))
-DESKTOP_DIR = os.path.dirname(SPEC_DIR)
-PROJECT_ROOT = Path(os.path.dirname(DESKTOP_DIR))
+_spec_dir = os.path.dirname(os.path.abspath(SPECPATH))
+PROJECT_ROOT = Path(_spec_dir).parent.parent  # desktop/pyinstaller/ → desktop/ → root
 RUNTIME = PROJECT_ROOT / "runtime"
 
 a = Analysis(
