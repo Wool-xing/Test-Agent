@@ -17,7 +17,12 @@ _SessionLocal: sessionmaker[Session] | None = None
 def get_engine():
     global _engine
     if _engine is None:
-        _engine = create_engine(get_settings().db_url, pool_pre_ping=True, future=True)
+        url = get_settings().db_url
+        kw: dict = {"pool_pre_ping": True, "future": True}
+        # Short connect timeout for psycopg to avoid hanging on unavailable DB
+        if url.startswith("postgresql"):
+            kw["connect_args"] = {"connect_timeout": 5}
+        _engine = create_engine(url, **kw)
     return _engine
 
 
