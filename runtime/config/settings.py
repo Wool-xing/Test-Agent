@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _get_project_root() -> Path:
+    """Resolve project root — handles PyInstaller onefile bundles."""
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS)  # type: ignore[attr-defined]
+    return Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -21,7 +29,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    project_root: Path = Field(default=Path(__file__).resolve().parents[2])
+    project_root: Path = Field(default_factory=_get_project_root)
     experts_dir: Path = Field(default=Path("02-专家定义"))
     skills_dir: Path = Field(default=Path("03-技能定义"))
     scripts_dir: Path = Field(default=Path("05-代码示例"))

@@ -7,6 +7,9 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
+  define: {
+    "import.meta.env.VITE_API_BASE": JSON.stringify("http://localhost:8800"),
+  },
   server: {
     port: 5173,
     proxy: {
