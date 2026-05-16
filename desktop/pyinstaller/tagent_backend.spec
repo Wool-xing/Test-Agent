@@ -1,10 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 """PyInstaller spec for Test-Agent backend as a standalone executable."""
 
+import os
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(SPECPATH).resolve().parents[2]
+SPEC_DIR = os.path.dirname(os.path.abspath(SPECPATH))
+DESKTOP_DIR = os.path.dirname(SPEC_DIR)
+PROJECT_ROOT = Path(os.path.dirname(DESKTOP_DIR))
 RUNTIME = PROJECT_ROOT / "runtime"
 
 a = Analysis(
