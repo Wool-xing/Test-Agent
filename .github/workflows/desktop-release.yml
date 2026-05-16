@@ -36,13 +36,13 @@ jobs:
       - name: Build Web UI
         working-directory: runtime/web
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Build Electron
         working-directory: desktop
         run: |
-          npm ci
+          npm install
           npx tsc -p electron/tsconfig.json
           npx electron-builder --win --config electron-builder.yml
 
@@ -77,13 +77,13 @@ jobs:
       - name: Build Web UI
         working-directory: runtime/web
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Build Electron
         working-directory: desktop
         run: |
-          npm ci
+          npm install
           npx tsc -p electron/tsconfig.json
           npx electron-builder --mac --config electron-builder.yml
 
