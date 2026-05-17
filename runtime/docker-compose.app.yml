@@ -1,0 +1,26 @@
+# Full stack: infrastructure + app
+# Usage: docker compose -f docker-compose.yml -f docker-compose.app.yml up
+services:
+  app:
+    build: .
+    container_name: tagent-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      TAGENT_DB_URL: postgresql://tagent:tagent@postgres:5432/tagent
+      TAGENT_MINIO_ENDPOINT: minio:9000
+      TAGENT_MINIO_ACCESS_KEY: tagent
+      TAGENT_MINIO_SECRET_KEY: tagent-secret
+      TAGENT_LLM_PROVIDER: stub
+      TAGENT_LOG_LEVEL: INFO
+    ports:
+      - "8800:8800"
+    volumes:
+      - tagent-workspace:/app/workspace
+    restart: unless-stopped
+
+volumes:
+  tagent-workspace:
