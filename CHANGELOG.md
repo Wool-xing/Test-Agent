@@ -15,6 +15,16 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
+## [v1.32.4] - 2026-05-17
+
+### Changed
+- README: 数字诚实化(8640→~12 CI-validated; 95% aspirational→removed; 32 skills→30 active+2 vision)
+- 00-项目导航/ROADMAP: 清除12处主宪章内部引用
+- generate_report.py: 143行→6 helper functions
+- mobile_driver.py: 107行→_build_monkey_cmd+_analyze_monkey_log
+
+---
+
 ## [v1.32.3] - 2026-05-17
 
 ### Changed
