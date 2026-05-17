@@ -16,24 +16,42 @@ from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
 from runtime.orchestrator.adapters.experts import execute_node, reset_upstream_cache
 from runtime.router.schema import DAGNode, RoutingDecision
+from runtime.self_healing.retry import with_retry
 
 
 def _run_node(node: DAGNode) -> dict[str, Any]:
-    with span(f"node.{node.kind}.{node.name}", node_id=node.id):
-        outcome = execute_node(name=node.name, kind=node.kind, inputs=node.inputs, timeout=node.timeout_seconds)
-    summary = {
-        "id": node.id,
-        "name": outcome.name,
-        "kind": outcome.kind,
-        "executed_script": outcome.executed_script,
-        "returncode": outcome.returncode,
-        "duration_ms": outcome.duration_ms,
-        "ok": outcome.ok,
-        "stdout_tail": outcome.stdout[-2000:] if outcome.stdout else "",
-        "stderr_tail": outcome.stderr[-2000:] if outcome.stderr else "",
-    }
-    if not outcome.ok and node.on_failure == "abort":
-        raise RuntimeError(f"node {node.id} aborted: rc={outcome.returncode}")
+    from runtime.orchestrator.hooks import get_hook_registry
+
+    hooks = get_hook_registry()
+    ctx = {"name": node.name, "kind": node.kind, "inputs": node.inputs, "timeout": node.timeout_seconds}
+    hooks.fire_before(node.id, ctx)
+
+    try:
+        with span(f"node.{node.kind}.{node.name}", node_id=node.id):
+
+            def _execute() -> Any:
+                return execute_node(name=node.name, kind=node.kind, inputs=node.inputs, timeout=node.timeout_seconds)
+
+            outcome = with_retry(_execute)()
+        summary = {
+            "id": node.id,
+            "name": outcome.name,
+            "kind": outcome.kind,
+            "executed_script": outcome.executed_script,
+            "returncode": outcome.returncode,
+            "duration_ms": outcome.duration_ms,
+            "ok": outcome.ok,
+            "stdout_tail": outcome.stdout[-2000:] if outcome.stdout else "",
+            "stderr_tail": outcome.stderr[-2000:] if outcome.stderr else "",
+        }
+        ctx["results"] = summary
+        hooks.fire_after(node.id, ctx)
+        if not outcome.ok and node.on_failure == "abort":
+            raise RuntimeError(f"node {node.id} aborted: rc={outcome.returncode}")
+    except Exception as exc:
+        ctx["error"] = str(exc)
+        hooks.fire_error(node.id, ctx)
+        raise
     return summary
 
 
@@ -46,15 +64,29 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     ordered: list[DAGNode] = decision.topological()
     log.info("direct flow start: run_id={} nodes={}", run_id, len(ordered))
 
+    MAX_FAILURES = 3
     by_id: dict[str, DAGNode] = {n.id: n for n in ordered}
     results: dict[str, dict] = {}
     failures: list[str] = []
+    skipped: list[str] = []
     pending = set(by_id.keys())
     futures: dict[str, Future] = {}
+    circuit_broken = False
     pool = ThreadPoolExecutor(max_workers=max_workers)
     try:
         with span("flow.run", run_id=run_id, nodes=len(ordered)):
             while pending:
+                # circuit breaker: stop submitting new work
+                if circuit_broken:
+                    # drain in-flight futures
+                    for nid in list(pending):
+                        if nid in futures:
+                            try:
+                                results[nid] = futures[nid].result()
+                            except Exception:
+                                results[nid] = {"id": nid, "ok": False, "error": "circuit broken"}
+                            pending.discard(nid)
+                    break
                 # find nodes whose deps are all done
                 ready = [
                     nid
@@ -70,43 +102,75 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                     next_id = next(iter(futures))
                     try:
                         results[next_id] = futures[next_id].result()
-                        if not results[next_id].get("ok"):
-                            failures.append(next_id)
                     except Exception as e:  # noqa: BLE001
-                        log.error("node {} crashed: {}", next_id, e)
-                        results[next_id] = {"id": next_id, "ok": False, "error": str(e)}
-                        failures.append(next_id)
+                        log.warning("node {} attempt failed: {}", next_id, e)
+                        for attempt in range(2):
+                            time.sleep(2**attempt)
+                            try:
+                                fut = pool.submit(_run_node, by_id[next_id])
+                                results[next_id] = fut.result()
+                                break
+                            except Exception as retry_exc:  # noqa: BLE001
+                                log.warning("node {} retry {}/2 failed", next_id, attempt + 1)
+                                if attempt == 1:
+                                    results[next_id] = {"id": next_id, "ok": False, "error": str(retry_exc)}
+                    if results.get(next_id):
+                        if results[next_id].get("skipped"):
+                            skipped.append(next_id)
+                        elif not results[next_id].get("ok"):
+                            failures.append(next_id)
+                            if len(failures) >= MAX_FAILURES:
+                                log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                                circuit_broken = True
                     pending.discard(next_id)
                     continue
                 for nid in done_now:
                     try:
                         results[nid] = futures[nid].result()
-                        if not results[nid].get("ok"):
-                            failures.append(nid)
                     except Exception as e:  # noqa: BLE001
-                        log.error("node {} crashed: {}", nid, e)
-                        results[nid] = {"id": nid, "ok": False, "error": str(e)}
-                        failures.append(nid)
+                        log.warning("node {} attempt failed: {}", nid, e)
+                        for attempt in range(2):
+                            time.sleep(2**attempt)
+                            try:
+                                fut = pool.submit(_run_node, by_id[nid])
+                                results[nid] = fut.result()
+                                break
+                            except Exception as retry_exc:  # noqa: BLE001
+                                log.warning("node {} retry {}/2 failed", nid, attempt + 1)
+                                if attempt == 1:
+                                    results[nid] = {"id": nid, "ok": False, "error": str(retry_exc)}
+                    if results.get(nid):
+                        if results[nid].get("skipped"):
+                            skipped.append(nid)
+                        elif not results[nid].get("ok"):
+                            failures.append(nid)
+                            if len(failures) >= MAX_FAILURES:
+                                log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                                circuit_broken = True
                     pending.discard(nid)
     finally:
         pool.shutdown(wait=True)
 
-    # L2-C: rollout 节点识别同 flows.py
+    completed = len(results)
+    log.info("DAG progress: {}/{} nodes done, {} failed, {} skipped", completed, len(ordered), len(failures), len(skipped))
+
+    # L2-C: rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
         if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
-    ]
+    ] + skipped
 
     summary = {
         "run_id": run_id,
         "total": len(ordered),
-        "succeeded": len(ordered) - len(failures),
+        "succeeded": len(ordered) - len(failures) - len(skipped),
         "failed": len(failures),
+        "skipped": len(skipped),
         "rollout_skipped": rollout_skipped,
         "results": results,
     }
     log.info(
-        "direct flow done: {}/{} ok ({} rollout skipped)",
-        summary["succeeded"], summary["total"], len(rollout_skipped)
+        "direct flow done: {}/{} ok, {} failed, {} skipped",
+        summary["succeeded"], summary["total"], summary["failed"], summary["skipped"]
     )
     return summary

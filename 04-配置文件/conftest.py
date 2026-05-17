@@ -103,11 +103,12 @@ def env_config() -> EnvConfig:
     return config
 
 
-@pytest.fixture(scope="session")
-def test_data(env_config: EnvConfig) -> dict:
+@pytest.fixture(scope="function")
+def test_data(env_config: EnvConfig, tmp_path: Path) -> dict:
     """
-    会话级测试数据。优先读取 workspace/测试数据/test_data.json；
+    函数级测试数据。优先读取 workspace/测试数据/test_data.json；
     不存在则尝试调用 utils.data_factory 生成基础数据。
+    每个测试独立 tmp_path，避免并行文件冲突。
     """
     data_file = Path("workspace/测试数据/test_data.json")
     if data_file.exists():
@@ -138,16 +139,17 @@ def test_data(env_config: EnvConfig) -> dict:
             },
         }
 
-    data_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(data_file, "w", encoding="utf-8") as f:
+    # 写入 tmp_path 避免并行测试文件冲突
+    tmp_data_file = tmp_path / "test_data.json"
+    with open(tmp_data_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    logger.info(f"已写入测试数据: {data_file}")
+    logger.info(f"已写入测试数据: {tmp_data_file}")
     return data
 
 
 # ===== Playwright 浏览器 Fixture（lazy import 避免纯 API 测试加载 playwright）=====
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def browser_context(env_config: EnvConfig):
     from playwright.sync_api import sync_playwright
 

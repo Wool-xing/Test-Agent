@@ -10,10 +10,12 @@ from loguru import logger
 _configured = False
 
 
-def configure_logging(level: str = "INFO") -> None:
+def configure_logging(level: str | None = None) -> None:
     global _configured
     if _configured:
         return
+    if level is None:
+        level = os.getenv("TAGENT_LOG_LEVEL", "INFO").upper()
     logger.remove()
     if os.getenv("TAGENT_LOG_JSON", "0") == "1":
         logger.add(sys.stdout, serialize=True, level=level)
