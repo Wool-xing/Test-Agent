@@ -5,8 +5,8 @@
 > **维护原则**：决策入档、开放问题入档、不打脸的承诺才写。重大决策须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。
 
 **项目名称**：`Test-Agent`（内部代号 `test-agent-team`）
-**当前阶段**：Phase 2 前期（V1.32.4 · 16 expert + 23/32 skill production + 0 rollout + 2 vision；V1.x rollout 收尾）
-**版本**：V1.32.4（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
+**当前阶段**：Phase 2 前期（V1.32.5 · 16 expert + 23/32 skill production + 0 rollout + 2 vision；V1.x rollout 收尾）
+**版本**：V1.32.5（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-05-17
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
 
@@ -26,7 +26,7 @@
 | 04 | [skills-bugtracker](docs/charter/04-skills-bugtracker.md) | Skills 自进化机制 + Bug Tracker 多适配器 |
 | 05 | [install-deploy](docs/charter/05-install-deploy.md) | 按需安装 + 架构图 + 快速开始 + 工作流 + 技术栈 + 闭环 + 升级 + 协作 + 跨 AI |
 | 06 | [test-architecture](docs/charter/06-test-architecture.md) | 测试架构深度 + 关键反问 + 开放问题 + 术语表 |
-| 07 | [runtime-license](docs/charter/07-runtime-license.md) | V1.32.4 运行时层 + LICENSE / CHANGELOG / 项目当前状态 |
+| 07 | [runtime-license](docs/charter/07-runtime-license.md) | V1.32.5 运行时层 + LICENSE / CHANGELOG / 项目当前状态 |
 
 ## 跨文件链接迁移指引
 

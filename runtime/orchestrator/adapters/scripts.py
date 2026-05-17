@@ -13,6 +13,7 @@ from pathlib import Path
 from loguru import logger
 
 from runtime.config.settings import get_settings
+from runtime.self_healing.retry import with_retry
 
 
 @dataclass(slots=True)
@@ -46,16 +47,20 @@ def run_script(script_filename: str, args: list[str] | None = None, *, timeout: 
     cmd = [sys.executable, str(script_path), *(args or [])]
     logger.info("running script: {}", " ".join(cmd))
     start = time.monotonic()
-    proc = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        timeout=timeout,
-        check=False,
-        env={**__import__("os").environ, "PYTHONIOENCODING": "utf-8"},
-    )
+
+    def _do_run() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout,
+            check=False,
+            env={**__import__("os").environ, "PYTHONIOENCODING": "utf-8"},
+        )
+
+    proc = with_retry(_do_run)()
     dur_ms = int((time.monotonic() - start) * 1000)
     return ScriptResult(
         script=script_filename,

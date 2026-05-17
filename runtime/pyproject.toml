@@ -64,3 +64,21 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "--cov-branch"
+markers = [
+    "flaky: flaky test (quarantine candidate)",
+    "portability: portability / co-existence / replaceability test (ISO 25010)",
+    "slow: slow test (>30s)",
+    "smoke: fast smoke / sanity check",
+]
+
+[tool.pylint.main]
+ignore = ["tests", ".venv", "__pycache__", "archive"]
+load-plugins = []
+
+[tool.pylint.messages_control]
+max-line-length = 110
+disable = ["C0114", "C0115", "C0116", "R0903", "R0801"]
+
+[tool.radon]
+cc_rank = "B"
