@@ -64,7 +64,7 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-addopts = ""
+addopts = "--cov-branch"
 markers = [
     "flaky: flaky test (quarantine candidate)",
     "portability: portability / co-existence / replaceability test (ISO 25010)",
