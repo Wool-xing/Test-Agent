@@ -49,7 +49,7 @@ beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
 # ===== [稳定层] 工具 =====
 python-dotenv==1.2.2               # [稳定层] .env 加载（修 CVE-2026-28684 symlink rename，1.0.1 仍含洞）
 tenacity==8.2.3                    # [稳定层] 重试库
-loguru==0.7.2                      # [稳定层] 增强日志
+loguru==0.7.3                      # [稳定层] 增强日志
 
 # ===== [稳定层] 验收测试 BDD =====
 pytest-bdd==7.0.0                  # [稳定层] BDD 框架
