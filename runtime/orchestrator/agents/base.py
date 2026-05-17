@@ -91,11 +91,13 @@ class AgentRunner(abc.ABC):
                 from runtime.subagent.aux_client import aux_client
 
                 client = aux_client()
+                from runtime.config.settings import get_settings
+
                 raw = client.complete(
                     self.system_prompt(),
                     self.user_prompt(ctx),
                     temperature=0.1,
-                    max_tokens=1500,
+                    max_tokens=get_settings().agent_max_tokens,
                 )
                 output = self._parse_json(raw)
                 # JSON 解析错误 → ok=False + degraded

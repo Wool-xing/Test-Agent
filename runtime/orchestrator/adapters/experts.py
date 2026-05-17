@@ -42,6 +42,12 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "ai-tester": "ai_validator.py",
     "pentest-tester": None,        # V1.19 production (V1.x rollout 收尾)
     "automotive-tester": None,     # V1.20 production (V1.x rollout 收尾)
+    # V1.34 bridge: standalone scripts wired into orchestrator
+    "mutation-test": "mutation_runner.py",
+    "chaos-test": "chaos_helper.py",
+    "fuzz-test": "fuzzer.py",
+    "a11y-test": "a11y_scanner.py",
+    "suite-minimize": "suite_minimizer.py",
 }
 
 # V1.14 防 mock 单源 (ROADMAP V1.15 Day 0 承诺):
@@ -79,6 +85,12 @@ SKILL_SCRIPT_MAP: dict[str, str | None] = {
     "visual-test": None,
     "system-test": None,
     "ai-test": "ai_validator.py",
+    # V1.34 bridge: standalone scripts wired into orchestrator
+    "mutation-testing": "mutation_runner.py",
+    "chaos-engineering": "chaos_helper.py",
+    "api-fuzzing": "fuzzer.py",
+    "accessibility-scan": "a11y_scanner.py",
+    "test-suite-minimization": "suite_minimizer.py",
 }
 
 # Scripts that require CLI args; injected when DAG node provides no inputs.
