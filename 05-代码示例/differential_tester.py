@@ -86,8 +86,6 @@ def compare_outputs(a: Any, b: Any) -> DiffResult:
         keys_b = set(b.keys())
         if keys_a != keys_b:
             div_type = "structure"
-            extra_a = keys_a - keys_b
-            extra_b = keys_b - keys_a
         else:
             div_type = "value"
     elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
