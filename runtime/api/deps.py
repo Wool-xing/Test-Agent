@@ -42,8 +42,9 @@ class Kernel:
         if not full_text and artifact.path:
             try:
                 full_text = Path(artifact.path).read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                full_text = ""
+            except OSError as e:
+                logger.warning("cannot read artifact {}: {}", artifact.path, e)
+                full_text = f"[READ_ERROR: {artifact.path}]"
         for node in decision.dag:
             if "artifact_text" not in node.inputs:
                 node.inputs["artifact_text"] = full_text[:20_000]
@@ -52,7 +53,7 @@ class Kernel:
             try:
                 run_id = create_run(target_summary, decision.detected_target_type, decision.model_dump())
             except Exception as e:  # noqa: BLE001
-                logger.warning("persistence unavailable, using ephemeral run_id: {}", e)
+                logger.error("persistence unavailable — run results will not be saved: {}", e)
                 run_id = _ephemeral_run_id()
         else:
             run_id = _ephemeral_run_id()
@@ -74,7 +75,7 @@ class Kernel:
         try:
             set_run_status(run_id, status)
         except Exception as e:  # noqa: BLE001
-            logger.debug("status persist skipped ({}): {}", run_id, e)
+            logger.warning("status persist skipped for {} ({}): {}", run_id, status.value, e)
 
     # ---------- catalog ----------
     def catalog(self) -> dict:

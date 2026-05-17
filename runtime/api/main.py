@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import tempfile
+import threading
 from pathlib import Path
+from typing import Any
 
-from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
@@ -16,15 +18,29 @@ from runtime.api.models import CatalogResponse, RunCreateText, RunCreated, RunSt
 from runtime.api.parsers import parse_path, parse_text, parse_url
 from runtime.config.settings import get_settings
 
+_settings = get_settings()
+
 app = FastAPI(title="Test-Agent Runtime", version=__version__)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["http://localhost:*", "http://127.0.0.1:*", "tauri://localhost"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+
+# Bearer token auth middleware — enforced only when TAGENT_API_AUTH_TOKEN is set
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next: Any) -> Any:
+    token = _settings.api_auth_token
+    if token and request.url.path not in ("/health", "/docs", "/openapi.json"):
+        auth = request.headers.get("Authorization", "")
+        if not auth or auth.removeprefix("Bearer ") != token:
+            return JSONResponse(status_code=401, content={"detail": "unauthorized"})
+    return await call_next(request)
+
 _kernel = Kernel()
 _run_results: dict[str, dict] = {}
+_run_lock = threading.Lock()
 
 
 @app.get("/health")
@@ -63,8 +79,11 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 
 
 @app.post("/run/file", response_model=RunCreated)
-async def run_file(file: UploadFile = File(...), extra: str = Form("")) -> RunCreated:
-    suffix = Path(file.filename or "upload").suffix
+async def run_file(file: UploadFile = File(..., max_length=50_000_000), extra: str = Form("")) -> RunCreated:
+    suffix = Path(file.filename or "upload").suffix.lower()
+    allowed = {".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip", ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml", ".py", ".js", ".ts", ".apk", ".ipa"}
+    if suffix not in allowed:
+        raise HTTPException(status_code=400, detail=f"file type not supported: {suffix}")
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(await file.read())
         tmp_path = Path(tmp.name)
@@ -174,8 +193,8 @@ def list_history() -> dict:
                         "duration_s": data.get("duration_s", data.get("duration_ms", 0) / 1000 if "duration_ms" in data else 0),
                         "confidence": data.get("confidence", 0),
                     })
-            except Exception:
-                continue
+            except (OSError, json.JSONDecodeError, ValueError) as e:
+                logger.warning("skipping unreadable run file {}: {}", f, e)
 
     return {"runs": runs[:50]}
 
@@ -202,8 +221,8 @@ def get_dashboard() -> dict:
                         if not r.get("ok") and r.get("name"):
                             name = r["name"]
                             expert_fails[name] = expert_fails.get(name, 0) + 1
-            except Exception:
-                continue
+            except (OSError, json.JSONDecodeError, ValueError) as e:
+                logger.warning("dashboard: skipping unreadable run file {}: {}", f, e)
 
     total = len(all_runs)
     if total == 0:
@@ -246,7 +265,9 @@ def get_dashboard() -> dict:
 def _run_in_background(run_id: str, decision) -> None:
     try:
         summary = _kernel.execute_sync(run_id, decision)
-        _run_results[run_id] = summary
-    except Exception as e:  # noqa: BLE001
-        logger.error("background run failed: {}", e)
-        _run_results[run_id] = {"error": str(e), "failed": 1, "succeeded": 0, "total": 0}
+        with _run_lock:
+            _run_results[run_id] = summary
+    except Exception:  # noqa: BLE001
+        logger.exception("background run {} failed", run_id)
+        with _run_lock:
+            _run_results[run_id] = {"error": "internal error — see logs", "failed": 1, "succeeded": 0, "total": 0, "status": "error"}

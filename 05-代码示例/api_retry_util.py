@@ -40,7 +40,7 @@ def _parse_retry_after(value: str, default: float) -> float:
             delta = (dt - now).total_seconds()
             return max(0.0, delta)
     except Exception:
-        pass
+        logger.debug("_parse_retry_after: unexpected error parsing %r", value)
     return default
 
 
