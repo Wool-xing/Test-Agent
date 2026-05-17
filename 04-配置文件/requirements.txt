@@ -69,7 +69,7 @@ python-pptx==0.6.23                # [稳定层] PPTX 报告 + PRD pptx 输入
 
 # ===== [可选] 移动端（10-移动测试）=====
 Appium-Python-Client==5.3.1        # [可选] Android/iOS 自动化
-selenium==4.43.0                   # [可选] WebDriver 协议
+selenium==4.44.0                   # [可选] WebDriver 协议
 websocket-client==1.8.0            # [稳定层] 同步 WebSocket（小程序协议 + EXE WS 测试）—— 1.8 兼容 selenium 4.43 (~=1.8)
 websockets==12.0                   # [稳定层] 异步 WebSocket（高并发性能测试）
 
