@@ -27,6 +27,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
 
     results: dict[str, dict] = {}
     failures: list[str] = []
+    skipped: list[str] = []
     with span("flow.run", run_id=run_id, nodes=len(ordered)):
         # Submit in topological order; nodes with all deps done fire immediately.
         futures: dict[str, Any] = {}
@@ -36,30 +37,32 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
         for nid, fut in futures.items():
             try:
                 results[nid] = fut.result()
-                if not results[nid].get("ok"):
+                if results[nid].get("skipped"):
+                    skipped.append(nid)
+                elif not results[nid].get("ok"):
                     failures.append(nid)
             except Exception as e:  # noqa: BLE001
                 log.error("node {} crashed: {}", nid, e)
                 results[nid] = {"id": nid, "ok": False, "error": str(e)}
                 failures.append(nid)
 
-    # L2-C: 识别 rollout 节点 (stderr 含 [V1.x rollout] 标记), 收集到 rollout_skipped 列表;
-    # 用于 selftest tolerant 模式排除 — V1.x 计划中未实装 expert 不应拉低通过率。
+    # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
         if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
-    ]
+    ] + skipped
 
     summary = {
         "run_id": run_id,
         "total": len(ordered),
-        "succeeded": len(ordered) - len(failures),
+        "succeeded": len(ordered) - len(failures) - len(skipped),
         "failed": len(failures),
+        "skipped": len(skipped),
         "rollout_skipped": rollout_skipped,
         "results": results,
     }
     log.info(
-        "flow done: {}/{} ok ({} rollout skipped)",
-        summary["succeeded"], summary["total"], len(rollout_skipped)
+        "flow done: {}/{} ok, {} failed, {} skipped",
+        summary["succeeded"], summary["total"], summary["failed"], summary["skipped"]
     )
     return summary

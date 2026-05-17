@@ -49,6 +49,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     by_id: dict[str, DAGNode] = {n.id: n for n in ordered}
     results: dict[str, dict] = {}
     failures: list[str] = []
+    skipped: list[str] = []
     pending = set(by_id.keys())
     futures: dict[str, Future] = {}
     pool = ThreadPoolExecutor(max_workers=max_workers)
@@ -70,7 +71,9 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                     next_id = next(iter(futures))
                     try:
                         results[next_id] = futures[next_id].result()
-                        if not results[next_id].get("ok"):
+                        if results[next_id].get("skipped"):
+                            skipped.append(next_id)
+                        elif not results[next_id].get("ok"):
                             failures.append(next_id)
                     except Exception as e:  # noqa: BLE001
                         log.error("node {} crashed: {}", next_id, e)
@@ -81,7 +84,9 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                 for nid in done_now:
                     try:
                         results[nid] = futures[nid].result()
-                        if not results[nid].get("ok"):
+                        if results[nid].get("skipped"):
+                            skipped.append(nid)
+                        elif not results[nid].get("ok"):
                             failures.append(nid)
                     except Exception as e:  # noqa: BLE001
                         log.error("node {} crashed: {}", nid, e)
@@ -91,22 +96,23 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     finally:
         pool.shutdown(wait=True)
 
-    # L2-C: rollout 节点识别同 flows.py
+    # L2-C: rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
         if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
-    ]
+    ] + skipped
 
     summary = {
         "run_id": run_id,
         "total": len(ordered),
-        "succeeded": len(ordered) - len(failures),
+        "succeeded": len(ordered) - len(failures) - len(skipped),
         "failed": len(failures),
+        "skipped": len(skipped),
         "rollout_skipped": rollout_skipped,
         "results": results,
     }
     log.info(
-        "direct flow done: {}/{} ok ({} rollout skipped)",
-        summary["succeeded"], summary["total"], len(rollout_skipped)
+        "direct flow done: {}/{} ok, {} failed, {} skipped",
+        summary["succeeded"], summary["total"], summary["failed"], summary["skipped"]
     )
     return summary
