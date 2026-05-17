@@ -17,6 +17,11 @@ from runtime.api.deps import Kernel
 from runtime.api.models import CatalogResponse, RunCreateText, RunCreated, RunStatus as RunStatusModel
 from runtime.api.parsers import parse_path, parse_text, parse_url
 from runtime.config.settings import get_settings
+from runtime.observability.prometheus_metrics import create_metrics_router
+from runtime.api.correlation import CorrelationMiddleware
+from runtime.api.endpoints.cancel import router as cancel_router, register_run, unregister_run
+from runtime.api.endpoints.stream import router as stream_router
+from runtime.api.result_store import ResultStore
 
 _settings = get_settings()
 
@@ -27,6 +32,15 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
 )
+
+app.add_middleware(CorrelationMiddleware)
+
+# Prometheus metrics (zero-config)
+_metrics_router = create_metrics_router()
+if _metrics_router is not None:
+    app.include_router(_metrics_router)
+app.include_router(cancel_router)
+app.include_router(stream_router)
 
 # Bearer token auth middleware — enforced only when TAGENT_API_AUTH_TOKEN is set
 @app.middleware("http")
@@ -39,7 +53,7 @@ async def auth_middleware(request: Request, call_next: Any) -> Any:
     return await call_next(request)
 
 _kernel = Kernel()
-_run_results: dict[str, dict] = {}
+_run_results = ResultStore(max_entries=1000, ttl_seconds=86400)
 _run_lock = threading.Lock()
 
 

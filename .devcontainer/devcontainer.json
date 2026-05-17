@@ -1,0 +1,30 @@
+{
+  "name": "Test-Agent",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "cd runtime && pip install -e \".[dev]\" && pre-commit install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "tamasfe.even-better-toml",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/runtime/.venv/bin/python"
+      }
+    }
+  },
+  "remoteEnv": {
+    "TAGENT_LLM_PROVIDER": "stub",
+    "TAGENT_LOG_LEVEL": "INFO"
+  }
+}

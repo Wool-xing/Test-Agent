@@ -58,6 +58,31 @@ class Settings(BaseSettings):
     api_auth_token: str = Field(default="")
     log_level: str = Field(default="INFO")
 
+    # ── Agent runtime ──
+    agent_max_tokens: int = Field(default=1500)
+    test_timeout_seconds: int = Field(default=3600)
+    max_concurrent_runs: int = Field(default=4)
+
+    # ── Safety gates ──
+    chaos_authorized: bool = Field(default=False)
+    pentest_authorized: bool = Field(default=False)
+
+    # ── Artifacts & reporting ──
+    artifact_retention_days: int = Field(default=30)
+    max_artifact_size_mb: int = Field(default=100)
+    report_format: str = Field(default="markdown")
+
+    # ── Notifications ──
+    notification_webhook_url: str = Field(default="")
+    error_report_recipients: str = Field(default="")
+
+    # ── Enterprise / CI ──
+    proxy_url: str = Field(default="")
+    trusted_ca_bundle: str = Field(default="")
+    selenium_hub_url: str = Field(default="")
+    docker_host: str = Field(default="")
+    ci_mode: bool = Field(default=False)
+
     def resolve(self, rel: Path) -> Path:
         return rel if rel.is_absolute() else (self.project_root / rel).resolve()
 

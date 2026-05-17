@@ -267,7 +267,7 @@ jobs:
           echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
           [ "$AGENTS" = "16" ] || { echo "❌ Agents 数量不符（期 16，实 $AGENTS）"; exit 1; }
           [ "$SKILLS" -eq "32" ] || { echo "❌ Skills 数量不符（期 32，实 $SKILLS）"; exit 1; }
-          [ "$UTILS" = "52" ] || { echo "❌ Utils 数量不符（期 52，实 $UTILS）"; exit 1; }
+          [ "$UTILS" = "57" ] || { echo "❌ Utils 数量不符（期 57，实 $UTILS）"; exit 1; }
           echo "✅ 文件统计正确"
 
       - name: 验证 .gitignore 排除源 MD
