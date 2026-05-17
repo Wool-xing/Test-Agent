@@ -61,6 +61,46 @@ class Settings(BaseSettings):
     def resolve(self, rel: Path) -> Path:
         return rel if rel.is_absolute() else (self.project_root / rel).resolve()
 
+    def validate_startup(self) -> list[dict[str, str]]:
+        """Check config health at startup. Returns list of {level, key, message}."""
+        import os
+
+        issues: list[dict[str, str]] = []
+
+        # LLM key check
+        llm_key = os.getenv("TAGENT_LLM_API_KEY", "")
+        if not llm_key:
+            alt_keys = ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DASHSCOPE_API_KEY", "DEEPSEEK_API_KEY"]
+            if not any(os.getenv(k) for k in alt_keys):
+                issues.append({
+                    "level": "warning",
+                    "key": "llm_api_key",
+                    "message": "No LLM API key found — LLM calls will fail. Set TAGENT_LLM_API_KEY in .env or environment.",
+                })
+
+        # Critical dirs exist
+        for attr, label in [("experts_dir", "experts"), ("skills_dir", "skills"), ("scripts_dir", "scripts")]:
+            p = self.resolve(getattr(self, attr))
+            if not p.is_dir():
+                issues.append({
+                    "level": "error",
+                    "key": attr,
+                    "message": f"{label} directory not found: {p}",
+                })
+
+        # DB URL: warn if postgres and no psycopg
+        if self.db_url and "postgres" in self.db_url:
+            try:
+                import psycopg  # noqa: F401
+            except ImportError:
+                issues.append({
+                    "level": "warning",
+                    "key": "db_url",
+                    "message": "PostgreSQL URL configured but psycopg not installed — database unavailable",
+                })
+
+        return issues
+
 
 _settings: Settings | None = None
 

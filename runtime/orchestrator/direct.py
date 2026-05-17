@@ -20,25 +20,38 @@ from runtime.self_healing.retry import with_retry
 
 
 def _run_node(node: DAGNode) -> dict[str, Any]:
-    with span(f"node.{node.kind}.{node.name}", node_id=node.id):
+    from runtime.orchestrator.hooks import get_hook_registry
 
-        def _execute() -> Any:
-            return execute_node(name=node.name, kind=node.kind, inputs=node.inputs, timeout=node.timeout_seconds)
+    hooks = get_hook_registry()
+    ctx = {"name": node.name, "kind": node.kind, "inputs": node.inputs, "timeout": node.timeout_seconds}
+    hooks.fire_before(node.id, ctx)
 
-        outcome = with_retry(_execute)()
-    summary = {
-        "id": node.id,
-        "name": outcome.name,
-        "kind": outcome.kind,
-        "executed_script": outcome.executed_script,
-        "returncode": outcome.returncode,
-        "duration_ms": outcome.duration_ms,
-        "ok": outcome.ok,
-        "stdout_tail": outcome.stdout[-2000:] if outcome.stdout else "",
-        "stderr_tail": outcome.stderr[-2000:] if outcome.stderr else "",
-    }
-    if not outcome.ok and node.on_failure == "abort":
-        raise RuntimeError(f"node {node.id} aborted: rc={outcome.returncode}")
+    try:
+        with span(f"node.{node.kind}.{node.name}", node_id=node.id):
+
+            def _execute() -> Any:
+                return execute_node(name=node.name, kind=node.kind, inputs=node.inputs, timeout=node.timeout_seconds)
+
+            outcome = with_retry(_execute)()
+        summary = {
+            "id": node.id,
+            "name": outcome.name,
+            "kind": outcome.kind,
+            "executed_script": outcome.executed_script,
+            "returncode": outcome.returncode,
+            "duration_ms": outcome.duration_ms,
+            "ok": outcome.ok,
+            "stdout_tail": outcome.stdout[-2000:] if outcome.stdout else "",
+            "stderr_tail": outcome.stderr[-2000:] if outcome.stderr else "",
+        }
+        ctx["results"] = summary
+        hooks.fire_after(node.id, ctx)
+        if not outcome.ok and node.on_failure == "abort":
+            raise RuntimeError(f"node {node.id} aborted: rc={outcome.returncode}")
+    except Exception as exc:
+        ctx["error"] = str(exc)
+        hooks.fire_error(node.id, ctx)
+        raise
     return summary
 
 

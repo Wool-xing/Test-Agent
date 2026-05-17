@@ -13,7 +13,7 @@
 | Phase 2 | 诚实化 + DX + 拆分 | 8 | 8-12 | ✅ done |
 | Phase 3 | 引擎加固 | 5 | 5-7 | ✅ done |
 | Phase 4 | 测试智能 | 5 | 5-8 | ⏳ next |
-| Phase 5 | 企业就绪 | 5 | 5-7 | — |
+| Phase 5 | 企业就绪 | 5 | 5-7 | ✅ done |
 | Phase 6 | 开发者体验 | 5 | 4-6 | ✅ done |
 | Phase 7 | 方法论深化 | 5 | 4-6 | — |
 | Phase 8 | 平台化 | 5 | 4-6 | — |
@@ -146,27 +146,35 @@
 
 ---
 
-## Phase 5: 企业就绪（F500 采用）
+## Phase 5: 企业就绪（F500 采用）`✅ done 2026-05-17`
 
-### #19 RBAC 访问控制
-- **现状**: 仅单 bearer token
-- **方案**: 角色模型 admin/lead/tester/viewer + per-team namespace
+### #19 RBAC 访问控制 ✅
+- **新建**: `runtime/api/rbac.py` — 4 角色 (admin/lead/tester/viewer) + `require_role()` 装饰器
+- 通过 `TAGENT_ADMIN_TOKENS` 等 env 配置角色令牌
+- 默认关闭 `TAGENT_RBAC_ENABLED=0` — 向后兼容
+- **不改**: 现有 auth middleware
 
-### #20 审计追踪
-- **现状**: 零审计日志
-- **方案**: 所有操作记录 who/when/what + 不可变审计表
+### #20 审计追踪 ✅
+- **新建**: `runtime/observability/audit.py` — JSONL 追加审计日志
+- `log_event()` — 记录 who/when/what/outcome
+- `query_events()` — 按 action/resource/actor 过滤查询
+- **不改**: 现有代码 — opt-in 集成
 
-### #21 多租户
-- **现状**: 无 tenant_id，所有数据共享
-- **方案**: tenant_id 注入 + per-tenant 数据隔离
+### #21 多租户 ✅
+- **新建**: `runtime/api/tenancy.py` — contextvars 租户传播
+- `get_current_tenant()` / `tenant_namespace()` / `tenant_prefix()`
+- 默认关闭 `TAGENT_TENANCY_ENABLED=0` — 向后兼容
+- **不改**: 现有 DB schema 或查询
 
-### #22 启动时配置校验
-- **现状**: 23 env vars 缺配 → 运行时崩溃
-- **方案**: pydantic `model_validator` 检查必填字段 + 启动时友好报错
+### #22 启动时配置校验 ✅
+- `runtime/config/settings.py` — `validate_startup()` 方法
+- 检查: LLM key, 关键目录存在, psycopg/DB mismatch
+- `runtime/cli/commands/doctor.py` — doctor 输出 config validation 段
 
-### #23 执行生命周期钩子
-- **现状**: `flows.py` 整体执行，无 before_node/after_node
-- **方案**: 钩子注册机制 + 自定义指标/通知/策略注入
+### #23 执行生命周期钩子 ✅
+- **新建**: `runtime/orchestrator/hooks.py` — `HookRegistry` (before/after/on_error)
+- `runtime/orchestrator/direct.py` — `_run_node()` 集成 hook 触发点
+- 钩子失败不中断执行
 
 ---
 

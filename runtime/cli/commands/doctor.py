@@ -25,6 +25,16 @@ def register(app: typer.Typer) -> None:
         console.print(f"  otel_enabled      = {s.otel_enabled}")
         cat = _kernel.catalog()
         console.print(f"\n[bold]Catalog:[/] {cat['counts']['experts']} experts, {cat['counts']['skills']} skills")
+
+        issues = s.validate_startup()
+        if issues:
+            console.print("\n[bold]Config validation:[/]")
+            for iss in issues:
+                icon = "[red]✗[/]" if iss["level"] == "error" else "[yellow]![/]"
+                console.print(f"  {icon} [{iss['key']}] {iss['message']}")
+        else:
+            console.print("\n[bold]Config validation:[/] [green]all checks passed[/]")
+
         ping_db()
         ping_minio()
 
