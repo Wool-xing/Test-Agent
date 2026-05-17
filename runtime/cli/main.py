@@ -26,6 +26,56 @@ if sys.platform == "win32":
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+_SMOKE_PRD_FIXTURE = """\
+# Smoke PRD · 登录模块(fixture)
+
+> Test-Agent 自检 fixture · 主宪章 §33。
+> **此文件不代表任何真实项目**,纯为 e2e 流程验证。
+
+## 1. 背景
+
+一个虚构的 SaaS 后台需要登录入口,本 PRD 用于触发 16 agent 的完整 DAG。
+
+## 2. 功能要求
+
+### 2.1 账号密码登录
+
+- 用户输入账号 + 密码,点登录
+- 后端校验,正确则颁发 session,跳转首页
+- 错误:提示 "账号或密码错误"
+
+### 2.2 短信验证码登录
+
+- 用户输入手机号,点"发送验证码"
+- 60 秒倒计时,验证码 6 位数字,5 分钟过期
+- 错误次数 5 次锁定 10 分钟
+
+### 2.3 安全要求
+
+- 密码字段加密传输(HTTPS)
+- 登录失败连续 5 次锁定账号
+- 登录成功后 session 24 小时过期
+
+## 3. 非功能
+
+- 接口 P99 延迟 < 300ms
+- 支持 1000 QPS 峰值
+- 移动端 + 桌面端兼容
+
+## 4. 不在范围
+
+- 注册流程
+- 找回密码
+- 第三方 OAuth
+
+## 5. 测试目标
+
+让 Test-Agent 跑完 16 agent DAG,产出:
+- 测试用例 Excel + xmind / markmap / opml
+- 自动化脚本骨架
+- 测试报告
+"""
+
 app = typer.Typer(add_completion=False, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
 console = Console(force_terminal=True)
@@ -463,8 +513,9 @@ def demo(
     console.print(f"\n[bold]Step 3/4 · tagent selftest --e2e (16 agent DAG · {step3_label})[/]")
     fixture_path = Path("examples/_smoke_prd.md")
     if not fixture_path.exists():
-        console.print(f"  [red]fixture missing:[/] {fixture_path}")
-        raise typer.Exit(2)
+        fixture_path.parent.mkdir(parents=True, exist_ok=True)
+        fixture_path.write_text(_SMOKE_PRD_FIXTURE, encoding="utf-8")
+        console.print(f"  [yellow]⚡ auto-generated fixture:[/] {fixture_path}")
     art = parse_path(fixture_path)
     run_id, decision = demo_kernel.submit(art, persist=False)
     summary = demo_kernel.execute_sync(run_id, decision)
