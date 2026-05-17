@@ -11,6 +11,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+import runtime
 from runtime.api.deps import Kernel
 from runtime.api.parsers import parse_path, parse_text, parse_url
 from runtime.cli.config import config_app
@@ -28,6 +29,15 @@ if sys.platform == "win32":
 app = typer.Typer(add_completion=False, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
 console = Console(force_terminal=True)
+
+
+@app.callback(invoke_without_command=True)
+def _version_callback(
+    version: bool = typer.Option(False, "--version", help="Show version and exit"),
+):
+    if version:
+        console.print(f"Test-Agent Runtime v{runtime.__version__}")
+        raise typer.Exit(0)
 _kernel = Kernel()
 
 
