@@ -83,7 +83,7 @@ psutil==5.9.6                      # [稳定层] 进程性能采集
 # ===== [可选] 视觉/游戏（12-视觉游戏测试）=====
 # airtest==1.4.3                   # [可选 · 需手动装] airtest 1.4.x 仍硬 pin mss==6.1.0 + numpy<2.0 + opencv-contrib<=4.6.0.66，与本仓 mss>=7.0.1 / numpy 2.x / opencv-python 4.13 全冲突。需自维隔离 venv 安装。
 opencv-python==4.13.0.92           # [可选] 图像处理
-scikit-image==0.24.0               # [可选] SSIM 视觉对比 (Py 3.12 原生支持, 0.22→0.24 修跨包 numpy 冲突)
+scikit-image==0.26.0               # [可选] SSIM 视觉对比 (Py 3.12 原生支持, 0.22→0.24 修跨包 numpy 冲突)
 imagehash==4.3.2                   # [可选] 感知哈希 (4.3.1→4.3.2 修小 CVE)
 pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
 Pillow==12.2.0                     # [可选] 图像（11→12.2 修 CVE-2026-25990 PSD heap overflow/FITS GZIP bomb/font integer overflow 等 5 个 high+moderate）
