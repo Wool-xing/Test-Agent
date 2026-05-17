@@ -79,7 +79,7 @@ def compare_outputs(a: Any, b: Any) -> DiffResult:
         return DiffResult(input_data=None, output_a=a, output_b=b, identical=True)
 
     # Classify divergence
-    if type(a) != type(b):
+    if not isinstance(a, type(b)):
         div_type = "type"
     elif isinstance(a, dict) and isinstance(b, dict):
         keys_a = set(a.keys())
