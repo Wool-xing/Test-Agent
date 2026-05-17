@@ -1,6 +1,11 @@
 #!/bin/bash
 # Test-Agent 工作流一键部署脚本
-# 用法（远程一行）：
+#
+# 安全提示：curl | bash 存在供应链风险。生产环境建议先 clone 仓库再本地执行：
+#   git clone --depth 1 --branch v1.32.4 https://github.com/Wool-xing/Test-Agent.git
+#   cd Test-Agent && bash install.sh /path/to/your-test-project
+#
+# 用法（远程一行，方便快速试用）：
 #   curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
 # 用法（本地）：
 #   bash install.sh /path/to/your-test-project
@@ -12,7 +17,7 @@ REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-xing/Test-Agent.git}"
 REPO_BRANCH="${TEST_AGENT_REPO_BRANCH:-main}"
 
 echo "=========================================="
-echo " Test-Agent 工作流一键部署 V1.32.0"
+echo " Test-Agent 工作流一键部署 V1.32.4"
 echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="

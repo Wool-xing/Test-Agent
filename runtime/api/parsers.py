@@ -103,17 +103,17 @@ def _extract_pdf(path: Path, max_pages: int = 30) -> str:
         return "\n\n".join(pages)
     except Exception as e:  # noqa: BLE001
         logger.warning("pdf extract failed {}: {}", path, e)
-        return ""
+        return f"[PDF_PARSE_ERROR: {path.name}]"
 
 
 def _extract_docx(path: Path) -> str:
     try:
         import docx  # python-docx
     except ImportError:
-        return ""
+        return "[DOCX_PARSE_ERROR: python-docx not installed]"
     try:
         d = docx.Document(str(path))
         return "\n".join(p.text for p in d.paragraphs)
     except Exception as e:  # noqa: BLE001
         logger.warning("docx extract failed {}: {}", path, e)
-        return ""
+        return f"[DOCX_PARSE_ERROR: {path.name}]"

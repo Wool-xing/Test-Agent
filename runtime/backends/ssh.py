@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shlex
 import time
 from pathlib import Path
 
@@ -26,7 +27,7 @@ class SSHBackend(BaseExecutionEnv):
         except ImportError as e:
             raise RuntimeError("asyncssh not installed; pip install asyncssh") from e
         self._conn = await asyncssh.connect(
-            self.host, port=self.port, username=self.user, client_keys=[self.key] if self.key else None, password=self.password, known_hosts=None
+            self.host, port=self.port, username=self.user, client_keys=[self.key] if self.key else None, password=self.password, known_hosts=()
         )
         logger.info("SSH connected: {}@{}:{}", self.user, self.host, self.port)
 
@@ -34,9 +35,9 @@ class SSHBackend(BaseExecutionEnv):
         start = time.monotonic()
         full = cmd
         if cwd:
-            full = f"cd {cwd} && {cmd}"
+            full = f"cd {shlex.quote(cwd)} && {cmd}"
         if env:
-            env_str = " ".join(f"{k}={v}" for k, v in env.items())
+            env_str = " ".join(f"{shlex.quote(k)}={shlex.quote(v)}" for k, v in env.items())
             full = f"{env_str} {full}"
         try:
             result = await self._conn.run(full, check=False, timeout=timeout)
@@ -51,10 +52,9 @@ class SSHBackend(BaseExecutionEnv):
             return ExecResult(ok=False, stdout="", stderr=str(e), returncode=None, elapsed_ms=int((time.monotonic() - start) * 1000))
 
     async def read(self, path: str) -> bytes:
-        result = await self._conn.run(f"cat {path}", check=False)
-        if result.exit_status != 0:
-            raise FileNotFoundError(path)
-        return (result.stdout or "").encode("utf-8")
+        async with self._conn.start_sftp_client() as sftp:
+            async with sftp.open(path, "rb") as f:
+                return await f.read()
 
     async def write(self, path: str, data: bytes) -> None:
         async with self._conn.start_sftp_client() as sftp:

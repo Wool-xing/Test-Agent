@@ -15,6 +15,57 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
+## [v1.32.4] - 2026-05-17
+
+### Changed
+- README: 数字诚实化(8640→~12 CI-validated; 95% aspirational→removed; 32 skills→30 active+2 vision)
+- 00-项目导航/ROADMAP: 清除12处主宪章内部引用
+- generate_report.py: 143行→6 helper functions
+- mobile_driver.py: 107行→_build_monkey_cmd+_analyze_monkey_log
+
+---
+
+## [v1.32.3] - 2026-05-17
+
+### Changed
+- router/llm_client.py: _stub_response 77-line if/elif chain → _STUB_TARGETS dispatch table
+- fuzzer.py: sum(PAYLOAD_LIBRARY.values(), []) hoist to module-level ALL_PAYLOADS
+
+---
+
+## [v1.32.2] - 2026-05-17
+
+### Security
+- backends/local.py: create_subprocess_shell → create_subprocess_exec (CWE-78)
+- backends/ssh.py: SFTP read 替代 shell cat; shlex.quote(cwd/env); known_hosts=()
+- config/settings.py: 删除默认硬编码凭据; api_host→127.0.0.1; 加 api_auth_token
+- api/main.py: Bearer token 认证中间件; CORS 限制 localhost; 文件上传 50MB+扩展名白名单
+- chaos_helper.py: kill_process psutil 缺失改为 RuntimeError 拒绝执行
+- protocol_helper.py: SOAP body_xml 用 xml_escape 防 XML 注入
+- miniprogram_runner.py: WebSocket close 包 try/finally 防连接泄漏
+- .gitignore: 加固 10 个敏感路径; 4 个已追踪测试报告 docx 从 git 移除
+
+### Fixed
+- api/main.py: history/dashboard 静默 except→指定异常+logger.warning; 后台线程 logger.exception 保 traceback; _run_results threading.Lock 防竞态
+- api/deps.py: persistence fail→logger.error; status persist DEBUG→WARNING; artifact read fail→[READ_ERROR]
+- api/parsers.py: PDF/DOCX extract fail→[PARSE_ERROR] marker
+- router/retrieval.py: retrieval fail DEBUG→WARNING
+- api_retry_util.py: bare except pass→logger.debug
+- i18n_checker.py: bare except Exception→指定异常
+- ci.yml: pin ludeeus/action-shellcheck@2.0.0
+- pre-commit: default_stages commit→pre-commit
+- install.sh: 供应链安全提示(git clone 优先于 curl|bash)
+
+---
+
+## [v1.32.1] - 2026-05-17
+
+### Fixed
+- CONTRIBUTING.md 文档数字 16/33/49 → 16/32/49（skill 数 33→32，与 pre-commit + CI 实际校验对齐）
+- 全项目版本号同步至 1.32.1
+
+---
+
 ## [v1.32.0] - 2026-05-17
 
 > **V1.15.0 → V1.32.0 (2026-05-15 ~ 2026-05-17) 共 17 版累积**。

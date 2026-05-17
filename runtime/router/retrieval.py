@@ -54,7 +54,7 @@ def build_similar_examples_block(artifact: TargetArtifact, top_k: int = 3) -> st
     try:
         return asyncio.run(build_similar_examples_block_async(artifact, top_k=top_k))
     except Exception as e:  # noqa: BLE001
-        logger.debug("history retrieval skipped: {}", e)
+        logger.warning("history retrieval skipped: {}", e)
         return ""
 
 

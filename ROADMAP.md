@@ -1,7 +1,7 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.32.0 (**expert rollout 收尾 + skill rollout 完成（16/16）**)
+> 当前状态:V1.32.4 (**expert rollout 收尾 + skill rollout 完成（16/16）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
@@ -67,7 +67,7 @@
 | `jmeter-script-gen` | JMeter JMX 生成 |
 | `python-script-gen` | pytest 脚本生成(Playwright + requests) |
 | `security-review` | OWASP Top 10 + SAST + 依赖 CVE |
-| `zentao-bug-submission` | BugTracker adapter(默认禅道,主宪章 §12) |
+| `zentao-bug-submission` | BugTracker adapter (默认禅道) |
 
 ---
 
@@ -133,8 +133,8 @@
 
 | Skill | 当前形态 | V2 路线 |
 |-------|----------|---------|
-| `agent-introspection-debugging` | 方法论参考(主宪章 §28) | LLM 决策回放 + 工具调用透明化实装 |
-| `build-your-own-x-explorer` | 教学引导参考(主宪章 §31) | 与 docs/theory/ 22 KB 卡片联动检索引擎 |
+| `agent-introspection-debugging` | 方法论参考 | LLM 决策回放 + 工具调用透明化实装 |
+| `build-your-own-x-explorer` | 教学引导参考 | 与 docs/theory/ 22 KB 卡片联动检索引擎 |
 
 ---
 

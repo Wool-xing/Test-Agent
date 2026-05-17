@@ -42,10 +42,10 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = Field(default=60)
     llm_max_retries: int = Field(default=2)
 
-    db_url: str = Field(default="postgresql+psycopg://tagent:tagent@localhost:5432/tagent")
+    db_url: str = Field(default="")
     minio_endpoint: str = Field(default="localhost:9000")
-    minio_access_key: str = Field(default="tagent")
-    minio_secret_key: str = Field(default="tagent-secret")
+    minio_access_key: str = Field(default="")
+    minio_secret_key: str = Field(default="")
     minio_bucket: str = Field(default="tagent-evidence")
     minio_secure: bool = Field(default=False)
 
@@ -53,8 +53,9 @@ class Settings(BaseSettings):
     otel_endpoint: str = Field(default="http://localhost:4317")
     otel_enabled: bool = Field(default=False)
 
-    api_host: str = Field(default="0.0.0.0")
+    api_host: str = Field(default="127.0.0.1")
     api_port: int = Field(default=8800)
+    api_auth_token: str = Field(default="")
 
     def resolve(self, rel: Path) -> Path:
         return rel if rel.is_absolute() else (self.project_root / rel).resolve()

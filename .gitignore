@@ -16,11 +16,11 @@ env/
 htmlcov/
 
 # workspace 测试产出（敏感 + 体积大）
-workspace/测试数据/test_data.json
-workspace/测试数据/jmeter_users.csv
-workspace/测试数据/*.json
-workspace/测试数据/*.csv
+workspace/测试数据/
 workspace/执行日志/
+workspace/测试报告/
+workspace/feedback/
+workspace/自动化脚本/
 
 # 但保留 workspace/执行日志/baselines/（性能基线需提交）
 !workspace/执行日志/baselines/
@@ -148,3 +148,11 @@ workspace/测试用例/_smoke_out/
 
 # ===== 内部开发文档（HANDOFF / 内部讨论纪要,不入公开仓）=====
 discussions/internal/
+docs/审查报告/
+docs/参考库/
+docs/decisions/
+archive/
+
+# ===== runtime 运行时产物（用户数据，不入仓）=====
+runtime/workspace/
+runtime/web/tsconfig.tsbuildinfo

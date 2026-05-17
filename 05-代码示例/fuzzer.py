@@ -39,6 +39,7 @@ PAYLOAD_LIBRARY = {
     "empty_collections": [[], {}, ""],
     "deeply_nested": ["{" * 100 + "}" * 100],
 }
+ALL_PAYLOADS: list = [v for vals in PAYLOAD_LIBRARY.values() for v in vals]
 
 
 def random_string(length: int = 100, charset: str = string.printable) -> str:
@@ -49,7 +50,7 @@ def mutate(value):
     """对值做随机变异"""
     strategies = [
         lambda v: random_string(random.randint(0, 1000)),
-        lambda v: random.choice(sum(PAYLOAD_LIBRARY.values(), [])),
+        lambda v: random.choice(ALL_PAYLOADS),
         lambda v: bytes([random.randint(0, 255) for _ in range(100)]),
     ]
     return random.choice(strategies)(value)
@@ -73,7 +74,7 @@ def fuzz_http_endpoint(
     for i in range(iterations):
         payload = {k: mutate(v) for k, v in fields.items()}
         # 加入纯 garbage payload
-        payload["__fuzz__"] = random.choice(sum(PAYLOAD_LIBRARY.values(), []))
+        payload["__fuzz__"] = random.choice(ALL_PAYLOADS)
         try:
             r = requests.request(method, url, json=payload, timeout=timeout)
             statuses[r.status_code] = statuses.get(r.status_code, 0) + 1

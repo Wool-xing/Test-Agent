@@ -97,4 +97,4 @@ repos:
 
 # 配置：项目根 .markdownlint.json 自定义规则
 default_install_hook_types: [pre-commit]
-default_stages: [commit]
+default_stages: [pre-commit]

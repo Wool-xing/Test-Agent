@@ -33,7 +33,7 @@ tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / s
 # → 产 .env + tagent.yml + STARTUP.md(5 步上手指南)
 ```
 
-矩阵驱动配置:8 测试类型 × 6 平台 × 5 LLM × 6 tracker × 6 通道(理论 8640 组合;并非全部已 e2e 验证)。见 [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md)。
+矩阵驱动配置:8 测试类型 × 6 平台 × 5 LLM × 6 tracker × 6 通道。实际 CI 验证约 12 种常用组合；完整 8640 网格是配置矩阵，不是覆盖率声明。见 [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md)。
 
 ---
 
@@ -42,7 +42,7 @@ tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / s
 Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告,全自主。为 QA 团队、安全研究员、车载测试工程师、以及任何想**用 AI 测试同时学测试理论**的人而生。
 
 - **16 专家 Agent** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
-- **32 业务 Skill** (23 production + 7 script + 0 rollout + 2 vision——见 [ROADMAP.md](ROADMAP.md)) **+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
+- **30 个活跃 Skill** (23 production + 7 script) **+ 2 个 vision-only**（方法论参考，不可执行）**+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
 - **49 生产工具** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV ……
 - **多 LLM(任厂商即插即用)** — 内置 6 厂商 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI 兼容兜底通道** 接其他任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 变量, 零代码改动. 速查手册: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 已实装(禅道);5 计划(Jira · GitHub · GitLab · Linear · Webhook,见 roadmap)
@@ -83,7 +83,7 @@ curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.s
 - **用例设计方法**:等价类 · 边界值 · 判定表 · 状态迁移 · 配对 · 正交 · 探索性 SBTM · 风险驱动 · TDD · BDD · ATDD
 - **质量门禁**:冒烟 → 回归 → performance_ci_quick → performance_full → release(5 层)
 
-覆盖面在上述类别广。**「95%」是目标值,不是测量值** — 领域专项门禁(航空 DO-178C / 医疗 HIPAA / 工业 IEC 61508)当前仅以 **skeleton** 合规 YAML 形态提供。
+覆盖面在上述类别较广但不穷尽。领域专项门禁（航空 DO-178C / 医疗 HIPAA / 工业 IEC 61508）以 skeleton 合规 YAML 形态提供，受监管行业生产使用需领域专家评审。
 
 ## 📖 设计文档
 

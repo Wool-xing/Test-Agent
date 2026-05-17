@@ -1,7 +1,7 @@
 # Test-Agent 启动指南(由 `tagent init` 生成)
 
 > 配置:**Web 系统测试** · Linux(Ubuntu/Debian/CentOS) · LLM=ollama · BugTracker=webhook · 通知=SMTP 邮件
-> 生成于 2026-05-14 02:13:02 · Test-Agent 1.14.0
+> 生成于 2026-05-17 12:25:29 · Test-Agent 1.32.4
 
 ## 1. 填占位(必做)
 

@@ -18,73 +18,38 @@ logger = logging.getLogger(__name__)
 
 # ===== Word 报告 =====
 
-def generate_test_report(data: Dict, output_path: str) -> str:
-    """生成 Word 测试报告。data 包含 project_name/version/environment/results/bugs/coverage/risks 等字段。
-
-    依赖 python-docx (可选)。未装时 graceful skip + sentinel 文件标记, DAG 节点不 fail。
-    """
-    try:
-        from docx import Document
-        from docx.shared import Pt, RGBColor
-        from docx.enum.text import WD_ALIGN_PARAGRAPH
-    except ImportError:
-        # graceful skip: 缺 python-docx 时写 sentinel + warning, 让 DAG 节点 exit 0
-        # (L2 selftest baseline 修复, generate_report.py n7 节点 ImportError → graceful)
-        logger.warning(
-            "python-docx 未安装, Word 报告跳过生成 (graceful skip)。"
-            "如需 Word 报告: pip install python-docx>=1.1.0。"
-            "L2 selftest 走此分支为预期行为。"
-        )
-        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        sentinel = Path(output_path).with_suffix(".skipped.txt")
-        sentinel.write_text(
-            "Word report generation skipped: python-docx not installed.\n"
-            f"data summary: project={data.get('project_name', '-')} "
-            f"verdict={data.get('verdict', '-')} "
-            f"pass_rate={data.get('results', {}).get('pass_rate', 0):.1%}\n"
-            "Install python-docx>=1.1.0 to enable full Word report.\n",
-            encoding="utf-8",
-        )
-        logger.info(f"sentinel 文件: {sentinel}")
-        return str(sentinel)
-
-    doc = Document()
-    # 字体 fallback：微软雅黑 → PingFang SC → Noto Sans CJK SC
+def _write_docx_header(doc, data: Dict) -> None:
+    from docx.shared import Pt
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
     style = doc.styles["Normal"]
     style.font.name = "微软雅黑"
     style.font.size = Pt(11)
-
     title = doc.add_heading("测试报告", level=0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
     doc.add_paragraph(f"项目：{data.get('project_name', '')}")
     doc.add_paragraph(f"版本：{data.get('version', '')}")
     doc.add_paragraph(f"测试环境：{data.get('environment', '')}")
     doc.add_paragraph(f"报告日期：{datetime.now().strftime('%Y-%m-%d %H:%M')}")
     doc.add_page_break()
 
-    # 一、执行摘要
+
+def _write_docx_summary(doc, data: Dict) -> None:
+    from docx.shared import RGBColor
     doc.add_heading("一、执行摘要", level=1)
     summary_table = doc.add_table(rows=2, cols=5)
     summary_table.style = "Table Grid"
-    headers = ["总用例", "通过", "失败", "通过率", "覆盖率"]
-    for i, h in enumerate(headers):
+    for i, h in enumerate(["总用例", "通过", "失败", "通过率", "覆盖率"]):
         cell = summary_table.cell(0, i)
         cell.text = h
         if cell.paragraphs and cell.paragraphs[0].runs:
             cell.paragraphs[0].runs[0].bold = True
-
     results = data.get("results", {})
-    values = [
-        str(results.get("total", 0)),
-        str(results.get("passed", 0)),
-        str(results.get("failed", 0)),
-        f"{results.get('pass_rate', 0):.1%}",
+    for i, v in enumerate([
+        str(results.get("total", 0)), str(results.get("passed", 0)),
+        str(results.get("failed", 0)), f"{results.get('pass_rate', 0):.1%}",
         f"{data.get('coverage', 0):.1%}",
-    ]
-    for i, v in enumerate(values):
+    ]):
         summary_table.cell(1, i).text = v
-
     conclusion = doc.add_paragraph()
     conclusion.add_run("测试结论：").bold = True
     verdict = data.get("verdict", "通过")
@@ -92,30 +57,30 @@ def generate_test_report(data: Dict, output_path: str) -> str:
     run.font.color.rgb = RGBColor(0, 128, 0) if verdict == "通过" else RGBColor(255, 0, 0)
     run.bold = True
 
-    # 一(补)、数据完整性警示 — 防 mock 闭环 (V1.14 W3-2b)
-    # test_lead.mock_output 在上游 degraded 时写 _degraded_upstream 列表
-    degraded_upstream = data.get("_degraded_upstream", [])
-    if degraded_upstream:
-        doc.add_heading("⚠ 数据完整性警示", level=1)
-        warning_p = doc.add_paragraph()
-        warning_run = warning_p.add_run(
-            f"本次报告基于不完整测试数据生成。共 {len(degraded_upstream)} 个 expert "
-            f"输出 degraded(mock 兜底 / LLM 失败 / 未实装 V1.x rollout):"
-        )
-        warning_run.font.color.rgb = RGBColor(255, 140, 0)  # 橙色
-        warning_run.bold = True
-        for name in degraded_upstream:
-            item = doc.add_paragraph(style="List Bullet")
-            item.add_run(f"expert '{name}' — 详见 ROADMAP.md V1.x rollout 节奏")
-        impact_p = doc.add_paragraph()
-        impact_run = impact_p.add_run(
-            "→ 上线决策建议: conditional 或 no-go(由 test-lead 判定);"
-            "不应基于此报告直接发版。"
-        )
-        impact_run.bold = True
-        impact_run.font.color.rgb = RGBColor(255, 0, 0)
 
-    # 二、缺陷统计
+def _write_docx_degraded_warning(doc, data: Dict) -> None:
+    from docx.shared import RGBColor
+    degraded_upstream = data.get("_degraded_upstream", [])
+    if not degraded_upstream:
+        return
+    doc.add_heading("⚠ 数据完整性警示", level=1)
+    warning_p = doc.add_paragraph()
+    warning_run = warning_p.add_run(
+        f"本次报告基于不完整测试数据生成。共 {len(degraded_upstream)} 个 expert "
+        f"输出 degraded(mock 兜底 / LLM 失败 / 未实装 V1.x rollout):"
+    )
+    warning_run.font.color.rgb = RGBColor(255, 140, 0)
+    warning_run.bold = True
+    for name in degraded_upstream:
+        item = doc.add_paragraph(style="List Bullet")
+        item.add_run(f"expert '{name}' — 详见 ROADMAP.md V1.x rollout 节奏")
+    impact_p = doc.add_paragraph()
+    impact_run = impact_p.add_run("→ 上线决策建议: conditional 或 no-go(由 test-lead 判定);不应基于此报告直接发版。")
+    impact_run.bold = True
+    impact_run.font.color.rgb = RGBColor(255, 0, 0)
+
+
+def _write_docx_bugs(doc, data: Dict) -> None:
     doc.add_heading("二、缺陷统计", level=1)
     bugs = data.get("bugs", {})
     bug_table = doc.add_table(rows=5, cols=3)
@@ -134,29 +99,62 @@ def generate_test_report(data: Dict, output_path: str) -> str:
             if ri == 0 and cell.paragraphs and cell.paragraphs[0].runs:
                 cell.paragraphs[0].runs[0].bold = True
 
-    # 三、性能指标（可选）
-    perf = data.get("performance")
-    if perf:
-        doc.add_heading("三、性能指标（JMeter）", level=1)
-        p_table = doc.add_table(rows=5, cols=2)
-        p_table.style = "Table Grid"
-        p_rows = [
-            ("TPS", f"{perf.get('tps', 0)} 次/秒"),
-            ("平均响应", f"{perf.get('avg_response_ms', 0)} ms"),
-            ("P95响应", f"{perf.get('p95_response_ms', 0)} ms"),
-            ("错误率", f"{perf.get('error_rate_pct', 0)}%"),
-            ("门禁结论", perf.get("quality_gate", "PASS")),
-        ]
-        for ri, (k, v) in enumerate(p_rows):
-            p_table.cell(ri, 0).text = k
-            p_table.cell(ri, 1).text = v
 
-    # 四、风险与建议
+def _write_docx_performance(doc, data: Dict) -> None:
+    perf = data.get("performance")
+    if not perf:
+        return
+    doc.add_heading("三、性能指标（JMeter）", level=1)
+    p_table = doc.add_table(rows=5, cols=2)
+    p_table.style = "Table Grid"
+    for ri, (k, v) in enumerate([
+        ("TPS", f"{perf.get('tps', 0)} 次/秒"),
+        ("平均响应", f"{perf.get('avg_response_ms', 0)} ms"),
+        ("P95响应", f"{perf.get('p95_response_ms', 0)} ms"),
+        ("错误率", f"{perf.get('error_rate_pct', 0)}%"),
+        ("门禁结论", perf.get("quality_gate", "PASS")),
+    ]):
+        p_table.cell(ri, 0).text = k
+        p_table.cell(ri, 1).text = v
+
+
+def _write_docx_risks(doc, data: Dict) -> None:
     doc.add_heading("四、风险与建议", level=1)
     for risk in data.get("risks", []):
         para = doc.add_paragraph(style="List Bullet")
         para.add_run(f"【{risk.get('level', '中')}】").bold = True
         para.add_run(risk.get("description", ""))
+
+
+def generate_test_report(data: Dict, output_path: str) -> str:
+    """生成 Word 测试报告。
+
+    依赖 python-docx (可选)。未装时 graceful skip + sentinel 文件标记。
+    """
+    try:
+        from docx import Document
+    except ImportError:
+        logger.warning("python-docx 未安装, Word 报告跳过生成。pip install python-docx>=1.1.0")
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        sentinel = Path(output_path).with_suffix(".skipped.txt")
+        results = data.get("results", {})
+        sentinel.write_text(
+            f"Word report skipped: python-docx not installed.\n"
+            f"project={data.get('project_name', '-')} verdict={data.get('verdict', '-')} "
+            f"pass_rate={results.get('pass_rate', 0):.1%}\n"
+            "Install python-docx>=1.1.0.\n",
+            encoding="utf-8",
+        )
+        logger.info(f"sentinel 文件: {sentinel}")
+        return str(sentinel)
+
+    doc = Document()
+    _write_docx_header(doc, data)
+    _write_docx_summary(doc, data)
+    _write_docx_degraded_warning(doc, data)
+    _write_docx_bugs(doc, data)
+    _write_docx_performance(doc, data)
+    _write_docx_risks(doc, data)
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     doc.save(output_path)

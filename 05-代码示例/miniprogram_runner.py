@@ -52,11 +52,13 @@ class WxMiniProgram:
         except ImportError:
             raise RuntimeError("缺少 websocket-client，pip install websocket-client")
         ws = websocket.create_connection(f"ws://127.0.0.1:{self.port}", timeout=30)
-        msg = {"id": int(time.time() * 1000), "method": method, "params": params or {}}
-        ws.send(json.dumps(msg))
-        resp = json.loads(ws.recv())
-        ws.close()
-        return resp
+        try:
+            msg = {"id": int(time.time() * 1000), "method": method, "params": params or {}}
+            ws.send(json.dumps(msg))
+            resp = json.loads(ws.recv())
+            return resp
+        finally:
+            ws.close()
 
     def reLaunch(self, path: str):
         return self._send("Page.reLaunch", {"url": path})

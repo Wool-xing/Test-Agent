@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import shlex
 import shutil
 import time
 from pathlib import Path
@@ -17,8 +18,8 @@ class LocalBackend(BaseExecutionEnv):
 
     async def exec(self, cmd: str, *, timeout: float = 60.0, cwd: str | None = None, env: dict | None = None) -> ExecResult:
         start = time.monotonic()
-        proc = await asyncio.create_subprocess_shell(
-            cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd, env=env
+        proc = await asyncio.create_subprocess_exec(
+            *shlex.split(cmd), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd, env=env
         )
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)

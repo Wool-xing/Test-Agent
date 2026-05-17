@@ -8,6 +8,7 @@ import json
 import logging
 import socket
 import time
+from xml.sax.saxutils import escape as xml_escape
 from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ def soap_call(endpoint: str, action: str, body_xml: str,
     import requests
     envelope = f"""<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>{body_xml}</soap:Body>
+  <soap:Body>{xml_escape(body_xml)}</soap:Body>
 </soap:Envelope>"""
     headers = {
         "Content-Type": "text/xml; charset=utf-8",

@@ -102,55 +102,41 @@ class LLMClient:
         return json.loads(raw[start : end + 1])
 
 
-def _stub_response(_system: str, user: str) -> str:
-    """Deterministic stub for tests. Picks plausible experts/skills from keywords.
+# Order matters: most-specific first to avoid 'api' inside 'mobile-application' style overlap.
+_STUB_TARGETS: list[tuple[tuple[str, ...], str, list]] = [
+    (("can-bus", "can bus", " ecu ", "adas", "v2x", " ota ", "asil", "iso 26262", "iso-26262", "automotive", "vehicle", "车载", "汽车"),
+     "automotive", ["requirements-analyst", "testcase-designer", "automotive-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    (("pentest", "penetration test", "sql injection", " xss ", " ssrf ", "owasp", "security testing", "渗透", "渗透测试"),
+     "pentest", [("pentest-coordinator", "skill"), "requirements-analyst", "testcase-designer", "pentest-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    (("canvas", "webgl", " ocr ", "visual regression", "screenshot diff", "视觉回归", "图像对比"),
+     "visual-system", ["requirements-analyst", "testcase-designer", "visual-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    ((" mqtt", "kafka", "rabbitmq", "jaeger", " iot ", "embedded", "modbus", "串口", "serial port"),
+     "system-integration", ["requirements-analyst", "testcase-designer", "env-manager", "system-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    (("apk", "ipa", " android", "\"android", " ios", "\"ios", "mobile-app", " mobile "),
+     "mobile-app", ["requirements-analyst", "testcase-designer", "mobile-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    ((".exe", " exe ", "desktop", "windows", ".msi", ".dmg"),
+     "desktop-app", ["requirements-analyst", "testcase-designer", "desktop-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    (("llm ", " llm", "ai model", "ai-model", "ml model", "model evaluation", "embedding"),
+     "ai-model", ["requirements-analyst", "testcase-designer", "ai-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+    (("rest api", "rest-api", "grpc", "graphql", " api ", "\"api", "endpoint", "openapi", "swagger"),
+     "rest-api", ["requirements-analyst", "testcase-designer", "automation-engineer", "test-executor", "bug-manager", "report-generator", "test-lead"]),
+]
+_STUB_DEFAULT = ("web-system", [
+    "requirements-analyst", "testcase-designer", "env-manager", "data-preparer",
+    "automation-engineer", "test-executor", "bug-manager", "report-generator", "test-lead",
+])
 
-    Only scans the TARGET ARTIFACT section, NOT the catalog (which contains all keywords).
-    """
+
+def _stub_response(_system: str, user: str) -> str:
+    """Deterministic stub for tests. Picks plausible experts/skills from keywords."""
     marker = "TARGET ARTIFACT:"
     idx = user.find(marker)
     target_text = user[idx + len(marker) :].lower() if idx >= 0 else user.lower()
-    # Order matters: most-specific first to avoid 'api' inside 'mobile-application' style overlap.
-    # 全 9 path 末统一 test-lead 决策(主宪章 §40 + 02-专家定义/README.md 流程
-    # "bug-manager → report-generator → test-lead 决策")
-    # experts list 元素: str(kind=expert) | (name, kind) tuple(支持 skill 节点)
-    if any(k in target_text for k in ("can-bus", "can bus", " ecu ", "adas", "v2x", " ota ", "asil", "iso 26262", "iso-26262", "automotive", "vehicle", "车载", "汽车")):
-        target = "automotive"
-        experts = ["requirements-analyst", "testcase-designer", "automotive-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in ("pentest", "penetration test", "sql injection", " xss ", " ssrf ", "owasp", "security testing", "渗透", "渗透测试")):
-        target = "pentest"
-        experts = [("pentest-coordinator", "skill"), "requirements-analyst", "testcase-designer", "pentest-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in ("canvas", "webgl", " ocr ", "visual regression", "screenshot diff", "视觉回归", "图像对比")):
-        target = "visual-system"
-        experts = ["requirements-analyst", "testcase-designer", "visual-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in (" mqtt", "kafka", "rabbitmq", "jaeger", " iot ", "embedded", "modbus", "串口", "serial port")):
-        target = "system-integration"
-        experts = ["requirements-analyst", "testcase-designer", "env-manager", "system-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in ("apk", "ipa", " android", "\"android", " ios", "\"ios", "mobile-app", " mobile ")):
-        target = "mobile-app"
-        experts = ["requirements-analyst", "testcase-designer", "mobile-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in (".exe", " exe ", "desktop", "windows", ".msi", ".dmg")):
-        target = "desktop-app"
-        experts = ["requirements-analyst", "testcase-designer", "desktop-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in ("llm ", " llm", "ai model", "ai-model", "ml model", "model evaluation", "embedding")):
-        target = "ai-model"
-        experts = ["requirements-analyst", "testcase-designer", "ai-tester", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    elif any(k in target_text for k in ("rest api", "rest-api", "grpc", "graphql", " api ", "\"api", "endpoint", "openapi", "swagger")):
-        target = "rest-api"
-        experts = ["requirements-analyst", "testcase-designer", "automation-engineer", "test-executor", "bug-manager", "report-generator", "test-lead"]
-    else:
-        target = "web-system"
-        experts = [
-            "requirements-analyst",
-            "testcase-designer",
-            "env-manager",
-            "data-preparer",
-            "automation-engineer",
-            "test-executor",
-            "bug-manager",
-            "report-generator",
-            "test-lead",
-        ]
+    target, experts = _STUB_DEFAULT
+    for keywords, t, exp in _STUB_TARGETS:
+        if any(k in target_text for k in keywords):
+            target, experts = t, exp
+            break
     nodes = []
     prev = None
     for i, exp in enumerate(experts):

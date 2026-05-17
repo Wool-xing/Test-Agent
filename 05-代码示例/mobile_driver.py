@@ -203,6 +203,39 @@ def save_perf_metrics(samples: list, output_dir: str, prefix: str = "perf"):
 
 # ===== Monkey 稳定性测试 =====
 
+def _build_monkey_cmd(package: str, event_count: int, throttle_ms: int, seed: Optional[int],
+                      serial: Optional[str], categories: Optional[list], extra_args: Optional[list],
+                      pcts: dict) -> list:
+    """Build adb shell monkey command line."""
+    cmd = ["adb"]
+    if serial:
+        cmd += ["-s", serial]
+    cmd += ["shell", "monkey", "-p", package, "--throttle", str(throttle_ms)]
+    for flag, key in [("--pct-touch", "touch"), ("--pct-motion", "motion"), ("--pct-nav", "nav"),
+                      ("--pct-majornav", "majornav"), ("--pct-syskeys", "syskeys"),
+                      ("--pct-appswitch", "appswitch"), ("--pct-anyevent", "anyevent")]:
+        cmd += [flag, str(pcts.get(key, 0))]
+    if seed is not None:
+        cmd += ["-s", str(seed)]
+    if categories:
+        for c in categories:
+            cmd += ["-c", c]
+    cmd += ["--ignore-crashes", "--ignore-timeouts", "--ignore-security-exceptions",
+            "--monitor-native-crashes", "--kill-process-after-error", "-v", "-v", "-v"]
+    if extra_args:
+        cmd += extra_args
+    cmd += [str(event_count)]
+    return cmd
+
+
+def _analyze_monkey_log(log_file: Path) -> tuple[int, int]:
+    """Count crashes and ANRs from monkey log. Returns (crashes, anrs)."""
+    if not log_file.exists():
+        return 0, 0
+    text = log_file.read_text(encoding="utf-8", errors="ignore")
+    return text.count("// CRASH"), text.count("// NOT RESPONDING")
+
+
 def run_monkey(
     package: str,
     event_count: int = 10000,
@@ -210,103 +243,42 @@ def run_monkey(
     seed: Optional[int] = None,
     serial: Optional[str] = None,
     categories: Optional[list] = None,
-    pct_touch: int = 40,
-    pct_motion: int = 25,
-    pct_nav: int = 15,
-    pct_majornav: int = 10,
-    pct_syskeys: int = 5,
-    pct_appswitch: int = 2,
-    pct_anyevent: int = 3,
+    pct_touch: int = 40, pct_motion: int = 25, pct_nav: int = 15,
+    pct_majornav: int = 10, pct_syskeys: int = 5,
+    pct_appswitch: int = 2, pct_anyevent: int = 3,
     output_dir: str = "workspace/执行日志/monkey",
     extra_args: Optional[list] = None,
     timeout: int = 3600,
 ) -> dict:
-    """
-    执行 Android Monkey 稳定性测试。
-
-    Args:
-        package: 目标 APP 包名
-        event_count: 注入事件总数（默认 1 万）
-        throttle_ms: 事件间隔 ms（默认 200）
-        seed: 随机种子（可重放）
-        serial: 设备 serial（多设备时必填）
-        categories: 限制启动的 Activity category 列表
-        pct_*: 各类事件百分比（合计 ≤100）
-        output_dir: 日志/截图输出目录
-        extra_args: 额外 monkey 参数
-        timeout: 超时（秒）
-
-    Returns:
-        {"event_count", "exit_code", "log_file", "crashes", "anrs", "duration_sec"}
-    """
+    """Execute Android Monkey stability test. Returns crash/ANR summary."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path(output_dir) / f"monkey_{package}_{ts}.log"
 
-    cmd = ["adb"]
-    if serial:
-        cmd += ["-s", serial]
-    cmd += ["shell", "monkey"]
-    cmd += ["-p", package]
-    cmd += ["--throttle", str(throttle_ms)]
-    cmd += ["--pct-touch", str(pct_touch)]
-    cmd += ["--pct-motion", str(pct_motion)]
-    cmd += ["--pct-nav", str(pct_nav)]
-    cmd += ["--pct-majornav", str(pct_majornav)]
-    cmd += ["--pct-syskeys", str(pct_syskeys)]
-    cmd += ["--pct-appswitch", str(pct_appswitch)]
-    cmd += ["--pct-anyevent", str(pct_anyevent)]
-    if seed is not None:
-        cmd += ["-s", str(seed)]
-    if categories:
-        for c in categories:
-            cmd += ["-c", c]
-    # 默认参数：忽略崩溃/超时继续，输出 verbose
-    cmd += ["--ignore-crashes", "--ignore-timeouts", "--ignore-security-exceptions",
-            "--monitor-native-crashes", "--kill-process-after-error",
-            "-v", "-v", "-v"]
-    if extra_args:
-        cmd += extra_args
-    cmd += [str(event_count)]
+    pcts = dict(touch=pct_touch, motion=pct_motion, nav=pct_nav, majornav=pct_majornav,
+                syskeys=pct_syskeys, appswitch=pct_appswitch, anyevent=pct_anyevent)
+    cmd = _build_monkey_cmd(package, event_count, throttle_ms, seed, serial, categories, extra_args, pcts)
 
     logger.info(f"启动 monkey: {' '.join(cmd)}")
     start = time.time()
     try:
         with open(log_file, "w", encoding="utf-8") as f:
-            proc = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT,
-                                   timeout=timeout, check=False)
+            proc = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, timeout=timeout, check=False)
         exit_code = proc.returncode
     except subprocess.TimeoutExpired:
         logger.error(f"monkey 超时 ({timeout}s)，已强制终止")
         exit_code = -1
 
     duration = round(time.time() - start, 1)
-
-    # 分析日志找 crash / ANR
-    crashes = 0
-    anrs = 0
-    if log_file.exists():
-        text = log_file.read_text(encoding="utf-8", errors="ignore")
-        crashes = text.count("// CRASH")
-        anrs = text.count("// NOT RESPONDING")
+    crashes, anrs = _analyze_monkey_log(log_file)
 
     result = {
-        "package": package,
-        "event_count": event_count,
-        "throttle_ms": throttle_ms,
-        "seed": seed,
-        "exit_code": exit_code,
-        "duration_sec": duration,
-        "crashes": crashes,
-        "anrs": anrs,
-        "log_file": str(log_file),
+        "package": package, "event_count": event_count, "throttle_ms": throttle_ms,
+        "seed": seed, "exit_code": exit_code, "duration_sec": duration,
+        "crashes": crashes, "anrs": anrs, "log_file": str(log_file),
         "stable": exit_code == 0 and crashes == 0 and anrs == 0,
     }
-
-    # 同步归档 logcat（含 crash 详情）
     archive_logcat(serial=serial, output=output_dir)
-
-    # 保存摘要 JSON
     summary = log_file.with_suffix(".json")
     summary.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info(f"monkey 完成: 事件={event_count}, 崩溃={crashes}, ANR={anrs}, 耗时={duration}s")
