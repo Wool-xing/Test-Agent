@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     api_host: str = Field(default="127.0.0.1")
     api_port: int = Field(default=8800)
     api_auth_token: str = Field(default="")
+    log_level: str = Field(default="INFO")
 
     def resolve(self, rel: Path) -> Path:
         return rel if rel.is_absolute() else (self.project_root / rel).resolve()

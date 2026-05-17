@@ -216,4 +216,8 @@ def _run_in_background(run_id: str, decision) -> None:
     except Exception:  # noqa: BLE001
         logger.exception("background run {} failed", run_id)
         with _run_lock:
-            _run_results[run_id] = {"error": "internal error — see logs", "failed": 1, "succeeded": 0, "total": 0, "status": "error"}
+            _run_results[run_id] = {
+                "error": f"run {run_id} failed — check logs at workspace/ or run with --debug",
+                "run_id": run_id,
+                "failed": 1, "succeeded": 0, "total": 0, "status": "error",
+            }

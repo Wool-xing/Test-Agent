@@ -14,7 +14,7 @@
 | Phase 3 | 引擎加固 | 5 | 5-7 | ✅ done |
 | Phase 4 | 测试智能 | 5 | 5-8 | ⏳ next |
 | Phase 5 | 企业就绪 | 5 | 5-7 | — |
-| Phase 6 | 开发者体验 | 5 | 4-6 | — |
+| Phase 6 | 开发者体验 | 5 | 4-6 | ✅ done |
 | Phase 7 | 方法论深化 | 5 | 4-6 | — |
 | Phase 8 | 平台化 | 5 | 4-6 | — |
 
@@ -170,27 +170,30 @@
 
 ---
 
-## Phase 6: 开发者体验（降低门槛）
+## Phase 6: 开发者体验（降低门槛）`✅ done 2026-05-17`
 
-### #24 安装步骤从 15→3
-- **现状**: Python+Node+Git+Java+JMeter+Allure+Docker+install.sh+.env+claude+smoke = 15 步
-- **对标**: Playwright 2 步
-- **方案**: `tagent bootstrap` 一站式命令（检测+安装+配置+验证）
+### #24 安装步骤从 15→3 ✅
+- **新建**: `runtime/cli/commands/bootstrap.py` — `tagent bootstrap` 一站式命令
+- 检测: Python/Git/pip 版本
+- 配置: 自动生成 .env 模板
+- 验证: LLM key 检查 + Runtime import
 
-### #25 Debug 模式 + 日志级别开关
-- **现状**: 11 个 `logger.debug()` 运行时不可见
-- **方案**: `TAGENT_LOG_LEVEL` env + `--debug` CLI flag
+### #25 Debug 模式 + 日志级别开关 ✅
+- `runtime/observability/logging.py` — `configure_logging()` 读取 `TAGENT_LOG_LEVEL` 环境变量
+- `runtime/config/settings.py` — 新增 `log_level` 字段
+- `runtime/cli/main.py` — `--debug` flag 设置 `TAGENT_LOG_LEVEL=DEBUG`
 
-### #26 错误消息可操作化
-- **现状**: "internal error -- see logs" 无日志路径/无关联 ID
-- **方案**: 所有错误附 log 路径 + correlation_id + 建议修复动作
+### #26 错误消息可操作化 ✅
+- `runtime/api/main.py:219` — "internal error — see logs" → 包含 run_id + 日志路径 + `--debug` 提示
+- `runtime/backends/modal.py:60,66` — "not connected" → "call connect() first"
 
-### #27 新手教程
-- **现状**: 无 tutorial/quickstart 目录
-- **方案**: 5 步交互式教程：clone → bootstrap → demo → 第一个自定义测试 → 读报告
+### #27 新手教程 ✅
+- **新建**: `docs/tutorial/TUTORIAL.md` — 5 步交互式教程 (clone→bootstrap→demo→custom→report)
 
-### #28 Shell 自动补全 + --no-color
-- **方案**: `tagent --install-completion` + `--no-color` flag
+### #28 Shell 自动补全 + --no-color ✅
+- `runtime/cli/main.py` — Typer `add_completion=True` 启用 `tagent --install-completion`
+- `runtime/cli/main.py` — `--no-color` flag
+- `runtime/cli/_shared.py` — `set_no_color()` 切换 Rich console 为无色模式
 
 ---
 

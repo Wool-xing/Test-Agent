@@ -23,8 +23,16 @@ if sys.platform == "win32":
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-console = Console(force_terminal=True)
+_no_color = os.environ.get("NO_COLOR", "").strip() != ""
+console = Console(force_terminal=True, color_system=None if _no_color else "auto")
 _kernel = Kernel()
+
+
+def set_no_color() -> None:
+    """Disable Rich console color output (for --no-color flag)."""
+    global console, _no_color
+    _no_color = True
+    console = Console(force_terminal=True, color_system=None)
 
 _SMOKE_PRD_FIXTURE = """\
 # Smoke PRD · 登录模块(fixture)

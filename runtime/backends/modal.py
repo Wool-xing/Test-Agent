@@ -57,13 +57,13 @@ class ModalBackend(BaseExecutionEnv):
 
     async def read(self, path: str) -> bytes:
         if self._sandbox is None:
-            raise RuntimeError("not connected")
+            raise RuntimeError("Modal sandbox not connected — call connect() first")
         with self._sandbox.open(path, "rb") as f:
             return f.read()
 
     async def write(self, path: str, data: bytes) -> None:
         if self._sandbox is None:
-            raise RuntimeError("not connected")
+            raise RuntimeError("Modal sandbox not connected — call connect() first")
         with self._sandbox.open(path, "wb") as f:
             f.write(data)
 
