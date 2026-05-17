@@ -33,7 +33,7 @@ tagent init --preset saas-web     # or: minimal / mobile-android / security-pent
 # → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
 ```
 
-Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels (8640 combinations on paper; not all are e2e-validated in this release). See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
+Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels. In practice, ~12 common combinations are tested in CI; the full 8640-grid is a config matrix, not a coverage claim. See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
 
 ---
 
@@ -42,7 +42,7 @@ Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 c
 Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports. Built for QA teams, security researchers, automotive testers, and anyone who wants to **use AI testing while learning the theory behind it**.
 
 - **16 expert agents** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — functional · security · mobile · desktop · AI model · automotive · pentest …
-- **32 business skills** (23 production + 7 script + 0 rollout + 2 vision — see [ROADMAP.md](ROADMAP.md)) **+ 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
+- **30 active skills** (23 production + 7 script) **+ 2 vision-only** (reference, not executable) **+ 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
 - **49 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
 - **Multi-LLM (any provider, plug-and-play)** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI-compatible fallback channel** for any other provider (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) via 3 env vars, zero code change. Cookbook: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
@@ -89,7 +89,7 @@ No Python/Node/Docker required. Download the installer for your platform and sta
 - **Test design methods**: equivalence-partitioning · boundary-value · decision-table · state-transition · pairwise · orthogonal · exploratory SBTM · risk-based · TDD · BDD · ATDD
 - **Quality gates**: smoke → regression → performance_ci_quick → performance_full → release (5-layer)
 
-Coverage is broad across the listed categories above. The **"95%" figure is aspirational, not a measured number** — domain-specific gates (DO-178C avionics / HIPAA medical / IEC 61508 industrial) currently ship as **skeleton** compliance YAML profiles only.
+Coverage across the listed categories is broad but not exhaustive. Domain-specific gates (DO-178C avionics / HIPAA medical / IEC 61508 industrial) ship as skeleton compliance YAML profiles — production use in regulated industries requires domain expert review.
 
 ## 📖 Design Documents
 

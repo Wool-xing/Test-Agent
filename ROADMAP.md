@@ -67,7 +67,7 @@
 | `jmeter-script-gen` | JMeter JMX 生成 |
 | `python-script-gen` | pytest 脚本生成(Playwright + requests) |
 | `security-review` | OWASP Top 10 + SAST + 依赖 CVE |
-| `zentao-bug-submission` | BugTracker adapter(默认禅道,主宪章 §12) |
+| `zentao-bug-submission` | BugTracker adapter (默认禅道) |
 
 ---
 
@@ -133,8 +133,8 @@
 
 | Skill | 当前形态 | V2 路线 |
 |-------|----------|---------|
-| `agent-introspection-debugging` | 方法论参考(主宪章 §28) | LLM 决策回放 + 工具调用透明化实装 |
-| `build-your-own-x-explorer` | 教学引导参考(主宪章 §31) | 与 docs/theory/ 22 KB 卡片联动检索引擎 |
+| `agent-introspection-debugging` | 方法论参考 | LLM 决策回放 + 工具调用透明化实装 |
+| `build-your-own-x-explorer` | 教学引导参考 | 与 docs/theory/ 22 KB 卡片联动检索引擎 |
 
 ---
 
