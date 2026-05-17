@@ -16,7 +16,7 @@
 | Phase 5 | 企业就绪 | 5 | 5-7 | ✅ done |
 | Phase 6 | 开发者体验 | 5 | 4-6 | ✅ done |
 | Phase 7 | 方法论深化 | 5 | 4-6 | ✅ done |
-| Phase 8 | 平台化 | 5 | 4-6 | — |
+| Phase 8 | 平台化 | 5 | 4-6 | ✅ done |
 
 ---
 
@@ -226,23 +226,31 @@
 
 ---
 
-## Phase 8: 平台化（生态 & 扩展）
+## Phase 8: 平台化（生态 & 扩展）`✅ done 2026-05-17`
 
-### #34 插件发现机制
-- **现状**: 仅扫描固定目录
-- **方案**: `importlib.metadata` entry_points 支持第三方包注册
+### #34 插件发现机制 ✅
+- `runtime/marketplace/discovery.py` — `importlib.metadata` entry_points 发现
+- 支持第三方包注册 agents/skills/backends (group=`tagent`)
 
-### #35 测试数据合成引擎
-- **方案**: 生产数据影子拷贝 + PII 自动脱敏 + 数据子集化
+### #35 测试数据合成引擎 ✅
+- `05-代码示例/data_synthesizer.py` — PII 自动检测 + 确定性地掩码
+- `mask_pii()` — 邮件/手机/身份证/IP/信用卡 5 类检测
+- `synthesize_from_json()` — 递归 walk + 掩码 + 写入
+- `subset_json()` — 随机子集提取
 
-### #36 APM/Observability 预集成仪表板
-- **方案**: 一键导出 Datadog/Grafana dashboard JSON
+### #36 APM/Observability 预集成仪表板 ✅
+- `runtime/observability/apm_export.py` — Datadog + Grafana dashboard JSON 导出
+- `export_datadog_dashboard()` — pass rate, MTTD/MTTR, expert health, flaky
+- `export_grafana_dashboard()` — stat + table panels with thresholds
 
-### #37 用户旅程影响映射
-- **方案**: 测试结果标注影响的业务路径（注册/支付/核心操作）
+### #37 用户旅程影响映射 ✅
+- `runtime/intelligence/journey_mapper.py` — 故障→业务路径映射
+- `map_failures_to_journeys()` — 基于模式匹配 (Registration/Login/Payment/...)
+- `journey_impact_report()` — journeys_impacted + most_impacted
 
-### #38 多地域合成监控
-- **方案**: GitHub Actions matrix 多地域定时执行 + 延迟热力图
+### #38 多地域合成监控 ✅
+- `.github/workflows/synthetic-monitor.yml` — 每 6 小时 4 地域 (us-east/west, eu-west, ap-southeast)
+- `tagent demo -y` + `tagent selftest --e2e` 定时执行
 
 ---
 
@@ -252,11 +260,11 @@
 Phase 1 (#1→#6) ✅  ← 安全基线不打，后续白搭
 Phase 2 (#7→#8) ✅  ← 诚实化 + CLI 拆分 + 冒烟测试
 Phase 3 (#9→#13) ✅ ← 引擎不牢，上层白搭
-Phase 4 (#14→#18) ⏳ ← 有了可靠执行，才谈智能分析
-Phase 6 (#24→#28)     ← 降低门槛 = 更多人用 = 更多反馈
-Phase 5 (#19→#23)     ← 企业客户需要的基本保障
-Phase 7 (#29→#33)     ← 测试方法论的科学严谨性
-Phase 8 (#34→#38)     ← 生态扩展
+Phase 4 (#14→#18) ✅ ← 有了可靠执行，才谈智能分析
+Phase 6 (#24→#28) ✅ ← 降低门槛 = 更多人用 = 更多反馈
+Phase 5 (#19→#23) ✅ ← 企业客户需要的基本保障
+Phase 7 (#29→#33) ✅ ← 测试方法论的科学严谨性
+Phase 8 (#34→#38) ✅ ← 生态扩展
 ```
 
-**共 38 项 (8 phase × ~5 项)。** Phase 1-3 完成 (19 项)，Phase 4 待执行。每项独立 PR，先确认再动手。
+**🎉 38/38 项全部完成。** 155 tests pass. 9/9 DAG demo ok.

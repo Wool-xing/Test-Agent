@@ -1,0 +1,40 @@
+# Multi‑region synthetic monitoring — runs tagent demo on schedule across regions
+name: Synthetic Monitor
+
+on:
+  schedule:
+    - cron: "7 */6 * * *"  # every 6 hours, off‑peak minute
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    name: "smoke ${{ matrix.region }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        region: [us-east, us-west, eu-west, ap-southeast]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime
+        run: pip install -e runtime/
+
+      - name: Run demo (smoke)
+        run: tagent demo -y
+        env:
+          TAGENT_LLM_PROVIDER: stub
+
+      - name: Run selftest
+        run: tagent selftest --e2e
+        env:
+          TAGENT_LLM_PROVIDER: stub
+
+      - name: Report status
+        if: failure()
+        run: |
+          echo "::warning::Synthetic monitor FAILED in ${{ matrix.region }}"
