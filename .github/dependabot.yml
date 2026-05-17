@@ -79,10 +79,10 @@ updates:
       # 锁死的核心库不允许 dependabot 升 major（手动评估）
       - dependency-name: "pytest"
         update-types: ["version-update:semver-major"]
-        # 显式封死 pytest 9.x 全系（含 minor/patch），W3 commit 67a322e 决策：
-        # 9.x 插件生态尚未跟上（pytest-xdist/pytest-rerunfailures/allure-pytest 报兼容警告），
-        # CVE-2025-71176 仅本地 DoS 影响，模板仓库可承受
-        versions: ["9.x"]
+        # pytest 9.x < 9.0.3 blocked for CVE-2025-71176 (TMPDIR handling).
+        # 9.0.3+ is patched and allowed. Plugin ecosystem (pytest-xdist/allure-pytest)
+        # compatibility verified with 9.0.3.
+        versions: ["< 9.0.3"]
       - dependency-name: "playwright"
         update-types: ["version-update:semver-major"]
 
