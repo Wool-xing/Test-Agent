@@ -15,6 +15,14 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
+## [v1.32.3] - 2026-05-17
+
+### Changed
+- router/llm_client.py: _stub_response 77-line if/elif chain → _STUB_TARGETS dispatch table
+- fuzzer.py: sum(PAYLOAD_LIBRARY.values(), []) hoist to module-level ALL_PAYLOADS
+
+---
+
 ## [v1.32.2] - 2026-05-17
 
 ### Security
