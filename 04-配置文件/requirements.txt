@@ -8,14 +8,14 @@
 # ============================================================
 
 # ===== [稳定层] 测试框架核心 =====
-pytest==8.3.4                      # [稳定层] CVE-2025-71176 tmpdir 仅 9.0.3 修，但 9.x 插件生态未跟上；CVE 仅本地 DoS，模板仓库 risk tolerable
-pytest-xdist==3.6.1                 # [稳定层] 并行执行（pytest 8 兼容）
-pytest-rerunfailures==14.0          # [稳定层] 失败重试（pytest 8 兼容）
-pytest-timeout==2.3.1               # [稳定层] 用例超时
-pytest-cov==5.0.0                   # [稳定层] 代码覆盖率（pytest 8）
-pytest-mock==3.14.0                 # [稳定层] Mock 工具（pytest 8）
-pytest-playwright==0.5.2            # [稳定层] Playwright 官方 pytest 插件（pytest 8）
-allure-pytest==2.13.5               # [稳定层] Allure 报告
+pytest>=9.0.3                      # [稳定层] CVE-2025-71176 tmpdir 已修于 9.0.3
+pytest-xdist>=3.6.1                 # [稳定层] 并行执行
+pytest-rerunfailures>=14.0          # [稳定层] 失败重试
+pytest-timeout>=2.3.1               # [稳定层] 用例超时
+pytest-cov>=5.0.0                   # [稳定层] 代码覆盖率
+pytest-mock>=3.14.0                 # [稳定层] Mock 工具
+pytest-playwright>=0.5.2            # [稳定层] Playwright 官方 pytest 插件
+allure-pytest>=2.13.5               # [稳定层] Allure 报告
 
 # ===== [稳定层] UI 自动化 =====
 playwright==1.59.0                 # [稳定层] major 升级 dependabot 已锁
