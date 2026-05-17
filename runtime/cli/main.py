@@ -389,7 +389,7 @@ def install(
     lane: str = typer.Argument(...),
     source: str = typer.Option(..., "--source", help="path to skill .md / agent .md / mcp config / hook"),
     tier: str = typer.Option("low", "--tier"),
-    version: str = typer.Option("1.32.1", "--version"),
+    version: str = typer.Option("1.32.2", "--version"),
 ):
     """Install marketplace entry through 4 safety gates."""
     import hashlib

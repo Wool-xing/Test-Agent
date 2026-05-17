@@ -1,4 +1,4 @@
-# runtime/orchestrator/agents/ 索引(V1.32.1)
+# runtime/orchestrator/agents/ 索引(V1.32.2)
 
 > 真 LLM-driven expert runner · 16 核心 expert 全落地 · 主宪章 §40 真 agent 落地 canon。
 
