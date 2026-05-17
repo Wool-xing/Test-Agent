@@ -144,6 +144,7 @@ def kill_process(pid: int, sig: int = signal.SIGKILL):
     _require_authorized("kill_process")
     if not isinstance(pid, int) or pid < 100:
         raise ValueError(f"refusing to kill system PID {pid} (must be ≥100)")
+    psutil_ok = False
     try:
         import psutil
         proc = psutil.Process(pid)
@@ -151,8 +152,11 @@ def kill_process(pid: int, sig: int = signal.SIGKILL):
             raise PermissionError(
                 f"refusing to kill PID {pid}: owner {proc.username()} ≠ self {psutil.Process(os.getpid()).username()}"
             )
+        psutil_ok = True
     except ImportError:
-        logger.warning("psutil 未装,跳过 owner 校验(建议 pip install psutil)")
+        raise RuntimeError("psutil not installed — required for owner validation; pip install psutil")
+    if not psutil_ok:
+        raise RuntimeError("psutil owner check failed — refusing to kill")
     os.kill(pid, sig)
     logger.info(f"已杀进程 PID={pid}")
 

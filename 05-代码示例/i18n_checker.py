@@ -86,8 +86,8 @@ def detect_hardcoded_strings(src_dir: str = "./src",
                         "file": str(f.relative_to(src_dir)),
                         "string": m.group(1)[:80],
                     })
-            except Exception:
-                continue
+            except (UnicodeDecodeError, PermissionError, OSError) as e:
+                logger.warning("i18n scan skipped %s: %s", f.relative_to(src_dir), e)
     return {
         "src_dir": src_dir,
         "hardcoded_count": len(findings),
