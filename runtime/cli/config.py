@@ -1,13 +1,13 @@
-"""tagent config — LLM provider 配置管理 (V1.22.0 · Step 2 多模型 onboarding).
+"""tagent config — LLM provider configuration (V1.22.0 · Step 2 multi-model onboarding).
 
-5 子命令:
-  list       — 列内置 6 + B 路径兼容样例
-  show       — 显当前 .env 配置 (key 全脱敏)
-  use        — 路径 A: 切到内置 provider, 写 TAGENT_LLM_PROVIDER + 厂商 key 占位
-  use-compat — 路径 B: OpenAI 兼容兜底通道 (任厂商即插即用)
-  unset      — 移除 .env 中指定 key (V1.25.0)
+5 sub-commands:
+  list       — list 6 built-in + path-B compatible examples
+  show       — show current .env config (keys fully redacted)
+  use        — path A: switch to built-in provider, write TAGENT_LLM_PROVIDER + vendor key placeholder
+  use-compat — path B: OpenAI-compatible fallback channel (any vendor, plug-and-play)
+  unset      — remove specified key from .env (V1.25.0)
 
-env 文件优先级: CWD/.env → 仓根/.env. 写前必备份 .env.bak.
+env file priority: CWD/.env -> repo-root/.env. Always backup to .env.bak before writing.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from pathlib import Path
 
 import typer
 
-config_app = typer.Typer(add_completion=False, help="LLM provider 配置 (路径 A 内置 6 + 路径 B 兼容任厂商)")
+config_app = typer.Typer(add_completion=False, help="LLM provider config (path A: 6 built-in + path B: any OpenAI-compatible vendor)")
 
 BUILTIN_PROVIDERS: dict[str, dict[str, str | None]] = {
     "claude": {
@@ -110,34 +110,34 @@ def _mask(secret: str) -> str:
 
 @config_app.command("list")
 def cmd_list() -> None:
-    """列内置 6 厂商 (路径 A) + B 路径兼容样例."""
-    typer.echo("📦 内置 provider (路径 A · litellm 直连):")
+    """List 6 built-in providers (path A) + path B compatible examples."""
+    typer.echo("📦 Built-in providers (path A · litellm direct):")
     for name, spec in BUILTIN_PROVIDERS.items():
-        env_hint = spec["env_key"] or "(无需 key, 本地)"
+        env_hint = spec["env_key"] or "(no key needed, local)"
         model = spec["model"] or ""
         typer.echo(f"  {name:10s} model={model:40s} key_env={env_hint}")
     typer.echo("")
-    typer.echo("🌐 兼容 provider (路径 B · OpenAI 协议兜底, 用 'use-compat'):")
+    typer.echo("🌐 Compatible providers (path B · OpenAI protocol, use 'use-compat'):")
     for name, info in COMPAT_EXAMPLES.items():
         typer.echo(f"  {name:18s} {info}")
     typer.echo("")
-    typer.echo("📖 完整 cookbook: 04-配置文件/llm-providers.md")
+    typer.echo("📖 Full cookbook: 04-配置文件/llm-providers.md")
 
 
 @config_app.command("show")
 def cmd_show() -> None:
-    """显当前 .env (TAGENT_LLM_* + 厂商 key 全脱敏)."""
+    """Show current .env (TAGENT_LLM_* keys fully redacted)."""
     env_path = _find_env_file()
     typer.echo(f"📄 .env: {env_path.resolve()}")
     if not env_path.exists():
-        typer.echo("  (文件不存, 用 'tagent config use <provider>' 创建)")
+        typer.echo("  (file not found, run 'tagent config use <provider>' to create)")
         return
     env = _parse_env(env_path)
     for key in TRACKED_KEYS:
         value = env.get(key, "")
         if key.endswith("KEY"):
             value = _mask(value) if value else ""
-        typer.echo(f"  {key}={value or '(未设)'}")
+        typer.echo(f"  {key}={value or '(not set)'}")
     for vendor_key in VENDOR_KEYS:
         if vendor_key in env:
             typer.echo(f"  {vendor_key}={_mask(env[vendor_key])}")
@@ -147,11 +147,11 @@ def cmd_show() -> None:
 def cmd_use(
     provider: str = typer.Argument(..., help=f"内置 6 之一: {', '.join(BUILTIN_PROVIDERS.keys())}"),
 ) -> None:
-    """路径 A: 切到指定内置 provider, 写 .env."""
+    """Path A: switch to specified built-in provider, write .env."""
     if provider not in BUILTIN_PROVIDERS:
-        typer.echo(f"❌ 未知 provider: {provider}")
-        typer.echo(f"   可用: {', '.join(BUILTIN_PROVIDERS.keys())}")
-        typer.echo("   兼容 provider 请用 'tagent config use-compat'")
+        typer.echo(f"❌ unknown provider: {provider}")
+        typer.echo(f"   available: {', '.join(BUILTIN_PROVIDERS.keys())}")
+        typer.echo("   compatible providers: use 'tagent config use-compat'")
         raise typer.Exit(2)
 
     spec = BUILTIN_PROVIDERS[provider]
@@ -165,12 +165,12 @@ def cmd_use(
         env[vendor_key] = "<your-key-here>"
 
     _write_env(env_path, env)
-    typer.echo(f"✅ 写 {env_path}: TAGENT_LLM_PROVIDER={provider}")
+    typer.echo(f"✅ wrote {env_path}: TAGENT_LLM_PROVIDER={provider}")
     if vendor_key:
-        typer.echo(f"⚠️  请填 {vendor_key} 真实 key 后再 'tagent demo' 验路由")
-        typer.echo(f"   注册: {spec['url']}")
+        typer.echo(f"⚠️  set {vendor_key} with real key, then run 'tagent demo'")
+        typer.echo(f"   sign up: {spec['url']}")
     else:
-        typer.echo(f"   {provider} 本地运行, 请启 {spec['url']} 服务")
+        typer.echo(f"   {provider} runs locally, start: {spec['url']}")
 
 
 @config_app.command("use-compat")
@@ -179,7 +179,7 @@ def cmd_use_compat(
     key: str = typer.Option(..., "--key", help="API key"),
     model: str = typer.Option(..., "--model", help="model 名 (不含 openai/ 前缀)"),
 ) -> None:
-    """路径 B: OpenAI 兼容兜底通道 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …)."""
+    """Path B: OpenAI-compatible fallback channel (Zhipu / Doubao / Kimi / Baichuan / Xunfei / ...)."""
     env_path = _find_env_file()
     env = _parse_env(env_path)
     env["TAGENT_LLM_PROVIDER"] = f"openai/{model}"

@@ -11,6 +11,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+import runtime
 from runtime.api.deps import Kernel
 from runtime.api.parsers import parse_path, parse_text, parse_url
 from runtime.cli.config import config_app
@@ -25,9 +26,68 @@ if sys.platform == "win32":
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+_SMOKE_PRD_FIXTURE = """\
+# Smoke PRD · 登录模块(fixture)
+
+> Test-Agent 自检 fixture · 主宪章 §33。
+> **此文件不代表任何真实项目**,纯为 e2e 流程验证。
+
+## 1. 背景
+
+一个虚构的 SaaS 后台需要登录入口,本 PRD 用于触发 16 agent 的完整 DAG。
+
+## 2. 功能要求
+
+### 2.1 账号密码登录
+
+- 用户输入账号 + 密码,点登录
+- 后端校验,正确则颁发 session,跳转首页
+- 错误:提示 "账号或密码错误"
+
+### 2.2 短信验证码登录
+
+- 用户输入手机号,点"发送验证码"
+- 60 秒倒计时,验证码 6 位数字,5 分钟过期
+- 错误次数 5 次锁定 10 分钟
+
+### 2.3 安全要求
+
+- 密码字段加密传输(HTTPS)
+- 登录失败连续 5 次锁定账号
+- 登录成功后 session 24 小时过期
+
+## 3. 非功能
+
+- 接口 P99 延迟 < 300ms
+- 支持 1000 QPS 峰值
+- 移动端 + 桌面端兼容
+
+## 4. 不在范围
+
+- 注册流程
+- 找回密码
+- 第三方 OAuth
+
+## 5. 测试目标
+
+让 Test-Agent 跑完 16 agent DAG,产出:
+- 测试用例 Excel + xmind / markmap / opml
+- 自动化脚本骨架
+- 测试报告
+"""
+
 app = typer.Typer(add_completion=False, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
 console = Console(force_terminal=True)
+
+
+@app.callback(invoke_without_command=True)
+def _version_callback(
+    version: bool = typer.Option(False, "--version", help="Show version and exit"),
+):
+    if version:
+        console.print(f"Test-Agent Runtime v{runtime.__version__}")
+        raise typer.Exit(0)
 _kernel = Kernel()
 
 
@@ -97,8 +157,8 @@ def plan(
 @app.command()
 def doctor(
     agents: bool = typer.Option(False, "--agents", help="L1 frontmatter lint + optional --probe LLM ping"),
-    probe: bool = typer.Option(False, "--probe", help="L3 真 LLM 每 agent ping 一次(~$0.5,主宪章 §33)"),
-    llm_smoke: bool = typer.Option(False, "--llm-smoke", help="L3 5 秒往返冒烟(单次真 LLM 'Hello → 你好',验首-mile 通路 + 输出 token/cost)"),
+    probe: bool = typer.Option(False, "--probe", help="L3 real LLM ping each agent once (~$0.5, charter §33)"),
+    llm_smoke: bool = typer.Option(False, "--llm-smoke", help="L3 5s round-trip smoke test (single real LLM call, verify first-mile + token/cost)"),
 ):
     """Sanity check: settings + catalog + optional DB/MinIO ping + L1/L3 self-check."""
     s = get_settings()
@@ -129,7 +189,7 @@ def doctor(
     if llm_smoke:
         from runtime.healthcheck.llm_smoke import run_llm_smoke
 
-        console.print("\n[bold]L3 LLM smoke (single round-trip 'Hello → 你好'):[/]")
+        console.print("\n[bold]L3 LLM smoke (single round-trip 'Hello'):[/]")
         r = run_llm_smoke()
         mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
         console.print(f"  {mark} {r.provider} / {r.model}  {r.latency_ms} ms")
@@ -147,7 +207,7 @@ def doctor(
     if probe:
         from runtime.healthcheck.llm_probe import probe_all_agents
 
-        console.print("\n[bold]L3 LLM probe (real call,主宪章 §33):[/]")
+        console.print("\n[bold]L3 LLM probe (real call, charter §33):[/]")
         results = probe_all_agents()
         for r in results:
             mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
@@ -161,17 +221,17 @@ def doctor(
 
 @app.command()
 def selftest(
-    e2e: bool = typer.Option(False, "--e2e", help="L3 整体 E2E(读 fixture PRD → 16 agent DAG → 执行 → 落盘,真 LLM,~$3)"),
-    fixture: str = typer.Option("examples/_smoke_prd.md", "--fixture", help="PRD fixture 路径"),
-    persist: bool = typer.Option(False, "--persist", help="写 DB"),
-    strict: bool = typer.Option(False, "--strict", help="100% 节点过才算通过;默认 ≥80% 过(主宪章 §33 容忍)"),
-    pass_threshold: float = typer.Option(0.80, "--pass-threshold", help="非 strict 模式最低通过率 0.0-1.0"),
+    e2e: bool = typer.Option(False, "--e2e", help="L3 full E2E (read fixture PRD -> 16 agent DAG -> execute -> persist, real LLM, ~$3)"),
+    fixture: str = typer.Option("examples/_smoke_prd.md", "--fixture", help="PRD fixture path"),
+    persist: bool = typer.Option(False, "--persist", help="write to DB"),
+    strict: bool = typer.Option(False, "--strict", help="100% node pass rate required; default >=80% (charter §33 tolerant)"),
+    pass_threshold: float = typer.Option(0.80, "--pass-threshold", help="minimum pass rate 0.0-1.0 in non-strict mode"),
 ):
-    """L3 整体自检(主宪章 §33,pre-tag 必跑).
+    """L3 full self-test (charter §33, required before tagging).
 
-    默认容忍模式:节点通过率 ≥ pass_threshold(0.80)即通过。Fixture e2e 因部分节点
-    需运行时输入(如 --data 路径),容忍部分失败,但通过率必须达标。
-    --strict 关此容忍,任一节点失败即算 fail(用于发布前最终验证)。
+    Default tolerant mode: pass if node pass rate >= threshold (0.80).
+    Fixture e2e tolerates partial failures (some nodes need runtime input).
+    --strict disables tolerance: any node fail = overall fail (pre-release check).
     """
     if not e2e:
         console.print("[yellow]nothing to do; pass --e2e[/]")
@@ -356,7 +416,7 @@ def install(
 
 @app.command()
 def uninstall(name: str = typer.Argument(...)):
-    """Uninstall (archive only, §22 不可逆禁止)."""
+    """Uninstall (archive only, irreversible per §22)."""
     from runtime.marketplace.installer import uninstall as do_uninstall
 
     res = do_uninstall(name)
@@ -369,14 +429,14 @@ def uninstall(name: str = typer.Argument(...)):
 
 @app.command()
 def demo(
-    out: str = typer.Option("workspace/_demo", "--out", help="demo 产物目录(.env / tagent.yml / STARTUP.md / 测试用例 / 报告)"),
-    preset: str = typer.Option("minimal", "--preset", help="init 用 preset · minimal=离线 0 配置(stub LLM + webhook)"),
-    keep: bool = typer.Option(False, "--keep", help="保留上次产物(默认每次 --overwrite 覆盖)"),
-    real_llm: bool = typer.Option(False, "--real-llm", help="真 LLM 路径(读 TAGENT_LLM_PROVIDER + 凭据),16-agent DAG ≈ $1-3 / 60-120s · 默认 stub"),
-    skip_smoke: bool = typer.Option(False, "--skip-smoke", help="--real-llm 前默认先跑 doctor --llm-smoke 探活;此 flag 关闭"),
-    yes: bool = typer.Option(False, "-y", "--yes", help="--real-llm 跳成本确认提示"),
+    out: str = typer.Option("workspace/_demo", "--out", help="demo output dir (.env / tagent.yml / STARTUP.md / test cases / reports)"),
+    preset: str = typer.Option("minimal", "--preset", help="init preset · minimal=offline 0-config (stub LLM + webhook)"),
+    keep: bool = typer.Option(False, "--keep", help="keep previous output (default overwrites each run)"),
+    real_llm: bool = typer.Option(False, "--real-llm", help="real LLM path (reads TAGENT_LLM_PROVIDER + credentials), 16-agent DAG ~$1-3 / 60-120s · default stub"),
+    skip_smoke: bool = typer.Option(False, "--skip-smoke", help="skip pre-flight smoke test before --real-llm"),
+    yes: bool = typer.Option(False, "-y", "--yes", help="skip cost confirmation prompt for --real-llm"),
 ):
-    """一键跑通完整 demo · 默认 0 配置 stub · `--real-llm` 走真 LLM(主宪章 §1 §7)."""
+    """One-command full demo · default 0-config stub · --real-llm for real LLM (charter §1 §7)."""
     import os
     import shutil
     import sys
@@ -388,29 +448,29 @@ def demo(
         os.environ.setdefault("PYTHONUTF8", "1")
 
     if real_llm:
-        # --real-llm: 读 env 真凭据,不强制 stub;先 smoke 探活防 16-agent 才发现 LLM 不通
-        provider = os.getenv("TAGENT_LLM_PROVIDER", "(unset → settings 默认)")
-        console.print(f"[bold yellow]⚠ --real-llm 模式[/]  provider={provider}")
-        console.print("  · 真调 LLM ≈ $1-3 / 60-120s(16 agent × 多次调用)")
-        console.print("  · 若 provider unset / 凭据缺,会在 selftest 阶段 raise")
+        # --real-llm: read real credentials from env; smoke-test first to avoid failing after 16-agent run
+        provider = os.getenv("TAGENT_LLM_PROVIDER", "(unset -> using settings default)")
+        console.print(f"[bold yellow]⚠ --real-llm mode[/]  provider={provider}")
+        console.print("  · Real LLM calls ~$1-3 / 60-120s (16 agents × multi-turn)")
+        console.print("  · Will raise during selftest if provider unset or credentials missing")
         if not yes:
-            if not typer.confirm("  继续?(N=退出)", default=False):
+            if not typer.confirm("  Continue? (N=exit)", default=False):
                 raise typer.Exit(0)
 
         if not skip_smoke:
             from runtime.healthcheck.llm_smoke import run_llm_smoke
 
-            console.print("\n[bold]Pre-flight · doctor --llm-smoke (单次往返探活)[/]")
+            console.print("\n[bold]Pre-flight · doctor --llm-smoke (single round-trip)[/]")
             r = run_llm_smoke()
             mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
             console.print(f"  {mark} {r.provider} / {r.model}  {r.latency_ms} ms  {r.reason or ''}")
             if not r.ok:
-                console.print("  [red]LLM 不通 → 退出(不浪费 16-agent 调用)。修配置或加 --skip-smoke 强跑[/]")
+                console.print("  [red]LLM unreachable -> exiting (not wasting 16-agent run). Fix config or add --skip-smoke[/]")
                 raise typer.Exit(1)
             if r.response:
                 console.print(f"    response: {r.response!r}")
     else:
-        # stub 路径:先于任何 Kernel/Router 实例化前设环境 + 清 settings 缓存(否则 _kernel 已锁 claude)
+        # stub path: set env + clear settings cache before Kernel/Router instantiation (otherwise _kernel locked to claude)
         os.environ["TAGENT_LLM_PROVIDER"] = "stub"
         os.environ["TAGENT_LLM_PROVIDER_FALLBACK"] = "stub"
 
@@ -425,11 +485,11 @@ def demo(
     from runtime.init.wizard import from_preset
 
     mode_label = "real LLM" if real_llm else "stub LLM"
-    console.print(f"\n[bold cyan]Test-Agent · 一键 demo[/]  (主宪章 §1 §7,{mode_label})\n")
+    console.print(f"\n[bold cyan]Test-Agent · One-Command Demo[/]  (charter §1 §7, {mode_label})\n")
 
     out_path = Path(out)
     if out_path.exists() and not keep:
-        console.print(f"[dim]清空旧产物 {out_path}[/]")
+        console.print(f"[dim]Clearing previous output {out_path}[/]")
         shutil.rmtree(out_path, ignore_errors=True)
     out_path.mkdir(parents=True, exist_ok=True)
 
@@ -449,12 +509,13 @@ def demo(
         console.print(f"  [red]✗ {len(report.issues)} issue(s)[/]")
         raise typer.Exit(1)
 
-    step3_label = "真 LLM · ~$1-3" if real_llm else "stub LLM · 0 成本"
+    step3_label = "real LLM · ~$1-3" if real_llm else "stub LLM · 0 cost"
     console.print(f"\n[bold]Step 3/4 · tagent selftest --e2e (16 agent DAG · {step3_label})[/]")
     fixture_path = Path("examples/_smoke_prd.md")
     if not fixture_path.exists():
-        console.print(f"  [red]fixture missing:[/] {fixture_path}")
-        raise typer.Exit(2)
+        fixture_path.parent.mkdir(parents=True, exist_ok=True)
+        fixture_path.write_text(_SMOKE_PRD_FIXTURE, encoding="utf-8")
+        console.print(f"  [yellow]⚡ auto-generated fixture:[/] {fixture_path}")
     art = parse_path(fixture_path)
     run_id, decision = demo_kernel.submit(art, persist=False)
     summary = demo_kernel.execute_sync(run_id, decision)
@@ -463,7 +524,7 @@ def demo(
     rate = succ / total if total else 0.0
     console.print(f"  ✓ DAG executed: {succ}/{total} ok ({rate:.0%})")
 
-    console.print("\n[bold]Step 4/4 · 看产物[/]")
+    console.print("\n[bold]Step 4/4 · Artifacts[/]")
     artifacts = []
     for d in (Path("workspace/测试用例"), Path("workspace/测试报告"), Path("workspace/执行日志")):
         if d.exists():
@@ -476,24 +537,24 @@ def demo(
         if len(artifacts) > 12:
             console.print(f"  · [dim]... +{len(artifacts) - 12} more[/]")
     else:
-        console.print("  [yellow](无产物 · 可能脚本依赖未装,跑 `pip install -r 04-配置文件/requirements.txt`)[/]")
+        console.print("  [yellow](no artifacts · script dependencies may be missing, run `pip install -r requirements.txt`)[/]")
 
-    console.print(f"\n[bold green]✓ demo done[/]  配置在 {out_path}  产物在 workspace/")
-    console.print(f"[dim]下一步:`cat {res.startup_path}` 看启动指南;改 `.env` 填占位换真 LLM 跑生产[/]")
+    console.print(f"\n[bold green]✓ demo done[/]  config: {out_path}  artifacts: workspace/")
+    console.print(f"[dim]Next: `cat {res.startup_path}` for startup guide; edit `.env` to use real LLM[/]")
 
 
 @app.command()
 def init(
-    test_type: str = typer.Option("", "--test-type", help="web/api/mobile/desktop/iot/car/ai_model/security(非交互时填)"),
+    test_type: str = typer.Option("", "--test-type", help="web/api/mobile/desktop/iot/car/ai_model/security (non-interactive mode)"),
     platform: str = typer.Option("", "--platform", help="linux/windows/mac/android/ios/embedded"),
     llm: str = typer.Option("", "--llm", help="claude/openai/qwen/deepseek/ollama"),
-    bug_tracker: str = typer.Option("", "--bug-tracker", help="zentao/jira/github/gitlab/linear/webhook(默认 zentao)"),
-    notifier: str = typer.Option("", "--notifier", help="逗号分隔 wechat,feishu,dingtalk,slack,email,teams"),
-    preset: str = typer.Option("", "--preset", help="minimal/saas-web/国内-web/mobile-android/security-pentest"),
-    out: str = typer.Option("workspace", "--out", help="产物目录(.env / tagent.yml / STARTUP.md)"),
-    overwrite: bool = typer.Option(False, "--overwrite", help="允许覆盖已有 .env/tagent.yml/STARTUP.md"),
+    bug_tracker: str = typer.Option("", "--bug-tracker", help="zentao/jira/github/gitlab/linear/webhook (default zentao)"),
+    notifier: str = typer.Option("", "--notifier", help="comma-separated: wechat,feishu,dingtalk,slack,email,teams"),
+    preset: str = typer.Option("", "--preset", help="minimal/saas-web/mobile-android/security-pentest"),
+    out: str = typer.Option("workspace", "--out", help="output dir (.env / tagent.yml / STARTUP.md)"),
+    overwrite: bool = typer.Option(False, "--overwrite", help="allow overwriting existing .env/tagent.yml/STARTUP.md"),
 ):
-    """5 分钟生成 `.env` + `tagent.yml` + `STARTUP.md`(主宪章 §1 一键部署 + §7)."""
+    """Generate .env + tagent.yml + STARTUP.md in 5 minutes (charter §1 one-command deploy + §7)."""
     from runtime.init.matrix import load_matrix
     from runtime.init.renderer import render_all
     from runtime.init.wizard import InitAnswers, from_args, from_preset, run_wizard
@@ -523,11 +584,11 @@ def init(
         console.print(f"[red]{e}[/]")
         raise typer.Exit(2)
 
-    console.print("\n[bold green]✓ 配置生成完毕[/]")
+    console.print("\n[bold green]✓ config generated[/]")
     console.print(f"  .env       → {res.env_path}")
     console.print(f"  tagent.yml → {res.yml_path}")
     console.print(f"  STARTUP.md → {res.startup_path}")
-    console.print(f"\n[bold]下一步[/]:`cat {res.startup_path}` 看启动指南")
+    console.print(f"\n[bold]Next[/]: `cat {res.startup_path}` for startup guide")
 
 
 @app.command()
@@ -535,9 +596,9 @@ def export(
     plan: str = typer.Argument(..., help="TestCaseTree JSON path (testcase-designer output)"),
     format: str = typer.Option("xmind", "--format", help="xmind | markmap | opml | all"),
     out: str = typer.Option("", "--out", help="output file (single format only)"),
-    out_dir: str = typer.Option("workspace/测试用例", "--out-dir", help="dir when --format all"),
+    out_dir: str = typer.Option("workspace/testcases", "--out-dir", help="output dir when --format all"),
 ):
-    """Export TestCaseTree to xmind / markmap / opml / all (charter §5 多格式 I/O)."""
+    """Export TestCaseTree to xmind / markmap / opml / all (charter §5 multi-format I/O)."""
     from runtime.exporters import xmind as _x  # noqa: F401 ensure registration
     from runtime.exporters import markmap as _m  # noqa: F401
     from runtime.exporters import opml as _o  # noqa: F401
