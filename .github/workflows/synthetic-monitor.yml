@@ -1,6 +1,9 @@
 # Multi‑region synthetic monitoring — runs tagent demo on schedule across regions
 name: Synthetic Monitor
 
+permissions:
+  contents: read
+
 on:
   schedule:
     - cron: "7 */6 * * *"  # every 6 hours, off‑peak minute
