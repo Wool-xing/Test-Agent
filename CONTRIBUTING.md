@@ -137,8 +137,8 @@ pytest --collect-only
 
 ### 自动化保障
 
-- `pre-commit`：16/33/49 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
-- `.github/workflows/ci.yml`：16/33/49 自校 + Markdown 链接有效性 + utils 导入
+- `pre-commit`：16/32/49 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
+- `.github/workflows/ci.yml`：16/32/49 自校 + Markdown 链接有效性 + utils 导入
 - `.github/workflows/codeql.yml`：python + GitHub Actions 安全扫描
 
 ### 提交前自检

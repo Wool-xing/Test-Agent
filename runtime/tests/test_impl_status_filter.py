@@ -36,7 +36,7 @@ def test_registry_expert_status_counts():
 
 
 def test_registry_skill_status_counts():
-    """Skill 32 = 23 production + 7 script + 0 rollout + 2 vision (V1.32.0 全 skill rollout 完成)。"""
+    """Skill 32 = 23 production + 7 script + 0 rollout + 2 vision (V1.32.1 全 skill rollout 完成)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.skills.values())
     assert counts.get("production", 0) == 23, f"skill production 应 23,实 {counts.get('production')}"
@@ -72,7 +72,7 @@ def test_router_flags_rollout_expert():
 
 
 def test_router_does_not_falsely_flag_production_skill():
-    """V1.32.0 全 rollout 完成 — production skill 不应被 flag 为 rollout/vision。"""
+    """V1.32.1 全 rollout 完成 — production skill 不应被 flag 为 rollout/vision。"""
     cat = get_catalog()
     dec = _mk_decision(("n1", "skill", "visual-test"))
     issues = router._validate_against_catalog(dec, cat)
@@ -122,7 +122,7 @@ def test_execute_node_rejects_rollout_expert():
 
 
 def test_execute_node_allows_production_skill():
-    """V1.32.0 全 rollout 完成 — production skill 应正常执行 (rc=0),不被硬拒。"""
+    """V1.32.1 全 rollout 完成 — production skill 应正常执行 (rc=0),不被硬拒。"""
     r = execute_node("automotive-can-bus-test", "skill")
     assert r.returncode == 0, f"production skill 被误拒: rc={r.returncode} stderr={r.stderr}"
     assert r.stdout, "production skill 应产出结果"
