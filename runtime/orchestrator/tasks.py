@@ -11,7 +11,7 @@ from runtime.observability.otel import span
 from runtime.router.schema import DAGNode
 
 
-@task(retries=2, retry_delay_seconds=exponential_backoff(backoff_factor=5))
+@task(retries=2, retry_delay_seconds=exponential_backoff(backoff_factor=5), timeout_seconds=3600)
 def execute_dag_node(node: DAGNode) -> dict:
     """Atomic node execution. Returns serializable summary."""
     with span(f"node.{node.kind}.{node.name}", node_id=node.id):

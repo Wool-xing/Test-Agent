@@ -25,6 +25,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
     ordered: list[DAGNode] = decision.topological()
     log.info("flow start: run_id={} nodes={}", run_id, len(ordered))
 
+    MAX_FAILURES = 3
     results: dict[str, dict] = {}
     failures: list[str] = []
     skipped: list[str] = []
@@ -34,17 +35,25 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
         for node in ordered:
             wait_for = [futures[d] for d in node.depends_on if d in futures]
             futures[node.id] = execute_dag_node.submit(node, wait_for=wait_for)
-        for nid, fut in futures.items():
+        total = len(futures)
+        for i, (nid, fut) in enumerate(futures.items(), 1):
             try:
                 results[nid] = fut.result()
                 if results[nid].get("skipped"):
                     skipped.append(nid)
                 elif not results[nid].get("ok"):
                     failures.append(nid)
+                    if len(failures) >= MAX_FAILURES:
+                        log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                        break
             except Exception as e:  # noqa: BLE001
                 log.error("node {} crashed: {}", nid, e)
                 results[nid] = {"id": nid, "ok": False, "error": str(e)}
                 failures.append(nid)
+                if len(failures) >= MAX_FAILURES:
+                    log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                    break
+            log.info("DAG progress: {}/{} nodes done", i, total)
 
     # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
