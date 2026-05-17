@@ -201,65 +201,11 @@ def list_history() -> dict:
 
 @app.get("/dashboard")
 def get_dashboard() -> dict:
-    """Aggregate quality metrics from all runs."""
-    import json as _json
+    """Aggregate quality metrics — 3‑row layout: decision → diagnostic → action."""
+    from runtime.observability.dashboard import build_dashboard
 
     ws = get_settings().workspace_dir
-    all_runs: list[dict] = []
-    expert_fails: dict[str, int] = {}
-
-    for scan_dir in [ws / "_demo", ws / "执行日志"]:
-        if not scan_dir.exists():
-            continue
-        for f in scan_dir.rglob("*.json"):
-            try:
-                data = _json.loads(f.read_text(encoding="utf-8"))
-                if isinstance(data, dict) and "total" in data:
-                    all_runs.append(data)
-                if "results" in data and isinstance(data["results"], dict):
-                    for node_id, r in data["results"].items():
-                        if not r.get("ok") and r.get("name"):
-                            name = r["name"]
-                            expert_fails[name] = expert_fails.get(name, 0) + 1
-            except (OSError, json.JSONDecodeError, ValueError) as e:
-                logger.warning("dashboard: skipping unreadable run file {}: {}", f, e)
-
-    total = len(all_runs)
-    if total == 0:
-        return {
-            "total_runs": 0, "avg_pass_rate": 0, "avg_confidence": 0,
-            "total_test_cases": 0, "recent_runs": [], "top_failures": [],
-        }
-
-    pass_rates = [(r.get("succeeded", r.get("passed", 0)) / max(r.get("total", 1), 1)) for r in all_runs]
-    confidences = [r.get("confidence", 0) for r in all_runs if isinstance(r.get("confidence"), (int, float))]
-    total_cases = sum(r.get("total", 0) for r in all_runs)
-
-    top = sorted(expert_fails.items(), key=lambda x: -x[1])[:10]
-
-    recent = sorted(all_runs, key=lambda r: str(r.get("date", r.get("timestamp", ""))), reverse=True)[:10]
-    recent_summaries = [
-        {
-            "run_id": r.get("run_id", ""),
-            "target": r.get("target", r.get("target_type", "")),
-            "date": str(r.get("date", r.get("timestamp", ""))),
-            "total": r.get("total", 0),
-            "passed": r.get("succeeded", r.get("passed", 0)),
-            "failed": r.get("failed", 0),
-            "confidence": r.get("confidence", 0),
-            "duration_s": r.get("duration_s", 0),
-        }
-        for r in recent
-    ]
-
-    return {
-        "total_runs": total,
-        "avg_pass_rate": sum(pass_rates) / total,
-        "avg_confidence": sum(confidences) / len(confidences) if confidences else 0,
-        "total_test_cases": total_cases,
-        "recent_runs": recent_summaries,
-        "top_failures": [{"expert": name, "fail_count": cnt} for name, cnt in top],
-    }
+    return build_dashboard(ws)
 
 
 def _run_in_background(run_id: str, decision) -> None:

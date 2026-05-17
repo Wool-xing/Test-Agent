@@ -28,6 +28,7 @@ from runtime.cli.commands.doctor import register as _reg_doctor
 from runtime.cli.commands.export import register as _reg_export
 from runtime.cli.commands.init import register as _reg_init
 from runtime.cli.commands.market import register as _reg_market
+from runtime.cli.commands.readiness import register as _reg_readiness
 from runtime.cli.commands.run import register_run as _reg_run
 from runtime.cli.commands.selftest import register as _reg_selftest
 
@@ -37,6 +38,7 @@ _reg_doctor(app)
 _reg_export(app)
 _reg_init(app)
 _reg_market(app)
+_reg_readiness(app)
 _reg_run(app)
 _reg_selftest(app)
 
