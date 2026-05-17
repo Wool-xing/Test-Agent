@@ -232,8 +232,8 @@ def block_outbound(target_host: str, duration: int = 60):
 
 # ===== 时钟漂移 =====
 
-def shift_clock(seconds: int):
-    """系统时钟前/后移(需 root,仅 Linux)· 双 env var gate"""
+def shift_clock(seconds: int, auto_restore: bool = True):
+    """系统时钟前/后移(需 root,仅 Linux)· 双 env var gate· auto_restore=默认自动回滚"""
     _require_authorized("shift_clock")
     if not CLOCK_DRIFT_ALLOWED:
         raise RuntimeError(
@@ -242,8 +242,14 @@ def shift_clock(seconds: int):
         )
     if not isinstance(seconds, int) or abs(seconds) > 86400:
         raise ValueError(f"invalid seconds: {seconds} (max ±86400)")
-    subprocess.run(["sudo", "-n", "date", "-s", f"@{int(time.time()) + seconds}"], check=True, timeout=30)
-    logger.info(f"时钟已 ±{seconds}s")
+    original_time = int(time.time())
+    try:
+        subprocess.run(["sudo", "-n", "date", "-s", f"@{original_time + seconds}"], check=True, timeout=30)
+        logger.info(f"时钟已 ±{seconds}s (auto_restore={auto_restore})")
+    finally:
+        if auto_restore:
+            subprocess.run(["sudo", "-n", "date", "-s", f"@{original_time}"], check=False, timeout=30)
+            logger.info("时钟已自动恢复到原时间")
 
 
 if __name__ == "__main__":
