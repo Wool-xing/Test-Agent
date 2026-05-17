@@ -174,7 +174,7 @@ def _auto_check(sc: SuccessCriterion, html: str, axe: dict) -> tuple[bool | None
         "2.4.2": "document-title",
         "2.4.6": "heading-order",
         "2.4.7": "focus-order-semantics",
-        "2.4.13": "focus-order-semantics",
+        "2.4.13": "focus-order-semantics",  # focus indicator area/contrast (axe-core validates focus styling)
         "2.5.3": "label",
         "2.5.8": "target-size",
         "3.1.1": "html-has-lang",
@@ -253,8 +253,8 @@ def compute_score(checklist: list[ChecklistResult],
     # Checklist score = fraction of auto-checkable that pass (same basis)
     checklist_fraction = automated
 
-    composite = automated  # when no manual checks done, composite = automated
-    # When manual checks are done later, composite = auto×0.6 + manual×0.4
+    composite = automated * 0.6  # weighted: auto 60%, manual 40% when available
+    # When manual checks are completed, composite = auto×0.6 + manual×0.4
 
     # Grade
     if composite >= 0.95:
