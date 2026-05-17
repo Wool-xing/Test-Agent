@@ -121,23 +121,23 @@ def cmd_list() -> None:
     for name, info in COMPAT_EXAMPLES.items():
         typer.echo(f"  {name:18s} {info}")
     typer.echo("")
-    typer.echo("📖 Full cookbook: config/llm-providers.md")
+    typer.echo("📖 Full cookbook: 04-配置文件/llm-providers.md")
 
 
 @config_app.command("show")
 def cmd_show() -> None:
-    """显当前 .env (TAGENT_LLM_* + 厂商 key 全脱敏)."""
+    """Show current .env (TAGENT_LLM_* keys fully redacted)."""
     env_path = _find_env_file()
     typer.echo(f"📄 .env: {env_path.resolve()}")
     if not env_path.exists():
-        typer.echo("  (文件不存, 用 'tagent config use <provider>' 创建)")
+        typer.echo("  (file not found, run 'tagent config use <provider>' to create)")
         return
     env = _parse_env(env_path)
     for key in TRACKED_KEYS:
         value = env.get(key, "")
         if key.endswith("KEY"):
             value = _mask(value) if value else ""
-        typer.echo(f"  {key}={value or '(未设)'}")
+        typer.echo(f"  {key}={value or '(not set)'}")
     for vendor_key in VENDOR_KEYS:
         if vendor_key in env:
             typer.echo(f"  {vendor_key}={_mask(env[vendor_key])}")

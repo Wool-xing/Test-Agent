@@ -80,7 +80,7 @@ def test_show_missing_env_hints_creation(tmp_path: Path, monkeypatch: pytest.Mon
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(config_app, ["show"])
     assert result.exit_code == 0
-    assert "文件不存" in result.stdout
+    assert "file not found" in result.stdout
 
 
 def test_show_masks_keys(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -123,14 +123,14 @@ def test_use_ollama_no_key_message(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(config_app, ["use", "ollama"])
     assert result.exit_code == 0
-    assert "本地" in result.stdout
+    assert "runs locally" in result.stdout
 
 
 def test_use_unknown_provider_exits_2(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(config_app, ["use", "nonexistent-vendor"])
     assert result.exit_code == 2
-    assert "未知 provider" in result.stdout
+    assert "unknown provider" in result.stdout
 
 
 def test_use_compat_writes_three_envs(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
