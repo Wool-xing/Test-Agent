@@ -46,7 +46,7 @@ jobs:
           npx tsc -p electron/tsconfig.json
           npx electron-builder --win --config electron-builder.yml
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Test-Agent-Windows
           path: dist-electron/*.exe
@@ -87,7 +87,7 @@ jobs:
           npx tsc -p electron/tsconfig.json
           npx electron-builder --mac --config electron-builder.yml
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Test-Agent-macOS
           path: dist-electron/Test-Agent-*.dmg
