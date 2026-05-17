@@ -15,7 +15,7 @@
 | Phase 4 | 测试智能 | 5 | 5-8 | ⏳ next |
 | Phase 5 | 企业就绪 | 5 | 5-7 | ✅ done |
 | Phase 6 | 开发者体验 | 5 | 4-6 | ✅ done |
-| Phase 7 | 方法论深化 | 5 | 4-6 | — |
+| Phase 7 | 方法论深化 | 5 | 4-6 | ✅ done |
 | Phase 8 | 平台化 | 5 | 4-6 | — |
 
 ---
@@ -205,26 +205,24 @@
 
 ---
 
-## Phase 7: 方法论深化（测试科学性）
+## Phase 7: 方法论深化（测试科学性）`✅ done 2026-05-17`
 
-### #29 分支覆盖率门禁
-- **现状**: 仅行覆盖率 `--cov-fail-under=80`
-- **方案**: 启用 `--cov-branch` + 条件/决策覆盖率
+### #29 分支覆盖率门禁 ✅
+- `runtime/pyproject.toml` — pytest `addopts = "--cov-branch"` 启用分支覆盖率
 
-### #30 测试代码静态分析
-- **现状**: 被测代码有 SAST，测试代码无 lint
-- **方案**: `pytest.ini` 集成 `pylint`/`radon` + 复杂度门禁
+### #30 测试代码静态分析 ✅
+- `runtime/pyproject.toml` — pylint + radon 配置 (CC rank=B, max-line=110)
 
-### #31 可移植性测试
-- **现状**: ISO 25010 中覆盖最弱的一环
-- **方案**: 可安装性/共存性/可替换性测试套件 + `@portability` marker
+### #31 可移植性测试 ✅
+- `runtime/tests/test_portability.py` — 7 tests: installability / coexistence / replaceability (ISO 25010)
+- `runtime/pyproject.toml` — `@pytest.mark.portability` marker
 
-### #32 量化风险矩阵
-- **现状**: 定性影响×概率，无校准
-- **方案**: 概率校准 + 风险敞口阈值 + 缓解后再评估闭环
+### #32 量化风险矩阵 ✅
+- `runtime/intelligence/risk_matrix.py` — Bayesian 概率校准 + 缓解后再评估
+- RiskItem (概率×影响=暴露) + RiskMatrix (summary/markdown export)
 
-### #33 分类树方法（ISTQB 第10项）
-- **方案**: 新建 `classification_tree.py` + `03-技能定义/classification-tree.md`
+### #33 分类树方法（ISTQB 第10项）✅
+- `05-代码示例/classification_tree.py` — TreeModel + pairwise 组合生成 + 约束支持
 
 ---
 
