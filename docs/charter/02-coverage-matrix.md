@@ -55,7 +55,7 @@
 | 变异测试（用例有效性） | mutation_runner | testcase-designer | ✅ |
 | DORA 4 指标 + 缺陷密度 + 套件减重 | dora_metrics + suite_minimizer | bug-manager | ✅ |
 | 伦理 / 偏见审计（数据集/模型/决策公平性） | fairness_auditor.py + ai_adversarial + suite_minimizer（覆盖偏差） + 公平性指标 | ai-tester | ✅ |
-| 沉默故障检测（无报警的恶化） | tracing_validator + web_vitals_collector + 阈值漂移检测 | test-executor | ⚪ Phase 3 |
+| 沉默故障检测（无报警的恶化） | silent_failure_detector.py + tracing_validator + web_vitals_collector + 阈值漂移检测 | test-executor | ✅ |
 | 决策可回放（任一判断可复现可反驳） | tracing_validator + history 归档 + 模型版本快照 | test-lead | ✅ |
 | 缺席者场景注入（残障/老年/未成年/未联网/精神危机） | a11y_scanner + i18n_checker + 边缘场景剧本库 | testcase-designer | ⚪ Phase 3 |
 | 证据链可采信性（司法/审计/监管送审） | dora_metrics + tracing_validator + 决策日志打包 | bug-manager | ⚪ Phase 4 |

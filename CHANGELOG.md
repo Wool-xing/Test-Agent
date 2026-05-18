@@ -16,9 +16,13 @@
 - 20 unit tests for fairness_auditor (runtime/tests/test_utils_fairness.py)
 - ai_validator.run_bias_audit(): integrated pipeline calling fairness_auditor
 
+- silent_failure_detector.py: 沉默故障检测 (Phase 3.2) — threshold drift + Mann-Kendall trend + OLS slope + sliding window + multi-source (tracing/web_vitals/prometheus) + batch_detect()
+- 21 unit tests for silent_failure_detector (runtime/tests/test_utils_silent_failure.py)
+
 ### Changed
 - coverage matrix: 伦理/偏见审计 ✅ (was Phase 3)
-- vision-dimensions: 公平性审计器 entry added ✅
+- coverage matrix: 沉默故障检测 ✅ (was Phase 3)
+- vision-dimensions: 公平性审计器 + 沉默故障探测器 ✅
 - 14-AI模型测试.md: fairness section expanded with 6-metric audit example
 
 _后续累积变更入此节;切版本时移到下方版本节。_

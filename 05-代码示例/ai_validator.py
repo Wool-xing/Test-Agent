@@ -160,6 +160,55 @@ def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
     }
 
 
+def run_silent_failure_audit(
+    output_dir: str = "workspace/执行日志/ai-silent-failure",
+    tracing_log: Optional[str] = None,
+    web_vitals_log: Optional[str] = None,
+    prometheus_counter_log: Optional[str] = None,
+    prometheus_gauge_log: Optional[str] = None,
+    custom_configs: Optional[List] = None,
+) -> Dict:
+    """Run silent failure detection across all data sources and return summary dict."""
+    from silent_failure_detector import (
+        batch_detect,
+        collect_from_tracing,
+        collect_from_web_vitals,
+        collect_from_prometheus_counter,
+        collect_from_prometheus_gauge,
+        export_report,
+        ci_summary,
+    )
+
+    configs: list = []
+
+    if tracing_log:
+        configs.extend(collect_from_tracing(tracing_log))
+    if web_vitals_log:
+        configs.extend(collect_from_web_vitals(web_vitals_log))
+    if prometheus_counter_log:
+        configs.extend(collect_from_prometheus_counter(prometheus_counter_log))
+    if prometheus_gauge_log:
+        configs.extend(collect_from_prometheus_gauge(prometheus_gauge_log))
+    if custom_configs:
+        configs.extend(custom_configs)
+
+    if not configs:
+        logger.info("No metric configs collected; silent failure audit skipped.")
+        return {"n_metrics": 0, "severity": "pass", "summary": "no data"}
+
+    report = batch_detect(configs)
+    export_report(report, output_dir=output_dir)
+
+    return {
+        "n_metrics": report.n_metrics,
+        "silent_count": report.silent_count,
+        "impending_count": report.impending_count,
+        "breached_count": report.breached_count,
+        "severity": report.overall_severity,
+        "summary": ci_summary(report),
+    }
+
+
 # ===== LLM 应用评估 =====
 
 def llm_eval(endpoint: str, prompt: str, expected_format: Optional[str] = None,

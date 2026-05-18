@@ -6,7 +6,7 @@
 
 ## 🧠 V1.36.0 运行时层(`runtime/`)
 
-> 已有 16 专家 / 32 Skill / 75 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
+> 已有 16 专家 / 32 Skill / 76 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
 
 ### 模块拓扑
@@ -104,13 +104,13 @@ uvicorn runtime.api.main:app --port 8800
 - 5 类典型输入(web/api/mobile/desktop/ai-model)stub 路由 = 5/5(100%)
 - M1 门槛:多模型真测 ≥85%;不达 → 双模型投票
 
-### 与 16 专家 / 32 Skill / 75 utils 的关系
+### 与 16 专家 / 32 Skill / 76 utils 的关系
 
 | 项 | 关系 |
 |----|------|
 | 16 专家 `.md` | **不动**。`registry` 扫 frontmatter,`router` 喂 LLM 选用 |
 | 32 Skill `.md` | **不动**。同上 |
-| 75 utils `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
+| 76 utils `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
 | `utils/` 通知/Bug | 复用 `generate_report.py` / `zentao_bug_manager.py` |
 
 任何专家/Skill/脚本**新增**或**修改**仍按宪章 §1 同步铁律走;`runtime/` 是新增 **调度** 层,不重复实现专家逻辑。
@@ -155,7 +155,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 ### 来源与引用（认知史）
 
 - 第一至五轮（DeepSeek + Claude）：测试 Agent 架构 + 九大簇
-- V1.0.0 工程基线：14 agent + 14 skill + 75 utils + CI/CD（历史基线）
+- V1.0.0 工程基线：14 agent + 14 skill + 76 utils + CI/CD（历史基线）
 - V1.1.0 ~ V1.36.0：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
 - 永久宪章糅合（2026-05-11/14/16）：FULL_GUIDE 工程主体 + 全局记忆哲学维度 + 持续回写
 
