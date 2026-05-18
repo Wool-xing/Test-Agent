@@ -26,7 +26,7 @@ SKILL_IMPL_STATUS: production
 | 6 总线 CAN/LIN/FlexRay/Eth | `/automotive-can-bus-test` |
 | 7 ADAS 场景 | `/automotive-adas-scenario` |
 | 8 OTA 升级 | `/automotive-ota-update-test` |
-| 9 合规审计 | `mcp-compliance-checker iso-26262/sotif/r155/r156` |
+| 9 合规审计 | `compliance/engine.py` + 行业规则库（ISO 26262/SOTIF/R155/R156 Phase 2） |
 | 10 报告 + Bug 单 | `report-generator` |
 
 ## 主宪章铁律

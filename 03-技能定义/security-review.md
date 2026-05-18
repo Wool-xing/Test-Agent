@@ -36,7 +36,7 @@ SKILL_IMPL_STATUS: script
 
 ## 工具(本项目已有)
 
-- `utils/security_scanner.py`(已有 49 代码示例之一)
+- `utils/security_scanner.py`(已有 67 代码示例之一)
 - `bandit`(Python SAST)
 - `gitleaks`(已在 pre-commit)
 - `pip-audit` + `safety`

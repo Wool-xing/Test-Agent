@@ -5,8 +5,8 @@
 | 文件 | 用途 |
 |------|------|
 | `flows.py` | Prefect `@flow` 主入口,接收 router DAG 跑全链路 |
-| `tasks.py` | `@task` 原子(调专家/Skill/49 脚本) |
-| `adapters/` | 包装 `05-代码示例/*.py` 49 脚本为 Prefect task |
+| `tasks.py` | `@task` 原子(调专家/Skill/67 脚本) |
+| `adapters/` | 包装 `05-代码示例/*.py` 67 脚本为 Prefect task |
 
 ## 编排能力
 

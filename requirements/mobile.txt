@@ -1,0 +1,6 @@
+# ===== mobile — 移动端测试 =====
+# 安装: pip install -r requirements/mobile.txt
+-r base.txt
+
+Appium-Python-Client==5.3.1
+selenium==4.43.0

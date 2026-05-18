@@ -15,6 +15,125 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---
 
+## [v1.37.0] - 2026-05-18
+
+### Added
+- Bug Tracker 5 适配器: `jira_bug_manager.py` / `github_bug_manager.py` / `linear_bug_manager.py` / `webhook_bug_manager.py`
+- Quality Gate Engine: `quality_gate_engine.py` + `04-配置文件/quality_gates.yaml` (YAML 驱动门禁)
+- Layered requirements: `requirements/{base,mobile,desktop,visual,system,ai,perf}.txt` (按需安装引擎)
+- CI `compileall runtime/` syntax check
+
+### Fixed
+- H16: Expert count clarified (9 含 test-lead vs 8 被协调)
+- H18: Skills README completed (13→32 business + 3 meta skills)
+- M12: `run_file` BackgroundTasks unified (was raw threading.Thread)
+- M14: RACI matrix expanded to 18 columns (pentest + automotive)
+- M15: `requires_layer` frontmatter field documented in CONTRIBUTING.md
+- M19: automotive-test checker reference fixed (`Nonexistent mcp-compliance-checker` → `compliance/engine.py`)
+
+### Changed
+- Utils count: 67 → 73 (6 new modules)
+- 3 charter items: Bug多适配 ✅ / 按需安装 ✅ / 门禁YAML ✅
+
+---
+
+## [v1.36.0] - 2026-05-18
+
+### Added
+- chaos_helper_v2.py: blast radius + steady-state hypothesis + 6 fault types
+- state_machine_tester_v2.py: N-switch coverage + executable guards + weighted walk
+- db_test_helper_v2.py: MySQL/SQLite + isolation levels + FK/constraint testing + connection pooling
+- bdd_runner_v2.py: Gherkin parser + pytest-bdd integration + coverage scanner
+- carbon_scheduler.py: electricityMap + CodeCarbon integration + green budget tracking
+- canary_config.py: Argo Rollouts CRD generation + Mann-Whitney analysis + error budget burn rate
+
+### Security
+- runtime/backends/ssh.py: known_hosts=None (was (), disabling host verification)
+- runtime/backends/docker.py: shlex.quote(cmd) before shell execution
+- runtime/api/main.py: constant-time bearer token comparison (secrets.compare_digest)
+- runtime/orchestrator/adapters/perf_orchestrator.py: fix SyntaxError (nonlocal outside function) + UnboundLocalError + missing import os
+- runtime/api/main.py: fix ResultStore TypeError (dict [] assignment → .put())
+- runtime/orchestrator/hooks.py: hook failures now logged at debug level (was silent pass)
+- runtime/observability/prometheus_metrics.py: list→deque(maxlen=1000) prevents unbounded growth
+- runtime/api/result_store.py: threading.Lock→RLock prevents deadlock in __contains__
+- runtime/router/llm_client.py + agents/base.py: fix strip("`") corrupting backtick content
+- runtime/api/endpoints/stream.py: fix race condition (setdefault) + store ensure_future task refs
+
+### Fixed
+- runtime/orchestrator/release_readiness.py: fix --from-summary AttributeError (Path wrapping)
+- runtime/orchestrator/direct.py: guard pool.shutdown() against uninitialized pool
+- runtime/tests/test_cli_commands.py: remove unregistered search/list/plan commands
+- 03-技能定义/darwin-skill/scripts/screenshot.mjs: replace hardcoded /Users/alchain/ path
+- 03-技能定义/nuwa-skill/references/skill-template.md: remove upstream author X/Twitter branding
+
+### Changed
+- VERSION: 1.32.5 → 1.36.0
+- runtime/__init__.py: __version__ "1.32.5" → "1.36.0"
+- runtime/pyproject.toml: version "1.32.0" → "1.36.0"
+- desktop/package.json + mobile/package.json: "1.32.0" → "1.36.0"
+- Global: "49 utils" → "67 utils" across all documentation (~25 locations)
+
+---
+
+## [v1.35.0] - 2026-05-18
+
+### Added
+- flaky_guard.py: pytest plugin + Chi-squared analysis + auto-quarantine + failure clustering
+- api_security_scanner_v2.py: complete OWASP API Top 10 2023 + JWT attack matrix (key confusion, kid injection, jku/x5u, expiry bypass)
+- data_factory_v2.py: 8 entity types + FK relationships + salted PII + CSV/SQL export
+- perf_orchestrator.py: unified performance orchestration + progressive load (10%→50%→100%→120%)
+- event_test_harness.py: Kafka/RabbitMQ/SQS + schema validation
+- visual_regression.py: multi-engine (pixelmatch + SSIM + Butteraugli)
+- flaky_analyzer.py: LLM root cause analysis (Google Auto-Diagnose style)
+- test_prioritizer.py: ML-based test ordering (git-diff→Bag-of-Words)
+- differential_tester.py: cross-implementation comparison + Mann-Whitney U significance
+- eu_ai_act.py: EU AI Act Annex III + Art.9-15 audit, compliance deadline 2026-08-02
+- supply_chain.py: CycloneDX SBOM + SLSA verification + Sigstore signing
+
+---
+
+## [v1.34.0] - 2026-05-18
+
+### Added
+- Settings 14-field + max_tokens configurable
+- IDE integration (.vscode/.editorconfig/devcontainer)
+- Docker hardening
+- script_bridge.py: 5 standalone scripts wired into orchestrator
+- a11y_scanner_v2.py: WCAG 2.2 with 78 criteria
+- suite_minimizer_v2.py: similarity-clustering based test minimization
+- Prometheus /metrics endpoint
+- Request-ID correlation middleware
+- WebSocket streaming for real-time run progress
+- ResultStore with LRU eviction
+- property_tester.py: Hypothesis PBT with 6 templates
+- contract_test_generator.py: OpenAPI→Pact generation
+- schema_fuzzer.py: JSON Schema-based fuzzing
+- Compliance engine
+- Desktop IPC extension (14 methods)
+- Data lifecycle manager
+- DORA 2025 metrics tracker
+
+---
+
+## [v1.33.0] - 2026-05-17
+
+### Added
+- Complete MASTER_PLAN execution (38/38 items across 8 phases)
+
+---
+
+## [v1.32.5] - 2026-05-17
+
+### Security
+- utils: shell injection hardening, hardcoded credential removal, API auth, silent failure fixes
+- CI: pin ludeeus/action-shellcheck@2.0.0
+- generate_report.py: split 143-line function → 6 helpers
+- mobile_driver.py: split 107-line function → helper extraction
+- _stub_response: 77-line if/elif chain → dispatch table
+- fuzzer.py: PAYLOAD_LIBRARY values hoist to module-level ALL_PAYLOADS
+
+---
+
 ## [v1.32.4] - 2026-05-17
 
 ### Changed
@@ -408,7 +527,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added(V1.1.0 · 运行时层)
 
-- **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 49 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
+- **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 67 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
   - `runtime/router/`:AI 路由(LiteLLM 多厂商:Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)。被测物 → 专家+Skill DAG。含 stub provider 供 CI 离线测,准确率 5/5 类型(web/api/mobile/desktop/ai-model)
   - `runtime/registry/`:扫 `02-专家定义/*.md` + `03-技能定义/*.md` frontmatter 生成统一目录(14 expert + 13 skill,实测通过)
   - `runtime/orchestrator/`:**双轨**——Prefect 2.x flow(全功能,带 UI/重试/状态机)+ Direct 执行器(无 Prefect 也能跑,ThreadPoolExecutor 并发,降级方案)
@@ -440,7 +559,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Changed（数字漂移修复 + URL 统一 Batch 2）
 
-- **顶层文档数字一致性**：`8 位专家 / 9 agent / 8 skill / 12 utils` 等过时数字全栈修正为 `14 agent / 13 skill / 49 utils`（核心 8 专家 + 平台扩展 5 专家 + test-lead 协调者）。涉及：`README_DETAIL.md` / `01-快速开始/使用手册.md` / `02-专家定义/01-测试主管.md` / `03-技能定义/test-coordinator.md` / `install.sh`。
+- **顶层文档数字一致性**：`8 位专家 / 9 agent / 8 skill / 12 utils` 等过时数字全栈修正为 `14 agent / 13 skill / 67 utils`（核心 8 专家 + 平台扩展 5 专家 + test-lead 协调者）。涉及：`README_DETAIL.md` / `01-快速开始/使用手册.md` / `02-专家定义/01-测试主管.md` / `03-技能定义/test-coordinator.md` / `install.sh`。
 - **GitHub 仓库 URL 统一**：所有引用 `YOUR-USER/Test-Agent工作流搭建` 的位置统一为 `Wool-xing/Test-Agent`（权威英文仓库名；中文 `Test-Agent工作流搭建` 仅作目录别名）。fork 用户可用 `TEST_AGENT_REPO_URL` 环境变量覆盖。涉及：`01-快速开始/部署说明.md` / `01-快速开始/使用手册.md` / `README_DETAIL.md`。
 - **覆盖率口径统一为 ~95%**：原 `~99%` (README/README_DETAIL) vs `约 90%` (00-项目导航) 不一致，统一为 `~95%`，剩 5% 为高度专业合规领域（航空 DO-178C / 医疗 HIPAA / 工业控制 IEC61508）。
 
@@ -454,21 +573,21 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `README.md` 删除三视角矩阵段（迁移至 FULL_GUIDE.md，避免双份维护）
   - `README.md` 行数从 240 降至 168 行
 - **W3 安全增强**：
-  - `49 个 utils .py` 文件头加 `# SPDX-License-Identifier: MIT`（合规标识）
+  - `67 个 utils .py` 文件头加 `# SPDX-License-Identifier: MIT`（合规标识）
   - `.pre-commit-config.yaml` 加 gitleaks hook（凭据扫描）
   - `.gitignore` 补漏：`.ruff_cache/` / `*.jtl` / `*.pem` / `*.key` / `*.crt` / `*.p12` / `*.pfx` / `*.jks` / `id_rsa` / `id_ed25519` / `coverage.xml` / `pip-wheel-metadata/`
 - **W3 收尾 · 方法论沉淀（F'+J+K）**：
   - `CONTRIBUTING.md` 末尾追加：**同步铁律段**（联动改动清单速查 + 自动化保障）+ **RACI 协作矩阵浓缩版**（14 专家 × 35 测试维度，含责任边界冲突解决与质量门禁联动）
   - `FULL_GUIDE.md` 末尾追加：**测试架构合理性深度章节**（6 子节：金字塔 2024 现代版 / Shift-Left 7 层 / Shift-Right 9 层 / 可观测三柱 + 测试可视化 / 五层质量门禁 + Flaky vs Reruns 哲学 / 调整路径 Phase 2-4 落地点）
   - 新建 `examples/web-demo/`：8 文件最小可跑 Web 测试示例（pytest + Playwright + Page Object，演示 `https://playwright.dev`，5 分钟跑通）
-  - `FULL_GUIDE.md:395` 漏修补救：`utils/*.py（12 个）` → `49 个，含 __init__.py`
+  - `FULL_GUIDE.md:395` 漏修补救：`utils/*.py（12 个）` → `67 个，含 __init__.py`
 
 ### Notes
 
 W1+W2+W3 合并提交：上架前必修安全 + 数字漂移修复 + URL 统一 + 信息架构重塑（FULL_GUIDE/INDEX/SPDX/gitleaks）。
 后续 W4 博客 + Show HN 准备 待执行。
 
-> 注：本仓库 GitHub Actions CI 已配 `permissions: contents: read` 最小权限（F3）；CodeQL 显式声明 per-job 权限。pre-commit 已含 `detect-private-key` + .env 防护 + 14/13/49 文件统计。
+> 注：本仓库 GitHub Actions CI 已配 `permissions: contents: read` 最小权限（F3）；CodeQL 显式声明 per-job 权限。pre-commit 已含 `detect-private-key` + .env 防护 + 14/13/67 文件统计。
 
 ---
 
@@ -480,7 +599,7 @@ W1+W2+W3 合并提交：上架前必修安全 + 数字漂移修复 + URL 统一 
 
 - 14 测试专家 Agent（核心 9 + 平台扩展 5）
 - 13 测试技能 Skill（通用 8 + 平台 5）
-- 49 utils Python 工具模块
+- 67 utils Python 工具模块
 - GitHub Actions + Jenkins 双 CICD
 - Dependabot 周扫描 + pip-audit/safety CVE 拦截
 - 多格式 PRD 加载（md/pdf/docx/xlsx/zip/png/url/html/pptx）

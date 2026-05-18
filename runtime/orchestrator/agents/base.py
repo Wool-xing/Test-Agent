@@ -139,7 +139,10 @@ class AgentRunner(abc.ABC):
     def _parse_json(raw: str) -> dict[str, Any]:
         raw = raw.strip()
         if raw.startswith("```"):
-            raw = raw.strip("`")
+            if raw.endswith("```"):
+                raw = raw[3:-3].strip()
+            else:
+                raw = raw[3:]
             if "\n" in raw:
                 _, raw = raw.split("\n", 1)
         start = raw.find("{")

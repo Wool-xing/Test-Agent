@@ -14,8 +14,18 @@
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-// 使用全局安装的 playwright-core
-const pw = require('/Users/alchain/.npm-global/lib/node_modules/playwright/node_modules/playwright-core');
+// Resolve playwright-core from the local project or global installation
+let pw;
+try {
+  pw = require(require.resolve('playwright-core', { paths: [process.cwd(), ...module.paths] }));
+} catch {
+  try {
+    pw = require('playwright-core');
+  } catch {
+    console.error('playwright-core not found. Install with: npm install playwright');
+    process.exit(1);
+  }
+}
 
 const htmlPath = process.argv[2] || new URL('../templates/result-card.html', import.meta.url).pathname;
 const outputPath = process.argv[3] || new URL('../templates/result-card.png', import.meta.url).pathname;

@@ -1,0 +1,6 @@
+# ===== perf — 性能测试 =====
+# 安装: pip install -r requirements/perf.txt
+-r base.txt
+
+locust==2.43.4
+# mutmut==2.4.5  # 变异测试

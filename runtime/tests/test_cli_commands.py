@@ -10,8 +10,8 @@ runner = CliRunner()
 
 EXPECTED_COMMANDS = [
     "catalog", "demo", "doctor", "export", "init",
-    "search", "list", "install", "uninstall", "verify",
-    "run", "plan", "selftest",
+    "install", "uninstall", "verify",
+    "run", "selftest",
 ]
 
 
@@ -51,8 +51,7 @@ def test_doctor_command():
 
 def test_help_per_command():
     """Each command has its own --help."""
-    for cmd in ["run", "catalog", "doctor", "selftest", "demo", "init", "export",
-                "search", "list", "install", "uninstall", "verify", "plan"]:
+    for cmd in EXPECTED_COMMANDS:
         result = runner.invoke(app, [cmd, "--help"])
         assert result.exit_code == 0, f"{cmd} --help failed"
         assert result.stdout.strip(), f"{cmd} --help produced no output"

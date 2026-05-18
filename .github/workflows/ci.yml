@@ -33,6 +33,7 @@ jobs:
       - name: 语法检查（py_compile）
         run: |
           python -m compileall 05-代码示例/ -q
+          python -m compileall runtime/ -q
 
   # ===== 2. 依赖漏洞扫描 =====
   security-audit:

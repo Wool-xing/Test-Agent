@@ -17,7 +17,7 @@ REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-xing/Test-Agent.git}"
 REPO_BRANCH="${TEST_AGENT_REPO_BRANCH:-main}"
 
 echo "=========================================="
-echo " Test-Agent 工作流一键部署 V1.32.5"
+echo " Test-Agent 工作流一键部署 V1.36.0"
 echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="
@@ -139,8 +139,8 @@ cp "$TEMPLATE_DIR/04-配置文件/.mcp.json"        "$PROJECT_ROOT/"
 cp "$TEMPLATE_DIR/04-配置文件/requirements.txt" "$PROJECT_ROOT/"
 [[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/04-配置文件/.env.example" "$PROJECT_ROOT/.env"
 
-# ===== 7. utils（49 个 .py + __init__）=====
-echo "→ 拷贝 utils（49 个）..."
+# ===== 7. utils（67 个 .py + __init__）=====
+echo "→ 拷贝 utils（67 个）..."
 for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
          excel_generator.py flaky_detector.py generate_report.py \
          jmeter_csv_exporter.py jmeter_result_parser.py \

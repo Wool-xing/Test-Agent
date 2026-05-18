@@ -39,7 +39,7 @@ class DockerBackend(BaseExecutionEnv):
             argv += ["-w", cwd]
         for k, v in (env or {}).items():
             argv += ["-e", f"{k}={v}"]
-        argv += [self.container, "sh", "-lc", cmd]
+        argv += [self.container, "sh", "-lc", shlex.quote(cmd)]
         rc, out, err = await self._run(argv, timeout=timeout)
         return ExecResult(ok=rc == 0, stdout=out, stderr=err, returncode=rc, elapsed_ms=int((time.monotonic() - start) * 1000))
 

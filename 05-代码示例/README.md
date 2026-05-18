@@ -1,6 +1,6 @@
 # 05-代码示例（utils/）索引
 
-49 个 Python 工具模块（含 `__init__.py`），按职责多分类（核心 / 平台 / 协议 / 非功能 / 用例方法 / 测试类型 / 安全增强 / DB/契约/API / 移动专项 / a11y/i18n / 度量 / 区块链/AI 对抗 / 输入）。
+73 个 Python 工具模块（含 `__init__.py`），按职责多分类（核心 / 平台 / 协议 / 非功能 / 用例方法 / 测试类型 / 安全增强 / DB/契约/API / 移动专项 / a11y/i18n / 度量 / 区块链/AI 对抗 / 输入）。
 
 > 顶层导航见根目录 `00-项目导航.md`。
 > import 路径权威：`from utils.<module> import ...`（部署后 utils/ 在项目根，conftest.py 已注入 sys.path）。
@@ -22,6 +22,12 @@
 | `regression_scope.py` | git diff 影响范围分析（YAML 配置） | `analyze_change_impact(base_branch)` |
 | `zentao_bug_manager.py` | BugTracker 默认 adapter:禅道 SDK + token 续期（其他 adapter 同契约 BugTrackerBase,主宪章 §12） | `ZentaoBugManager.create_bug` / `batch_submit_from_failures` |
 | `ci_quality_gate.py` | CI 门禁统一（junit + cov） | `parse_junit` / `check_smoke` / `check_regression` / `check_coverage` |
+| `quality_gate_engine.py` | YAML 驱动门禁引擎（替代硬编码阈值） | `QualityGateEngine` / `check_smoke/regression/coverage/performance/release` |
+| `bug_tracker_base.py` | BugTracker 抽象基类 + 工厂模式（5 适配器注册） | `BugTrackerBase` / `create_bug_manager` / `TRACKER_REGISTRY` |
+| `jira_bug_manager.py` | Jira REST API 适配器 | `JiraBugManager.submit_bug/query_open_bugs` |
+| `github_bug_manager.py` | GitHub Issues API 适配器 | `GitHubBugManager.submit_bug/query_open_bugs` |
+| `linear_bug_manager.py` | Linear GraphQL API 适配器 | `LinearBugManager.submit_bug/query_open_bugs` |
+| `webhook_bug_manager.py` | 通用 Webhook 推送适配器（企微/飞书/钉钉/Slack 回调） | `WebhookBugManager.submit_bug` |
 
 ---
 

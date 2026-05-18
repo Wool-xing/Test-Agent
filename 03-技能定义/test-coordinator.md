@@ -200,7 +200,7 @@ else
     THREADS=5;  RAMPUP=10; DURATION=60
 fi
 
-# TARGET_HOST/PROTOCOL/PORT 由 conftest 或 .env 解析（不含协议前�缀）
+# TARGET_HOST/PROTOCOL/PORT 由 conftest 或 .env 解析（不含协议前缀）
 jmeter -n \
     -t workspace/自动化脚本/jmeter/test_plan.jmx \
     -l workspace/执行日志/jmeter-results/result.jtl \

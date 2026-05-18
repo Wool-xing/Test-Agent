@@ -111,7 +111,10 @@ def main():
         print(f"❌ 文件不存在: {skill_path}")
         sys.exit(1)
 
-    content = skill_path.read_text(encoding='utf-8')
+    try:
+        content = skill_path.read_text(encoding='utf-8')
+    except UnicodeDecodeError:
+        content = skill_path.read_text(encoding='gbk')
 
     checks = [
         ("心智模型数量", check_mental_models),
