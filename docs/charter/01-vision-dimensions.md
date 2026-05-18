@@ -25,7 +25,7 @@
 | `03-技能定义/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
 | `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `05-代码示例/` | utils（74 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
+| `05-代码示例/` | utils（75 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
 | `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---
@@ -112,6 +112,7 @@
 | 缓慢暴力监测器 | 跨发布周期跟踪代际效应 | 文明层 | 需多年数据积累，Phase 4 | ❌ |
 | 缺席者画像生成器 | 强制注入边缘用户场景 | 文明/权力层 | a11y_scanner + i18n_checker + 边缘剧本库 | ⚪ |
 | 现实缝合力探针 | 测试平台对半真半假内容的免疫 | 社会权力层 | ai_adversarial 扩展 | ⚪ |
+| 公平性审计器 | 数据集/模型/决策公平性指标 (DI/EO/校准/交叉) | 社会权力层 | fairness_auditor.py | ✅ |
 | 末日哨兵 | 计算"这一次就是那一次"概率 | 文明层 | 需监管/学界共识授权，Phase 4 | ❌ |
 | 神圣性守护器 | 识别宗教/纪念场景的不可亵渎边界 | 簇 9 | i18n_checker 禁忌矩阵扩展 | ❌ |
 | 精神危机响应器 | 模拟危机状态用户、验证交接路径 | 簇 9 | 缺席者剧本库子集 | ❌ |

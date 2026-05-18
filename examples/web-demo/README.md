@@ -71,7 +71,7 @@ examples/web-demo/
 
 | 完整工作流 | 本 demo |
 |-----------|---------|
-| 16 Agent + 32 Skill + 74 utils | 仅 pytest + playwright |
+| 16 Agent + 32 Skill + 75 utils | 仅 pytest + playwright |
 | `.env` 配置 8 必填 | 不需 `.env` |
 | Allure / JMeter / BugTracker 集成 | 不集成 |
 | 冒烟 + 回归 + 性能门禁 | 仅 1 冒烟用例 |

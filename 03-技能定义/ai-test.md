@@ -21,7 +21,7 @@ SKILL_IMPL_STATUS: script
 □ 黄金测试集 CSV（含 input + label 列）→ AI_GOLDEN_TEST_SET
 □ 模型版本号 → AI_MODEL_VERSION（Bug 报告 buildFound）
 □ 漂移基线数据（可选）→ AI_DRIFT_BASELINE
-□ 公平性测试集（含敏感属性列，如 gender）
+□ 公平性测试集（含敏感属性列，如 gender / race）+ fairness_auditor.py 偏见审计
 □ LLM 测试用例 yaml → workspace/自动化脚本/python/ai/prompts/llm_eval_cases.yaml
 ```
 

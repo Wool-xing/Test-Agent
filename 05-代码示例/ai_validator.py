@@ -96,6 +96,9 @@ def fairness_metrics(dataset: str, sensitive_attr: str, endpoint: str) -> Dict:
     """
     分组准确率：按 sensitive_attr 切分子集，分别计算准确率。
     返回各组指标 + 最大差距。
+
+    For comprehensive fairness audit (disparate impact, equal opportunity,
+    equalized odds, calibration, intersectional), use fairness_auditor.py.
     """
     import pandas as pd
     from sklearn.metrics import accuracy_score
@@ -115,6 +118,46 @@ def fairness_metrics(dataset: str, sensitive_attr: str, endpoint: str) -> Dict:
         vals = list(metrics.values())
         metrics["max_gap"] = round(max(vals) - min(vals), 4)
     return metrics
+
+
+def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
+                   output_dir: str = "workspace/执行日志/ai-fairness") -> Dict:
+    """Run full fairness audit via fairness_auditor and return summary dict."""
+    import pandas as pd
+
+    from fairness_auditor import (
+        audit_dataset_bias,
+        audit_model_fairness,
+        export_bias_report,
+        summary,
+    )
+
+    df = pd.read_csv(dataset)
+    labels = df["label"].to_numpy() if "label" in df.columns else None
+    predictions = load_predictions(endpoint, df["input"].tolist()) if endpoint else None
+
+    reports = []
+    for attr in sensitive_attrs:
+        if attr not in df.columns:
+            logger.warning("Sensitive attribute %r not in dataset; skip.", attr)
+            continue
+        sensitive = df[attr].to_numpy()
+
+        if labels is not None:
+            r = audit_dataset_bias(labels, sensitive, group_names=sorted(df[attr].unique()))
+            reports.append(r)
+            export_bias_report(r, output_dir=output_dir)
+
+        if labels is not None and predictions is not None:
+            r = audit_model_fairness(labels, predictions, sensitive)
+            reports.append(r)
+            export_bias_report(r, output_dir=output_dir)
+
+    return {
+        "n_reports": len(reports),
+        "severity": max((r.overall_severity for r in reports), key=lambda s: {"pass": 0, "warning": 1, "fail": 2}.get(s, 0), default="pass"),
+        "summaries": [summary(r) for r in reports],
+    }
 
 
 # ===== LLM 应用评估 =====

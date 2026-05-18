@@ -11,6 +11,16 @@
 
 ## [Unreleased]
 
+### Added
+- fairness_auditor.py: 伦理/偏见审计 (Phase 3.1) — dataset bias + model fairness (6 metrics: DI/SPD/EO/equalized_odds/calibration/predictive_parity) + intersectional + decision audit
+- 20 unit tests for fairness_auditor (runtime/tests/test_utils_fairness.py)
+- ai_validator.run_bias_audit(): integrated pipeline calling fairness_auditor
+
+### Changed
+- coverage matrix: 伦理/偏见审计 ✅ (was Phase 3)
+- vision-dimensions: 公平性审计器 entry added ✅
+- 14-AI模型测试.md: fairness section expanded with 6-metric audit example
+
 _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---

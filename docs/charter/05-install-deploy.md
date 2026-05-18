@@ -248,7 +248,7 @@ your-test-project/
 ├── .claude/{agents,skills}/           ← 16 agent + 32 skill（业务） + 3 元 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
-├── utils/                             ← 74 个 .py + __init__
+├── utils/                             ← 75 个 .py + __init__
 ├── src/                               ← 被测系统源码（cov 指向）
 ├── workspace/
 │   ├── 测试计划/  需求分析/  测试用例/  测试数据/
@@ -297,7 +297,7 @@ your-test-project/
 | `.claude/skills/*.md`（斜杠技能） | ✅ Claude Code 独有 | 其他工具无对等机制 |
 | `.mcp.json`（MCP 协议） | 半依赖 | MCP 是开放协议；Claude Desktop / Cursor 部分支持；OpenAI 系也开始支持 |
 | `Agent` 工具（test-lead 调用子专家） | ✅ Claude Code 独有 | 其他工具用人工编排 / 多 agent 框架替代 |
-| `utils/*.py`（74 个，含 `__init__.py`） | ❌ 纯 Python | 跨工具完全可用 |
+| `utils/*.py`（75 个，含 `__init__.py`） | ❌ 纯 Python | 跨工具完全可用 |
 | pytest / Playwright / JMeter / Allure | ❌ 跨工具 | 完全可用 |
 | CI/CD（yml / groovy） | ❌ 跨工具 | 完全可用 |
 | conftest.py / .env / requirements.txt | ❌ 标准 Python | 完全可用 |
