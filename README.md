@@ -43,7 +43,7 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 
 - **16 expert agents** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — functional · security · mobile · desktop · AI model · automotive · pentest …
 - **30 active skills** (23 production + 7 script) **+ 2 vision-only** (reference, not executable) **+ 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
-- **73 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
+- **74 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
 - **Multi-LLM (any provider, plug-and-play)** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI-compatible fallback channel** for any other provider (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) via 3 env vars, zero code change. Cookbook: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
 - **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
 - **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams
@@ -104,7 +104,7 @@ Test-Agent/
 ├── 02-专家定义/             ← 16 expert agents (11 production + 5 script, V1.x rollout 收尾)
 ├── 03-技能定义/             ← 32 business skills (23 production + 7 script + 0 rollout + 2 vision) + 3 meta-skills
 ├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
-├── 05-代码示例/             ← 73 production utils
+├── 05-代码示例/             ← 74 production utils
 ├── 06-CICD集成/             ← GitHub Actions + Jenkins
 ├── runtime/                ← V1.x runtime layer (router / orchestrator / MCP / web / scheduler / subagent / learning_loop / backends / gateway / tutor / essence_watcher / marketplace)
 ├── docs/charter/           ← Vision charter (7 split files: vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license)

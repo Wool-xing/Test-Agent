@@ -25,7 +25,7 @@
 | `03-技能定义/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
 | `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `05-代码示例/` | utils（73 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
+| `05-代码示例/` | utils（74 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
 | `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---

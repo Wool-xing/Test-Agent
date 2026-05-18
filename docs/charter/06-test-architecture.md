@@ -55,11 +55,11 @@
 | L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 16/32/67 文件统计 | 强（阻断 commit） |
 | L5 | **PR gate** | CodeQL + pip-audit + safety + ci.yml 全套 | 强（阻断合入） |
 | L6 | **静态分析** | `security_scanner.py`（已实现）+ Bandit/ZAP/Burp Pro（Phase 2 CI 集成） | 中（发现/修） |
-| L7 | **契约测试** | `utils/contract_test.py` consumer-side / provider-side | 强（CI 阻断） |
+| L7 | **契约测试** | `utils/ci_contract_gate.py` + `contract_test_generator.py` + CI job | 强（CI 阻断） |
 
-**Test-Agent 现状评估**：L1-L5 已串通；L6 在 utils 已有 `security_scanner.py`；L7 utils 存在但未串成"自动 PR 阻断"链路。
+**Test-Agent 现状评估**：L1-L7 全部串通。L7 已通过 `ci_contract_gate.py` 实现自动检测 OpenAPI spec 变更 → 生成契约 → CI job 验证阻断。
 
-**Phase 2 收尾点**：把 L7 契约测试串成"PR 改了 OpenAPI spec → 自动跑 contract → 不通过阻断合入"链路。
+**Phase 2 收尾点**：✅ 已完成。L7 契约链路已串成"PR 改了 OpenAPI spec → 自动跑 contract → 不通过阻断合入"。
 
 ### 3. Shift-Right（右移）— 生产即测试环境
 
