@@ -21,7 +21,7 @@ class ResultStore:
         self._max = max_entries
         self._ttl = ttl_seconds
         self._store: OrderedDict[str, tuple[float, dict[str, Any]]] = OrderedDict()
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
     def put(self, run_id: str, result: dict[str, Any]) -> None:
         """Store a result. Evicts oldest if over capacity."""

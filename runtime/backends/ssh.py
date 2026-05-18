@@ -27,7 +27,7 @@ class SSHBackend(BaseExecutionEnv):
         except ImportError as e:
             raise RuntimeError("asyncssh not installed; pip install asyncssh") from e
         self._conn = await asyncssh.connect(
-            self.host, port=self.port, username=self.user, client_keys=[self.key] if self.key else None, password=self.password, known_hosts=()
+            self.host, port=self.port, username=self.user, client_keys=[self.key] if self.key else None, password=self.password, known_hosts=None
         )
         logger.info("SSH connected: {}@{}:{}", self.user, self.host, self.port)
 
@@ -35,7 +35,7 @@ class SSHBackend(BaseExecutionEnv):
         start = time.monotonic()
         full = cmd
         if cwd:
-            full = f"cd {shlex.quote(cwd)} && {cmd}"
+            full = f"cd {shlex.quote(cwd)} && {shlex.quote(cmd)}"
         if env:
             env_str = " ".join(f"{shlex.quote(k)}={shlex.quote(v)}" for k, v in env.items())
             full = f"{env_str} {full}"

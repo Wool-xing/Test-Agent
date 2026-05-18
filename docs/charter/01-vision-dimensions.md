@@ -25,7 +25,7 @@
 | `03-技能定义/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
 | `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `05-代码示例/` | utils（49 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
+| `05-代码示例/` | utils（74 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
 | `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---
@@ -118,9 +118,9 @@
 | 踩踏推演器 | 群体情绪与系统反馈的正反馈回路 | 簇 9 | chaos_helper 扩展 | ❌ |
 | 司法证据包生成器 | 决策链、模型版本、数据集打包 | 簇 9 | dora_metrics + decisions/ 打包脚本 | ⚪ |
 | 禁忌矩阵 | 跨文化禁忌词/色/数/节日组合 | 簇 9 | i18n_checker 本地化共建 | ❌ |
-| Bug 多适配引擎 | 5 套 tracker 切换 | 工程层 | `utils/bug_tracker_*.py` | ✅ |
+| Bug 多适配引擎 | 5 套 tracker 切换 | 工程层 | `utils/bug_tracker_base.py` + `zentao_bug_manager.py` + `jira_bug_manager.py` + `github_bug_manager.py` + `linear_bug_manager.py` + `webhook_bug_manager.py` | ✅ |
 | AgentChat 协调器 | 讨论触发 / 中枢路由 / 反问留档 | 工程层 | test-lead + `discussions/` | ✅ |
-| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `install.sh` + frontmatter requires_layer | ✅ |
+| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `requirements/` (base/mobile/desktop/visual/system/ai/perf 七文件) + `install.sh` | ✅ |
 | darwin-skill 自进化 | skill 文本结构棘轮优化 | 工程/元层 | `.claude/skills/darwin-skill/` | ✅ |
 
 ---

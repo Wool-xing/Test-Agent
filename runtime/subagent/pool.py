@@ -7,9 +7,11 @@ import threading
 
 from loguru import logger
 
+import os
+
 _executor: concurrent.futures.ThreadPoolExecutor | None = None
 _lock = threading.Lock()
-_DEFAULT_WORKERS = 32
+_DEFAULT_WORKERS = min(32, (os.cpu_count() or 4))
 
 
 def get_pool() -> concurrent.futures.ThreadPoolExecutor:

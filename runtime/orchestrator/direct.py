@@ -72,8 +72,9 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     pending = set(by_id.keys())
     futures: dict[str, Future] = {}
     circuit_broken = False
-    pool = ThreadPoolExecutor(max_workers=max_workers)
+    pool = None
     try:
+        pool = ThreadPoolExecutor(max_workers=max_workers)
         with span("flow.run", run_id=run_id, nodes=len(ordered)):
             while pending:
                 # circuit breaker: stop submitting new work
@@ -149,7 +150,8 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                                 circuit_broken = True
                     pending.discard(nid)
     finally:
-        pool.shutdown(wait=True)
+        if pool is not None:
+            pool.shutdown(wait=True)
 
     completed = len(results)
     log.info("DAG progress: {}/{} nodes done, {} failed, {} skipped", completed, len(ordered), len(failures), len(skipped))

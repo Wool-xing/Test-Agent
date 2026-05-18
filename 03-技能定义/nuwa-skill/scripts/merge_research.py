@@ -98,7 +98,10 @@ def main():
             rows.append(f"│ {label:<12} │ {'❌ 缺失':<8} │ {'—':<24} │")
             continue
 
-        content = md_file.read_text(encoding='utf-8')
+        try:
+            content = md_file.read_text(encoding='utf-8')
+        except UnicodeDecodeError:
+            content = md_file.read_text(encoding='gbk')
         files[key] = content
         stats = count_sources(content)
         findings = extract_key_findings(content)

@@ -1,0 +1,11 @@
+# ===== visual — 视觉/游戏测试 =====
+# 安装: pip install -r requirements/visual.txt
+-r base.txt
+
+opencv-python==4.13.0.92
+scikit-image==0.24.0
+imagehash==4.3.2
+pytesseract==0.3.10
+Pillow==12.2.0
+# airtest==1.4.3        # 冲突 — 需隔离 venv
+# paddleocr==2.7.0.3    # 备选 OCR（重，按需）

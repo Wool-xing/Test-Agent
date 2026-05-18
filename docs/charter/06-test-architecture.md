@@ -52,14 +52,14 @@
 | L1 | **需求阶段** | `requirements-analyst` 双轨输出（MD + JSON）+ 风险矩阵 | 弱（评审） |
 | L2 | **设计阶段** | `testcase-designer` 等价类/边界值/状态迁移/配对测试 + 风险矩阵 | 弱（评审） |
 | L3 | **IDE 编码时** | ruff + mypy + IDE 实时提示 | 强（编辑器红线） |
-| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 16/32/49 文件统计 | 强（阻断 commit） |
+| L4 | **commit 前 (pre-commit)** | gitleaks + ruff + private-source 防护 + .env 防护 + 16/32/67 文件统计 | 强（阻断 commit） |
 | L5 | **PR gate** | CodeQL + pip-audit + safety + ci.yml 全套 | 强（阻断合入） |
-| L6 | **静态分析** | Bandit（Python SAST）+ ZAP/Burp Pro（DAST） | 中（发现/修） |
-| L7 | **契约测试** | `utils/contract_test.py` consumer-side / provider-side | 强（CI 阻断） |
+| L6 | **静态分析** | `security_scanner.py`（已实现）+ Bandit/ZAP/Burp Pro（Phase 2 CI 集成） | 中（发现/修） |
+| L7 | **契约测试** | `utils/ci_contract_gate.py` + `contract_test_generator.py` + CI job | 强（CI 阻断） |
 
-**Test-Agent 现状评估**：L1-L5 已串通；L6 在 utils 已有 `security_scanner.py`；L7 utils 存在但未串成"自动 PR 阻断"链路。
+**Test-Agent 现状评估**：L1-L7 全部串通。L7 已通过 `ci_contract_gate.py` 实现自动检测 OpenAPI spec 变更 → 生成契约 → CI job 验证阻断。
 
-**Phase 2 收尾点**：把 L7 契约测试串成"PR 改了 OpenAPI spec → 自动跑 contract → 不通过阻断合入"链路。
+**Phase 2 收尾点**：✅ 已完成。L7 契约链路已串成"PR 改了 OpenAPI spec → 自动跑 contract → 不通过阻断合入"。
 
 ### 3. Shift-Right（右移）— 生产即测试环境
 
@@ -133,7 +133,7 @@
 
 | Phase | 触发条件 | 标志性交付 |
 |------|---------|----------|
-| **Phase 1**（已完成 V1.0.0-V1.32.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 完成 | 16 expert (11p+5s) + 32 skill (23p+7s+0r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
+| **Phase 1**（已完成 V1.0.0-V1.36.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 完成 | 16 expert (11p+5s) + 32 skill (23p+7s+0r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
 | **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 + skill rollout 继续 |
 | **Phase 3** | Phase 2 全交付 + 接入 ≥ 2 行业 | 合成监控 + canary/feature flag + 统一 dashboard + 沉默故障 + 缺席者注入 |
 | **Phase 4** | 接入合规行业（金融/医疗/司法）| 证据链司法可采信打包 + 数字考古学家 + AI 测试深化 |
@@ -145,7 +145,7 @@
 |------|------|-----------|---------|
 | **金字塔单元层** | 弱（utils 自身无测试） | Phase 2 | `tests/test_utils_*.py` 全覆盖 + 变异测试反向用 |
 | **Shift-Left L7 契约链路** | utils 雏形未串通 | Phase 2 | OpenAPI 改动 → contract → PR 阻断 |
-| **门禁引擎抽象** | 阈值写死代码 | Phase 2 | `utils/quality_gate_engine.py` + yaml 驱动 |
+| **门禁引擎抽象** | 阈值写死代码 | Phase 2 | ✅ `utils/quality_gate_engine.py` + `04-配置文件/quality_gates.yaml` 驱动 |
 | **Shift-Right R1 合成监控** | 缺 | Phase 3 | `utils/synthetic_monitor.py` |
 | **Shift-Right R4 canary + feature flag** | 缺 | Phase 3 | `utils/canary_runner.py` + `feature_flag_validator.py` |
 | **可观测统一 dashboard** | 散落 HTML 报告 | Phase 3 | DORA + 缺陷密度 + flaky + 变异分数 → Grafana / 静态 HTML 模板 |

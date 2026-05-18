@@ -41,7 +41,7 @@ def export_datadog_dashboard(
                 "definition": {
                     "type": "query_value",
                     "title": "MTTD (min)",
-                    "requests': [{'q": f"avg:test.mttd_minutes{{{decision.get('mttd_minutes', 0)}}}", "aggregator": "avg"}],
+                    "requests": [{"q": f"avg:test.mttd_minutes{{{decision.get('mttd_minutes', 0)}}}", "aggregator": "avg"}],
                 }
             },
             {

@@ -8,6 +8,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List
 
+from loguru import logger
+
 NodeHook = Callable[[str, Dict[str, Any]], None]
 """Hook signature: (node_id, node_ctx) → None.
 
@@ -35,21 +37,21 @@ class HookRegistry:
             try:
                 fn(node_id, ctx)
             except Exception:
-                pass  # hooks must not break execution
+                logger.debug("hook {}.{} failed for node {}", getattr(fn, '__module__', ''), getattr(fn, '__name__', repr(fn)), node_id)
 
     def fire_after(self, node_id: str, ctx: Dict[str, Any]) -> None:
         for fn in self.after:
             try:
                 fn(node_id, ctx)
             except Exception:
-                pass
+                logger.debug("hook {}.{} failed for node {}", getattr(fn, '__module__', ''), getattr(fn, '__name__', repr(fn)), node_id)
 
     def fire_error(self, node_id: str, ctx: Dict[str, Any]) -> None:
         for fn in self.on_error:
             try:
                 fn(node_id, ctx)
             except Exception:
-                pass
+                logger.debug("hook {}.{} failed for node {}", getattr(fn, '__module__', ''), getattr(fn, '__name__', repr(fn)), node_id)
 
 
 # Global singleton — callers can replace per-run with a fresh instance.

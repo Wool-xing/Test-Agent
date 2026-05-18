@@ -1,6 +1,6 @@
 # 02-专家定义 索引
 
-**16 个 Agent**,按域分三类:核心通用流程 9 + 平台专项扩展 5 + 垂直领域 2;按实装状态:**11 production + 5 script + 0 rollout**(详见根目录 [ROADMAP.md](../ROADMAP.md))。
+**16 个 Agent**,按域分三类:核心通用流程 9 (含 test-lead 协调者) + 平台专项扩展 5 + 垂直领域 2。test-lead 自身不计入被协调专家清单时核心为 8 位。按实装状态:**11 production + 5 script + 0 rollout**(详见根目录 [ROADMAP.md](../ROADMAP.md))。
 
 顶层导航见 [00-项目导航.md](../00-项目导航.md)。
 

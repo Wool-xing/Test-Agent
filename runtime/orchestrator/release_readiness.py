@@ -7,6 +7,7 @@ Does NOT modify test_lead.py — usable independently.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 
@@ -116,7 +117,7 @@ def _cli() -> None:
 
     if args.from_summary:
         import json as _json
-        data = _json.loads(args.from_summary.read_text(encoding="utf-8"))
+        data = _json.loads(Path(args.from_summary).read_text(encoding="utf-8"))
         result = score_from_run_summary(data)
     else:
         result = score_readiness(

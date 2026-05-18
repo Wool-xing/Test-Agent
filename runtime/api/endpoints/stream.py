@@ -44,9 +44,7 @@ _streams: dict[str, RunStream] = {}
 
 
 def get_or_create_stream(run_id: str) -> RunStream:
-    if run_id not in _streams:
-        _streams[run_id] = RunStream(run_id)
-    return _streams[run_id]
+    return _streams.setdefault(run_id, RunStream(run_id))
 
 
 def push_node_event(run_id: str, node_id: str, status: str, output: dict | None = None) -> None:

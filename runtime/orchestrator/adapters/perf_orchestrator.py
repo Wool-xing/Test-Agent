@@ -11,6 +11,7 @@ Features:
 from __future__ import annotations
 
 import json
+import os
 import statistics
 import subprocess
 import sys
@@ -88,6 +89,7 @@ class PerfOrchestrator:
         errors = 0
 
         def worker():
+            nonlocal errors
             t0 = time.time()
             try:
                 ok = fn()
@@ -106,7 +108,6 @@ class PerfOrchestrator:
                 if len(futures) > concurrent * 2:
                     for f in as_completed(futures[:concurrent]):
                         if f.result():
-                            nonlocal success
                             success += 1
                     futures = futures[concurrent:]
 

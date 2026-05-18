@@ -33,6 +33,41 @@ jobs:
       - name: 语法检查（py_compile）
         run: |
           python -m compileall 05-代码示例/ -q
+          python -m compileall runtime/ -q
+
+  # ===== 1b. L7 契约门禁 (Shift-Left: OpenAPI 变更 → 契约验证) =====
+  contract-gate:
+    name: L7 契约门禁
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install jsonschema requests
+
+      - name: L7 契约检测
+        run: |
+          python 05-代码示例/ci_contract_gate.py \
+            --base-ref "origin/${{ github.base_ref }}" \
+            --consumer "test-agent-ci" \
+            --output-json workspace/contracts/ci-contract-result.json || {
+              echo "::warning::Contract gate failed — check workspace/contracts/ for details"
+            }
+
+      - name: 上传契约产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contracts
+          path: workspace/contracts/
+          retention-days: 7
 
   # ===== 2. 依赖漏洞扫描 =====
   security-audit:

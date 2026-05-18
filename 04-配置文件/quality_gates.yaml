@@ -1,0 +1,30 @@
+# Quality Gates Configuration (YAML-driven)
+# 门禁引擎 quality_gate_engine.py 读取此文件。
+# 用户修改此文件即可调整门禁阈值，无需改代码。
+
+smoke:
+  min_pass_rate_pct: 95
+
+regression:
+  min_pass_rate_pct: 90
+  min_coverage_pct: 80
+  max_flaky_pct: 5
+
+performance_ci_quick:
+  min_tps: 20
+  max_p95_ms: 800
+  max_avg_ms: 400
+  max_error_pct: 1.0
+
+performance_full:
+  min_tps: 100
+  max_p95_ms: 500
+  max_avg_ms: 200
+  max_error_pct: 1.0
+  max_baseline_regression_pct: 20
+
+release:
+  require_smoke: true
+  require_regression: true
+  require_perf_full: false
+  require_bug_review: true

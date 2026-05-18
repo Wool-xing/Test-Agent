@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import secrets
 import tempfile
 import threading
 from pathlib import Path
@@ -48,7 +49,7 @@ async def auth_middleware(request: Request, call_next: Any) -> Any:
     token = _settings.api_auth_token
     if token and request.url.path not in ("/health", "/docs", "/openapi.json"):
         auth = request.headers.get("Authorization", "")
-        if not auth or auth.removeprefix("Bearer ") != token:
+        if not auth or not secrets.compare_digest(auth.removeprefix("Bearer "), token):
             return JSONResponse(status_code=401, content={"detail": "unauthorized"})
     return await call_next(request)
 
@@ -93,7 +94,7 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 
 
 @app.post("/run/file", response_model=RunCreated)
-async def run_file(file: UploadFile = File(..., max_length=50_000_000), extra: str = Form("")) -> RunCreated:
+async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]
     suffix = Path(file.filename or "upload").suffix.lower()
     allowed = {".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip", ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml", ".py", ".js", ".ts", ".apk", ".ipa"}
     if suffix not in allowed:
@@ -105,10 +106,7 @@ async def run_file(file: UploadFile = File(..., max_length=50_000_000), extra: s
     if extra:
         art.text = (art.text or "") + "\n\n# User note:\n" + extra
     run_id, decision = _kernel.submit(art)
-    # Kick off in same process pool; fire-and-forget for v1 simplicity.
-    import threading
-
-    threading.Thread(target=_run_in_background, args=(run_id, decision), daemon=True).start()
+    bg.add_task(_run_in_background, run_id, decision)
     return RunCreated(
         run_id=run_id,
         decision_summary={
@@ -226,12 +224,12 @@ def _run_in_background(run_id: str, decision) -> None:
     try:
         summary = _kernel.execute_sync(run_id, decision)
         with _run_lock:
-            _run_results[run_id] = summary
+            _run_results.put(run_id, summary)
     except Exception:  # noqa: BLE001
         logger.exception("background run {} failed", run_id)
         with _run_lock:
-            _run_results[run_id] = {
+            _run_results.put(run_id, {
                 "error": f"run {run_id} failed — check logs at workspace/ or run with --debug",
                 "run_id": run_id,
                 "failed": 1, "succeeded": 0, "total": 0, "status": "error",
-            }
+            })

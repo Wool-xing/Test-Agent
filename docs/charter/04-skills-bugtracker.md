@@ -70,10 +70,10 @@ V1.0.0 darwin-skill **不消费**项目运行数据（`discussions/` / `decision
 | 适配器 | 状态 | 配置字段 | severity 映射 |
 |--------|------|---------|--------------|
 | **zentao**（默认） | ✅ V1.0.0 | `ZENTAO_URL / ZENTAO_USER / ZENTAO_TOKEN` | severity 1=P0 / 2=P1 / 3=P2 / 4=P3 |
-| **jira** | ✅ V1.0.0 | `JIRA_URL / JIRA_USER / JIRA_TOKEN / JIRA_PROJECT_KEY` | Highest=P0 / High=P1 / Medium=P2 / Low=P3 |
-| **github** | ✅ V1.0.0 | `GITHUB_TOKEN / GITHUB_REPO` | label `priority:p0..p3` |
-| **linear** | ✅ V1.0.0 | `LINEAR_API_KEY / LINEAR_TEAM_ID` | priority 1=P0 / 2=P1 / 3=P2 / 4=P3 |
-| **webhook** | ✅ V1.0.0 | `BUG_WEBHOOK_URL`（POST JSON） | 调用方自定义 |
+| **jira** | ⚪ Phase 2 | `JIRA_URL / JIRA_USER / JIRA_TOKEN / JIRA_PROJECT_KEY` | Highest=P0 / High=P1 / Medium=P2 / Low=P3 |
+| **github** | ⚪ Phase 2 | `GITHUB_TOKEN / GITHUB_REPO` | label `priority:p0..p3` |
+| **linear** | ⚪ Phase 2 | `LINEAR_API_KEY / LINEAR_TEAM_ID` | priority 1=P0 / 2=P1 / 3=P2 / 4=P3 |
+| **webhook** | ⚪ Phase 2 | `BUG_WEBHOOK_URL`（POST JSON） | 调用方自定义 |
 
 ### 2. 切换方式
 

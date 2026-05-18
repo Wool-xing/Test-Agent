@@ -46,8 +46,11 @@ def load_local() -> list[Entry]:
         return []
     out: list[Entry] = []
     for e in data.get("entries", []):
+        url = e.get("source_url", "")
+        if url and not url.startswith("https://"):
+            logger.warning("marketplace entry {} has non-https source_url: {}", e.get("name", "?"), url)
         out.append(Entry(
-            name=e["name"], version=e["version"], lane=e["lane"], source_url=e["source_url"],
+            name=e["name"], version=e["version"], lane=e["lane"], source_url=url,
             sha256=e.get("sha256", ""), signature=e.get("signature", ""), license=e.get("license", ""),
             safety_score=int(e.get("safety_score", 0)), confidence=e.get("confidence", "llm-draft-unreviewed"),
             source_tier=e.get("source_tier", "low"), installed_at=e.get("installed_at"),

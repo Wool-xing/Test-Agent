@@ -1,4 +1,4 @@
-"""Real LLM-driven skill runners (V1.32.5 · ALL 14/14 rollout complete).
+"""Real LLM-driven skill runners (V1.36.0 · ALL 14/14 rollout complete).
 
 16 production runners across 3 domains:
 - General: mobile-test, visual-test, system-test, eval-harness

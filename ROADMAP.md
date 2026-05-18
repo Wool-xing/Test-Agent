@@ -1,7 +1,7 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.32.5 (**expert rollout 收尾 + skill rollout 完成（16/16）**)
+> 当前状态:V1.36.0 (**expert rollout 收尾 + skill rollout 完成（16/16）**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
@@ -129,6 +129,14 @@
 
 ---
 
+## V1.34-V1.36 能力扩展
+
+- **V1.34**: script_bridge.py 桥接 5 独立脚本进 orchestrator pipeline
+- **V1.35**: 11 深度审计模块 (flaky guard / API security v2 / data factory v2 / perf orchestrator / event harness / visual regression / ML prioritizer / differential tester / EU AI Act / supply chain)
+- **V1.36**: 6 延期模块 (chaos v2 / state machine v2 / DB test v2 / BDD v2 / carbon scheduler / canary config) + CVE-2025-71176 fix + 深度审查65发现全修
+
+---
+
 ## V2.x vision — 2 skill(暂留方法论参考形态)
 
 | Skill | 当前形态 | V2 路线 |
@@ -193,4 +201,14 @@ V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.29.0 | 2026-05-16 | **skill rollout #8** — pentest-exploit + pentest-report 双 skill LLM-driven 生产落地 (exploit: 沙箱内验证 PoC + 不可破坏性约束 · report: working PoC 嵌入 + CWE/CVSS/PoC/修复 4 维) | 16 expert + 18/32 production |
 | V1.30.0 | 2026-05-16 | **skill rollout #9** — automotive-test + automotive-can-bus-test 双 skill LLM-driven 生产落地 (主编排: 10 阶段 HARA→报告 · CAN: CAN/CAN-FD/SOME-IP 协议一致性 + dbc 解析) | 16 expert + 20/32 production |
 | V1.31.0 | 2026-05-16 | **skill rollout #10 (收尾)** — automotive-adas-scenario + automotive-ota-update-test + automotive-hil-loop-test 3 skill LLM-driven 生产落地 (ADAS: AEB/ACC/LKA + CARLA 仿真 · OTA: 6 校验 + UN R156/GB 44496 合规 · HIL: MIL/SIL/HIL 三环 + dSPACE). **V1.x rollout 完成 — 23/32 production + 7 script + 0 rollout + 2 vision.** | 16 expert + 23/32 production (0 rollout 待) |
+| V1.32.0 | 2026-05-17 | 深审32发现全修 + 版本号全同步 + 私源泄漏清洗 | 16 expert + 23/32 production |
+| V1.32.1 | 2026-05-17 | CONTRIBUTING skill count 33→32 fix + 版本号同步 | 16 expert + 23/32 production |
+| V1.32.2 | 2026-05-17 | Security hardening batch: CWE-78 fix + credential removal + CORS + WebSocket leak + XML escape | 16 expert + 23/32 production |
+| V1.32.3 | 2026-05-17 | Refactor: _stub_response dispatch table + fuzzer ALL_PAYLOADS hoist | 16 expert + 23/32 production |
+| V1.32.4 | 2026-05-17 | Honesty pass: remove aspirational numbers + split overlong functions | 16 expert + 23/32 production |
+| V1.32.5 | 2026-05-17 | Security: shell injection + hardcoded creds + silent failures | 16 expert + 23/32 production |
+| V1.33.0 | 2026-05-17 | MASTER_PLAN 38/38 items across 8 phases complete | 16 expert + 23/32 production |
+| V1.34.0 | 2026-05-18 | Phase 1-5 initial audit: 18 additions (settings/IDE/Docker/Prometheus/streaming/PBT/contract/schema fuzz/compliance/DORA) | 16 expert + 23/32 production |
+| V1.35.0 | 2026-05-18 | Deep audit 11 core modules (flaky guard/API security v2/data factory v2/perf/e2e event harness/visual regression/ML prioritizer/differential/EU AI Act/supply chain) | 16 expert + 23/32 production |
+| V1.36.0 | 2026-05-18 | Remaining 6 deferred modules + CVE-2025-71176 fix + 深度审查65发现全修 | 16 expert + 30/32 active (23 production + 7 script) |
 | V2.0.0 | TBD | V2.x 路线图启动 | 16/16 + V2 |
