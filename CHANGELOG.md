@@ -19,10 +19,14 @@
 - silent_failure_detector.py: 沉默故障检测 (Phase 3.2) — threshold drift + Mann-Kendall trend + OLS slope + sliding window + multi-source (tracing/web_vitals/prometheus) + batch_detect()
 - 21 unit tests for silent_failure_detector (runtime/tests/test_utils_silent_failure.py)
 
+- absentee_scenario_injector.py: 缺席者场景注入 (Phase 3.3) — 9 absentee groups (visual/motor/hearing/cognitive/elderly/minor/offline/crisis/non-native) × 21 canonical scenarios + charter generation + coverage reporting
+- 20 unit tests for absentee_scenario_injector (runtime/tests/test_utils_absentee.py)
+
 ### Changed
 - coverage matrix: 伦理/偏见审计 ✅ (was Phase 3)
 - coverage matrix: 沉默故障检测 ✅ (was Phase 3)
-- vision-dimensions: 公平性审计器 + 沉默故障探测器 ✅
+- coverage matrix: 缺席者场景注入 ✅ (was Phase 3) — PHASE 3 COMPLETE
+- vision-dimensions: 公平性审计器 + 沉默故障探测器 + 缺席者场景注入器 ✅
 - 14-AI模型测试.md: fairness section expanded with 6-metric audit example
 
 _后续累积变更入此节;切版本时移到下方版本节。_
