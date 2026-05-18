@@ -26,6 +26,10 @@
 - 39 unit tests for evidence_chain (runtime/tests/test_utils_evidence_chain.py)
 - ai_validator.run_evidence_chain_audit(): integrated pipeline calling evidence_chain
 
+- taboo_matrix.py: 神圣性与跨文化禁忌矩阵 (Phase 5) — 135 entries across 16 locales in 5 dimensions: taboo words (50), taboo colors (23), taboo numbers (22), taboo holiday periods (26), sacred context rules (14)
+- i18n_checker.py Phase 5 extensions: audit_taboo_words(), audit_taboo_colors(), audit_taboo_numbers(), audit_taboo_holidays(), audit_sacred_contexts(), run_taboo_audit() — combined entry point with structured JSON report
+- 84 unit tests for Phase 5: test_utils_taboo_matrix.py (30 tests) + test_utils_i18n_taboo.py (54 tests)
+
 ### Changed
 - coverage matrix: 伦理/偏见审计 ✅ (was Phase 3)
 - coverage matrix: 沉默故障检测 ✅ (was Phase 3)
