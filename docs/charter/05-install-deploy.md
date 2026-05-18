@@ -248,7 +248,7 @@ your-test-project/
 ├── .claude/{agents,skills}/           ← 16 agent + 32 skill（业务） + 3 元 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
-├── utils/                             ← 76 个 .py + __init__
+├── utils/                             ← 77 个 .py + __init__
 ├── src/                               ← 被测系统源码（cov 指向）
 ├── workspace/
 │   ├── 测试计划/  需求分析/  测试用例/  测试数据/
