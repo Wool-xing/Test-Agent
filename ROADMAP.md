@@ -1,7 +1,7 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.36.0 (**expert rollout 收尾 + skill rollout 完成（16/16）**)
+> 当前状态:V1.41.0 (**expert rollout 收尾 + skill rollout 完成（16/16）+ Phase 3 完成 + Phase 4 完成**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
@@ -215,4 +215,5 @@ V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.38.0 | 2026-05-18 | Phase 3.1 伦理/偏见审计: fairness_auditor.py (dataset bias + 6 model fairness metrics + intersectional + decision audit) + 20 tests + ai_validator bias audit pipeline | 16 expert + 30/32 active · 1/3 Phase 3 done |
 | V1.39.0 | 2026-05-18 | Phase 3.2 沉默故障检测: silent_failure_detector.py (threshold drift + Mann-Kendall + OLS trend + sliding window + multi-source batch) + 21 tests + tracing/web_vitals/prometheus collectors | 16 expert + 30/32 active · 2/3 Phase 3 done |
 | V1.40.0 | 2026-05-18 | Phase 3.3 缺席者场景注入: absentee_scenario_injector.py (9 absentee groups × 21 canonical scenarios + charter generation + coverage reporting) + 20 tests | 16 expert + 30/32 active · PHASE 3 COMPLETE |
+| V1.41.0 | 2026-05-19 | Phase 4 证据链可采信性: evidence_chain.py (SHA-256 hash chain + multi-source collection + ISO 27001/SOC2/NIST 800-53/GDPR compliance mapping + JSON/Markdown export + integrity verification) + 39 tests + ai_validator evidence chain audit pipeline | 16 expert + 30/32 active · PHASE 4 DELIVERED |
 | V2.0.0 | TBD | V2.x 路线图启动 | 16/16 + V2 |

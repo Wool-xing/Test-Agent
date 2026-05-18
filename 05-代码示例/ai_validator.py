@@ -209,6 +209,44 @@ def run_silent_failure_audit(
     }
 
 
+# ===== 证据链打包 =====
+
+
+def run_evidence_chain_audit(
+    decisions_dir: Optional[str] = None,
+    output_dir: str = "workspace/执行日志/evidence",
+) -> Dict:
+    """Build evidence chain package from workspace and export JSON + custody report."""
+    from evidence_chain import (
+        build_evidence_chain,
+        export_package,
+        export_chain_of_custody_report,
+        verify_chain_integrity,
+        ci_summary,
+    )
+
+    pkg = build_evidence_chain(
+        decisions_dir=Path(decisions_dir) if decisions_dir else None,
+    )
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    json_path = export_package(pkg, Path(output_dir) / f"{pkg.package_id}.json")
+    md_path = export_chain_of_custody_report(
+        pkg, Path(output_dir) / f"{pkg.package_id}_custody.md")
+
+    verification = verify_chain_integrity(pkg)
+    return {
+        "package_id": pkg.package_id,
+        "items": len(pkg.chain.items),
+        "integrity_verified": verification["pass"],
+        "tampered_count": len(verification["tampered"]),
+        "compliance_standards": sorted(pkg.compliance.keys()),
+        "json_export": json_path,
+        "md_report": md_path,
+        "summary": ci_summary(pkg),
+    }
+
+
 # ===== LLM 应用评估 =====
 
 def llm_eval(endpoint: str, prompt: str, expected_format: Optional[str] = None,

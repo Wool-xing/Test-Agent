@@ -22,11 +22,17 @@
 - absentee_scenario_injector.py: 缺席者场景注入 (Phase 3.3) — 9 absentee groups (visual/motor/hearing/cognitive/elderly/minor/offline/crisis/non-native) × 21 canonical scenarios + charter generation + coverage reporting
 - 20 unit tests for absentee_scenario_injector (runtime/tests/test_utils_absentee.py)
 
+- evidence_chain.py: 证据链可采信性打包器 (Phase 4) — SHA-256 hash chain + multi-source collection (decisions/DORA/tracing/baselines/history) + ISO 27001/SOC2/NIST 800-53/GDPR compliance mapping + JSON package + Markdown custody report + integrity verification
+- 39 unit tests for evidence_chain (runtime/tests/test_utils_evidence_chain.py)
+- ai_validator.run_evidence_chain_audit(): integrated pipeline calling evidence_chain
+
 ### Changed
 - coverage matrix: 伦理/偏见审计 ✅ (was Phase 3)
 - coverage matrix: 沉默故障检测 ✅ (was Phase 3)
 - coverage matrix: 缺席者场景注入 ✅ (was Phase 3) — PHASE 3 COMPLETE
+- coverage matrix: 证据链可采信性 ✅ (was Phase 4) — PHASE 4 DELIVERED
 - vision-dimensions: 公平性审计器 + 沉默故障探测器 + 缺席者场景注入器 ✅
+- vision-dimensions: 司法证据包生成器 ✅ (was ⚪)
 - 14-AI模型测试.md: fairness section expanded with 6-metric audit example
 
 _后续累积变更入此节;切版本时移到下方版本节。_
