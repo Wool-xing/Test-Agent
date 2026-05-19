@@ -23,7 +23,7 @@ def run_bandit(target_path: str, output: Optional[str] = None) -> Dict:
     output = output or "workspace/执行日志/security/bandit_report.json"
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     cmd = ["bandit", "-r", target_path, "-f", "json", "-o", output, "-q"]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if not Path(output).exists():
         return {"error": "bandit 输出无文件", "stderr": proc.stderr}
     data = json.loads(Path(output).read_text(encoding="utf-8"))
@@ -42,7 +42,7 @@ def run_bandit(target_path: str, output: Optional[str] = None) -> Dict:
 def run_safety_check(requirements_file: str = "requirements.txt") -> Dict:
     """Safety 检查 pip 依赖 CVE。需 pip install safety"""
     cmd = ["safety", "check", "-r", requirements_file, "--json"]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     try:
         data = json.loads(proc.stdout) if proc.stdout else {"vulnerabilities": []}
     except json.JSONDecodeError:

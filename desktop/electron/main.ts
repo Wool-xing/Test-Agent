@@ -24,14 +24,8 @@ function getBackendPath(): string {
 function startBackend(): Promise<void> {
   return new Promise((resolve, reject) => {
     const isDev = !app.isPackaged;
-    const cmd = isDev
-      ? "python"
-      : getBackendPath();
-    const args = isDev
-      ? ["-m", "runtime.cli.main", "run", "--help"] // dev: use CLI
-      : [];
 
-    // In dev mode, start uvicorn directly
+    // In dev mode, start uvicorn directly via python -c
     const devArgs = isDev
       ? ["-c", `import uvicorn; uvicorn.run('runtime.api.main:app',host='127.0.0.1',port=${BACKEND_PORT})`]
       : [];
