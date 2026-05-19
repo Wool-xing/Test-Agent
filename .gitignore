@@ -19,6 +19,7 @@ htmlcov/
 workspace/测试数据/
 workspace/执行日志/
 workspace/测试报告/
+workspace/_outputs/
 workspace/feedback/
 workspace/自动化脚本/
 
