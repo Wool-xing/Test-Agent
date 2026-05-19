@@ -20,6 +20,7 @@ import concurrent.futures
 import json
 import os
 import time
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -105,7 +106,7 @@ def test_foreign_key_integrity(db_url: str, table: str, fk_column: str,
 
     try:
         # Try to insert row with invalid FK
-        invalid_fk = str(uuid.uuid4().int)[:10] if 'uuid' in dir() else "99999999"
+        invalid_fk = str(uuid.uuid4().int)[:10]
         try:
             conn.execute(text(f"INSERT INTO {table} ({fk_column}) VALUES (:val)"),
                         {"val": int(invalid_fk)})
@@ -191,9 +192,6 @@ def test_pool_exhaustion(db_url: str, pool_size: int = 5) -> dict:
     finally:
         for c in connections:
             c.close()
-
-
-import uuid
 
 
 # ═══════════════════════════════════════════════════════════════

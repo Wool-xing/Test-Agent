@@ -1,6 +1,6 @@
 # essence_watcher 选择性应用 policy(主宪章 §29)
 #
-# 实际部署:cp 到 D:/项目文件/_精髓库/_apply_policy.yaml 启用
+# 实际部署:cp 到 <essence-repo>/_apply_policy.yaml 启用
 # 默认所有 delta 仅入精髓库,不动 Test-Agent.
 
 # 自动提议入 Test-Agent(待审)

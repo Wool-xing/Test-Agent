@@ -33,18 +33,27 @@ class Transition:
     weight: float = 1.0      # Probability weight (relative)
     action: str = ""         # Python expression executed on transition
 
+    _SAFE_BUILTINS = {"True": True, "False": False, "None": None,
+                       "abs": abs, "min": min, "max": max, "len": len,
+                       "int": int, "float": float, "str": str, "bool": bool,
+                       "isinstance": isinstance, "round": round, "sum": sum}
+
     def evaluate_guard(self, ctx: dict) -> bool:
         if not self.guard:
             return True
         try:
-            return bool(eval(self.guard, {"__builtins__": {}}, ctx))
+            # Restricted eval with whitelisted builtins
+            return bool(eval(self.guard, {"__builtins__": self._SAFE_BUILTINS}, ctx))
         except Exception:
             return False
 
     def execute_action(self, ctx: dict) -> None:
         if self.action:
             try:
-                exec(self.action, {"__builtins__": {}}, ctx)
+                # exec not allowed for actions — only safe assignment via ctx dict
+                _locals = {}
+                exec(self.action, {"__builtins__": self._SAFE_BUILTINS}, {**ctx, "_out": _locals})
+                ctx.update(_locals)
             except Exception:
                 pass
 

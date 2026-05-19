@@ -79,8 +79,11 @@ def _calc_psi(expected, actual, buckets: int = 10) -> float:
     """PSI 计算（Population Stability Index）"""
     import numpy as np
     breakpoints = np.linspace(0, 1, buckets + 1)
-    e_pct, _ = np.histogram(expected.rank(pct=True), breakpoints)
-    a_pct, _ = np.histogram(actual.rank(pct=True), breakpoints)
+    # Compute percentile ranks via numpy (avoid pandas-only .rank(pct=True))
+    e_rank = np.searchsorted(np.sort(expected), expected, side='right') / len(expected)
+    a_rank = np.searchsorted(np.sort(actual), actual, side='right') / len(actual)
+    e_pct, _ = np.histogram(e_rank, breakpoints)
+    a_pct, _ = np.histogram(a_rank, breakpoints)
     e_pct = e_pct / max(len(expected), 1)
     a_pct = a_pct / max(len(actual), 1)
     psi = 0.0
@@ -162,41 +165,91 @@ def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
 
 def run_silent_failure_audit(
     output_dir: str = "workspace/执行日志/ai-silent-failure",
-    tracing_log: Optional[str] = None,
-    web_vitals_log: Optional[str] = None,
-    prometheus_counter_log: Optional[str] = None,
-    prometheus_gauge_log: Optional[str] = None,
+    trace_durations_ms: Optional[List[float]] = None,
+    web_vitals_data: Optional[Dict] = None,
+    prometheus_counter_data: Optional[Dict] = None,
+    prometheus_gauge_data: Optional[Dict] = None,
     custom_configs: Optional[List] = None,
 ) -> Dict:
     """Run silent failure detection across all data sources and return summary dict."""
+    from datetime import datetime, timezone
     from silent_failure_detector import (
-        batch_detect,
         collect_from_tracing,
         collect_from_web_vitals,
         collect_from_prometheus_counter,
         collect_from_prometheus_gauge,
         export_report,
         ci_summary,
+        DriftResult,
+        SilentFailureReport,
     )
 
-    configs: list = []
+    results: list[DriftResult] = []
 
-    if tracing_log:
-        configs.extend(collect_from_tracing(tracing_log))
-    if web_vitals_log:
-        configs.extend(collect_from_web_vitals(web_vitals_log))
-    if prometheus_counter_log:
-        configs.extend(collect_from_prometheus_counter(prometheus_counter_log))
-    if prometheus_gauge_log:
-        configs.extend(collect_from_prometheus_gauge(prometheus_gauge_log))
+    if trace_durations_ms:
+        results.append(collect_from_tracing(trace_durations_ms))
+    if web_vitals_data:
+        results.append(collect_from_web_vitals(
+            metric_name=web_vitals_data.get("metric_name", "unknown"),
+            values=web_vitals_data.get("values", []),
+            threshold=web_vitals_data.get("threshold", 2500.0),
+            baseline=web_vitals_data.get("baseline"),
+        ))
+    if prometheus_counter_data:
+        results.append(collect_from_prometheus_counter(
+            metric_name=prometheus_counter_data.get("metric_name", "unknown"),
+            values=prometheus_counter_data.get("values", []),
+            threshold=prometheus_counter_data.get("threshold", 10.0),
+            baseline=prometheus_counter_data.get("baseline"),
+        ))
+    if prometheus_gauge_data:
+        results.append(collect_from_prometheus_gauge(
+            metric_name=prometheus_gauge_data.get("metric_name", "unknown"),
+            values=prometheus_gauge_data.get("values", []),
+            threshold=prometheus_gauge_data.get("threshold", 0.8),
+            direction=prometheus_gauge_data.get("direction", "below"),
+            baseline=prometheus_gauge_data.get("baseline"),
+        ))
     if custom_configs:
-        configs.extend(custom_configs)
+        results.extend(custom_configs)
 
-    if not configs:
-        logger.info("No metric configs collected; silent failure audit skipped.")
+    if not results:
+        logger.info("No data provided; silent failure audit skipped.")
         return {"n_metrics": 0, "severity": "pass", "summary": "no data"}
 
-    report = batch_detect(configs)
+    silent = sum(1 for r in results if r.severity == "silent")
+    impending = sum(1 for r in results if r.severity == "impending")
+    breached = sum(1 for r in results if r.severity == "breached")
+
+    severity = "pass"
+    if breached > 0:
+        severity = "fail"
+    elif impending > 0:
+        severity = "warning"
+
+    summary_lines = [
+        f"Silent Failure Scan: {len(results)} metrics checked",
+        f"  Silent (stable):    {silent}",
+        f"  Impending (drift):  {impending}",
+        f"  Breached (alert):   {breached}",
+        f"  Overall: {severity.upper()}",
+    ]
+    for r in results:
+        if r.severity != "silent":
+            summary_lines.append(f"  ! {r.metric_name}: {r.severity} — {r.recommendation}")
+
+    report = SilentFailureReport(
+        source="ai_validator",
+        checked_at=datetime.now(timezone.utc).isoformat(),
+        n_metrics=len(results),
+        results=results,
+        silent_count=silent,
+        impending_count=impending,
+        breached_count=breached,
+        overall_severity=severity,
+        summary_lines=summary_lines,
+    )
+
     export_report(report, output_dir=output_dir)
 
     return {
