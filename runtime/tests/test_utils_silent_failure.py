@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-_utils_dir = Path(__file__).resolve().parents[2] / "05-代码示例"
+_utils_dir = Path(__file__).resolve().parents[2] / "utils"
 if str(_utils_dir) not in sys.path:
     sys.path.insert(0, str(_utils_dir))
 

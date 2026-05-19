@@ -23,9 +23,9 @@ runtime/router                       ← LiteLLM 多厂商 + Ollama 兜底
    ▼
 runtime/orchestrator                 ← Prefect 2.x flow + Direct 降级执行器
    │
-   ├─► 02-专家定义/*.md              ← Claude Code 加载
-   ├─► 03-技能定义/*.md              ← Skill 调用
-   └─► 05-代码示例/*.py              ← 67 脚本(subprocess 隔离)
+   ├─► agents/*.md              ← Claude Code 加载
+   ├─► skills/*.md              ← Skill 调用
+   └─► utils/*.py              ← 67 脚本(subprocess 隔离)
    │
    ▼
 runtime/storage 飞轮                  ← Postgres+pgvector + MinIO

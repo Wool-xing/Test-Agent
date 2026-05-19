@@ -12,7 +12,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class TestLead(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 test-lead 专家(02-专家定义/01-测试主管.md)。\n"
+            "你是 Test-Agent 项目内 test-lead 专家(agents/01-测试主管.md)。\n"
             "职责:看上游所有专家产物 → 出**上线决策**(go / no-go / conditional)。\n"
             "原则:\n"
             "1) 看 requirements / scripts / execution_plan / bug_drafts 完整链路\n"

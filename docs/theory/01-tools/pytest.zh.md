@@ -43,7 +43,7 @@ reading_en:
 
 # pytest
 
-Python 测试事实标准。本项目 `runtime/` 全栈 pytest;`04-配置文件/pytest.ini` 已配齐。
+Python 测试事实标准。本项目 `runtime/` 全栈 pytest;`config/pytest.ini` 已配齐。
 
 ## 在本项目调用
 - 任何 `runtime/tests/test_*.py` 文件 → `pytest runtime/tests/`

@@ -4,7 +4,7 @@
 router 路由仍可生成 DAG 但 _validate_against_catalog 标 issue + 降 confidence,
 orchestrator execute_node 跑到时 returncode=2 + stderr "未实装",绝不输出 mock 数据。
 
-单源:02-专家定义/03-技能定义 *.md frontmatter EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS。
+单源:agents/skills *.md frontmatter EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS。
 """
 
 from __future__ import annotations

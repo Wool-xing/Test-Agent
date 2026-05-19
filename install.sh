@@ -113,18 +113,18 @@ mkdir -p "$PROJECT_ROOT"/workspace/执行日志/{allure-results,jmeter-results,j
 # ===== 5. 拷贝 Agent / Skill 定义 =====
 echo "→ 拷贝 Agent 定义..."
 # Glob 全部 [0-9]*.md (业务 agent),自动覆盖未来新增
-find "$TEMPLATE_DIR/02-专家定义" -maxdepth 1 -name '[0-9]*.md' -exec cp {} "$PROJECT_ROOT/.claude/agents/" \;
+find "$TEMPLATE_DIR/agents" -maxdepth 1 -name '[0-9]*.md' -exec cp {} "$PROJECT_ROOT/.claude/agents/" \;
 agent_count=$(ls "$PROJECT_ROOT/.claude/agents/"[0-9]*.md 2>/dev/null | wc -l)
 echo "  已部署 $agent_count 个 Agent"
 
 echo "→ 拷贝 Skill 定义..."
 # Glob 顶层业务 skill (排除 README)
-find "$TEMPLATE_DIR/03-技能定义" -maxdepth 1 -name '*.md' ! -name 'README.md' -exec cp {} "$PROJECT_ROOT/.claude/skills/" \;
+find "$TEMPLATE_DIR/skills" -maxdepth 1 -name '*.md' ! -name 'README.md' -exec cp {} "$PROJECT_ROOT/.claude/skills/" \;
 # 上游派生子目录 (darwin / karpathy-guidelines / nuwa)
 # 注: 用 "${subdir%/}" 去 trailing / — macOS BSD cp 上 `cp -r darwin-skill/ dest/`
 # 会展开内容到 dest/, 而非把 darwin-skill 整目录拷过去 (与 GNU cp 行为不同)。
 # Linux GNU cp 上两种语法等价, 但 macOS 必须去 / 才能保证子目录结构。
-for subdir in "$TEMPLATE_DIR/03-技能定义"/*/; do
+for subdir in "$TEMPLATE_DIR/skills"/*/; do
     [[ -d "$subdir" ]] && cp -r "${subdir%/}" "$PROJECT_ROOT/.claude/skills/"
 done
 skill_md_count=$(ls "$PROJECT_ROOT/.claude/skills/"*.md 2>/dev/null | wc -l)
@@ -133,11 +133,11 @@ echo "  已部署 $skill_md_count 个业务 Skill + $skill_dir_count 个元 Skil
 
 # ===== 6. 配置文件 =====
 echo "→ 拷贝配置文件..."
-cp "$TEMPLATE_DIR/04-配置文件/conftest.py"      "$PROJECT_ROOT/"
-cp "$TEMPLATE_DIR/04-配置文件/pytest.ini"       "$PROJECT_ROOT/"
-cp "$TEMPLATE_DIR/04-配置文件/.mcp.json"        "$PROJECT_ROOT/"
-cp "$TEMPLATE_DIR/04-配置文件/requirements.txt" "$PROJECT_ROOT/"
-[[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/04-配置文件/.env.example" "$PROJECT_ROOT/.env"
+cp "$TEMPLATE_DIR/config/conftest.py"      "$PROJECT_ROOT/"
+cp "$TEMPLATE_DIR/config/pytest.ini"       "$PROJECT_ROOT/"
+cp "$TEMPLATE_DIR/config/.mcp.json"        "$PROJECT_ROOT/"
+cp "$TEMPLATE_DIR/config/requirements.txt" "$PROJECT_ROOT/"
+[[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/config/.env.example" "$PROJECT_ROOT/.env"
 
 # ===== 7. utils（67 个 .py + __init__）=====
 echo "→ 拷贝 utils（67 个）..."
@@ -157,13 +157,13 @@ for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
          push_test.py a11y_scanner.py i18n_checker.py \
          mutation_runner.py dora_metrics.py blockchain_test.py ai_adversarial.py \
          slo_validator.py email_sender.py suite_minimizer.py; do
-    cp "$TEMPLATE_DIR/05-代码示例/${f}" "$PROJECT_ROOT/utils/"
+    cp "$TEMPLATE_DIR/utils/${f}" "$PROJECT_ROOT/utils/"
 done
 
 # ===== 8. CI/CD =====
 echo "→ 拷贝 CI/CD..."
-cp "$TEMPLATE_DIR/06-CICD集成/github-actions-test.yml" "$PROJECT_ROOT/.github/workflows/test.yml"
-cp "$TEMPLATE_DIR/06-CICD集成/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsfile"
+cp "$TEMPLATE_DIR/ci/github-actions-test.yml" "$PROJECT_ROOT/.github/workflows/test.yml"
+cp "$TEMPLATE_DIR/ci/jenkins-pipeline.groovy" "$PROJECT_ROOT/Jenkinsfile"
 
 # ===== 8.5 顶层法律 / 治理 / 路线图文档 =====
 echo "→ 拷贝法律 / 治理 / 路线图文档..."

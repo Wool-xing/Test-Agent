@@ -27,7 +27,7 @@ def _validate_against_catalog(decision: RoutingDecision, catalog: Catalog) -> li
     issues: list[str] = []
 
     # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 检查 expert / skill 实装状态
-    # 单源: catalog entry.impl_status (02-专家定义/03-技能定义 .md frontmatter)
+    # 单源: catalog entry.impl_status (agents/skills .md frontmatter)
     # rollout / vision / unknown 状态 router 仍可路由,但 issues 列表标 warning + downgrade confidence
     # → orchestrator execute_node 跑到时会硬拒并报明确错误 (returncode=2),不输出 mock 数据
     for n in decision.dag:

@@ -18,7 +18,7 @@
 ## 2. 装依赖(按需)
 
 ```bash
-pip install -r 04-配置文件/requirements.txt
+pip install -r config/requirements.txt
 # 大部分依赖 apt-get 已装
 ```
 
@@ -58,7 +58,7 @@ tagent run "carla://localhost:2000" --mode learn
 ## 7. 下一步
 
 - 看 `examples/web-demo/` 5 分钟跑通最小例
-- 看 `01-快速开始/INDEX.md` 完整流程
+- 看 `docs/getting-started/INDEX.md` 完整流程
 - 看 `docs/INDEX.md` 找样式 / 理论 KB
 
 ---

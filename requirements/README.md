@@ -21,4 +21,4 @@
 - 不强迫 mobile 用户装 desktop 工具
 - 运行时缺依赖→反问用户是否补装，不静默自动装
 - 补装走 `pip install --upgrade-strategy only-if-needed`
-- `04-配置文件/requirements.txt` 保留作为全量安装参考
+- `config/requirements.txt` 保留作为全量安装参考

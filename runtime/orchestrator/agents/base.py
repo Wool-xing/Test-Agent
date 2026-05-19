@@ -49,7 +49,7 @@ class AgentRunner(abc.ABC):
 
     @abc.abstractmethod
     def system_prompt(self) -> str:
-        """从 02-专家定义/*.md 提炼的角色 prompt."""
+        """从 agents/*.md 提炼的角色 prompt."""
 
     @abc.abstractmethod
     def user_prompt(self, ctx: RunnerContext) -> str:

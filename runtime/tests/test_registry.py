@@ -9,8 +9,8 @@ from runtime.registry.registry import build_catalog
 
 # 动态扫源目录而非写死数字 — 项目持续增长 agent/skill,基线会过时
 _PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
-_EXPERTS_DIR = _PROJECT_ROOT / "02-专家定义"
-_SKILLS_DIR = _PROJECT_ROOT / "03-技能定义"
+_EXPERTS_DIR = _PROJECT_ROOT / "agents"
+_SKILLS_DIR = _PROJECT_ROOT / "skills"
 
 
 def test_catalog_loads_existing_assets():
@@ -23,11 +23,11 @@ def test_catalog_loads_existing_assets():
 
     assert len(cat.experts) >= src_experts, (
         f"experts loaded={len(cat.experts)}, source agents={src_experts} "
-        f"— registry 漏扫,检查 02-专家定义/ 下的 [0-9]*.md 文件"
+        f"— registry 漏扫,检查 agents/ 下的 [0-9]*.md 文件"
     )
     assert len(cat.skills) >= src_skills, (
         f"skills loaded={len(cat.skills)}, source skills>={src_skills} "
-        f"— registry 漏扫,检查 03-技能定义/ 下的 *.md 文件"
+        f"— registry 漏扫,检查 skills/ 下的 *.md 文件"
     )
     assert "test-lead" in cat.experts, "test-lead expert missing"
 

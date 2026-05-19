@@ -17,16 +17,16 @@
 | 根目录 | README.md | 简明入口（≤ 200 行） | 所有用户 |
 | **根目录** | **00-项目导航.md** | **按职责分类速查（通用流程 / 平台专项 / 协议 / 输入 / CI）** | **所有用户** |
 | **根目录** | **FULL_GUIDE.md（本文档）** | **永久宪章 + 完整指南** | **所有用户** |
-| `01-快速开始/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
-| `01-快速开始/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
-| `01-快速开始/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
-| `01-快速开始/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
-| `02-专家定义/` | 16 个 .md（9 核心 + 5 平台 + 2 垂直） + README 索引 | Agent 定义文件 | 开发人员 |
-| `03-技能定义/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
-| `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
-| `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `05-代码示例/` | utils（78 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
-| `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
+| `docs/getting-started/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
+| `docs/getting-started/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
+| `docs/getting-started/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
+| `docs/getting-started/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
+| `agents/` | 16 个 .md（9 核心 + 5 平台 + 2 垂直） + README 索引 | Agent 定义文件 | 开发人员 |
+| `skills/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
+| `config/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
+| `config/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
+| `utils/` | utils（78 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
+| `ci/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---
 
@@ -167,7 +167,7 @@
 
 **探索 + 元工具 4 个**：`build-your-own-x-explorer` + `karpathy-guidelines` + `darwin-skill` + `nuwa-skill`
 
-> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [03-技能定义/README.md](../../03-技能定义/README.md)。
+> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [skills/README.md](../../skills/README.md)。
 
 ### 工程级质量门禁（分层）
 

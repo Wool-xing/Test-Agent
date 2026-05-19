@@ -6,7 +6,7 @@
 |------|------|
 | `flows.py` | Prefect `@flow` 主入口,接收 router DAG 跑全链路 |
 | `tasks.py` | `@task` 原子(调专家/Skill/67 脚本) |
-| `adapters/` | 包装 `05-代码示例/*.py` 67 脚本为 Prefect task |
+| `adapters/` | 包装 `utils/*.py` 67 脚本为 Prefect task |
 
 ## 编排能力
 

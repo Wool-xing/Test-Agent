@@ -147,7 +147,7 @@ def build_server():
     TOOLS = [
         Tool(
             name="catalog",
-            description="List 16 experts + 32 skills loaded from 02-专家定义/* + 03-技能定义/*.",
+            description="List 16 experts + 32 skills loaded from agents/* + skills/*.",
             inputSchema={"type": "object", "properties": {}, "additionalProperties": False},
         ),
         Tool(

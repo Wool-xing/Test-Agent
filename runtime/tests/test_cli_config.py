@@ -73,7 +73,7 @@ def test_list_shows_six_builtins_and_compat_examples():
         assert name in result.stdout
     assert "zhipu" in result.stdout
     assert "doubao" in result.stdout
-    assert "04-配置文件/llm-providers.md" in result.stdout
+    assert "config/llm-providers.md" in result.stdout
 
 
 def test_show_missing_env_hints_creation(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

@@ -3,7 +3,7 @@
 Honors charter:
   - §18-12 决策可追溯:工具调用自动落 `decisions/{date}_mcp_{tool}_{run_id}.json`
   - §21 横切可复现性:run_id 注入 + seed 记录 + 失败 snapshot
-  - §1 同步铁律:服务列表必须与 `04-配置文件/.mcp.json` 一致
+  - §1 同步铁律:服务列表必须与 `config/.mcp.json` 一致
 """
 
 from __future__ import annotations

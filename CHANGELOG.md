@@ -47,7 +47,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Added
 - Bug Tracker 5 适配器: `jira_bug_manager.py` / `github_bug_manager.py` / `linear_bug_manager.py` / `webhook_bug_manager.py`
-- Quality Gate Engine: `quality_gate_engine.py` + `04-配置文件/quality_gates.yaml` (YAML 驱动门禁)
+- Quality Gate Engine: `quality_gate_engine.py` + `config/quality_gates.yaml` (YAML 驱动门禁)
 - Layered requirements: `requirements/{base,mobile,desktop,visual,system,ai,perf}.txt` (按需安装引擎)
 - CI `compileall runtime/` syntax check
 
@@ -91,8 +91,8 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - runtime/orchestrator/release_readiness.py: fix --from-summary AttributeError (Path wrapping)
 - runtime/orchestrator/direct.py: guard pool.shutdown() against uninitialized pool
 - runtime/tests/test_cli_commands.py: remove unregistered search/list/plan commands
-- 03-技能定义/darwin-skill/scripts/screenshot.mjs: replace hardcoded /Users/alchain/ path
-- 03-技能定义/nuwa-skill/references/skill-template.md: remove upstream author X/Twitter branding
+- skills/darwin-skill/scripts/screenshot.mjs: replace hardcoded /Users/alchain/ path
+- skills/nuwa-skill/references/skill-template.md: remove upstream author X/Twitter branding
 
 ### Changed
 - VERSION: 1.32.5 → 1.36.0
@@ -332,10 +332,10 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ### Added(V1.12.0 · `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
 
 - **新模块 `runtime/init/`**:
-  - `matrix.py`:`load_matrix()` 加载 `04-配置文件/templates/matrix.yaml`(单源真理)
+  - `matrix.py`:`load_matrix()` 加载 `config/templates/matrix.yaml`(单源真理)
   - `wizard.py`:`run_wizard()` 交互向导 · `from_args()` 非交互 · `from_preset()` 5 预设
   - `renderer.py`:`render_all()` 把 InitAnswers + matrix + 模板 → `.env` + `tagent.yml` + `STARTUP.md`
-- **新模板库 `04-配置文件/templates/`**:
+- **新模板库 `config/templates/`**:
   - `matrix.yaml` 单源真理:**8 测试类型 × 6 平台 × 5 LLM × 6 BugTracker × 6 通知 = 8640 组合**
   - `base.env.tpl` · `base.tagent.yml.tpl` · `STARTUP.md.tpl`(`{{var}}` 占位)
 - **CLI**:`tagent init [--test-type] [--platform] [--llm] [--bug-tracker] [--notifier] [--preset] [--out] [--overwrite]`
@@ -360,7 +360,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ### Fixed(V1.11.0 · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
 
 - **同步铁律(§1)执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
-  - `00-项目导航.md` · `02-专家定义/{01,07,08,09}.md` · `02-专家定义/README.md` · `03-技能定义/{README,test-coordinator,zentao-bug-submission}.md` · `04-配置文件/mcp-server-impl.md` · `05-代码示例/{README.md,api_retry_util.py}` · `06-CICD集成/{INDEX,CICD集成说明}.md` · `01-快速开始/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
+  - `00-项目导航.md` · `agents/{01,07,08,09}.md` · `agents/README.md` · `skills/{README,test-coordinator,zentao-bug-submission}.md` · `config/mcp-server-impl.md` · `utils/{README.md,api_retry_util.py}` · `ci/{INDEX,CICD集成说明}.md` · `docs/getting-started/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
 - **adapter 修 V1.10 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
   - 现 `tagent selftest --e2e --strict` **100% PASS 8/8**(原 88% 7/8)
   - generate_report.py 默认注入 `--data=workspace/执行日志/_selftest_summary.json`,fixture 自动生成
@@ -420,7 +420,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **教学层 KB 扩 13 大类**(原 12 → 13,加 `13-build-your-own/`):
   - INDEX + 10 P0 测试相关卡(database/network-stack/web-server/git/search-engine/shell/regex-engine/programming-language/web-browser/bot)
   - 每卡含 `estimated_time_hours` + 测试映射 + 推荐路径
-- **主 skill**:`03-技能定义/build-your-own-x-explorer.md`(引导式 deep-dive 推荐)
+- **主 skill**:`skills/build-your-own-x-explorer.md`(引导式 deep-dive 推荐)
 - **Marketplace 4 lane 系统**(对标 Claude Code 官方):
   - `marketplace/{skills,agents,mcp,hooks}/` 目录
   - `marketplace/INDEX.md` + `registry.json` + `_safety_policy.yaml`(4 关安全门 + 3 信任级源)
@@ -437,7 +437,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **上游参考扩 2 条目**:
   - `karpathy-skills.md`(125k★ · LLM 写代码 4 原则元层)
   - `everything-claude-code.md`(179k★ · AI agent harness 性能优化 200 skill / 53 agent / Homunculus instincts / Selective install)
-- **Karpathy 4 原则**(主宪章 §27,元层贯穿):Think Before / Simplicity First / Surgical Changes / Goal-Driven Execution;`03-技能定义/karpathy-guidelines/SKILL.md` 部署 upstream 原文(类 darwin-skill 不改本地)
+- **Karpathy 4 原则**(主宪章 §27,元层贯穿):Think Before / Simplicity First / Surgical Changes / Goal-Driven Execution;`skills/karpathy-guidelines/SKILL.md` 部署 upstream 原文(类 darwin-skill 不改本地)
 - **ECC 6 测试 skill 入库**(对测试有用的,§28):
   - `tdd-workflow` · TDD 80%+ 覆盖
   - `verification-loop` · 5-phase verify(build→typecheck→lint→test→coverage)
@@ -458,8 +458,8 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 - **上游参考扩**:`pentest-ai-agents.md` 合并萃取 pentagi(黑盒)+ shannon(白盒);10 节;含对比表+应用 checklist
 - **2 新专家**:
-  - `02-专家定义/15-渗透测试.md` `pentest-tester`(白盒+黑盒+5 攻击域 + Static-Dynamic Correlation + PoC-only)
-  - `02-专家定义/16-车载测试.md` `automotive-tester`(ISO 26262 + AUTOSAR + HIL/SIL/MIL/PIL + ADAS + OTA + V2X)
+  - `agents/15-渗透测试.md` `pentest-tester`(白盒+黑盒+5 攻击域 + Static-Dynamic Correlation + PoC-only)
+  - `agents/16-车载测试.md` `automotive-tester`(ISO 26262 + AUTOSAR + HIL/SIL/MIL/PIL + ADAS + OTA + V2X)
 - **7 新 pentest skill**:
   - `pentest-coordinator`(主)/ `pentest-recon` / `pentest-vuln` / `pentest-exploit` / `pentest-web` / `pentest-api` / `pentest-report`
 - **5 新 automotive skill**:
@@ -550,14 +550,14 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - §20 Phase 触发条件(不绑月份)
   - How to apply 7-12 扩展项(铭文优先级 / 决策可追溯 / 纪要不可删 / darwin 棘轮 / 依赖补装反问 / 修改四关)
 - **行业适配参照表全删除**(主宪章 + FULL_GUIDE 双删)
-- **darwin-skill 入库**:`03-技能定义/darwin-skill/` 完整部署(SKILL.md + scripts/ + templates/ + assets/ + docs/),upstream 原文不改;13 Skill → 14 Skill
+- **darwin-skill 入库**:`skills/darwin-skill/` 完整部署(SKILL.md + scripts/ + templates/ + assets/ + docs/),upstream 原文不改;13 Skill → 14 Skill
 - **FULL_GUIDE.md 优化**:三公理/铭文 + 18 闭环段替换为"已迁主宪章 §X"指引(避免双份维护);Bug Tracker / 按需安装 / darwin / AgentChat 详节保留作为深度参考;附 runtime 章节(M1-11 留存)
 
 ### Added(V1.1.0 · 运行时层)
 
 - **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 67 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
   - `runtime/router/`:AI 路由(LiteLLM 多厂商:Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)。被测物 → 专家+Skill DAG。含 stub provider 供 CI 离线测,准确率 5/5 类型(web/api/mobile/desktop/ai-model)
-  - `runtime/registry/`:扫 `02-专家定义/*.md` + `03-技能定义/*.md` frontmatter 生成统一目录(14 expert + 13 skill,实测通过)
+  - `runtime/registry/`:扫 `agents/*.md` + `skills/*.md` frontmatter 生成统一目录(14 expert + 13 skill,实测通过)
   - `runtime/orchestrator/`:**双轨**——Prefect 2.x flow(全功能,带 UI/重试/状态机)+ Direct 执行器(无 Prefect 也能跑,ThreadPoolExecutor 并发,降级方案)
   - `runtime/api/`:FastAPI 入口 `/run/text` `/run/file` `/run/url` `/status/{run_id}` `/report/{run_id}` `/catalog` `/health`。多格式上传 PDF/Word/MD/exe/APK/IPA/Docker/口头/URL/目录
   - `runtime/cli/`:Typer CLI `tagent run|plan|catalog|doctor`
@@ -579,16 +579,16 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Security（安全·上架前必修 Batch 1）
 
-- **修复 `eval()` 远程代码注入风险**：`05-代码示例/media_validator.py` 中 `get_video_meta()` 原通过 `eval(video.get("r_frame_rate"))` 解析 FFmpeg 外部输出，存在注入风险。改用 `fractions.Fraction` 安全解析。
+- **修复 `eval()` 远程代码注入风险**：`utils/media_validator.py` 中 `get_video_meta()` 原通过 `eval(video.get("r_frame_rate"))` 解析 FFmpeg 外部输出，存在注入风险。改用 `fractions.Fraction` 安全解析。
 - **移除占位邮箱**：`SECURITY.md` 与 `CODE_OF_CONDUCT.md` 移除 `security@example.com` / `conduct@example.com` 占位地址，统一指向 GitHub Security Advisories 私密通道；避免上架后被误用作真实联系方式。
 - **示例脱敏**：
-  - `02-专家定义/13-系统集成测试.md` 示例中 `SSHClient(host="192.168.1.100", user="root", password="...")` 改为 `os.getenv()` 读取，配合 `.env` 注入；同段 `IOT_SSH_HOST` 占位改为 `<DEVICE_IP>`。
-  - `02-专家定义/07-测试执行.md` 混沌命令示例中真实风格 IP `192.168.1.100` 改为占位 `<TARGET_IP>`。
+  - `agents/13-系统集成测试.md` 示例中 `SSHClient(host="192.168.1.100", user="root", password="...")` 改为 `os.getenv()` 读取，配合 `.env` 注入；同段 `IOT_SSH_HOST` 占位改为 `<DEVICE_IP>`。
+  - `agents/07-测试执行.md` 混沌命令示例中真实风格 IP `192.168.1.100` 改为占位 `<TARGET_IP>`。
 
 ### Changed（数字漂移修复 + URL 统一 Batch 2）
 
-- **顶层文档数字一致性**：`8 位专家 / 9 agent / 8 skill / 12 utils` 等过时数字全栈修正为 `14 agent / 13 skill / 67 utils`（核心 8 专家 + 平台扩展 5 专家 + test-lead 协调者）。涉及：`README_DETAIL.md` / `01-快速开始/使用手册.md` / `02-专家定义/01-测试主管.md` / `03-技能定义/test-coordinator.md` / `install.sh`。
-- **GitHub 仓库 URL 统一**：所有引用 `YOUR-USER/Test-Agent工作流搭建` 的位置统一为 `Wool-xing/Test-Agent`（权威英文仓库名；中文 `Test-Agent工作流搭建` 仅作目录别名）。fork 用户可用 `TEST_AGENT_REPO_URL` 环境变量覆盖。涉及：`01-快速开始/部署说明.md` / `01-快速开始/使用手册.md` / `README_DETAIL.md`。
+- **顶层文档数字一致性**：`8 位专家 / 9 agent / 8 skill / 12 utils` 等过时数字全栈修正为 `14 agent / 13 skill / 67 utils`（核心 8 专家 + 平台扩展 5 专家 + test-lead 协调者）。涉及：`README_DETAIL.md` / `docs/getting-started/使用手册.md` / `agents/01-测试主管.md` / `skills/test-coordinator.md` / `install.sh`。
+- **GitHub 仓库 URL 统一**：所有引用 `YOUR-USER/Test-Agent工作流搭建` 的位置统一为 `Wool-xing/Test-Agent`（权威英文仓库名；中文 `Test-Agent工作流搭建` 仅作目录别名）。fork 用户可用 `TEST_AGENT_REPO_URL` 环境变量覆盖。涉及：`docs/getting-started/部署说明.md` / `docs/getting-started/使用手册.md` / `README_DETAIL.md`。
 - **覆盖率口径统一为 ~95%**：原 `~99%` (README/README_DETAIL) vs `约 90%` (00-项目导航) 不一致，统一为 `~95%`，剩 5% 为高度专业合规领域（航空 DO-178C / 医疗 HIPAA / 工业控制 IEC61508）。
 
 ### Added
@@ -596,7 +596,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - 新建 `CHANGELOG.md` + `VERSION` 文件，启动语义版本管理。
 - **W3 信息架构重塑**：
   - `README_DETAIL.md` 改名为 `FULL_GUIDE.md`（宪章§0 文件分发策略：README.md 简明入口 ≤ 200 行 / FULL_GUIDE.md 详细指南）
-  - 新建 `01-快速开始/INDEX.md` / `04-配置文件/INDEX.md` / `06-CICD集成/INDEX.md`（宪章§3 每目录索引；02/03/05 已有 README.md 等价于 INDEX）
+  - 新建 `docs/getting-started/INDEX.md` / `config/INDEX.md` / `ci/INDEX.md`（宪章§3 每目录索引；02/03/05 已有 README.md 等价于 INDEX）
   - `README.md` 头加项目代号 `test-agent-team` + 版本 + License
   - `README.md` 删除三视角矩阵段（迁移至 FULL_GUIDE.md，避免双份维护）
   - `README.md` 行数从 240 降至 168 行

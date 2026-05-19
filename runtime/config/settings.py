@@ -30,9 +30,9 @@ class Settings(BaseSettings):
     )
 
     project_root: Path = Field(default_factory=_get_project_root)
-    experts_dir: Path = Field(default=Path("02-专家定义"))
-    skills_dir: Path = Field(default=Path("03-技能定义"))
-    scripts_dir: Path = Field(default=Path("05-代码示例"))
+    experts_dir: Path = Field(default=Path("agents"))
+    skills_dir: Path = Field(default=Path("skills"))
+    scripts_dir: Path = Field(default=Path("utils"))
     workspace_dir: Path = Field(default=Path("workspace"))
 
     llm_provider: str = Field(default="claude")

@@ -115,7 +115,7 @@
 | **regression** | merge 到 main / develop | P0=100% / P1≥95% / 总体≥90% / cov ≥80% / Flaky <5% | 评估遗留风险 | `utils/ci_quality_gate.py::GATES['regression_p0_p1']` |
 | **performance_ci_quick** | CI 默认（5 并发） | TPS≥20 / P95≤800ms / err <1% | 警告不阻 | `utils/jmeter_result_parser.DEFAULT_GATES_CI_QUICK` |
 | **performance_full** | release/* 分支 + 手动（50 并发） | TPS≥100 / P95≤500ms / 基线回归 <20% | 阻断 release | `utils/jmeter_result_parser.DEFAULT_GATES_FULL` |
-| **release** | 上线前 | 上述全 PASS + bug-manager 审批 + test-lead 决策 | 不上线 | `02-专家定义/01-测试主管.md::上线决策` |
+| **release** | 上线前 | 上述全 PASS + bug-manager 审批 + test-lead 决策 | 不上线 | `agents/01-测试主管.md::上线决策` |
 
 **门禁可配置性**：阈值集中在 `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*`。Phase 2 抽 `quality_gate_engine.py` + yaml 驱动，让用户改阈值不需改代码。
 
@@ -145,7 +145,7 @@
 |------|------|-----------|---------|
 | **金字塔单元层** | 弱（utils 自身无测试） | Phase 2 | `tests/test_utils_*.py` 全覆盖 + 变异测试反向用 |
 | **Shift-Left L7 契约链路** | utils 雏形未串通 | Phase 2 | OpenAPI 改动 → contract → PR 阻断 |
-| **门禁引擎抽象** | 阈值写死代码 | Phase 2 | ✅ `utils/quality_gate_engine.py` + `04-配置文件/quality_gates.yaml` 驱动 |
+| **门禁引擎抽象** | 阈值写死代码 | Phase 2 | ✅ `utils/quality_gate_engine.py` + `config/quality_gates.yaml` 驱动 |
 | **Shift-Right R1 合成监控** | 缺 | Phase 3 | `utils/synthetic_monitor.py` |
 | **Shift-Right R4 canary + feature flag** | 缺 | Phase 3 | `utils/canary_runner.py` + `feature_flag_validator.py` |
 | **可观测统一 dashboard** | 散落 HTML 报告 | Phase 3 | DORA + 缺陷密度 + flaky + 变异分数 → Grafana / 静态 HTML 模板 |

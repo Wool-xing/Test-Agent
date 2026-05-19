@@ -1,6 +1,6 @@
 """Real LLM-driven agent runners(V1.36.0 · 主宪章 §33 + §40).
 
-每个 runner 把 02-专家定义/*.md 的角色描述变成可执行的 LLM 调用:
+每个 runner 把 agents/*.md 的角色描述变成可执行的 LLM 调用:
 - 读上游产物 → 拼 prompt → 调 LLM → 解析输出 → 落产物 → 给下游
 
 11 核心 runner(V1.x rollout 收尾,所有 LLM-driven expert 已实装):

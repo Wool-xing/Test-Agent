@@ -4,7 +4,7 @@ V1.23.0 minimum viable (ROADMAP skill rollout #2 落地):
 - LLM 读 PRD + 上游 mobile-tester expert 产物 → 6 阶段执行计划
   (设备就绪 / Appium / 用例批次 / 性能采集 / Monkey / 报告归档)
   + 质量门禁 + 跨平台并行策略
-- 不实装 03-技能定义/mobile-test.md 全部职责 (Appium driver 真跑 / 云真机
+- 不实装 skills/mobile-test.md 全部职责 (Appium driver 真跑 / 云真机
   / 弱网注入 / 小程序开发者工具 CLI 等留后续深化)
 - 输出执行计划 JSON, 真执行守护在 utils 层 (mobile_driver.py / miniprogram_runner)
 """
@@ -21,7 +21,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class MobileTest(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 mobile-test skill(03-技能定义/mobile-test.md)。\n"
+            "你是 Test-Agent 项目内 mobile-test skill(skills/mobile-test.md)。\n"
             "职责:基于 PRD + 上游 mobile-tester expert 产物,编排移动端测试 6 阶段执行计划。\n"
             "原则:\n"
             "1) 识别目标平台:Android / iOS / 微信/支付宝/抖音 小程序 / 混合 H5\n"

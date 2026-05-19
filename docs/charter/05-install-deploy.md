@@ -154,7 +154,7 @@ git clone https://github.com/Wool-xing/Test-Agent.git
 bash Test-Agent/install.sh /path/to/your-test-project
 ```
 
-> 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `01-快速开始/部署说明.md`。
+> 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `docs/getting-started/部署说明.md`。
 
 `install.sh` 自动完成：克隆模板 → 装 Claude Code → 建目录 → 拷贝全部文件 → 装 Python 依赖 + Playwright。
 
@@ -195,7 +195,7 @@ claude
 
 > 注：`>` 后面是 Claude Code 提示符的输入（斜杠技能或自然语言），**不是 shell 命令**。
 
-详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）→ `01-快速开始/使用手册.md` 顶部「🚀 启动指引」章节。
+详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）→ `docs/getting-started/使用手册.md` 顶部「🚀 启动指引」章节。
 
 ---
 
@@ -272,7 +272,7 @@ your-test-project/
 
 ## 🛠️ 升级 / 回滚 / 卸载
 
-详见 `01-快速开始/部署说明.md` "升级 / 回滚 / 卸载" 章节。
+详见 `docs/getting-started/部署说明.md` "升级 / 回滚 / 卸载" 章节。
 
 升级会覆盖：`.claude/agents/`、`.claude/skills/`、`utils/`、`conftest.py`、`pytest.ini`、`requirements.txt`、`.mcp.json`、`.github/workflows/test.yml`、`Jenkinsfile`。
 不会覆盖：`.env`、`workspace/`、`src/`。
@@ -282,8 +282,8 @@ your-test-project/
 ## 🤝 协作与反馈
 
 - 文档结构、Bug 反馈：在仓库内提 issue
-- 功能扩展：先在 `02-专家定义/` 加 agent / `03-技能定义/` 加 skill，详见 `CONTRIBUTING.md`
-- 改动 `utils/` 时同步更新 `04-配置文件/requirements.txt` 与 `06-CICD集成/` 中的引用
+- 功能扩展：先在 `agents/` 加 agent / `skills/` 加 skill，详见 `CONTRIBUTING.md`
+- 改动 `utils/` 时同步更新 `config/requirements.txt` 与 `ci/` 中的引用
 
 ---
 

@@ -7,9 +7,9 @@ repos:
         exclude: \.md$
       - id: end-of-file-fixer
         # upstream skill 目录不动(主宪章 §14 §27 darwin-skill / karpathy-guidelines 禁本地 fork)
-        exclude: ^03-技能定义/(darwin-skill|karpathy-guidelines)/
+        exclude: ^skills/(darwin-skill|karpathy-guidelines)/
       - id: check-yaml
-        exclude: ^06-CICD集成/jenkins-pipeline\.groovy$
+        exclude: ^ci/jenkins-pipeline\.groovy$
       - id: check-json
       - id: check-toml
       - id: check-added-large-files
@@ -25,8 +25,8 @@ repos:
     rev: v0.1.13
     hooks:
       - id: ruff
-        args: [--config, "05-代码示例/.ruff.toml"]
-        files: ^05-代码示例/
+        args: [--config, "utils/.ruff.toml"]
+        files: ^utils/
       # ruff-format 关掉：utils 紧凑 CLI 风格不需自动重排
 
   # ===== 凭据扫描（gitleaks）=====
@@ -65,7 +65,7 @@ repos:
       # 文件统计校验（防误删 agent/skill/utils）
       - id: file-count-check
         name: Agents/Skills/Utils 数量校验
-        entry: bash -c 'A=$(ls 02-专家定义/[0-9]*.md 2>/dev/null | wc -l); S=$(ls 03-技能定义/*.md 2>/dev/null | grep -v README | wc -l); U=$(ls 05-代码示例/*.py 2>/dev/null | wc -l); [ "$A" = "16" ] || { echo "❌ Agents 数量异常（期 16，实 $A）"; exit 1; }; [ "$S" -eq "32" ] || { echo "❌ Skills 数量异常（期 32，实 $S）"; exit 1; }; [ "$U" -eq "79" ] || { echo "❌ Utils 数量异常（期 79，实 $U）"; exit 1; }; echo "✅ 文件统计正确"'
+        entry: bash -c 'A=$(ls agents/[0-9]*.md 2>/dev/null | wc -l); S=$(ls skills/*.md 2>/dev/null | grep -v README | wc -l); U=$(find utils -name "*.py" ! -name "__init__.py" 2>/dev/null | wc -l); [ "$A" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $A)"; exit 1; }; [ "$S" -eq "32" ] || { echo "❌ Skills count mismatch (expected 32, got $S)"; exit 1; }; [ "$U" -eq "78" ] || { echo "❌ Utils count mismatch (expected 78, got $U)"; exit 1; }; echo "✅ File counts correct"'
         language: system
         pass_filenames: false
         always_run: true
@@ -93,7 +93,7 @@ repos:
         # / MD025(single-h1) / MD026(trailing-punct):中文项目常见 nit,与现有 disable 风格一致
         args: ['--disable', 'MD013', 'MD033', 'MD041', 'MD036', 'MD022', 'MD031', 'MD032', 'MD024', 'MD034', 'MD040', 'MD014', 'MD009', 'MD012', 'MD010', 'MD025', 'MD026', 'MD050', 'MD049', 'MD007', 'MD004', 'MD005', 'MD030', 'MD035', 'MD037', 'MD038', 'MD039', '--']
         # upstream skill dirs 不改本地:darwin-skill / karpathy-guidelines(主宪章 §14 §27)
-        exclude: ^(Test-Agent工作流搭建\.md|03-技能定义/(darwin-skill|karpathy-guidelines)/.*)$
+        exclude: ^(skills/(darwin-skill|karpathy-guidelines)/.*)$
 
 # 配置：项目根 .markdownlint.json 自定义规则
 default_install_hook_types: [pre-commit]

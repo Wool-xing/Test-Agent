@@ -28,11 +28,11 @@ jobs:
       - name: Ruff 检查（用 utils/.ruff.toml 配置）
         run: |
           pip install ruff
-          ruff check 05-代码示例/ --config 05-代码示例/.ruff.toml
+          ruff check utils/ --config utils/.ruff.toml
 
       - name: 语法检查（py_compile）
         run: |
-          python -m compileall 05-代码示例/ -q
+          python -m compileall utils/ -q
           python -m compileall runtime/ -q
 
   # ===== 1b. L7 契约门禁 (Shift-Left: OpenAPI 变更 → 契约验证) =====
@@ -54,7 +54,7 @@ jobs:
 
       - name: L7 契约检测
         run: |
-          python 05-代码示例/ci_contract_gate.py \
+          python utils/quality/ci_contract_gate.py \
             --base-ref "origin/${{ github.base_ref }}" \
             --consumer "test-agent-ci" \
             --output-json workspace/contracts/ci-contract-result.json || {
@@ -85,13 +85,13 @@ jobs:
       - name: pip-audit 扫描
         run: |
           pip install pip-audit
-          pip-audit -r 04-配置文件/requirements.txt --format columns || true
+          pip-audit -r config/requirements.txt --format columns || true
         continue-on-error: true   # CI 模板仓库 audit 仅做参考，不强阻（避免依赖冲突误杀）
 
       - name: safety 扫描
         run: |
           pip install safety
-          safety check -r 04-配置文件/requirements.txt --short-report
+          safety check -r config/requirements.txt --short-report
         continue-on-error: true
 
   # ===== 3. install.sh 脚本检查 =====
@@ -108,9 +108,7 @@ jobs:
           scandir: '.'
           additional_files: 'install.sh'
 
-  # ===== 3b. install.sh macOS 真机端到端 (本 session V1.14.0+1 新加) =====
-  # 用 GitHub Actions macos-latest runner 实跑 install.sh, 验 ROADMAP "Mac 真机"挂账。
-  # 关键: 设 TEST_AGENT_LOCAL_SRC 跳过 git clone, 用 PR 当前改动而非 fetch default branch。
+  # ===== 3b. install.sh macOS 真机端到端 =====
   macos-real-install:
     name: install.sh macOS 端到端 (实跑)
     runs-on: macos-latest
@@ -124,8 +122,6 @@ jobs:
       - name: 跑 install.sh /tmp/test-target (LOCAL_SRC=PR)
         env:
           TEST_AGENT_LOCAL_SRC: ${{ github.workspace }}
-          # macOS runner 自带 git/bash/curl, npm 用于 claude-code (会装但允许失败,
-          # CI 不验 npm 安装链, 仅验 install.sh 主流程 + Python venv)
           CI: "true"
         run: |
           mkdir -p /tmp/test-target
@@ -137,13 +133,12 @@ jobs:
       - name: 验关键 artifacts
         run: |
           # install.sh 实际部署结构 (非源仓 mirror, 而是 Claude Code 项目脚手架):
-          #   02-专家定义/[0-9]*.md → .claude/agents/   (Claude Code subagent 路径)
-          #   03-技能定义/*.md → .claude/skills/        (Claude Code skill 路径)
-          #   05-代码示例/*.py → utils/
-          #   utils/ 原内容 → utils/
-          #   04-配置文件/{conftest.py,pytest.ini,.mcp.json,requirements.txt} → PROJECT_ROOT/
-          #   04-配置文件/.env.example → PROJECT_ROOT/.env (rename)
-          #   06-CICD集成/* → .github/workflows/test.yml + Jenkinsfile
+          #   agents/[0-9]*.md → .claude/agents/
+          #   skills/*.md → .claude/skills/
+          #   utils/*.py → utils/
+          #   config/{conftest.py,pytest.ini,.mcp.json,requirements.txt} → PROJECT_ROOT/
+          #   config/.env.example → PROJECT_ROOT/.env (rename)
+          #   ci/* → .github/workflows/test.yml + Jenkinsfile
           #   顶层 LICENSE/ROADMAP/README/... → PROJECT_ROOT/
           #   .venv/ 新建 + pip 装依赖
           # runtime/ 不拷 (引擎源, V2 通过 pip 装独立分发)
@@ -164,12 +159,9 @@ jobs:
           test "$agent_n" -eq 16 || { echo "❌ agent 数 $agent_n ≠ 16"; exit 1; }
           test "$skill_md_n" -eq 32 || { echo "❌ skill .md 数 $skill_md_n ≠ 32"; exit 1; }
           test "$skill_dir_n" -eq 3 || { echo "❌ skill meta 子目录数 $skill_dir_n ≠ 3 (期望 darwin/karpathy/nuwa)"; exit 1; }
-          # 验 05-代码示例 内 script rename 到 utils/
-          test -f "/tmp/test-target/utils/generate_report.py" \
-            || { echo "❌ 缺 utils/generate_report.py (05-代码示例 拷贝丢)"; exit 1; }
-          # 排错: 列 .claude/skills 内容 (debug 用)
-          echo "--- .claude/skills/ 内容: ---"
-          ls -la /tmp/test-target/.claude/skills/ | head -50
+          # 验 utils/ 内 script 存在
+          test -f "/tmp/test-target/utils/reporting/generate_report.py" \
+            || { echo "❌ 缺 utils/reporting/generate_report.py (拷贝丢)"; exit 1; }
           echo "✅ install.sh macOS 实跑 OK"
 
       - name: 上传 install.log (失败时排错用)
@@ -194,7 +186,7 @@ jobs:
           pip install pyyaml
           python -c "
           import yaml, sys
-          for f in ['.github/dependabot.yml', '.github/workflows/ci.yml', '06-CICD集成/github-actions-test.yml']:
+          for f in ['.github/dependabot.yml', '.github/workflows/ci.yml', 'ci/github-actions-test.yml']:
               try:
                   yaml.safe_load(open(f))
                   print(f'✅ {f}')
@@ -207,7 +199,7 @@ jobs:
         run: |
           python -c "
           import json, sys
-          for f in ['04-配置文件/.mcp.json']:
+          for f in ['config/.mcp.json']:
               try:
                   json.load(open(f))
                   print(f'✅ {f}')
@@ -231,19 +223,20 @@ jobs:
         run: |
           set -o pipefail
           python -m pip install --upgrade pip
-          pip install -r 04-配置文件/requirements.txt 2>&1 | tail -20 || \
+          pip install -r config/requirements.txt 2>&1 | tail -20 || \
             pip install pytest faker factory-boy requests websocket-client pdfplumber python-docx openpyxl PyYAML python-dotenv tenacity loguru beautifulsoup4 jsonschema
 
       - name: 核心 utils 导入测试
         run: |
-          cd 05-代码示例
+          cd utils
           python -c "
-          import sys
+          import sys, os
+          sys.path.insert(0, '.')
           modules = [
-              'api_retry_util', 'data_factory', 'data_masking',
-              'excel_generator', 'flaky_detector', 'jmeter_csv_exporter',
-              'jmeter_result_parser', 'regression_scope',
-              'ci_quality_gate', 'prd_loader',
+              'protocols.api_retry_util', 'data.data_factory', 'data.data_masking',
+              'reporting.excel_generator', 'quality.flaky_detector', 'performance.jmeter_csv_exporter',
+              'performance.jmeter_result_parser', 'infra.regression_scope',
+              'quality.ci_quality_gate', 'design.prd_loader',
           ]
           failed = []
           for m in modules:
@@ -296,14 +289,14 @@ jobs:
 
       - name: 统计核对
         run: |
-          AGENTS=$(ls 02-专家定义/[0-9]*.md | wc -l)
-          SKILLS=$(ls 03-技能定义/*.md | grep -v README | wc -l)
-          UTILS=$(ls 05-代码示例/*.py | wc -l)
+          AGENTS=$(ls agents/[0-9]*.md | wc -l)
+          SKILLS=$(ls skills/*.md | grep -v README | wc -l)
+          UTILS=$(find utils -name "*.py" ! -name "__init__.py" | wc -l)
           echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
-          [ "$AGENTS" = "16" ] || { echo "❌ Agents 数量不符（期 16，实 $AGENTS）"; exit 1; }
-          [ "$SKILLS" -eq "32" ] || { echo "❌ Skills 数量不符（期 32，实 $SKILLS）"; exit 1; }
-          [ "$UTILS" -eq "79" ] || { echo "❌ Utils 数量不符（期 79，实 $UTILS）"; exit 1; }
-          echo "✅ 文件统计正确"
+          [ "$AGENTS" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $AGENTS)"; exit 1; }
+          [ "$SKILLS" -eq "32" ] || { echo "❌ Skills count mismatch (expected 32, got $SKILLS)"; exit 1; }
+          [ "$UTILS" -eq "78" ] || { echo "❌ Utils count mismatch (expected 78, got $UTILS)"; exit 1; }
+          echo "✅ File counts correct"
 
       - name: 验证 .gitignore 排除源 MD
         run: |
@@ -339,7 +332,7 @@ jobs:
       - name: 安装运行时依赖
         run: |
           python -m pip install --upgrade pip
-          pip install -r 04-配置文件/requirements.txt 2>&1 | tail -10 || true
+          pip install -r config/requirements.txt 2>&1 | tail -10 || true
           # 兜底:确保关键运行时模块在
           pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect
 
@@ -355,8 +348,7 @@ jobs:
           python -m runtime.cli.main selftest --e2e --pass-threshold 0.80
           echo "✅ L2 stub e2e ≥80% 节点通过"
 
-  # ===== 9. runtime/tests pytest 单元测试 (V1.16-followup 新加) =====
-  # 验 7 AgentRunner 专项 + registry + router + X4 防 mock 闭环 测试
+  # ===== 9. runtime/tests pytest 单元测试 =====
   pytest-unit:
     name: runtime/tests pytest 单元
     runs-on: ubuntu-latest
@@ -367,12 +359,12 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: 安装 runtime 最小依赖 (不装 04-配置文件/requirements.txt — 避 pytest-bdd 7.0 与 pytest 8.3 冲突)
+      - name: 安装 runtime 最小依赖
         run: |
           python -m pip install --upgrade pip
           # runtime/ 依赖 (与 selftest-mock 一致)
           pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect fastapi python-multipart httpx
-          # pytest core (排除 pytest-bdd / pytest-playwright 等用户场景 plugin, 避免 _pytest.nodes iterparentnodeids 冲突)
+          # pytest core (排除 pytest-bdd / pytest-playwright 等用户场景 plugin)
           pip install pytest pytest-asyncio pytest-cov
 
       - name: pytest runtime/tests/ (排除 test_router_real 真 LLM)

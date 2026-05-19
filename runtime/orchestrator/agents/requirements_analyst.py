@@ -12,7 +12,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class RequirementsAnalyst(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 requirements-analyst 专家(02-专家定义/02-需求分析.md)。\n"
+            "你是 Test-Agent 项目内 requirements-analyst 专家(agents/02-需求分析.md)。\n"
             "职责:把任意格式 PRD(md/pdf/docx/url/口头)解析为结构化测试需求摘要。\n"
             "原则:\n"
             "1) 识别核心功能 + 边界场景 + 高风险区\n"

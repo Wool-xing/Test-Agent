@@ -13,7 +13,7 @@ from runtime.init.wizard import InitAnswers
 def _templates_dir() -> Path:
     from runtime.config.settings import get_settings
 
-    return get_settings().project_root / "04-配置文件" / "templates"
+    return get_settings().project_root / "config" / "templates"
 
 
 def _read_version() -> str:
@@ -124,7 +124,7 @@ def _required_hint(key: str, ans: InitAnswers, m: Matrix) -> str:
         "TARGET_URL": "渗透目标 URL",
         "SCAN_PROFILE": "quick / full / stealth",
     }
-    return hints.get(key, "见 04-配置文件/INDEX.md")
+    return hints.get(key, "见 config/INDEX.md")
 
 
 def _apply(tpl: str, vars_: dict[str, str]) -> str:

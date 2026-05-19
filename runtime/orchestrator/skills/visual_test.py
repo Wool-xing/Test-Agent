@@ -4,7 +4,7 @@ V1.24.0 minimum viable (ROADMAP skill rollout #3 落地):
 - LLM 读 PRD + 上游 visual-tester expert 产物 → 5 阶段执行计划
   (环境检查 / 模板图准备 / 视觉冒烟 / 视觉回归 / 报告归档)
   + 质量门禁 + 多分辨率策略
-- 不实装 03-技能定义/visual-test.md 全部职责 (Airtest 真跑 / OCR 引擎
+- 不实装 skills/visual-test.md 全部职责 (Airtest 真跑 / OCR 引擎
   / SSIM 像素对比 / 多设备矩阵 等留后续深化)
 - 输出执行计划 JSON, 真执行守护在 utils 层 (visual_helper.py)
 """
@@ -21,7 +21,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class VisualTest(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 visual-test skill(03-技能定义/visual-test.md)。\n"
+            "你是 Test-Agent 项目内 visual-test skill(skills/visual-test.md)。\n"
             "职责:基于 PRD + 上游 visual-tester expert 产物,编排视觉/游戏测试 5 阶段执行计划。\n"
             "原则:\n"
             "1) 识别目标类型:手游 / PC游戏 / 网页游戏 / Canvas/WebGL / 富图形界面 / 3D 工具\n"

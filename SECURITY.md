@@ -66,11 +66,11 @@
 
 | 资产 | 类型 |
 |------|------|
-| `02-专家定义/15-渗透测试.md` | 渗透测试 Agent(调用 sqlmap / Metasploit / Hydra 等真实攻击工具) |
-| `03-技能定义/pentest-*.md`(7 项) | 渗透 skill 系列(api / coordinator / exploit / recon / report / vuln / web) |
-| `05-代码示例/api_security_scanner.py` | API 安全扫描器(SSRF / IDOR / JWT / CSRF; 默认 refuse,需 `TAGENT_PENTEST_AUTHORIZED=1` + AWS metadata 探针需 `confirm_metadata_probe=True`) |
-| `05-代码示例/ai_adversarial.py` | AI 对抗测试 / LLM 越狱 / Prompt Injection / 成员推断攻击(含 JAILBREAK_PROMPTS + PROMPT_INJECTION_TEMPLATES 模板; 4 个远端 op 默认 refuse,需 `TAGENT_PENTEST_AUTHORIZED=1`; `test_llm_jailbreak` / `test_prompt_injection` / `membership_inference_basic` 三个 HIGH 风险 op 额外需 `confirm_offensive=True` 或 `confirm_inference_attack=True` kwarg) |
-| `05-代码示例/security_scanner.py` | 通用安全扫描器(调用 ZAP / Burp) |
+| `agents/15-渗透测试.md` | 渗透测试 Agent(调用 sqlmap / Metasploit / Hydra 等真实攻击工具) |
+| `skills/pentest-*.md`(7 项) | 渗透 skill 系列(api / coordinator / exploit / recon / report / vuln / web) |
+| `utils/api_security_scanner.py` | API 安全扫描器(SSRF / IDOR / JWT / CSRF; 默认 refuse,需 `TAGENT_PENTEST_AUTHORIZED=1` + AWS metadata 探针需 `confirm_metadata_probe=True`) |
+| `utils/ai_adversarial.py` | AI 对抗测试 / LLM 越狱 / Prompt Injection / 成员推断攻击(含 JAILBREAK_PROMPTS + PROMPT_INJECTION_TEMPLATES 模板; 4 个远端 op 默认 refuse,需 `TAGENT_PENTEST_AUTHORIZED=1`; `test_llm_jailbreak` / `test_prompt_injection` / `membership_inference_basic` 三个 HIGH 风险 op 额外需 `confirm_offensive=True` 或 `confirm_inference_attack=True` kwarg) |
+| `utils/security_scanner.py` | 通用安全扫描器(调用 ZAP / Burp) |
 
 **操作者必须**:
 
@@ -89,9 +89,9 @@
 
 | utils 文件 | env var | 守护操作 | 额外约束 |
 |------|------|------|------|
-| `05-代码示例/chaos_helper.py` | `TAGENT_CHAOS_AUTHORIZED=1` | 混沌注入 + path / host validation | – |
-| `05-代码示例/db_test_helper.py` | `TAGENT_DB_TEST_AUTHORIZED=1` | `explain_query` / `benchmark_query` / `test_migration` / `test_postgres_backup_restore` | `test_postgres_backup_restore` 额外需 `confirm_destructive=True` kwarg;SQL identifier + cmd 双白名单 |
-| `05-代码示例/desktop_driver.py` | `TAGENT_DESKTOP_AUTHORIZED=1`(仅 macOS ops) | macOS: `open_macos_app` / `macos_menu`;跨平台: `get_windows_app` / `launch_electron` 路径校验 | macOS ops 需 platform=darwin + AppleScript identifier 白名单;跨平台 driver 接受的 exe / executable 路径必须绝对 + 存在 + 普通文件 + 非 symlink |
+| `utils/chaos_helper.py` | `TAGENT_CHAOS_AUTHORIZED=1` | 混沌注入 + path / host validation | – |
+| `utils/db_test_helper.py` | `TAGENT_DB_TEST_AUTHORIZED=1` | `explain_query` / `benchmark_query` / `test_migration` / `test_postgres_backup_restore` | `test_postgres_backup_restore` 额外需 `confirm_destructive=True` kwarg;SQL identifier + cmd 双白名单 |
+| `utils/desktop_driver.py` | `TAGENT_DESKTOP_AUTHORIZED=1`(仅 macOS ops) | macOS: `open_macos_app` / `macos_menu`;跨平台: `get_windows_app` / `launch_electron` 路径校验 | macOS ops 需 platform=darwin + AppleScript identifier 白名单;跨平台 driver 接受的 exe / executable 路径必须绝对 + 存在 + 普通文件 + 非 symlink |
 
 **与武器化代码区分**: 上述 utils 设计用途是**测试**而非**攻击**,但调用时仍执行任意 SQL / shell / AppleScript。env var gate 是误调防护,不豁免操作者的环境隔离责任。
 

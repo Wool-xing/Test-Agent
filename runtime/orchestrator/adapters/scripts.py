@@ -1,4 +1,4 @@
-"""Adapter: wrap `05-代码示例/*.py` scripts as callable units.
+"""Adapter: wrap `utils/*.py` scripts as callable units.
 
 Uses subprocess to isolate sys.path / globals from the runtime layer.
 """
@@ -30,7 +30,7 @@ class ScriptResult:
 
 
 def run_script(script_filename: str, args: list[str] | None = None, *, timeout: int = 1800) -> ScriptResult:
-    """Run a script under 05-代码示例/ by filename.
+    """Run a script under utils/ by filename.
 
     Args:
         script_filename: e.g. "smoke_runner.py" (must live under scripts_dir).

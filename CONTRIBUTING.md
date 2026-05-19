@@ -11,12 +11,12 @@
 3. 顶部 YAML frontmatter（必含 `name` / `description` / `tools`；可选 `requires_layer: [base, <layer>]` 标注依赖层，值见 `docs/charter/05-install-deploy.md` 六层定义）
 4. 编写：职责 / 工具栈 / Page Object 或调用模板 / 协作输出
 5. **同步**：
-   - `02-专家定义/README.md` 加一行
+   - `agents/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `01-测试主管.md` 路由表（如平台扩展）
    - `utils/prd_loader.PLATFORM_KEYWORDS` 加关键词（如平台扩展）
    - `install.sh` agents 数组加文件名
-   - `01-快速开始/部署说明.md` PowerShell + bash 拷贝清单加
+   - `docs/getting-started/部署说明.md` PowerShell + bash 拷贝清单加
 
 ---
 
@@ -33,12 +33,12 @@
    - 质量门禁
    - 输出文件
 5. **同步**：
-   - `03-技能定义/README.md` 加一行
+   - `skills/README.md` 加一行
    - `00-项目导航.md` 加一行
-   - `01-快速开始/使用手册.md` skill 详解段加描述
+   - `docs/getting-started/使用手册.md` skill 详解段加描述
    - `01-测试主管.md` 快速命令清单加一行
    - `install.sh` skills 数组加文件名
-   - `01-快速开始/部署说明.md` 拷贝清单加
+   - `docs/getting-started/部署说明.md` 拷贝清单加
 
 ---
 
@@ -49,14 +49,14 @@
 3. 顶部 docstring 标注被引用方
 4. 必含：公开 API + CLI（argparse）
 5. **同步**：
-   - `05-代码示例/README.md` 表格加一行
+   - `utils/README.md` 表格加一行
    - `00-项目导航.md` 对应分类加一行
-   - `04-配置文件/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
-   - `04-配置文件/.env.example` 加配置字段
-   - `04-配置文件/conftest.py` `pytest_configure` 加产出目录
-   - `04-配置文件/pytest.ini` markers 加新标记
+   - `config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
+   - `config/.env.example` 加配置字段
+   - `config/conftest.py` `pytest_configure` 加产出目录
+   - `config/pytest.ini` markers 加新标记
    - `install.sh` utils 数组 + 数字
-   - `01-快速开始/部署说明.md` 拷贝清单 + 数字
+   - `docs/getting-started/部署说明.md` 拷贝清单 + 数字
 
 ---
 
@@ -71,9 +71,9 @@
 
 ## 添加新 .env 字段
 
-1. `04-配置文件/.env.example` 加（带注释）
-2. `01-快速开始/配置清单.md` 字段说明加一行
-3. `04-配置文件/conftest.py` `EnvConfig` 加字段（如功能必需）
+1. `config/.env.example` 加（带注释）
+2. `docs/getting-started/配置清单.md` 字段说明加一行
+3. `config/conftest.py` `EnvConfig` 加字段（如功能必需）
 4. CI yml / Jenkins Credentials 同步（如 CI 需要）
 
 ---
@@ -110,10 +110,10 @@ perf(jmeter): 减少不必要心跳
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
-ls 02-专家定义/[0-9]*.md | wc -l   # 18（或 +N）
-ls 03-技能定义/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
-ls 05-代码示例/*.py | wc -l         # 67（或 +N,含 __init__.py）
-grep -c "^    [a-z_]+:" 04-配置文件/pytest.ini  # markers 数
+ls agents/[0-9]*.md | wc -l   # 18（或 +N）
+ls skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
+ls utils/*.py | wc -l         # 67（或 +N,含 __init__.py）
+grep -c "^    [a-z_]+:" config/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
 ```
@@ -128,12 +128,12 @@ pytest --collect-only
 
 | 改动类型 | 必同步至 |
 |---------|---------|
-| 新增/删除 Agent | `02-专家定义/README.md` + `00-项目导航.md` + `install.sh` agents 数组 + `01-快速开始/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS` |
-| 新增/删除 Skill | `03-技能定义/README.md` + `00-项目导航.md` + `install.sh` skills 数组 + `01-快速开始/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单 |
-| 新增/删除 utils | `05-代码示例/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers + `install.sh` utils 数组 |
+| 新增/删除 Agent | `agents/README.md` + `00-项目导航.md` + `install.sh` agents 数组 + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS` |
+| 新增/删除 Skill | `skills/README.md` + `00-项目导航.md` + `install.sh` skills 数组 + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单 |
+| 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers + `install.sh` utils 数组 |
 | 数字变化（18/32+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.sh + ci.yml `file-count` job 校验 |
 | URL/repo 名变化 | grep `Wool-xing/Test-Agent` 全替换 + `install.sh::REPO_URL` + `dependabot.yml` |
-| 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `02-专家定义/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
+| 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `agents/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
 
 ### 自动化保障
 
@@ -152,7 +152,7 @@ pytest --collect-only
 
 ## RACI 协作矩阵（浓缩版）
 
-> 完整路由逻辑见 `02-专家定义/01-测试主管.md` PLATFORM_KEYWORDS 与 `02-专家定义/README.md` 流程依赖关系。
+> 完整路由逻辑见 `agents/01-测试主管.md` PLATFORM_KEYWORDS 与 `agents/README.md` 流程依赖关系。
 
 ### 缩写
 

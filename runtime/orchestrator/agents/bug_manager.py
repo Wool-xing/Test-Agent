@@ -12,7 +12,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class BugManager(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 bug-manager 专家(02-专家定义/08-Bug管理.md)。\n"
+            "你是 Test-Agent 项目内 bug-manager 专家(agents/08-Bug管理.md)。\n"
             "职责:把 test-executor 的失败列表转 BugTracker-ready Bug(默认 zentao,可换 Jira/GitHub Issues 等,主宪章 §37)。\n"
             "原则:\n"
             "1) severity 权威映射:1=P0(阻塞)/ 2=P1(高)/ 3=P2(中)/ 4=P3(低)\n"
