@@ -23,7 +23,10 @@ logger = logging.getLogger(__name__)
 # 部署后: conftest.py 在 $PROJECT_ROOT/, utils 在 $PROJECT_ROOT/utils/
 # 源码仓: conftest.py 在 config/, utils 在 ../utils/
 # 双场景都加 sys.path,确保 utils 平铺 import (e.g., `from api_retry_util import ...`) 工作
-_PROJECT_ROOT = Path(__file__).parent
+_CONFIG_DIR = Path(__file__).parent
+_PROJECT_ROOT = _CONFIG_DIR.parent if (_CONFIG_DIR / ".." / "utils").resolve().is_dir() else _CONFIG_DIR
+if str(_CONFIG_DIR) not in sys.path:
+    sys.path.insert(0, str(_CONFIG_DIR))
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
@@ -34,6 +37,11 @@ _UTILS_CANDIDATES = [
 for _utils_dir in _UTILS_CANDIDATES:
     if _utils_dir.is_dir() and str(_utils_dir) not in sys.path:
         sys.path.insert(0, str(_utils_dir))
+        # utils 子目录也注入 — V1.42.0 重组后 utils/ 下 12 子目录
+        for _sub in _utils_dir.iterdir():
+            if _sub.is_dir() and not _sub.name.startswith(("_", ".")):
+                if str(_sub) not in sys.path:
+                    sys.path.insert(0, str(_sub))
 
 
 # ===== 环境配置 =====

@@ -11,7 +11,7 @@ import requests
 from dotenv import load_dotenv
 
 # 同包 import（部署后 utils/ 在 sys.path 中）
-from api_retry_util import call_with_retry
+from utils.protocols.api_retry_util import call_with_retry
 
 load_dotenv()
 logger = logging.getLogger(__name__)

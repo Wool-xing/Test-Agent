@@ -152,7 +152,7 @@ def _load_taboo_matrix():
     _here = _Path(__file__).resolve().parent
     if str(_here) not in _sys.path:
         _sys.path.insert(0, str(_here))
-    from taboo_matrix import (
+    from utils.design.taboo_matrix import (
         TABOO_WORDS, TABOO_COLORS, TABOO_NUMBERS,
         TABOO_HOLIDAYS, SACRED_CONTEXTS,
         get_matrix_summary, get_supported_locales,

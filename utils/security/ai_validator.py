@@ -128,7 +128,7 @@ def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
     """Run full fairness audit via fairness_auditor and return summary dict."""
     import pandas as pd
 
-    from fairness_auditor import (
+    from utils.a11y_i18n.fairness_auditor import (
         audit_dataset_bias,
         audit_model_fairness,
         export_bias_report,
@@ -270,7 +270,7 @@ def run_evidence_chain_audit(
     output_dir: str = "workspace/执行日志/evidence",
 ) -> Dict:
     """Build evidence chain package from workspace and export JSON + custody report."""
-    from evidence_chain import (
+    from utils.reporting.evidence_chain import (
         build_evidence_chain,
         export_package,
         export_chain_of_custody_report,

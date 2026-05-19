@@ -43,7 +43,7 @@ def generate_jmeter_dataset(
     批量生成并导出 JMeter 压测专用用户数据。
     count 建议 = JMeter 并发线程数（确保每个虚拟用户独立账号）。
     """
-    from data_factory import UserFactory  # 同 utils 包内同级 import
+    from utils.data.data_factory import UserFactory
     users = [UserFactory() for _ in range(count)]
     return export_to_jmeter_csv(users, output_path, fields)
 
