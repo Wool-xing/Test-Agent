@@ -83,6 +83,14 @@ class Settings(BaseSettings):
     docker_host: str = Field(default="")
     ci_mode: bool = Field(default=False)
 
+    def model_post_init(self, _context: object) -> None:
+        """Resolve relative Path fields to absolute after model init."""
+        root = self.project_root
+        for attr in ("experts_dir", "skills_dir", "scripts_dir", "workspace_dir"):
+            p = getattr(self, attr)
+            if not p.is_absolute():
+                object.__setattr__(self, attr, (root / p).resolve())
+
     def resolve(self, rel: Path) -> Path:
         return rel if rel.is_absolute() else (self.project_root / rel).resolve()
 

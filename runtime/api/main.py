@@ -14,22 +14,24 @@ from fastapi.responses import JSONResponse
 from loguru import logger
 
 from runtime import __version__
+from runtime.api.correlation import CorrelationMiddleware
 from runtime.api.deps import Kernel
-from runtime.api.models import CatalogResponse, RunCreateText, RunCreated, RunStatus as RunStatusModel
+from runtime.api.endpoints.cancel import router as cancel_router
+from runtime.api.endpoints.stream import router as stream_router
+from runtime.api.models import CatalogResponse, RunCreated, RunCreateText
+from runtime.api.models import RunStatus as RunStatusModel
 from runtime.api.parsers import parse_path, parse_text, parse_url
+from runtime.api.result_store import ResultStore
 from runtime.config.settings import get_settings
 from runtime.observability.prometheus_metrics import create_metrics_router
-from runtime.api.correlation import CorrelationMiddleware
-from runtime.api.endpoints.cancel import router as cancel_router, register_run, unregister_run
-from runtime.api.endpoints.stream import router as stream_router
-from runtime.api.result_store import ResultStore
 
 _settings = get_settings()
 
 app = FastAPI(title="Test-Agent Runtime", version=__version__)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:*", "http://127.0.0.1:*", "tauri://localhost"],
+    allow_origins=["tauri://localhost"],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
 )
@@ -94,7 +96,7 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 
 
 @app.post("/run/file", response_model=RunCreated)
-async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]
+async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
     suffix = Path(file.filename or "upload").suffix.lower()
     allowed = {".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip", ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml", ".py", ".js", ".ts", ".apk", ".ipa"}
     if suffix not in allowed:

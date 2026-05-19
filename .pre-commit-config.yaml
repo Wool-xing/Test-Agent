@@ -26,6 +26,9 @@ repos:
       - id: ruff
         args: [--config, "utils/.ruff.toml"]
         files: ^utils/
+      - id: ruff
+        args: [--config, "runtime/pyproject.toml"]
+        files: ^runtime/
       # ruff-format 关掉：utils 紧凑 CLI 风格不需自动重排
 
   # ===== 凭据扫描（gitleaks）=====

@@ -101,9 +101,9 @@ updates:
     commit-message:
       prefix: "ci"
 
-  # ===== npm（Claude Code CLI / lighthouse / pa11y / playwright 等）=====
+  # ===== npm（runtime/web — React/Vite 前端）=====
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/runtime/web"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -113,5 +113,22 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+      - "ui"
+    commit-message:
+      prefix: "deps(npm)"
+
+  # ===== npm（desktop — Electron 桌面应用）=====
+  - package-ecosystem: "npm"
+    directory: "/desktop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "npm"
+      - "desktop"
     commit-message:
       prefix: "deps(npm)"
