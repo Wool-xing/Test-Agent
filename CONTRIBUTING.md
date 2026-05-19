@@ -110,7 +110,7 @@ perf(jmeter): 减少不必要心跳
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
-ls agents/[0-9]*.md | wc -l   # 18（或 +N）
+ls agents/[0-9]*.md | wc -l   # 16（或 +N）
 ls skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
 ls utils/*.py | wc -l         # 67（或 +N,含 __init__.py）
 grep -c "^    [a-z_]+:" config/pytest.ini  # markers 数
@@ -162,7 +162,7 @@ pytest --collect-only
 - **I** = Informed（被通报）
 - 空 = 不参与
 
-### 18 专家代号
+### 16 专家代号
 
 | 代号 | 专家 | 类别 |
 |------|------|------|

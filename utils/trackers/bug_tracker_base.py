@@ -50,31 +50,31 @@ class BugTrackerBase(ABC):
 TRACKER_REGISTRY: dict[str, type[BugTrackerBase]] = {}
 
 try:
-    from zentao_bug_manager import ZentaoBugManager  # noqa: F811
+    from utils.trackers.zentao_bug_manager import ZentaoBugManager
     TRACKER_REGISTRY["zentao"] = ZentaoBugManager
 except ImportError:
     pass
 
 try:
-    from jira_bug_manager import JiraBugManager  # noqa: F811
+    from utils.trackers.jira_bug_manager import JiraBugManager
     TRACKER_REGISTRY["jira"] = JiraBugManager
 except ImportError:
     pass
 
 try:
-    from github_bug_manager import GitHubBugManager  # noqa: F811
+    from utils.trackers.github_bug_manager import GitHubBugManager
     TRACKER_REGISTRY["github"] = GitHubBugManager
 except ImportError:
     pass
 
 try:
-    from linear_bug_manager import LinearBugManager  # noqa: F811
+    from utils.trackers.linear_bug_manager import LinearBugManager
     TRACKER_REGISTRY["linear"] = LinearBugManager
 except ImportError:
     pass
 
 try:
-    from webhook_bug_manager import WebhookBugManager  # noqa: F811
+    from utils.trackers.webhook_bug_manager import WebhookBugManager
     TRACKER_REGISTRY["webhook"] = WebhookBugManager
 except ImportError:
     pass

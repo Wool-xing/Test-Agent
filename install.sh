@@ -2,7 +2,7 @@
 # Test-Agent 工作流一键部署脚本
 #
 # 安全提示：curl | bash 存在供应链风险。生产环境建议先 clone 仓库再本地执行：
-#   git clone --depth 1 --branch v1.32.5 https://github.com/Wool-xing/Test-Agent.git
+#   git clone --depth 1 --branch v1.42.0 https://github.com/Wool-xing/Test-Agent.git
 #   cd Test-Agent && bash install.sh /path/to/your-test-project
 #
 # 用法（远程一行，方便快速试用）：
@@ -17,7 +17,7 @@ REPO_URL="${TEST_AGENT_REPO_URL:-https://github.com/Wool-xing/Test-Agent.git}"
 REPO_BRANCH="${TEST_AGENT_REPO_BRANCH:-main}"
 
 echo "=========================================="
-echo " Test-Agent 工作流一键部署 V1.36.0"
+echo " Test-Agent 工作流一键部署 V1.42.0"
 echo " 仓库:     $REPO_URL ($REPO_BRANCH)"
 echo " 项目目录: $PROJECT_ROOT"
 echo "=========================================="
@@ -28,7 +28,7 @@ PRESERVE_FILES=(".env" "workspace/测试数据/test_data.json"
                 "workspace/regression_modules.yaml")
 BACKUP_DIR=""
 if [[ -d "$PROJECT_ROOT" ]]; then
-    BACKUP_DIR="$(mktemp -d -t test-agent-backup-XXXXXX)"
+    BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/test-agent-backup-XXXXXXXX")"
     echo "→ 检测到已有项目，备份用户数据到 $BACKUP_DIR"
     for f in "${PRESERVE_FILES[@]}"; do
         if [[ -f "$PROJECT_ROOT/$f" ]]; then
@@ -52,7 +52,7 @@ restore_user_data() {
         rm -rf "$BACKUP_DIR"
     fi
 }
-trap 'restore_user_data; [[ -n "${TEMPLATE_DIR:-}" ]] && rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null || true' EXIT
+trap 'restore_user_data; [[ -n "${TEMPLATE_DIR:-}" ]] && rm -rf "$(dirname "$TEMPLATE_DIR")" 2>/dev/null' EXIT
 
 # ===== 1. 检查工具 =====
 need() { command -v "$1" >/dev/null 2>&1 || { echo "❌ 缺少 $1"; exit 1; }; }
@@ -139,26 +139,17 @@ cp "$TEMPLATE_DIR/config/.mcp.json"        "$PROJECT_ROOT/"
 cp "$TEMPLATE_DIR/config/requirements.txt" "$PROJECT_ROOT/"
 [[ -f "$PROJECT_ROOT/.env" ]] || cp "$TEMPLATE_DIR/config/.env.example" "$PROJECT_ROOT/.env"
 
-# ===== 7. utils（67 个 .py + __init__）=====
-echo "→ 拷贝 utils（67 个）..."
-for f in __init__.py api_retry_util.py data_factory.py data_masking.py \
-         excel_generator.py flaky_detector.py generate_report.py \
-         jmeter_csv_exporter.py jmeter_result_parser.py \
-         regression_scope.py zentao_bug_manager.py ci_quality_gate.py \
-         mobile_driver.py miniprogram_runner.py desktop_driver.py \
-         visual_helper.py iot_helper.py media_validator.py \
-         tracing_validator.py mq_helper.py ai_validator.py \
-         prd_loader.py websocket_helper.py protocol_helper.py \
-         security_scanner.py network_throttle.py chaos_helper.py \
-         soak_runner.py ux_metrics.py compatibility_matrix.py \
-         state_machine_tester.py pairwise_generator.py bdd_runner.py \
-         web_vitals_collector.py api_security_scanner.py fuzzer.py \
-         db_test_helper.py contract_test.py openapi_test_gen.py \
-         push_test.py a11y_scanner.py i18n_checker.py \
-         mutation_runner.py dora_metrics.py blockchain_test.py ai_adversarial.py \
-         slo_validator.py email_sender.py suite_minimizer.py; do
-    cp "$TEMPLATE_DIR/utils/${f}" "$PROJECT_ROOT/utils/"
-done
+# ===== 7. utils（自动扫描全部 .py 文件）=====
+echo "→ 拷贝 utils..."
+_count=0
+while IFS= read -r -d '' f; do
+    rel="${f#$TEMPLATE_DIR/utils/}"
+    dest="$PROJECT_ROOT/utils/$rel"
+    mkdir -p "$(dirname "$dest")"
+    cp "$f" "$dest"
+    _count=$((_count + 1))
+done < <(find "$TEMPLATE_DIR/utils" -name "*.py" -print0)
+echo "  ✓ $_count 个 .py 文件已拷贝"
 
 # ===== 8. CI/CD =====
 echo "→ 拷贝 CI/CD..."
@@ -196,8 +187,13 @@ export PYTHONIOENCODING=utf-8
 # (B uv 待 upstream 修: 实测 uv + Tsinghua 组合协同有 bug, 未达预期 10x)
 if [[ -z "${PIP_INDEX_URL:-}" ]]; then
     is_cn=0
-    case "${LANG:-}" in zh*|*CN*|*GB*) is_cn=1 ;; esac
-    [[ "$(date +%z 2>/dev/null)" == "+0800" ]] && is_cn=1
+    # 允许显式跳过 CN 镜像: TEST_AGENT_NO_CN_MIRROR=1 ./install.sh ...
+    if [[ "${TEST_AGENT_NO_CN_MIRROR:-0}" == "1" ]]; then
+        is_cn=0
+    else
+        case "${LANG:-}" in zh*|*CN*|*GB*) is_cn=1 ;; esac
+        [[ "$(date +%z 2>/dev/null)" == "+0800" ]] && is_cn=1
+    fi
     if [[ $is_cn -eq 1 ]]; then
         echo "→ 检测到 CN 环境, 用清华 PyPI 镜像加速 (export PIP_INDEX_URL=... 可覆盖)"
         export PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple

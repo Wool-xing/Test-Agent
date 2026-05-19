@@ -53,7 +53,7 @@ contextBridge.exposeInMainWorld("tagendAPI", {
 
   // ── Metadata ──
   getBackendPort: () => 8800,
-  getAppVersion: () => "1.33.0",
+  getAppVersion: () => "1.42.0",
   platform: process.platform,
   isElectron: true,
 });

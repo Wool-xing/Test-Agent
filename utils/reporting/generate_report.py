@@ -191,9 +191,9 @@ def send_wechat_report(summary: Dict, webhook: Optional[str] = None) -> bool:
 
 def send_feishu_report(summary: Dict, webhook: Optional[str] = None) -> bool:
     """飞书 富文本卡片 通知"""
-    webhook = webhook or os.getenv("FEISHU_WEBHOOK")
+    webhook = webhook or os.getenv("FEISHU_WEBHOOK_URL")
     if not webhook:
-        logger.warning("未配置 FEISHU_WEBHOOK，跳过飞书通知")
+        logger.warning("未配置 FEISHU_WEBHOOK_URL，跳过飞书通知")
         return False
     # 飞书卡片合法颜色：blue/wathet/turquoise/green/yellow/orange/red/carmine/violet/purple/indigo/grey
     color = "green" if summary.get("pass_rate", 0) >= 0.9 else "red"
@@ -234,9 +234,9 @@ def send_feishu_report(summary: Dict, webhook: Optional[str] = None) -> bool:
 
 def send_dingtalk_report(summary: Dict, webhook: Optional[str] = None) -> bool:
     """钉钉 markdown 通知"""
-    webhook = webhook or os.getenv("DINGTALK_WEBHOOK")
+    webhook = webhook or os.getenv("DINGTALK_WEBHOOK_URL")
     if not webhook:
-        logger.warning("未配置 DINGTALK_WEBHOOK，跳过钉钉通知")
+        logger.warning("未配置 DINGTALK_WEBHOOK_URL，跳过钉钉通知")
         return False
     pass_rate = summary.get("pass_rate", 0)
     verdict = summary.get("verdict", "通过")

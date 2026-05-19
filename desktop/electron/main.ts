@@ -141,7 +141,14 @@ function createWindow(): void {
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+        shell.openExternal(url);
+      }
+    } catch {
+      // Invalid URL — silently ignore
+    }
     return { action: "deny" };
   });
 }

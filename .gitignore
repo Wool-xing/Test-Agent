@@ -25,7 +25,6 @@ workspace/自动化脚本/
 
 # 但保留 workspace/执行日志/baselines/（性能基线需提交）
 !workspace/执行日志/baselines/
-!workspace/执行日志/baselines/*.json
 
 # ===== 敏感配置 =====
 .env
@@ -51,7 +50,6 @@ npm-debug.log
 package-lock.json
 
 # ===== 操作系统 =====
-.DS_Store
 desktop.ini
 
 # ===== 日志 =====

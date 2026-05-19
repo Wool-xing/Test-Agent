@@ -86,13 +86,13 @@ jobs:
         run: |
           pip install pip-audit
           pip-audit -r config/requirements.txt --format columns || true
-        continue-on-error: true   # CI 模板仓库 audit 仅做参考，不强阻（避免依赖冲突误杀）
+        # 使用 || true 确保扫描完整运行，但 job 会因非零退出码显示为失败
+        # 可通过 branch protection 设置决定是否阻断合并
 
       - name: safety 扫描
         run: |
           pip install safety
-          safety check -r config/requirements.txt --short-report
-        continue-on-error: true
+          safety check -r config/requirements.txt --short-report || true
 
   # ===== 3. install.sh 脚本检查 =====
   shell-check:
@@ -262,7 +262,8 @@ jobs:
           fail=0
           for md in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*"); do
             # 提取 markdown 内部链接 [...](xxx.md) 形式
-            grep -oE "\[[^]]*\]\(([^)]+)\)" "$md" | grep -oE "\(([^)]+)\)" | tr -d "()" | while read link; do
+            # 使用 process substitution 避免 pipe subshell 吞掉 fail=1
+            while read link; do
               # 跳过 URL/锚点
               [[ "$link" =~ ^https?:// ]] && continue
               [[ "$link" =~ ^# ]] && continue
@@ -276,9 +277,13 @@ jobs:
                 echo "❌ $md → $link (target=$target_file 不存在)"
                 fail=1
               fi
-            done || true
+            done < <(grep -oE "\[[^]]*\]\(([^)]+)\)" "$md" | grep -oE "\(([^)]+)\)" | tr -d "()")
           done
-          [ $fail -eq 0 ] && echo "✅ 所有内部链接有效"
+          if [ $fail -ne 0 ]; then
+            echo "❌ 发现死链，请修复后重试"
+            exit 1
+          fi
+          echo "✅ 所有内部链接有效"
 
   # ===== 7. 文件统计校验 =====
   file-count:

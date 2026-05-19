@@ -205,7 +205,7 @@ def list_history() -> dict:
                         "duration_s": data.get("duration_s", data.get("duration_ms", 0) / 1000 if "duration_ms" in data else 0),
                         "confidence": data.get("confidence", 0),
                     })
-            except (OSError, json.JSONDecodeError, ValueError) as e:
+            except (OSError, _json.JSONDecodeError, ValueError) as e:
                 logger.warning("skipping unreadable run file {}: {}", f, e)
 
     return {"runs": runs[:50]}

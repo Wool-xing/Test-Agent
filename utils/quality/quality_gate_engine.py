@@ -20,9 +20,9 @@ from typing import Any
 try:
     import defusedxml.ElementTree as ET  # type: ignore[import-untyped]
 except ImportError:
-    logger = logging.getLogger(__name__)
-    logger.warning("defusedxml 未安装，使用标准库 xml.etree.ElementTree（不防 Billion Laughs）。pip install defusedxml")
-    import xml.etree.ElementTree as ET
+    raise ImportError(
+        "defusedxml is required for secure XML parsing. Install with: pip install defusedxml"
+    )
 
 logger = logging.getLogger(__name__)
 

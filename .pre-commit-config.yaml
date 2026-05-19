@@ -9,7 +9,6 @@ repos:
         # upstream skill 目录不动(主宪章 §14 §27 darwin-skill / karpathy-guidelines 禁本地 fork)
         exclude: ^skills/(darwin-skill|karpathy-guidelines)/
       - id: check-yaml
-        exclude: ^ci/jenkins-pipeline\.groovy$
       - id: check-json
       - id: check-toml
       - id: check-added-large-files

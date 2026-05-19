@@ -19,6 +19,36 @@ from runtime.router.schema import DAGNode, RoutingDecision
 from runtime.self_healing.retry import with_retry
 
 
+def _is_abort_exception(exc: Exception) -> bool:
+    """Check if exception signals an on_failure=abort (not a transient error)."""
+    return isinstance(exc, RuntimeError) and "aborted" in str(exc)
+
+
+def _run_node_with_retry(node: DAGNode, pool: ThreadPoolExecutor, results: dict, log) -> None:
+    """Execute a node with retries, respecting on_failure=abort."""
+    nid = node.id
+    try:
+        results[nid] = pool.submit(_run_node, node).result()
+    except Exception as exc:
+        log.warning("node {} attempt failed: {}", nid, exc)
+        if node.on_failure == "abort" or _is_abort_exception(exc):
+            results[nid] = {"id": nid, "ok": False, "error": str(exc), "aborted": True}
+            return
+        # retry up to 2 more times for transient errors
+        for attempt in range(2):
+            time.sleep(2 ** attempt)
+            try:
+                results[nid] = pool.submit(_run_node, node).result()
+                return
+            except Exception as retry_exc:
+                log.warning("node {} retry {}/2 failed", nid, attempt + 1)
+                if node.on_failure == "abort" or _is_abort_exception(retry_exc):
+                    results[nid] = {"id": nid, "ok": False, "error": str(retry_exc), "aborted": True}
+                    return
+                if attempt == 1:
+                    results[nid] = {"id": nid, "ok": False, "error": str(retry_exc)}
+
+
 def _run_node(node: DAGNode) -> dict[str, Any]:
     from runtime.orchestrator.hooks import get_hook_registry
 
@@ -100,53 +130,42 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                 done_now = [nid for nid, f in futures.items() if f.done() and nid in pending]
                 if not done_now:
                     # block on the oldest pending future
-                    next_id = next(iter(futures))
+                    next_id = next(nid for nid in futures if nid in pending)
                     try:
                         results[next_id] = futures[next_id].result()
-                    except Exception as e:  # noqa: BLE001
-                        log.warning("node {} attempt failed: {}", next_id, e)
-                        for attempt in range(2):
-                            time.sleep(2**attempt)
-                            try:
-                                fut = pool.submit(_run_node, by_id[next_id])
-                                results[next_id] = fut.result()
-                                break
-                            except Exception as retry_exc:  # noqa: BLE001
-                                log.warning("node {} retry {}/2 failed", next_id, attempt + 1)
-                                if attempt == 1:
-                                    results[next_id] = {"id": next_id, "ok": False, "error": str(retry_exc)}
-                    if results.get(next_id):
-                        if results[next_id].get("skipped"):
+                    except Exception as exc:
+                        log.warning("node {} attempt failed: {}", next_id, exc)
+                        _run_node_with_retry(by_id[next_id], pool, results, log)
+                    r = results.get(next_id)
+                    if r:
+                        if r.get("skipped"):
                             skipped.append(next_id)
-                        elif not results[next_id].get("ok"):
+                        elif not r.get("ok"):
                             failures.append(next_id)
-                            if len(failures) >= MAX_FAILURES:
-                                log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                            if r.get("aborted") or len(failures) >= MAX_FAILURES:
+                                if r.get("aborted"):
+                                    log.error("node {} aborted, terminating DAG", next_id)
+                                else:
+                                    log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                                 circuit_broken = True
                     pending.discard(next_id)
                     continue
                 for nid in done_now:
                     try:
                         results[nid] = futures[nid].result()
-                    except Exception as e:  # noqa: BLE001
-                        log.warning("node {} attempt failed: {}", nid, e)
-                        for attempt in range(2):
-                            time.sleep(2**attempt)
-                            try:
-                                fut = pool.submit(_run_node, by_id[nid])
-                                results[nid] = fut.result()
-                                break
-                            except Exception as retry_exc:  # noqa: BLE001
-                                log.warning("node {} retry {}/2 failed", nid, attempt + 1)
-                                if attempt == 1:
-                                    results[nid] = {"id": nid, "ok": False, "error": str(retry_exc)}
-                    if results.get(nid):
-                        if results[nid].get("skipped"):
+                    except Exception as exc:
+                        results[nid] = {"id": nid, "ok": False, "error": str(exc), "aborted": _is_abort_exception(exc)}
+                    r = results.get(nid)
+                    if r:
+                        if r.get("skipped"):
                             skipped.append(nid)
-                        elif not results[nid].get("ok"):
+                        elif not r.get("ok"):
                             failures.append(nid)
-                            if len(failures) >= MAX_FAILURES:
-                                log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                            if r.get("aborted") or len(failures) >= MAX_FAILURES:
+                                if r.get("aborted"):
+                                    log.error("node {} aborted, terminating DAG", nid)
+                                else:
+                                    log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                                 circuit_broken = True
                     pending.discard(nid)
     finally:

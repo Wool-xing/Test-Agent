@@ -98,7 +98,7 @@ Test-Agent/
 ├── agents/             ← 16 个专家 Agent (11 production + 5 script + 0 rollout)
 ├── skills/             ← 32 个业务 Skill (23 production + 7 script + 0 rollout + 2 vision) + 3 个元 Skill
 ├── config/             ← conftest / pytest.ini / .env / .mcp.json
-├── utils/             ← 67 个生产工具
+├── utils/             ← 78 个生产工具
 ├── ci/             ← GitHub Actions + Jenkins
 ├── runtime/                ← V1.x 运行时(router/orchestrator/MCP/web/scheduler/subagent/learning_loop/backends/gateway/tutor/essence_watcher/marketplace)
 ├── docs/charter/           ← 愿景宪章(7 子文件: vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license)

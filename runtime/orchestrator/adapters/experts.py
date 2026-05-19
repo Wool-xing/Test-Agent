@@ -152,15 +152,19 @@ def _resolve_script(name: str, kind: str) -> str | None:
     return None
 
 
+import threading as _threading
+
 _upstream_outputs: dict[str, dict] = {}  # 流水线内每 expert 产物缓存,供下游 RunnerContext.upstream
 _upstream_meta: dict[str, dict] = {}     # 流水线内每 expert 元信息 (ok/degraded/error),供下游 RunnerContext.upstream_meta
                                           # 防 mock 闭环: test-lead 看到任一 degraded → 决策降级
+_upstream_lock = _threading.Lock()        # 防御性锁: 拓扑排序保证依赖顺序,锁仅防未来并行分支
 
 
 def reset_upstream_cache() -> None:
     """每次新 run 开始前由 flow 调,清空上游产物缓存."""
-    _upstream_outputs.clear()
-    _upstream_meta.clear()
+    with _upstream_lock:
+        _upstream_outputs.clear()
+        _upstream_meta.clear()
 
 
 def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: int = 1800) -> StepOutcome:
@@ -219,8 +223,9 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 import time as _t
                 t0 = _t.time()
                 res = runner.run(ctx)
-                _upstream_outputs[name] = res.output
-                _upstream_meta[name] = {
+                with _upstream_lock:
+                    _upstream_outputs[name] = res.output
+                    _upstream_meta[name] = {
                     "ok": res.ok,
                     "degraded": res.degraded,
                     "error": res.error,
@@ -263,8 +268,9 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 import time as _t
                 t0 = _t.time()
                 res = runner.run(ctx)
-                _upstream_outputs[name] = res.output
-                _upstream_meta[name] = {
+                with _upstream_lock:
+                    _upstream_outputs[name] = res.output
+                    _upstream_meta[name] = {
                     "ok": res.ok,
                     "degraded": res.degraded,
                     "error": res.error,

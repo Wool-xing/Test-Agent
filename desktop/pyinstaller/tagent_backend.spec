@@ -13,10 +13,10 @@ a = Analysis(
     pathex=[str(PROJECT_ROOT), str(RUNTIME)],
     binaries=[],
     datas=[
-        (str(PROJECT_ROOT / "02-专家定义"), "02-专家定义"),
-        (str(PROJECT_ROOT / "03-技能定义"), "03-技能定义"),
-        (str(PROJECT_ROOT / "05-代码示例"), "05-代码示例"),
-        (str(PROJECT_ROOT / "04-配置文件"), "04-配置文件"),
+        (str(PROJECT_ROOT / "agents"), "agents"),
+        (str(PROJECT_ROOT / "skills"), "skills"),
+        (str(PROJECT_ROOT / "config"), "config"),
+        (str(PROJECT_ROOT / "utils"), "utils"),
         (str(PROJECT_ROOT / "VERSION"), "."),
     ],
     hiddenimports=[

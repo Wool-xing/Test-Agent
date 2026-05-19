@@ -173,7 +173,7 @@ def run_silent_failure_audit(
 ) -> Dict:
     """Run silent failure detection across all data sources and return summary dict."""
     from datetime import datetime, timezone
-    from silent_failure_detector import (
+    from utils.security.silent_failure_detector import (
         collect_from_tracing,
         collect_from_web_vitals,
         collect_from_prometheus_counter,

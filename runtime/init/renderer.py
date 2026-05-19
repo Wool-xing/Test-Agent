@@ -103,6 +103,10 @@ def _build_tpl_vars(ans: InitAnswers, m: Matrix) -> dict[str, str]:
         "REQUIRED_FILLS_BLOCK": required_fills,
         "PLATFORM_DEPS_HINT": platform_deps_hint,
         "SAMPLE_TARGET": sample_target,
+        # infra defaults (dev only — user must change for production)
+        "DB_URL": "postgresql+psycopg://tagent:tagent@localhost:5432/tagent",
+        "MINIO_ACCESS_KEY": "minioadmin",
+        "MINIO_SECRET_KEY": "minioadmin",
     }
 
 

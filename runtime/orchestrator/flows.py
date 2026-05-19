@@ -54,6 +54,17 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
                     log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                     break
             log.info("DAG progress: {}/{} nodes done", i, total)
+        else:
+            # no break — all futures completed normally
+            pass
+        # Cancel any remaining in-flight futures after circuit breaker or abort
+        cancelled = 0
+        for nid, fut in futures.items():
+            if nid not in results and not fut.done():
+                fut.cancel()
+                cancelled += 1
+        if cancelled:
+            log.warning("circuit breaker: cancelled {} in-flight task(s)", cancelled)
 
     # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
