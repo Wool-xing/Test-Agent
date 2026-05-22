@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import sys
-import subprocess
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -52,8 +52,9 @@ class TestCoexistence:
 class TestReplaceability:
     def test_standard_interfaces(self):
         """Core functions use standard Python interfaces (no custom protocols)."""
-        from runtime.orchestrator.adapters.experts import execute_node
         import inspect
+
+        from runtime.orchestrator.adapters.experts import execute_node
         sig = inspect.signature(execute_node)
         params = list(sig.parameters.keys())
         assert "name" in params

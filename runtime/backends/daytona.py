@@ -5,8 +5,6 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-from loguru import logger
-
 from runtime.backends.base import BaseExecutionEnv, ExecResult, register
 
 

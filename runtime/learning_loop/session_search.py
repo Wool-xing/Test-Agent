@@ -5,12 +5,9 @@ SQLite FTS5 over historical sessions. LLM summary attached at retrieval time.
 
 from __future__ import annotations
 
-import json
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
-
-from loguru import logger
 
 from runtime.config.settings import get_settings
 

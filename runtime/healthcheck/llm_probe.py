@@ -12,7 +12,6 @@ from dataclasses import dataclass
 from runtime.registry.registry import build_catalog
 from runtime.subagent.aux_client import aux_client
 
-
 SMOKE_PROMPT = "用一句话(≤30 字)用中文描述你这个测试专家的核心职责。不要任何前置废话。"
 
 

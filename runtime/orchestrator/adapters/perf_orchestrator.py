@@ -12,14 +12,12 @@ from __future__ import annotations
 
 import json
 import os
-import statistics
 import subprocess
-import sys
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable
 
 
 @dataclass

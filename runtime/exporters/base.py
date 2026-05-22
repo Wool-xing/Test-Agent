@@ -25,7 +25,7 @@ class TestCaseNode:
     expected: list[str] = field(default_factory=list)
     notes: str = ""
     tags: list[str] = field(default_factory=list)
-    children: list["TestCaseNode"] = field(default_factory=list)
+    children: list[TestCaseNode] = field(default_factory=list)
     id: str = ""  # optional,LLM 可不填,exporter 自动生成
 
 

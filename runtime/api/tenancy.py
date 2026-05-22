@@ -13,9 +13,6 @@ from __future__ import annotations
 
 import contextvars
 import os
-from typing import Optional
-
-from loguru import logger
 
 _current_tenant: contextvars.ContextVar[str | None] = contextvars.ContextVar(
     "current_tenant", default=None

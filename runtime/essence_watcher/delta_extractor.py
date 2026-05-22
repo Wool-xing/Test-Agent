@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-import json
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -85,7 +84,7 @@ def extract_delta(essence_name: str, repo_url: str, prev_sha: str | None, new_sh
     except Exception as e:
         logger.warning("LLM delta extraction failed: {}", e)
         return {
-            "delta_summary": f"LLM unavailable, manual review required",
+            "delta_summary": "LLM unavailable, manual review required",
             "new_skills": [],
             "new_rules": [],
             "new_test_methodology": [],
@@ -112,11 +111,11 @@ def write_update_report(essence_name: str, repo_url: str, prev_sha: str | None, 
         f"## Summary\n{delta.get('delta_summary', '(none)')}\n\n"
         f"## Applies to Test-Agent?\n**{delta.get('applies_to_test_agent', False)}** (LLM confidence: {delta.get('confidence', 'low')})\n\n"
         f"## New skills\n" + "\n".join(f"- {s}" for s in delta.get("new_skills", [])) + "\n\n"
-        f"## New rules\n" + "\n".join(f"- {s}" for s in delta.get("new_rules", [])) + "\n\n"
-        f"## New test methodology\n" + "\n".join(f"- {s}" for s in delta.get("new_test_methodology", [])) + "\n\n"
-        f"## Evidence(原文引用)\n" + "\n".join(f"> {e}" for e in delta.get("evidence", [])) + "\n\n"
-        f"---\n"
-        f"**Action required**: 用户审 → 改 `confidence: high/medium/low` + 填 `reviewer/last_reviewed`;若 applies_to_test_agent → 触发 Test-Agent 集成 PR;否则仅入 upstream 即结束。\n",
+        "## New rules\n" + "\n".join(f"- {s}" for s in delta.get("new_rules", [])) + "\n\n"
+        "## New test methodology\n" + "\n".join(f"- {s}" for s in delta.get("new_test_methodology", [])) + "\n\n"
+        "## Evidence(原文引用)\n" + "\n".join(f"> {e}" for e in delta.get("evidence", [])) + "\n\n"
+        "---\n"
+        "**Action required**: 用户审 → 改 `confidence: high/medium/low` + 填 `reviewer/last_reviewed`;若 applies_to_test_agent → 触发 Test-Agent 集成 PR;否则仅入 upstream 即结束。\n",
         encoding="utf-8",
     )
     return target

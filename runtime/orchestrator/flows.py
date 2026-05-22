@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from loguru import logger
 from prefect import flow
 from prefect.task_runners import ConcurrentTaskRunner
 

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from collections import OrderedDict
 from typing import Any
 
 from loguru import logger
@@ -25,14 +26,12 @@ _kernel: Kernel | None = None
 # Charter §21 横切预算: 防 server 长时跑无限增长.
 # Production should rely on Postgres `runs` table; this is the fast path.
 _MAX_RUN_RESULTS = 1024
-_run_results: "OrderedDict[str, dict]" = None  # type: ignore[assignment]
+_run_results: OrderedDict[str, dict] = None  # type: ignore[assignment]
 
 
 def _results_dict():
     global _run_results
     if _run_results is None:
-        from collections import OrderedDict
-
         _run_results = OrderedDict()
     return _run_results
 

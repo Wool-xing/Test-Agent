@@ -10,8 +10,6 @@ import time
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any
 
-from loguru import logger
-
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
 from runtime.orchestrator.adapters.experts import execute_node, reset_upstream_cache

@@ -7,8 +7,6 @@ import json
 import sys
 from pathlib import Path
 
-import pytest
-
 _utils_dir = Path(__file__).resolve().parents[2] / "utils"
 if str(_utils_dir) not in sys.path:
     sys.path.insert(0, str(_utils_dir))
@@ -38,7 +36,7 @@ class TestListGroups:
 
 class TestQueryScenarios:
     def test_query_all_returns_all(self):
-        from absentee_scenario_injector import query_scenarios, SCENARIOS
+        from absentee_scenario_injector import SCENARIOS, query_scenarios
         assert len(query_scenarios()) == len(SCENARIOS)
 
     def test_query_by_group(self):
@@ -76,7 +74,7 @@ class TestQueryScenarios:
 
 class TestInjectScenarios:
     def test_inject_all(self):
-        from absentee_scenario_injector import inject_scenarios, SCENARIOS
+        from absentee_scenario_injector import SCENARIOS, inject_scenarios
         results = inject_scenarios()
         # Default min_severity=P2 includes all
         assert len(results) == len(SCENARIOS)
@@ -113,7 +111,7 @@ class TestInjectScenarios:
 
 class TestGenerateCharter:
     def test_generates_markdown(self):
-        from absentee_scenario_injector import query_scenarios, generate_charter
+        from absentee_scenario_injector import generate_charter, query_scenarios
         scenarios = query_scenarios(groups=["visual_impairment"], severity="P0")
         charter = generate_charter(scenarios[0], module="login", duration_min=45)
         assert "# Charter:" in charter
@@ -141,7 +139,7 @@ class TestGenerateCharter:
 
 class TestCoverageReport:
     def test_full_coverage(self):
-        from absentee_scenario_injector import inject_scenarios, coverage_report
+        from absentee_scenario_injector import coverage_report, inject_scenarios
         scenarios = inject_scenarios()
         report = coverage_report(scenarios)
         assert report["total_absentee_groups"] == 9
@@ -149,7 +147,7 @@ class TestCoverageReport:
         assert len(report["groups_missing"]) == 0
 
     def test_partial_coverage(self):
-        from absentee_scenario_injector import inject_scenarios, coverage_report
+        from absentee_scenario_injector import coverage_report, inject_scenarios
         scenarios = inject_scenarios(groups=["visual_impairment", "elderly"])
         report = coverage_report(scenarios)
         assert report["groups_covered"] == 2
@@ -169,7 +167,7 @@ class TestCoverageReport:
 
 class TestExport:
     def test_export_json(self, tmp_path):
-        from absentee_scenario_injector import inject_scenarios, export_injection_plan
+        from absentee_scenario_injector import export_injection_plan, inject_scenarios
         scenarios = inject_scenarios(groups=["elderly"])
         path = export_injection_plan(scenarios, output_dir=str(tmp_path))
         assert Path(path).exists()
@@ -178,7 +176,7 @@ class TestExport:
         assert "coverage" in data
 
     def test_ci_summary(self):
-        from absentee_scenario_injector import inject_scenarios, ci_summary
+        from absentee_scenario_injector import ci_summary, inject_scenarios
         scenarios = inject_scenarios(groups=["visual_impairment", "mental_crisis"])
         text = ci_summary(scenarios)
         assert "visual_impairment" in text or "视觉" in text

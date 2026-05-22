@@ -105,7 +105,7 @@ class TestLead(AgentRunner):
             known_risks = ["此为 stub LLM 输出,非真测试数据"]
         else:
             verdict = "go"
-            summary_zh = f"selftest mock 验证 · GO"
+            summary_zh = "selftest mock 验证 · GO"
             rationale = (
                 "本次为 selftest fixture mock 运行 · 主流程编排链路全通 · "
                 "P0 Bug=0,自动判 go · 真生产环境请填真 PRD + 真 LLM 再判。"

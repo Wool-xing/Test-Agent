@@ -14,8 +14,6 @@ import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
-from loguru import logger
-
 
 @dataclass(slots=True)
 class GateResult:

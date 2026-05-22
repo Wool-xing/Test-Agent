@@ -13,19 +13,18 @@ from __future__ import annotations
 
 import logging
 from importlib.metadata import EntryPoint, entry_points
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
 PLUGIN_GROUP = "tagent"
 
 
-def discover_plugins() -> Dict[str, List[EntryPoint]]:
+def discover_plugins() -> dict[str, list[EntryPoint]]:
     """Discover all registered tagent plugins grouped by type.
 
     Returns: {"agents": [...], "skills": [...], "backends": [...]}
     """
-    discovered: Dict[str, List[EntryPoint]] = {"agents": [], "skills": [], "backends": []}
+    discovered: dict[str, list[EntryPoint]] = {"agents": [], "skills": [], "backends": []}
     try:
         eps = entry_points(group=PLUGIN_GROUP)
         for ep in eps:
@@ -47,9 +46,9 @@ def discover_plugins() -> Dict[str, List[EntryPoint]]:
     return discovered
 
 
-def list_plugins() -> List[Dict[str, str]]:
+def list_plugins() -> list[dict[str, str]]:
     """Flat list of all discovered plugins."""
-    plugins: List[Dict[str, str]] = []
+    plugins: list[dict[str, str]] = []
     for kind, eps in discover_plugins().items():
         for ep in eps:
             plugins.append({

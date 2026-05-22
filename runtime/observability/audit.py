@@ -10,7 +10,7 @@ import json
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from loguru import logger
 
@@ -30,7 +30,7 @@ def log_event(
     resource: str = "",
     resource_id: str = "",
     actor: str = "",
-    details: Optional[dict[str, Any]] = None,
+    details: dict[str, Any] | None = None,
     outcome: str = "success",
 ) -> None:
     """Append one audit event to today's JSONL file. Thread‑safe.
@@ -61,10 +61,10 @@ def log_event(
 
 
 def query_events(
-    action: Optional[str] = None,
-    resource: Optional[str] = None,
-    resource_id: Optional[str] = None,
-    actor: Optional[str] = None,
+    action: str | None = None,
+    resource: str | None = None,
+    resource_id: str | None = None,
+    actor: str | None = None,
     limit: int = 100,
     since_days: int = 7,
 ) -> list[dict[str, Any]]:

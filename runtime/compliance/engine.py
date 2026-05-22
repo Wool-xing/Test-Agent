@@ -11,7 +11,6 @@ Engine evaluates each check against the project and produces a compliance report
 from __future__ import annotations
 
 import json
-import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path

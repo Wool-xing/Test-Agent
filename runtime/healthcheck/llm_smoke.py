@@ -15,7 +15,6 @@ from loguru import logger
 from runtime.config.settings import get_settings
 from runtime.router.llm_client import PROVIDER_MODEL_MAP
 
-
 SMOKE_SYSTEM = "You are a translation helper. Reply with ONLY the translated text, no extra words."
 SMOKE_USER = "Translate to Chinese: Hello"
 

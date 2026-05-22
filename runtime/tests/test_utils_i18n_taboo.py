@@ -6,21 +6,18 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
-
 _utils_dir = Path(__file__).resolve().parents[2] / "utils"
 if str(_utils_dir) not in sys.path:
     sys.path.insert(0, str(_utils_dir))
 
-from i18n_checker import (
-    audit_taboo_words,
-    audit_taboo_colors,
-    audit_taboo_numbers,
-    audit_taboo_holidays,
+from i18n_checker import (  # noqa: E402
     audit_sacred_contexts,
+    audit_taboo_colors,
+    audit_taboo_holidays,
+    audit_taboo_numbers,
+    audit_taboo_words,
     run_taboo_audit,
 )
-
 
 # ═══════════════════════════════════════════════════════════════
 # audit_taboo_words

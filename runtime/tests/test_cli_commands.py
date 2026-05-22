@@ -26,6 +26,7 @@ def test_all_commands_registered():
 def test_version_flag():
     """--version prints version and exits 0."""
     import re
+
     from runtime import __version__
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0

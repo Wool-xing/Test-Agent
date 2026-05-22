@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import concurrent.futures
+import os
 import threading
 
 from loguru import logger
-
-import os
 
 _executor: concurrent.futures.ThreadPoolExecutor | None = None
 _lock = threading.Lock()

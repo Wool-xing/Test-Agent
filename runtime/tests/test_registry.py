@@ -6,7 +6,6 @@ import pathlib
 
 from runtime.registry.registry import build_catalog
 
-
 # 动态扫源目录而非写死数字 — 项目持续增长 agent/skill,基线会过时
 _PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
 _EXPERTS_DIR = _PROJECT_ROOT / "agents"

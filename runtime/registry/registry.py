@@ -151,7 +151,7 @@ def build_catalog() -> Catalog:
 
 
 def dump_catalog(target: Path | None = None) -> Path:
-    s = get_settings()
+    get_settings()
     target = target or (Path(__file__).parent / "catalog.json")
     cat = build_catalog()
     target.write_text(

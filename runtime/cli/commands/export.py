@@ -19,9 +19,9 @@ def register(app: typer.Typer) -> None:
         out_dir: str = typer.Option("workspace/testcases", "--out-dir", help="output dir when --format all"),
     ):
         """Export TestCaseTree to xmind / markmap / opml / all."""
-        from runtime.exporters import xmind as _x  # noqa: F401
         from runtime.exporters import markmap as _m  # noqa: F401
         from runtime.exporters import opml as _o  # noqa: F401
+        from runtime.exporters import xmind as _x  # noqa: F401
         from runtime.exporters.base import REGISTRY, get_exporter
 
         plan_path = Path(plan)

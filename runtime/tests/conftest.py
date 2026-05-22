@@ -18,9 +18,8 @@ _UTILS_DIR = _PROJECT_ROOT / "utils"
 if _UTILS_DIR.is_dir() and str(_UTILS_DIR) not in sys.path:
     sys.path.insert(0, str(_UTILS_DIR))
     for _sub in _UTILS_DIR.iterdir():
-        if _sub.is_dir() and not _sub.name.startswith(("_", ".")):
-            if str(_sub) not in sys.path:
-                sys.path.insert(0, str(_sub))
+        if _sub.is_dir() and not _sub.name.startswith(("_", ".")) and str(_sub) not in sys.path:
+            sys.path.insert(0, str(_sub))
 
 
 @pytest.fixture(autouse=True)

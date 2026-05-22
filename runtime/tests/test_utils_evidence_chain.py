@@ -3,31 +3,29 @@
 import json
 import sys
 import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "utils"))
 from evidence_chain import (  # noqa: E402
-    EvidenceItem,
     ChainOfCustody,
+    EvidenceItem,
     EvidencePackage,
-    hash_content,
+    build_evidence_chain,
+    ci_summary,
+    collect_baselines,
     collect_decisions,
     collect_dora_metrics,
-    collect_tracing_validation,
-    collect_baselines,
     collect_test_history,
-    build_evidence_chain,
-    verify_chain_integrity,
-    export_package,
-    export_chain_of_custody_report,
+    collect_tracing_validation,
     compliance_matrix,
-    ci_summary,
+    export_chain_of_custody_report,
+    export_package,
+    hash_content,
     quick_package,
+    verify_chain_integrity,
 )
-
 
 # ── Fixtures ──
 

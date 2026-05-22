@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.panel import Panel
@@ -17,12 +16,12 @@ def register(app: typer.Typer) -> None:
 
     @app.command()
     def readiness(
-        smoke: float = typer.Option(1.0, "--smoke", help="Smoke pass rate (0-1)"),
-        regression: float = typer.Option(1.0, "--regression", help="Regression pass rate (0-1)"),
-        perf_ok: bool = typer.Option(False, "--perf-ok", help="Performance gate passed"),
-        security_ok: bool = typer.Option(False, "--security-ok", help="Security gate passed"),
-        p0_bugs: int = typer.Option(0, "--p0-bugs", help="P0 bug count"),
-        from_summary: Optional[Path] = typer.Option(None, "--from-summary", help="Run summary JSON path"),
+        smoke: float = typer.Option(1.0, "--smoke", help="Smoke pass rate (0-1)"),  # noqa: B008
+        regression: float = typer.Option(1.0, "--regression", help="Regression pass rate (0-1)"),  # noqa: B008
+        perf_ok: bool = typer.Option(False, "--perf-ok", help="Performance gate passed"),  # noqa: B008
+        security_ok: bool = typer.Option(False, "--security-ok", help="Security gate passed"),  # noqa: B008
+        p0_bugs: int = typer.Option(0, "--p0-bugs", help="P0 bug count"),  # noqa: B008
+        from_summary: Path | None = typer.Option(None, "--from-summary", help="Run summary JSON path"),  # noqa: B008
     ) -> None:
         """Weighted release readiness score (smoke×0.4 + regression×0.3 + perf×0.2 + security×0.1)."""
         if from_summary:

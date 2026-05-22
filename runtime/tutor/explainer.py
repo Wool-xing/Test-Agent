@@ -11,11 +11,10 @@ are real KB entries; non-existent → strip + downgrade confidence.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
 
 from loguru import logger
 
-from runtime.tutor.i18n import card_text, get_lang, t
+from runtime.tutor.i18n import get_lang, t
 from runtime.tutor.theory_kb import get_kb
 from runtime.tutor.verbosity import Mode, get_mode
 

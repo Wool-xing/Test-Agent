@@ -13,10 +13,10 @@ from typing import Any
 from loguru import logger
 
 from runtime.mcp.base import make_server, run_stdio, tool_decision_logged
-from runtime.mcp.protocol_adapter.base import REGISTRY, get_adapter
 
 # trigger adapter registration
 from runtime.mcp.protocol_adapter import adapters  # noqa: F401
+from runtime.mcp.protocol_adapter.base import REGISTRY, get_adapter
 
 
 @tool_decision_logged("list_protocols")
@@ -33,7 +33,7 @@ async def tool_ping(protocol: str, target: str, payload: Any = "ping", timeout: 
         "target": target,
         "ok": result.ok,
         "elapsed_ms": result.elapsed_ms,
-        "payload": result.payload if isinstance(result.payload, (str, dict, type(None))) else str(result.payload),
+        "payload": result.payload if isinstance(result.payload, str | dict | None) else str(result.payload),
         "error": result.error,
         "meta": result.meta,
     }

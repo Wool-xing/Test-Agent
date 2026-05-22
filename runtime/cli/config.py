@@ -215,4 +215,4 @@ def cmd_unset(
     _write_env(env_path, env)
     typer.echo(f"✅ 已移除 {key} (原值: {old_value})")
     typer.echo(f"   备份: {env_path}.bak")
-    typer.echo(f"   下一步: tagent config use <provider> 重设, 或 tagent config show 验证")
+    typer.echo("   下一步: tagent config use <provider> 重设, 或 tagent config show 验证")

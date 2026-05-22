@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import time
 from pathlib import Path
 
@@ -82,10 +83,8 @@ class VercelSandboxBackend(BaseExecutionEnv):
 
     async def close(self) -> None:
         if self._client and self._sandbox_id:
-            try:
+            with contextlib.suppress(Exception):
                 await self._client.delete(f"/v1/sandboxes/{self._sandbox_id}")
-            except Exception:
-                pass
         if self._client:
             await self._client.aclose()
         self._client = None

@@ -6,29 +6,24 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
-
 _utils_dir = Path(__file__).resolve().parents[2] / "utils"
 if str(_utils_dir) not in sys.path:
     sys.path.insert(0, str(_utils_dir))
 
-from taboo_matrix import (
-    Severity,
-    TabooCategory,
-    TABOO_WORDS,
-    TABOO_COLORS,
-    TABOO_NUMBERS,
-    TABOO_HOLIDAYS,
+from taboo_matrix import (  # noqa: E402
     SACRED_CONTEXTS,
-    get_taboo_words,
-    get_taboo_colors,
-    get_taboo_numbers,
-    get_taboo_holidays,
+    TABOO_COLORS,
+    TABOO_HOLIDAYS,
+    TABOO_NUMBERS,
+    TABOO_WORDS,
+    get_matrix_summary,
     get_sacred_contexts,
     get_supported_locales,
-    get_matrix_summary,
+    get_taboo_colors,
+    get_taboo_holidays,
+    get_taboo_numbers,
+    get_taboo_words,
 )
-
 
 # ═══════════════════════════════════════════════════════════════
 # Data integrity

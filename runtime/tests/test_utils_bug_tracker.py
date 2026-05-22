@@ -75,7 +75,7 @@ class TestTrackerRegistry:
         assert "webhook" in TRACKER_REGISTRY
 
     def test_all_registry_values_are_basetracker_subclasses(self):
-        from bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY
+        from bug_tracker_base import TRACKER_REGISTRY, BugTrackerBase
         for name, cls in TRACKER_REGISTRY.items():
             if name == "zentao":
                 # Legacy: ZentaoBugManager not yet migrated to BugTrackerBase ABC

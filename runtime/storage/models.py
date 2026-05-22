@@ -37,8 +37,8 @@ class Run(Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     artifact_keys: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
 
-    cases: Mapped[list["Case"]] = relationship(back_populates="run", cascade="all, delete-orphan")
-    evidence: Mapped[list["Evidence"]] = relationship(back_populates="run", cascade="all, delete-orphan")
+    cases: Mapped[list[Case]] = relationship(back_populates="run", cascade="all, delete-orphan")
+    evidence: Mapped[list[Evidence]] = relationship(back_populates="run", cascade="all, delete-orphan")
 
 
 class CaseResult(str, enum.Enum):
@@ -63,7 +63,7 @@ class Case(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     run: Mapped[Run] = relationship(back_populates="cases")
-    defects: Mapped[list["Defect"]] = relationship(back_populates="case", cascade="all, delete-orphan")
+    defects: Mapped[list[Defect]] = relationship(back_populates="case", cascade="all, delete-orphan")
 
 
 class DefectSeverity(str, enum.Enum):

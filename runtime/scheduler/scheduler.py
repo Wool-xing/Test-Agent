@@ -7,12 +7,11 @@
 
 from __future__ import annotations
 
-import os
+import contextlib
 import threading
-import time
+from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
 
 from loguru import logger
 
@@ -55,15 +54,11 @@ def _release_lock(f) -> None:
         if _LOCK_BACKEND == "fcntl":
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
         elif _LOCK_BACKEND == "msvcrt":
-            try:
+            with contextlib.suppress(OSError):
                 msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
-            except OSError:
-                pass
     finally:
-        try:
+        with contextlib.suppress(OSError):
             f.close()
-        except OSError:
-            pass
 
 
 def run_job(job: dict, *, runner: Callable[[str], dict] | None = None) -> dict:

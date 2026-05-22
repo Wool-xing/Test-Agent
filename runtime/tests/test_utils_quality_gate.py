@@ -9,8 +9,6 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import pytest
-
 # Ensure utils is importable
 _utils_dir = Path(__file__).resolve().parents[2] / "utils"
 if str(_utils_dir) not in sys.path:
@@ -77,8 +75,8 @@ class TestParseJunit:
 
 class TestCheckSmoke:
     def test_pass(self):
-        from ci_quality_gate import check_smoke
         import ci_quality_gate as m
+        from ci_quality_gate import check_smoke
         m.GATES["smoke"]["min_pass_rate_pct"] = 95
 
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
@@ -93,8 +91,8 @@ class TestCheckSmoke:
             Path(path).unlink()
 
     def test_fail_below_threshold(self):
-        from ci_quality_gate import check_smoke
         import ci_quality_gate as m
+        from ci_quality_gate import check_smoke
         m.GATES["smoke"]["min_pass_rate_pct"] = 95
 
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:

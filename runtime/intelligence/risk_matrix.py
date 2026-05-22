@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List
 
 
 @dataclass
@@ -18,7 +17,7 @@ class RiskItem:
     probability: float   # 0.0 – 1.0 (calibrated)
     impact: float         # 0.0 – 1.0 (calibrated)
     category: str = "functional"
-    mitigations: List[str] = field(default_factory=list)
+    mitigations: list[str] = field(default_factory=list)
     residual_probability: float | None = None
     residual_impact: float | None = None
 
@@ -47,7 +46,7 @@ class RiskItem:
 
 @dataclass
 class RiskMatrix:
-    items: List[RiskItem] = field(default_factory=list)
+    items: list[RiskItem] = field(default_factory=list)
 
     def add(self, item: RiskItem) -> None:
         self.items.append(item)
@@ -59,7 +58,7 @@ class RiskMatrix:
             n = 3  # effective sample size
             item.probability = round((item.probability * n + historical_fail_rate) / (n + 1), 3)
 
-    def mitigate(self, item_id: str, residual_prob: float, residual_impact: float, mitigations: List[str]) -> None:
+    def mitigate(self, item_id: str, residual_prob: float, residual_impact: float, mitigations: list[str]) -> None:
         for item in self.items:
             if item.id == item_id:
                 item.residual_probability = residual_prob
@@ -68,7 +67,7 @@ class RiskMatrix:
                 return
         raise KeyError(f"risk item '{item_id}' not found")
 
-    def summary(self) -> Dict:
+    def summary(self) -> dict:
         levels = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
         for item in self.items:
             levels[item.level] += 1

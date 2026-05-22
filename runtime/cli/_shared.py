@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 from pathlib import Path
 
-import typer
 from rich.console import Console
 from rich.table import Table
 
 from runtime.api.deps import Kernel
 from runtime.api.parsers import parse_path, parse_text, parse_url
-from runtime.config.settings import get_settings
 
 # Fix Unicode and SSL on Windows
 if sys.platform == "win32":
@@ -130,6 +127,7 @@ def print_dag(decision):
 def ping_db():
     try:
         from sqlalchemy import text
+
         from runtime.storage.db import get_engine
         with get_engine().connect() as c:
             c.execute(text("SELECT 1"))

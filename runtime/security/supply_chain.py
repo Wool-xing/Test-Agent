@@ -15,7 +15,6 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 
 @dataclass
@@ -84,7 +83,7 @@ def generate_sbom(output_path: str = "workspace/sbom.cdx.json") -> SbomReport:
         "metadata": {"timestamp": report.timestamp,
                      "component": {"name": "test-dependencies", "type": "library"}},
         "components": [{"type": "library", "name": p.name, "version": p.version,
-                        "purl": p.purl, "licenses": [{"license": {"name": l}} for l in p.licenses],
+                        "purl": p.purl, "licenses": [{"license": {"name": lic}} for lic in p.licenses],
                         "hashes": [{"alg": k.upper(), "content": v} for k, v in p.hashes.items()]}
                        for p in report.packages if p.name != "unknown"],
     }

@@ -52,14 +52,12 @@ class SSHBackend(BaseExecutionEnv):
             return ExecResult(ok=False, stdout="", stderr=str(e), returncode=None, elapsed_ms=int((time.monotonic() - start) * 1000))
 
     async def read(self, path: str) -> bytes:
-        async with self._conn.start_sftp_client() as sftp:
-            async with sftp.open(path, "rb") as f:
-                return await f.read()
+        async with self._conn.start_sftp_client() as sftp, sftp.open(path, "rb") as f:
+            return await f.read()
 
     async def write(self, path: str, data: bytes) -> None:
-        async with self._conn.start_sftp_client() as sftp:
-            async with sftp.open(path, "wb") as f:
-                await f.write(data)
+        async with self._conn.start_sftp_client() as sftp, sftp.open(path, "wb") as f:
+            await f.write(data)
 
     async def sync_in(self, local: Path, remote: str) -> None:
         async with self._conn.start_sftp_client() as sftp:

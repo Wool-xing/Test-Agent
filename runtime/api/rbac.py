@@ -14,9 +14,9 @@ When disabled (default), all endpoints behave as before.
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from enum import Enum
 from functools import wraps
-from typing import Callable, List, Optional
 
 from loguru import logger
 
@@ -65,7 +65,7 @@ def _rbac_enabled() -> bool:
     return os.getenv("TAGENT_RBAC_ENABLED", "0") == "1"
 
 
-def resolve_role(token: str) -> Optional[Role]:
+def resolve_role(token: str) -> Role | None:
     """Resolve a bearer token to a role. Returns None if RBAC disabled or token unknown."""
     if not _rbac_enabled():
         return Role.ADMIN  # when off, everyone is admin (backward compat)

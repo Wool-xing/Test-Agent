@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typer
 
-from runtime.cli._shared import console, ping_db, ping_minio, _kernel
+from runtime.cli._shared import _kernel, console, ping_db, ping_minio
 from runtime.config.settings import get_settings
 
 

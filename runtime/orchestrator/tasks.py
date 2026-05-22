@@ -6,8 +6,8 @@ from loguru import logger
 from prefect import task
 from prefect.tasks import exponential_backoff
 
-from runtime.orchestrator.adapters.experts import StepOutcome, execute_node
 from runtime.observability.otel import span
+from runtime.orchestrator.adapters.experts import StepOutcome, execute_node
 from runtime.router.schema import DAGNode
 
 

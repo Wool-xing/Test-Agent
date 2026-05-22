@@ -152,7 +152,7 @@ def _resolve_script(name: str, kind: str) -> str | None:
     return None
 
 
-import threading as _threading
+import threading as _threading  # noqa: E402
 
 _upstream_outputs: dict[str, dict] = {}  # 流水线内每 expert 产物缓存,供下游 RunnerContext.upstream
 _upstream_meta: dict[str, dict] = {}     # 流水线内每 expert 元信息 (ok/degraded/error),供下游 RunnerContext.upstream_meta
@@ -250,8 +250,8 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
     if kind == "skill":
         try:
             from runtime.config.settings import get_settings
-            from runtime.orchestrator.skills import get_skill_runner
             from runtime.orchestrator.agents.base import RunnerContext
+            from runtime.orchestrator.skills import get_skill_runner
 
             runner = get_skill_runner(name)
             if runner is not None:
