@@ -59,8 +59,9 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
         # Cancel any remaining in-flight futures after circuit breaker or abort
         cancelled = 0
         for nid, fut in futures.items():
-            if nid not in results and not fut.done():
-                fut.cancel()
+            if nid not in results and not fut.state.is_final():
+                if hasattr(fut, "cancel"):
+                    fut.cancel()
                 cancelled += 1
         if cancelled:
             log.warning("circuit breaker: cancelled {} in-flight task(s)", cancelled)
