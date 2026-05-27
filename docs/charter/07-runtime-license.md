@@ -121,7 +121,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 ## 📜 LICENSE / CHANGELOG / CONTRIBUTING / SECURITY
 
 - **LICENSE**：MIT（详见 [`LICENSE`](../../LICENSE)）
-- **CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.36.0 / expert rollout 收尾 + skill rollout 全 16/16 完成）
+- **CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.43.0 / Phase 3+4+5 落版 + 32/32 skill active 全 production）
 - **VERSION**：详见 [`VERSION`](../../VERSION)
 - **CONTRIBUTING**：详见 [`CONTRIBUTING.md`](../../CONTRIBUTING.md)（含同步铁律 + RACI 矩阵）
 - **SECURITY**：详见 [`SECURITY.md`](../../SECURITY.md)（漏洞报告流程 + GitHub Security Advisories 入口）
