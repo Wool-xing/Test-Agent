@@ -70,13 +70,13 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 
 ## 嵌入 README
 
-```markdown
-![demo](docs/assets/demo.gif)
+```html
+<img src="docs/assets/demo.gif" alt="demo">
 ```
 
 或 SVG(终端动画体积更小):
-```markdown
-![demo](docs/assets/demo.svg)
+```html
+<img src="docs/assets/demo.svg" alt="demo">
 ```
 
 ## Checkpoint
