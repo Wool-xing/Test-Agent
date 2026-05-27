@@ -339,7 +339,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r config/requirements.txt 2>&1 | tail -10 || true
           # 兜底:确保关键运行时模块在
-          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect
+          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect defusedxml
 
       - name: L1 frontmatter lint(主宪章 §33 第 1 层)
         run: |
@@ -368,7 +368,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # runtime/ 依赖 (与 selftest-mock 一致)
-          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect fastapi python-multipart httpx numpy
+          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect fastapi python-multipart httpx numpy defusedxml
           # pytest core (排除 pytest-bdd / pytest-playwright 等用户场景 plugin)
           pip install pytest pytest-asyncio pytest-cov
 

@@ -127,6 +127,9 @@ safety==3.0.1                      # [稳定层] 依赖 CVE 检查
 # Toxiproxy [外部]：docker run shopify/toxiproxy
 # stress-ng [外部]：apt install stress-ng（chaos_helper 自动 fallback Python loop）
 
+# ===== [稳定层] 安全 XML 解析（utils/quality_gate, runtime/integrity）=====
+defusedxml==0.7.1                  # [稳定层] XXE/亿笑/decompression bomb 防护
+
 # ============================================================
 # 外部工具（[外部]，非 pip，需独立安装。详见 01-快速开始/部署说明.md）
 # ============================================================
