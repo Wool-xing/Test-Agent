@@ -13,7 +13,7 @@ const PROVIDERS = [
 
 export default function SettingsPage() {
   const [provider, setProvider] = useState(localStorage.getItem("tagent_provider") || "stub");
-  const [apiKey, setApiKey] = useState(localStorage.getItem("tagent_api_key") || "");
+  const [apiKey, setApiKey] = useState("");  // 安全: 不持久化, 仅 in-memory; 刷新后重输
   const [model, setModel] = useState(localStorage.getItem("tagent_model") || "stub");
   const [saved, setSaved] = useState(false);
 
@@ -21,8 +21,8 @@ export default function SettingsPage() {
 
   const save = () => {
     localStorage.setItem("tagent_provider", provider);
-    localStorage.setItem("tagent_api_key", apiKey);
     localStorage.setItem("tagent_model", model);
+    // apiKey 不写 localStorage; 仅当前会话 in-memory state (防 XSS 读取)
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -92,7 +92,7 @@ export default function SettingsPage() {
       </button>
 
       <p className="text-xs text-slate-400">
-        Settings are stored locally. {provider === "stub" ? "Switch to a real provider and add your API key for AI-powered testing." : "Your API key is stored only in this browser/app."}
+        Provider 与 model 本地保存。<strong>API key 仅在当前会话有效</strong>(出于安全考虑不持久化,刷新页面或重启后需重输)。{provider === "stub" ? "Stub 模式无需 key,用于离线 demo。" : ""}
       </p>
     </div>
   );
