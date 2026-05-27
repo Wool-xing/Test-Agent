@@ -1,8 +1,10 @@
 """automotive-hil-loop-test · HIL/SIL/MIL/PIL 环路编排 (V1.31.0)."""
 from __future__ import annotations
+
 from pathlib import Path
-from typing import Any
+
 from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, register_skill
+
 
 @register_skill("automotive-hil-loop-test")
 class AutomotiveHilLoopTest(AgentRunner):

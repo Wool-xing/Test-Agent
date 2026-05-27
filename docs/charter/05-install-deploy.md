@@ -8,7 +8,9 @@
 
 > install.sh 不再一次性装全。**用户选了什么形态，才装什么依赖**——避免 mobile 用户被强装 desktop 工具，反之亦然。
 
-### 1. 依赖六层划分
+### 1. 依赖六层划分（Phase 2 规划）
+
+> **当前状态**：`install.sh` 通过 `pip install -r requirements.txt` 统一安装。分层按需安装（按产品形态选择性装依赖）为 Phase 2 路线图项。`requirements/` 目录含规划文档。
 
 | 层 | requirements 文件 | 触发条件 | 关键包 |
 |----|----------------|---------|--------|
@@ -152,7 +154,7 @@ git clone https://github.com/Wool-xing/Test-Agent.git
 bash Test-Agent/install.sh /path/to/your-test-project
 ```
 
-> 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `01-快速开始/部署说明.md`。
+> 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `docs/getting-started/部署说明.md`。
 
 `install.sh` 自动完成：克隆模板 → 装 Claude Code → 建目录 → 拷贝全部文件 → 装 Python 依赖 + Playwright。
 
@@ -193,7 +195,7 @@ claude
 
 > 注：`>` 后面是 Claude Code 提示符的输入（斜杠技能或自然语言），**不是 shell 命令**。
 
-详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）→ `01-快速开始/使用手册.md` 顶部「🚀 启动指引」章节。
+详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）→ `docs/getting-started/使用手册.md` 顶部「🚀 启动指引」章节。
 
 ---
 
@@ -246,7 +248,7 @@ your-test-project/
 ├── .claude/{agents,skills}/           ← 16 agent + 32 skill（业务） + 3 元 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
-├── utils/                             ← 49 个 .py + __init__
+├── utils/                             ← 78 个 .py + __init__
 ├── src/                               ← 被测系统源码（cov 指向）
 ├── workspace/
 │   ├── 测试计划/  需求分析/  测试用例/  测试数据/
@@ -270,7 +272,7 @@ your-test-project/
 
 ## 🛠️ 升级 / 回滚 / 卸载
 
-详见 `01-快速开始/部署说明.md` "升级 / 回滚 / 卸载" 章节。
+详见 `docs/getting-started/部署说明.md` "升级 / 回滚 / 卸载" 章节。
 
 升级会覆盖：`.claude/agents/`、`.claude/skills/`、`utils/`、`conftest.py`、`pytest.ini`、`requirements.txt`、`.mcp.json`、`.github/workflows/test.yml`、`Jenkinsfile`。
 不会覆盖：`.env`、`workspace/`、`src/`。
@@ -280,8 +282,8 @@ your-test-project/
 ## 🤝 协作与反馈
 
 - 文档结构、Bug 反馈：在仓库内提 issue
-- 功能扩展：先在 `02-专家定义/` 加 agent / `03-技能定义/` 加 skill，详见 `CONTRIBUTING.md`
-- 改动 `utils/` 时同步更新 `04-配置文件/requirements.txt` 与 `06-CICD集成/` 中的引用
+- 功能扩展：先在 `agents/` 加 agent / `skills/` 加 skill，详见 `CONTRIBUTING.md`
+- 改动 `utils/` 时同步更新 `config/requirements.txt` 与 `ci/` 中的引用
 
 ---
 
@@ -295,7 +297,7 @@ your-test-project/
 | `.claude/skills/*.md`（斜杠技能） | ✅ Claude Code 独有 | 其他工具无对等机制 |
 | `.mcp.json`（MCP 协议） | 半依赖 | MCP 是开放协议；Claude Desktop / Cursor 部分支持；OpenAI 系也开始支持 |
 | `Agent` 工具（test-lead 调用子专家） | ✅ Claude Code 独有 | 其他工具用人工编排 / 多 agent 框架替代 |
-| `utils/*.py`（49 个，含 `__init__.py`） | ❌ 纯 Python | 跨工具完全可用 |
+| `utils/*.py`（76 个，含 `__init__.py`） | ❌ 纯 Python | 跨工具完全可用 |
 | pytest / Playwright / JMeter / Allure | ❌ 跨工具 | 完全可用 |
 | CI/CD（yml / groovy） | ❌ 跨工具 | 完全可用 |
 | conftest.py / .env / requirements.txt | ❌ 标准 Python | 完全可用 |

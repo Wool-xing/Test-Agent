@@ -49,7 +49,7 @@ class AgentRunner(abc.ABC):
 
     @abc.abstractmethod
     def system_prompt(self) -> str:
-        """从 02-专家定义/*.md 提炼的角色 prompt."""
+        """从 agents/*.md 提炼的角色 prompt."""
 
     @abc.abstractmethod
     def user_prompt(self, ctx: RunnerContext) -> str:
@@ -139,7 +139,7 @@ class AgentRunner(abc.ABC):
     def _parse_json(raw: str) -> dict[str, Any]:
         raw = raw.strip()
         if raw.startswith("```"):
-            raw = raw.strip("`")
+            raw = raw[3:-3].strip() if raw.endswith("```") else raw[3:]
             if "\n" in raw:
                 _, raw = raw.split("\n", 1)
         start = raw.find("{")

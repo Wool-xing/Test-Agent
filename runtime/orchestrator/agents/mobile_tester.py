@@ -19,7 +19,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class MobileTester(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 mobile-tester 专家(02-专家定义/10-移动测试.md)。\n"
+            "你是 Test-Agent 项目内 mobile-tester 专家(agents/10-移动测试.md)。\n"
             "职责:基于 PRD + 上游摘要,生成移动端测试用例 + ADB/Xcode 命令清单。\n"
             "原则:\n"
             "1) 识别目标平台:Android / iOS / 微信/支付宝/抖音 小程序 / 混合 H5\n"

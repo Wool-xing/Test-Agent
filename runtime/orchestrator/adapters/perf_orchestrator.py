@@ -11,14 +11,13 @@ Features:
 from __future__ import annotations
 
 import json
-import statistics
+import os
 import subprocess
-import sys
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable
 
 
 @dataclass
@@ -88,6 +87,7 @@ class PerfOrchestrator:
         errors = 0
 
         def worker():
+            nonlocal errors
             t0 = time.time()
             try:
                 ok = fn()
@@ -106,7 +106,6 @@ class PerfOrchestrator:
                 if len(futures) > concurrent * 2:
                     for f in as_completed(futures[:concurrent]):
                         if f.result():
-                            nonlocal success
                             success += 1
                     futures = futures[concurrent:]
 

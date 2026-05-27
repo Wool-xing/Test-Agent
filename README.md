@@ -33,7 +33,7 @@ tagent init --preset saas-web     # or: minimal / mobile-android / security-pent
 # → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
 ```
 
-Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels. In practice, ~12 common combinations are tested in CI; the full 8640-grid is a config matrix, not a coverage claim. See [`04-配置文件/templates/INDEX.md`](04-配置文件/templates/INDEX.md).
+Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels. In practice, ~12 common combinations are tested in CI; the full 8640-grid is a config matrix, not a coverage claim. See [`config/templates/INDEX.md`](config/templates/INDEX.md).
 
 ---
 
@@ -43,8 +43,8 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 
 - **16 expert agents** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — functional · security · mobile · desktop · AI model · automotive · pentest …
 - **30 active skills** (23 production + 7 script) **+ 2 vision-only** (reference, not executable) **+ 3 meta-skills** — TDD · E2E · regression · pentest · car-CAN-bus · eval-harness · …
-- **49 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
-- **Multi-LLM (any provider, plug-and-play)** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI-compatible fallback channel** for any other provider (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) via 3 env vars, zero code change. Cookbook: [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
+- **78 production utils** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV · …
+- **Multi-LLM (any provider, plug-and-play)** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI-compatible fallback channel** for any other provider (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) via 3 env vars, zero code change. Cookbook: [`config/llm-providers.md`](config/llm-providers.md)
 - **BugTracker** — 1 active adapter (Zentao); 5 planned (Jira · GitHub · GitLab · Linear · Webhook, see roadmap)
 - **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams
 - **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others ready to enable in `.mcp.json`)
@@ -72,7 +72,7 @@ No Python/Node/Docker required. Download the installer for your platform and sta
 
 1. **All-platform** — Web / API / Android / iOS / WeChat-miniprogram / Windows EXE / macOS / Linux / Electron / game / IoT / audio-video / AI/LLM / blockchain / 车载
 2. **All-protocol** — HTTP(S) / gRPC / WebSocket / TCP / UDP / GraphQL / SOAP / MQTT / SSH / serial / Kafka / RabbitMQ / Modbus / CAN-bus / SOME-IP / DoIP / UDS
-3. **Multi-LLM no lock-in (any provider)** — 6 built-in providers via `tagent config use <name>` (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) plus **OpenAI-compatible fallback** via `tagent config use-compat` for any other (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) — 3 env vars, zero code change. See [`04-配置文件/llm-providers.md`](04-配置文件/llm-providers.md)
+3. **Multi-LLM no lock-in (any provider)** — 6 built-in providers via `tagent config use <name>` (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) plus **OpenAI-compatible fallback** via `tagent config use-compat` for any other (Zhipu / Doubao / Kimi / Baichuan / Xunfei / …) — 3 env vars, zero code change. See [`config/llm-providers.md`](config/llm-providers.md)
 4. **Learn while using** — `--mode learn` outputs every step with theory references (22 KB cards across 13 domains: tools / coding / foundation / strategy / methods / protocols / platforms / gates / security / AI testing / compliance / process / build-your-own)
 5. **Safe-by-default** — sandboxed exec / PII scrub / runtime prompt-injection scan / 4-gate marketplace verify / decisions audit trail
 
@@ -100,12 +100,12 @@ For project design rationale, architecture decisions, and methodology rationale,
 ```text
 Test-Agent/
 ├── 00-项目导航.md           ← 5-dimension category guide
-├── 01-快速开始/             ← user manual / deploy / config / deliverables
-├── 02-专家定义/             ← 16 expert agents (11 production + 5 script, V1.x rollout 收尾)
-├── 03-技能定义/             ← 32 business skills (23 production + 7 script + 0 rollout + 2 vision) + 3 meta-skills
-├── 04-配置文件/             ← conftest / pytest.ini / .env / .mcp.json
-├── 05-代码示例/             ← 49 production utils
-├── 06-CICD集成/             ← GitHub Actions + Jenkins
+├── docs/getting-started/             ← user manual / deploy / config / deliverables
+├── agents/             ← 16 expert agents (11 production + 5 script, V1.x rollout 收尾)
+├── skills/             ← 32 business skills (23 production + 7 script + 0 rollout + 2 vision) + 3 meta-skills
+├── config/             ← conftest / pytest.ini / .env / .mcp.json
+├── utils/             ← 78 production utils
+├── ci/             ← GitHub Actions + Jenkins
 ├── runtime/                ← V1.x runtime layer (router / orchestrator / MCP / web / scheduler / subagent / learning_loop / backends / gateway / tutor / essence_watcher / marketplace)
 ├── docs/charter/           ← Vision charter (7 split files: vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license)
 ├── docs/theory/            ← 22 teaching KB cards across 13 categories
@@ -127,11 +127,11 @@ Test-Agent/
 
 | Audience | Read |
 |----------|------|
-| **First-time user** | [Quick start](01-快速开始/INDEX.md) → [Deploy](01-快速开始/部署说明.md) |
-| **QA engineer** | [User manual](01-快速开始/使用手册.md) → [Skill catalog](03-技能定义/) |
+| **First-time user** | [Quick start](docs/getting-started/INDEX.md) → [Deploy](docs/getting-started/部署说明.md) |
+| **QA engineer** | [User manual](docs/getting-started/使用手册.md) → [Skill catalog](skills/) |
 | **Architect / SRE** | [Architecture deep-dive](docs/charter/06-test-architecture.md) → [Runtime](docs/charter/07-runtime-license.md) → [Runtime modules](runtime/INDEX.md) |
-| **Security researcher** | [Pentest expert](02-专家定义/15-渗透测试.md) → [pentest-coordinator](03-技能定义/pentest-coordinator.md) |
-| **Automotive tester** | [Automotive expert](02-专家定义/16-车载测试.md) → [ASIL workflow](03-技能定义/automotive-test.md) |
+| **Security researcher** | [Pentest expert](agents/15-渗透测试.md) → [pentest-coordinator](skills/pentest-coordinator.md) |
+| **Automotive tester** | [Automotive expert](agents/16-车载测试.md) → [ASIL workflow](skills/automotive-test.md) |
 | **Contributor** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](marketplace/INDEX.md) |
 
 ## 🛠️ Tech Stack

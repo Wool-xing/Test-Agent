@@ -1,6 +1,6 @@
 [project]
 name = "test-agent-runtime"
-version = "1.32.0"
+version = "1.43.0"
 description = "Test-Agent runtime: AI router + Prefect orchestrator + FastAPI/CLI entry + flywheel storage"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -31,6 +31,7 @@ dependencies = [
     "pypdf>=6.0.0",
     "python-docx>=1.1.0",
     "rich>=13.9.0",
+    "defusedxml>=0.7.1",
 ]
 
 [project.optional-dependencies]
@@ -60,6 +61,8 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

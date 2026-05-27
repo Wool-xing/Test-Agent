@@ -24,7 +24,7 @@ from loguru import logger
 from runtime.orchestrator.adapters.scripts import ScriptResult, list_available_scripts, run_script
 
 # Canonical script mapping. Names without a script run as a no-op step (logged only).
-# Mapping derived from existing 05-代码示例 filenames; missing scripts degrade gracefully.
+# Mapping derived from existing utils filenames; missing scripts degrade gracefully.
 EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "test-lead": None,
     "requirements-analyst": None,
@@ -51,12 +51,12 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
 }
 
 # V1.14 防 mock 单源 (ROADMAP V1.15 Day 0 承诺):
-# 实装状态读 registry catalog (02-专家定义/03-技能定义 *.md frontmatter
+# 实装状态读 registry catalog (agents/skills *.md frontmatter
 # EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS),避免 hardcoded dict 与 .md 双源漂移。
 #
 # 合法值 (registry._VALID_IMPL_STATUS 同步):
 #   - production: 真 LLM-driven runner (orchestrator/agents/*.py) 已实装
-#   - script: 真 script-backed (05-代码示例/*.py) 已实装
+#   - script: 真 script-backed (utils/*.py) 已实装
 #   - rollout: V1.x rollout 待实装 → execute_node 拒绝路由,不输出 mock
 #   - vision: V2.x 方法论参考 → 同 rollout 处理
 #   - unknown: frontmatter 缺失/非法值 → 同 rollout 处理 (fail closed)
@@ -152,22 +152,26 @@ def _resolve_script(name: str, kind: str) -> str | None:
     return None
 
 
+import threading as _threading  # noqa: E402
+
 _upstream_outputs: dict[str, dict] = {}  # 流水线内每 expert 产物缓存,供下游 RunnerContext.upstream
 _upstream_meta: dict[str, dict] = {}     # 流水线内每 expert 元信息 (ok/degraded/error),供下游 RunnerContext.upstream_meta
                                           # 防 mock 闭环: test-lead 看到任一 degraded → 决策降级
+_upstream_lock = _threading.Lock()        # 防御性锁: 拓扑排序保证依赖顺序,锁仅防未来并行分支
 
 
 def reset_upstream_cache() -> None:
     """每次新 run 开始前由 flow 调,清空上游产物缓存."""
-    _upstream_outputs.clear()
-    _upstream_meta.clear()
+    with _upstream_lock:
+        _upstream_outputs.clear()
+        _upstream_meta.clear()
 
 
 def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: int = 1800) -> StepOutcome:
     inputs = inputs or {}
 
     # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 拒绝路由未实装 expert/skill,不输出 mock 数据
-    # 单源 = 02-专家定义/03-技能定义 .md frontmatter (registry catalog)
+    # 单源 = agents/skills .md frontmatter (registry catalog)
     if kind in ("expert", "skill"):
         status = _get_impl_status(name, kind)
         if status in ("rollout", "vision"):
@@ -219,8 +223,9 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 import time as _t
                 t0 = _t.time()
                 res = runner.run(ctx)
-                _upstream_outputs[name] = res.output
-                _upstream_meta[name] = {
+                with _upstream_lock:
+                    _upstream_outputs[name] = res.output
+                    _upstream_meta[name] = {
                     "ok": res.ok,
                     "degraded": res.degraded,
                     "error": res.error,
@@ -245,8 +250,8 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
     if kind == "skill":
         try:
             from runtime.config.settings import get_settings
-            from runtime.orchestrator.skills import get_skill_runner
             from runtime.orchestrator.agents.base import RunnerContext
+            from runtime.orchestrator.skills import get_skill_runner
 
             runner = get_skill_runner(name)
             if runner is not None:
@@ -263,8 +268,9 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 import time as _t
                 t0 = _t.time()
                 res = runner.run(ctx)
-                _upstream_outputs[name] = res.output
-                _upstream_meta[name] = {
+                with _upstream_lock:
+                    _upstream_outputs[name] = res.output
+                    _upstream_meta[name] = {
                     "ok": res.ok,
                     "degraded": res.degraded,
                     "error": res.error,
@@ -304,7 +310,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
             executed_script=script,
             returncode=127,
             stdout="",
-            stderr=f"script '{script}' not found under 05-代码示例/",
+            stderr=f"script '{script}' not found under utils/",
             duration_ms=0,
         )
     defaults = SCRIPT_DEFAULT_ARGS.get(script, {})

@@ -1,12 +1,12 @@
 # runtime 索引
 
 > Test-Agent 运行时层（V1.1.0 新增）。
-> 顶层导航见根目录 `00-项目导航.md`；runtime 完整章节见 `docs/charter/07-runtime-license.md`；总索引见 `FULL_GUIDE.md`。
+> 顶层导航见根目录 `00-项目导航.md`；运行时完整章节见 `docs/charter/07-runtime-license.md`；架构设计见 [`ARCHITECTURE.md`](ARCHITECTURE.md)。
 
 ## 定位
 
-把 16 专家定义 + 32 业务 Skill + 3 元 Skill + 49 脚本 从"文档+工具箱"升级为"可执行运行时"。
-本层 **不动** `02-专家定义/` `03-技能定义/` `05-代码示例/` 已有内容,仅作调度。
+把 16 专家定义 + 32 业务 Skill + 3 元 Skill + 67 脚本 从"文档+工具箱"升级为"可执行运行时"。
+本层 **不动** `agents/` `skills/` `utils/` 已有内容,仅作调度。
 
 ## 模块清单
 
@@ -46,9 +46,9 @@ runtime/router                  ← 新增,AI 决策
    ▼
 runtime/orchestrator            ← 新增,Prefect 编排
    │
-   ├─► 02-专家定义/*.md         ← 已有,文档→Claude Code 加载
-   ├─► 03-技能定义/*.md         ← 已有,文档→Skill 调用
-   └─► 05-代码示例/*.py         ← 已有,49 脚本(adapter 包装)
+   ├─► agents/*.md         ← 已有,文档→Claude Code 加载
+   ├─► skills/*.md         ← 已有,文档→Skill 调用
+   └─► utils/*.py         ← 已有,67 脚本(adapter 包装)
    │
    ▼
 runtime/storage 飞轮            ← 新增,数据沉淀

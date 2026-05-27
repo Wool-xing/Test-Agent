@@ -4,7 +4,7 @@ V1.27.0 minimum viable (ROADMAP skill rollout #5 落地):
 - LLM 读 PRD + 上游 ai-tester expert 产物 → 5 阶段评测计划
   (评测配置 / pass@k / 稳定性 / 延迟 / 报告归档)
   + 质量门禁 + 安全护栏
-- 不实装 03-技能定义/eval-harness.md 全部职责 (eval_replay.py 真跑
+- 不实装 skills/eval-harness.md 全部职责 (eval_replay.py 真跑
   / PII scrub 执行 / LongMemEval benchmark 等留后续深化)
 - 输出评测计划 JSON, 真执行在 runtime/tutor/eval_replay.py + ai_validator.py
 """
@@ -21,7 +21,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class EvalHarness(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 eval-harness skill(03-技能定义/eval-harness.md)。\n"
+            "你是 Test-Agent 项目内 eval-harness skill(skills/eval-harness.md)。\n"
             "职责:基于 PRD + 上游 ai-tester expert 产物,编排 LLM/AI 系统评测 5 阶段计划。\n"
             "原则:\n"
             "1) 识别评测目标:prompt 版本回归 / RAG retrieval 质量 / agent 路由准确率 / 模型升级对比\n"

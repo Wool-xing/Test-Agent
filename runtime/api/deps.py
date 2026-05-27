@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -14,8 +13,8 @@ from runtime.registry.registry import get_catalog
 from runtime.router.llm_client import LLMClient
 from runtime.router.router import route
 from runtime.router.schema import RoutingDecision, TargetArtifact
-from runtime.storage.repo import create_run, set_run_status
 from runtime.storage.models import RunStatus
+from runtime.storage.repo import create_run, set_run_status
 
 
 class Kernel:

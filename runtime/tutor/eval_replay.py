@@ -20,8 +20,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from loguru import logger
-
 from runtime.config.settings import get_settings
 
 

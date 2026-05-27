@@ -6,17 +6,17 @@
 
 ## 添加新 Agent
 
-1. 选定分类（核心通用 9 / 平台扩展 5）
+1. 选定分类（核心通用 9 / 平台扩展 5 / 垂直领域 2）
 2. 文件命名 `15-XXX.md`（按编号递增）
-3. 顶部 YAML frontmatter（必含 `name` / `description` / `tools`）
+3. 顶部 YAML frontmatter（必含 `name` / `description` / `tools`；可选 `requires_layer: [base, <layer>]` 标注依赖层，值见 `docs/charter/05-install-deploy.md` 六层定义）
 4. 编写：职责 / 工具栈 / Page Object 或调用模板 / 协作输出
 5. **同步**：
-   - `02-专家定义/README.md` 加一行
+   - `agents/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `01-测试主管.md` 路由表（如平台扩展）
    - `utils/prd_loader.PLATFORM_KEYWORDS` 加关键词（如平台扩展）
    - `install.sh` agents 数组加文件名
-   - `01-快速开始/部署说明.md` PowerShell + bash 拷贝清单加
+   - `docs/getting-started/部署说明.md` PowerShell + bash 拷贝清单加
 
 ---
 
@@ -24,7 +24,7 @@
 
 1. 选定分类（通用 8 / 平台专项 5）
 2. 文件命名 `<verb>-<noun>.md`（如 `chaos-test.md`）
-3. 顶部 YAML frontmatter
+3. 顶部 YAML frontmatter（可选 `requires_layer: [base, <layer>]` 标注依赖层，值见 `05-install-deploy.md` 六层定义）
 4. 必含章节：
    - 🔔 开测前准备清单（平台 skill 必有）
    - 触发方式
@@ -33,12 +33,12 @@
    - 质量门禁
    - 输出文件
 5. **同步**：
-   - `03-技能定义/README.md` 加一行
+   - `skills/README.md` 加一行
    - `00-项目导航.md` 加一行
-   - `01-快速开始/使用手册.md` skill 详解段加描述
+   - `docs/getting-started/使用手册.md` skill 详解段加描述
    - `01-测试主管.md` 快速命令清单加一行
    - `install.sh` skills 数组加文件名
-   - `01-快速开始/部署说明.md` 拷贝清单加
+   - `docs/getting-started/部署说明.md` 拷贝清单加
 
 ---
 
@@ -49,14 +49,14 @@
 3. 顶部 docstring 标注被引用方
 4. 必含：公开 API + CLI（argparse）
 5. **同步**：
-   - `05-代码示例/README.md` 表格加一行
+   - `utils/README.md` 表格加一行
    - `00-项目导航.md` 对应分类加一行
-   - `04-配置文件/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
-   - `04-配置文件/.env.example` 加配置字段
-   - `04-配置文件/conftest.py` `pytest_configure` 加产出目录
-   - `04-配置文件/pytest.ini` markers 加新标记
+   - `config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
+   - `config/.env.example` 加配置字段
+   - `config/conftest.py` `pytest_configure` 加产出目录
+   - `config/pytest.ini` markers 加新标记
    - `install.sh` utils 数组 + 数字
-   - `01-快速开始/部署说明.md` 拷贝清单 + 数字
+   - `docs/getting-started/部署说明.md` 拷贝清单 + 数字
 
 ---
 
@@ -71,9 +71,9 @@
 
 ## 添加新 .env 字段
 
-1. `04-配置文件/.env.example` 加（带注释）
-2. `01-快速开始/配置清单.md` 字段说明加一行
-3. `04-配置文件/conftest.py` `EnvConfig` 加字段（如功能必需）
+1. `config/.env.example` 加（带注释）
+2. `docs/getting-started/配置清单.md` 字段说明加一行
+3. `config/conftest.py` `EnvConfig` 加字段（如功能必需）
 4. CI yml / Jenkins Credentials 同步（如 CI 需要）
 
 ---
@@ -110,10 +110,10 @@ perf(jmeter): 减少不必要心跳
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
-ls 02-专家定义/[0-9]*.md | wc -l   # 16（或 +N）
-ls 03-技能定义/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
-ls 05-代码示例/*.py | wc -l         # 49（或 +N,含 __init__.py）
-grep -c "^    [a-z_]+:" 04-配置文件/pytest.ini  # markers 数
+ls agents/[0-9]*.md | wc -l   # 16（或 +N）
+ls skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
+ls utils/*.py | wc -l         # 67（或 +N,含 __init__.py）
+grep -c "^    [a-z_]+:" config/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
 ```
@@ -128,17 +128,17 @@ pytest --collect-only
 
 | 改动类型 | 必同步至 |
 |---------|---------|
-| 新增/删除 Agent | `02-专家定义/README.md` + `00-项目导航.md` + `install.sh` agents 数组 + `01-快速开始/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS` |
-| 新增/删除 Skill | `03-技能定义/README.md` + `00-项目导航.md` + `install.sh` skills 数组 + `01-快速开始/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单 |
-| 新增/删除 utils | `05-代码示例/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers + `install.sh` utils 数组 |
-| 数字变化（16/32+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.sh + ci.yml `file-count` job 校验 |
+| 新增/删除 Agent | `agents/README.md` + `00-项目导航.md` + `install.sh` agents 数组 + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS` |
+| 新增/删除 Skill | `skills/README.md` + `00-项目导航.md` + `install.sh` skills 数组 + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单 |
+| 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers + `install.sh` utils 数组 |
+| 数字变化（18/32+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.sh + ci.yml `file-count` job 校验 |
 | URL/repo 名变化 | grep `Wool-xing/Test-Agent` 全替换 + `install.sh::REPO_URL` + `dependabot.yml` |
-| 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `02-专家定义/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
+| 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `agents/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
 
 ### 自动化保障
 
-- `pre-commit`：16/32/49 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
-- `.github/workflows/ci.yml`：16/32/49 自校 + Markdown 链接有效性 + utils 导入
+- `pre-commit`：18/32/67 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
+- `.github/workflows/ci.yml`：18/32/67 自校 + Markdown 链接有效性 + utils 导入
 - `.github/workflows/codeql.yml`：python + GitHub Actions 安全扫描
 
 ### 提交前自检
@@ -152,7 +152,7 @@ pytest --collect-only
 
 ## RACI 协作矩阵（浓缩版）
 
-> 完整路由逻辑见 `02-专家定义/01-测试主管.md` PLATFORM_KEYWORDS 与 `02-专家定义/README.md` 流程依赖关系。
+> 完整路由逻辑见 `agents/01-测试主管.md` PLATFORM_KEYWORDS 与 `agents/README.md` 流程依赖关系。
 
 ### 缩写
 
@@ -180,47 +180,49 @@ pytest --collect-only
 | VT | visual-tester | 平台扩展 |
 | ST | system-tester | 平台扩展 |
 | AT | ai-tester | 平台扩展 |
+| PT | pentest-tester | 垂直领域 |
+| AMT | automotive-tester | 垂直领域 |
 
 ### RACI 主表（测试维度 × 专家）
 
-| 测试维度 | TL | RA | TD | EM | DP | AE | TE | BM | RG | MT | DT | VT | ST | AT |
-|---------|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| 需求分析 | A | R | C | I | I | I | I | I | I | C | C | C | C | C |
-| 用例设计-功能 | A | C | R | I | C | I | I | I | I | C | C | C | C | C |
-| 用例设计-非功能 | A | C | R | I | C | C | C | C | I |  |  |  |  |  |
-| 环境准备 | A | I | I | R | C | C | C | I | I | C | C |  | C |  |
-| 数据准备 | A | I | C | C | R | C | C | I | I | C |  |  | C | C |
-| Web 自动化 | A | I | C | I | C | R | C | I | I |  |  |  |  |  |
-| API 自动化 | A | I | C | I | C | R | C | I | I |  |  |  | C |  |
-| 性能（JMeter） | A | C | C | C | C | R | R | I | C |  |  |  |  |  |
-| 移动端 | A | C | C | C | C | C | C | I | I | R |  |  |  |  |
-| 桌面端 | A | C | C | C | C | C | C | I | I |  | R |  |  |  |
-| 视觉/游戏 | A | C | C | C | C | C | C | I | I |  |  | R |  |  |
-| 系统/IoT/音视频 | A | C | C | C | C | C | C | I | I |  |  |  | R |  |
-| AI/LLM | A | C | C | C | C | C | C | I | I |  |  |  |  | R |
-| 安全（SAST/DAST/Fuzz） | A | I | R | C | I | C | C | R | I |  |  |  |  | C |
-| 兼容矩阵 | A | I | R | C | I | R | C | I | I | C | C |  |  |  |
-| 弱网 | A | I | C | C | I | C | R | I | I | C |  |  |  |  |
-| 稳定 Soak | A | I | C | C | I | C | R | I | I | C |  |  |  |  |
-| 可靠性（重试/降级） | A | I | C | C | I | R | C | I | I |  |  |  |  |  |
-| 混沌 | A | I | C | C | I | C | R | I | I |  |  |  |  |  |
-| 灾备 Failover | A | I | C | R | I | C | R | I | I |  |  |  | C |  |
-| UX 度量 | A | I | R | C | I | R | C | I | C |  |  |  |  |  |
-| 易用性（Nielsen） | A | I | R | C | I | C | I | I | I |  |  |  |  |  |
-| 探索性 SBTM | A | I | R | C | C | C | C | C | I |  |  |  |  |  |
-| Web Vitals | A | I | C | I | I | R | C | I | I |  |  |  |  |  |
-| A11y 无障碍 | A | I | R | I | I | R | C | I | I |  |  |  |  |  |
-| i18n / l10n | A | I | R | I | I | R | C | I | I |  |  |  |  |  |
-| 数据库测试 | A | I | C | C | R | R | C | I | I |  |  |  |  |  |
-| 契约测试 | A | C | R | I | C | R | C | I | I |  |  |  |  |  |
-| 视觉回归 | A | I | C | I | I | C | C | I | I |  |  | R |  |  |
-| AI 对抗/越狱 | A | C | C | I | I | C | C | C | I |  |  |  |  | R |
-| 变异测试 | A | I | R | I | I | C | C | I | I |  |  |  |  |  |
-| DORA / 度量 | A | I | C | I | I | C | R | R | R |  |  |  |  |  |
-| Bug 提交 BugTracker | A | I | I | I | I | I | C | R | C | I | I | I | I | I |
-| 报告生成 | A | I | I | I | I | I | C | C | R | I | I | I | I | I |
-| 多端通知 | A | I | I | I | I | I | I | I | R | I | I | I | I | I |
-| **上线决策** | **R/A** | C | C | I | I | C | C | C | C | I | I | I | I | I |
+| 测试维度 | TL | RA | TD | EM | DP | AE | TE | BM | RG | MT | DT | VT | ST | AT | PT | AMT |
+|---------|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|-----|
+| 需求分析 | A | R | C | I | I | I | I | I | I | C | C | C | C | C | C | |
+| 用例设计-功能 | A | C | R | I | C | I | I | I | I | C | C | C | C | C | C | |
+| 用例设计-非功能 | A | C | R | I | C | C | C | C | I |  |  |  |  |  | C | |
+| 环境准备 | A | I | I | R | C | C | C | I | I | C | C |  | C |  | C | |
+| 数据准备 | A | I | C | C | R | C | C | I | I | C |  |  | C | C | | |
+| Web 自动化 | A | I | C | I | C | R | C | I | I |  |  |  |  |  | | |
+| API 自动化 | A | I | C | I | C | R | C | I | I |  |  |  | C |  | | |
+| 性能（JMeter） | A | C | C | C | C | R | R | I | C |  |  |  |  |  | | |
+| 移动端 | A | C | C | C | C | C | C | I | I | R |  |  |  |  | | |
+| 桌面端 | A | C | C | C | C | C | C | I | I |  | R |  |  |  | | |
+| 视觉/游戏 | A | C | C | C | C | C | C | I | I |  |  | R |  |  | | |
+| 系统/IoT/音视频 | A | C | C | C | C | C | C | I | I |  |  |  | R |  | C | C |
+| AI/LLM | A | C | C | C | C | C | C | I | I |  |  |  |  | R | C | |
+| 安全（SAST/DAST/Fuzz） | A | I | R | C | I | C | C | R | I |  |  |  |  | C | R | |
+| 兼容矩阵 | A | I | R | C | I | R | C | I | I | C | C |  |  |  | | C |
+| 弱网 | A | I | C | C | I | C | R | I | I | C |  |  |  |  | | |
+| 稳定 Soak | A | I | C | C | I | C | R | I | I | C |  |  |  |  | | |
+| 可靠性（重试/降级） | A | I | C | C | I | R | C | I | I |  |  |  |  |  | | C |
+| 混沌 | A | I | C | C | I | C | R | I | I |  |  |  |  |  | C | |
+| 灾备 Failover | A | I | C | R | I | C | R | I | I |  |  |  | C |  | C | C |
+| UX 度量 | A | I | R | C | I | R | C | I | C |  |  |  |  |  | | |
+| 易用性（Nielsen） | A | I | R | C | I | C | I | I | I |  |  |  |  |  | | |
+| 探索性 SBTM | A | I | R | C | C | C | C | C | I |  |  |  |  |  | | |
+| Web Vitals | A | I | C | I | I | R | C | I | I |  |  |  |  |  | | |
+| A11y 无障碍 | A | I | R | I | I | R | C | I | I |  |  |  |  |  | | |
+| i18n / l10n | A | I | R | I | I | R | C | I | I |  |  |  |  |  | | |
+| 数据库测试 | A | I | C | C | R | R | C | I | I |  |  |  |  |  | | |
+| 契约测试 | A | C | R | I | C | R | C | I | I |  |  |  |  |  | | |
+| 视觉回归 | A | I | C | I | I | C | C | I | I |  |  | R |  |  | | |
+| AI 对抗/越狱 | A | C | C | I | I | C | C | C | I |  |  |  |  | R | C | |
+| 变异测试 | A | I | R | I | I | C | C | I | I |  |  |  |  |  | | |
+| DORA / 度量 | A | I | C | I | I | C | R | R | R |  |  |  |  |  | | |
+| Bug 提交 BugTracker | A | I | I | I | I | I | C | R | C | I | I | I | I | I | I | I |
+| 报告生成 | A | I | I | I | I | I | C | C | R | I | I | I | I | I | I | I |
+| 多端通知 | A | I | I | I | I | I | I | I | R | I | I | I | I | I | I | I |
+| **上线决策** | **R/A** | C | C | I | I | C | C | C | C | I | I | I | I | I | I | I |
 
 ### 责任边界冲突解决
 

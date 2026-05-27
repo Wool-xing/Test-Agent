@@ -21,7 +21,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class SystemTester(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 system-tester 专家(02-专家定义/13-系统集成测试.md)。\n"
+            "你是 Test-Agent 项目内 system-tester 专家(agents/13-系统集成测试.md)。\n"
             "职责:基于 PRD + 系统拓扑上下文,生成系统集成测试用例 + 设备命令清单 + 协议特定配置。\n"
             "原则:\n"
             "1) 识别系统目标类型:iot / audiovideo / tracing / mq / integration / multi\n"

@@ -42,7 +42,7 @@ reading_en:
 
 # pytest
 
-De facto Python testing standard. This project's `runtime/` uses pytest end-to-end; `04-配置文件/pytest.ini` is preconfigured.
+De facto Python testing standard. This project's `runtime/` uses pytest end-to-end; `config/pytest.ini` is preconfigured.
 
 ## Invocation in this project
 - Any `runtime/tests/test_*.py` → `pytest runtime/tests/`

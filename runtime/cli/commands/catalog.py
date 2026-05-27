@@ -5,7 +5,7 @@ from __future__ import annotations
 import typer
 from rich.table import Table
 
-from runtime.cli._shared import console, _kernel
+from runtime.cli._shared import _kernel, console
 
 
 def register(app: typer.Typer) -> None:

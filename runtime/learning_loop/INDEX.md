@@ -5,7 +5,7 @@
 
 ## 不变量(与 hermes 同源)
 
-- **只动 agent-created skill**(不动 02-专家定义/03-技能定义已有)
+- **只动 agent-created skill**(不动 agents/skills已有)
 - **绝不自动删,只归档**(`workspace/learning/archive/`)
 - **Pinned skill 绕过所有自动**
 - **用 auxiliary client**(`runtime/subagent/aux_client`)

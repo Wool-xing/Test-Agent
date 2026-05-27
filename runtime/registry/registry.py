@@ -1,6 +1,6 @@
 """Expert + Skill registry.
 
-Scans `02-专家定义/*.md` and `03-技能定义/*.md`, parses YAML frontmatter,
+Scans `agents/*.md` and `skills/*.md`, parses YAML frontmatter,
 exposes a unified catalog for router/orchestrator/api.
 
 Frontmatter contract (already present in existing files):
@@ -29,7 +29,7 @@ EntryKind = Literal["expert", "skill"]
 
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n(.*)$", re.DOTALL)
 
-# 合法 impl_status (与 02-专家定义/*.md / 03-技能定义/*.md frontmatter 严同步)
+# 合法 impl_status (与 agents/*.md / skills/*.md frontmatter 严同步)
 _VALID_IMPL_STATUS = {"production", "script", "rollout", "vision"}
 
 
@@ -151,7 +151,7 @@ def build_catalog() -> Catalog:
 
 
 def dump_catalog(target: Path | None = None) -> Path:
-    s = get_settings()
+    get_settings()
     target = target or (Path(__file__).parent / "catalog.json")
     cat = build_catalog()
     target.write_text(

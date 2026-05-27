@@ -11,7 +11,6 @@ Engine evaluates each check against the project and produces a compliance report
 from __future__ import annotations
 
 import json
-import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -218,11 +217,6 @@ def _evaluate_profile(profile: dict[str, Any]) -> ComplianceReport:
         report.manual += 1
 
     # Run auto-checks
-    one_time = os.getcwd
-    try:
-        os.getcwd = lambda: str(Path.cwd())  # no-op, use actual cwd
-    except Exception:
-        pass
     for auto_fn in AUTO_CHECKS:
         result = auto_fn()
         report.results.append(result)

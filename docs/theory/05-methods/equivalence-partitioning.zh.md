@@ -47,7 +47,7 @@ reading_en:
 5. 配合**边界值分析**测临界点
 
 ## Test-Agent 用法
-- `testcase-designer` 专家(02-专家定义/03-用例设计.md)默认套此法
+- `testcase-designer` 专家(agents/03-用例设计.md)默认套此法
 - Excel 输出 4 Sheet 含等价类表
 
 ## 为什么这么做?

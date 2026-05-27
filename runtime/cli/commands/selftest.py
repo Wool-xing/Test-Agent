@@ -7,7 +7,7 @@ from pathlib import Path
 import typer
 
 from runtime.api.parsers import parse_path
-from runtime.cli._shared import console, _kernel
+from runtime.cli._shared import _kernel, console
 
 
 def register(app: typer.Typer) -> None:

@@ -3,6 +3,6 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 echo "Building Python backend..."
-pip install pyinstaller -q
+pip install pyinstaller || { echo "PyInstaller install failed"; exit 1; }
 pyinstaller --clean --noconfirm pyinstaller/tagent_backend.spec
 echo "Backend built: dist-python/tagent-backend"

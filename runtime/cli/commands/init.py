@@ -43,7 +43,7 @@ def register(app: typer.Typer) -> None:
             res = render_all(answers, Path(out), matrix=matrix, overwrite=overwrite)
         except FileExistsError as e:
             console.print(f"[red]{e}[/]")
-            raise typer.Exit(2)
+            raise typer.Exit(2) from e
 
         console.print("\n[bold green]✓ config generated[/]")
         console.print(f"  .env       → {res.env_path}")

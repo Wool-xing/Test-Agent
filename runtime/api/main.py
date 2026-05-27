@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import secrets
 import tempfile
 import threading
 from pathlib import Path
@@ -13,22 +14,24 @@ from fastapi.responses import JSONResponse
 from loguru import logger
 
 from runtime import __version__
+from runtime.api.correlation import CorrelationMiddleware
 from runtime.api.deps import Kernel
-from runtime.api.models import CatalogResponse, RunCreateText, RunCreated, RunStatus as RunStatusModel
+from runtime.api.endpoints.cancel import router as cancel_router
+from runtime.api.endpoints.stream import router as stream_router
+from runtime.api.models import CatalogResponse, RunCreated, RunCreateText
+from runtime.api.models import RunStatus as RunStatusModel
 from runtime.api.parsers import parse_path, parse_text, parse_url
+from runtime.api.result_store import ResultStore
 from runtime.config.settings import get_settings
 from runtime.observability.prometheus_metrics import create_metrics_router
-from runtime.api.correlation import CorrelationMiddleware
-from runtime.api.endpoints.cancel import router as cancel_router, register_run, unregister_run
-from runtime.api.endpoints.stream import router as stream_router
-from runtime.api.result_store import ResultStore
 
 _settings = get_settings()
 
 app = FastAPI(title="Test-Agent Runtime", version=__version__)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:*", "http://127.0.0.1:*", "tauri://localhost"],
+    allow_origins=["tauri://localhost"],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
 )
@@ -48,7 +51,7 @@ async def auth_middleware(request: Request, call_next: Any) -> Any:
     token = _settings.api_auth_token
     if token and request.url.path not in ("/health", "/docs", "/openapi.json"):
         auth = request.headers.get("Authorization", "")
-        if not auth or auth.removeprefix("Bearer ") != token:
+        if not auth or not secrets.compare_digest(auth.removeprefix("Bearer "), token):
             return JSONResponse(status_code=401, content={"detail": "unauthorized"})
     return await call_next(request)
 
@@ -93,7 +96,7 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 
 
 @app.post("/run/file", response_model=RunCreated)
-async def run_file(file: UploadFile = File(..., max_length=50_000_000), extra: str = Form("")) -> RunCreated:
+async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
     suffix = Path(file.filename or "upload").suffix.lower()
     allowed = {".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip", ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml", ".py", ".js", ".ts", ".apk", ".ipa"}
     if suffix not in allowed:
@@ -105,10 +108,7 @@ async def run_file(file: UploadFile = File(..., max_length=50_000_000), extra: s
     if extra:
         art.text = (art.text or "") + "\n\n# User note:\n" + extra
     run_id, decision = _kernel.submit(art)
-    # Kick off in same process pool; fire-and-forget for v1 simplicity.
-    import threading
-
-    threading.Thread(target=_run_in_background, args=(run_id, decision), daemon=True).start()
+    bg.add_task(_run_in_background, run_id, decision)
     return RunCreated(
         run_id=run_id,
         decision_summary={
@@ -207,7 +207,7 @@ def list_history() -> dict:
                         "duration_s": data.get("duration_s", data.get("duration_ms", 0) / 1000 if "duration_ms" in data else 0),
                         "confidence": data.get("confidence", 0),
                     })
-            except (OSError, json.JSONDecodeError, ValueError) as e:
+            except (OSError, _json.JSONDecodeError, ValueError) as e:
                 logger.warning("skipping unreadable run file {}: {}", f, e)
 
     return {"runs": runs[:50]}
@@ -226,12 +226,12 @@ def _run_in_background(run_id: str, decision) -> None:
     try:
         summary = _kernel.execute_sync(run_id, decision)
         with _run_lock:
-            _run_results[run_id] = summary
+            _run_results.put(run_id, summary)
     except Exception:  # noqa: BLE001
         logger.exception("background run {} failed", run_id)
         with _run_lock:
-            _run_results[run_id] = {
+            _run_results.put(run_id, {
                 "error": f"run {run_id} failed — check logs at workspace/ or run with --debug",
                 "run_id": run_id,
                 "failed": 1, "succeeded": 0, "total": 0, "status": "error",
-            }
+            })

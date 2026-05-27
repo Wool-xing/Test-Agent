@@ -1,8 +1,8 @@
 """L1 frontmatter lint · 无 LLM · pre-push / pre-commit / doctor 共用.
 
 校验:
-- 02-专家定义/[0-9]*.md 16 个文件 frontmatter `name`/`description`/`tools` 必填
-- 03-技能定义/*.md(排除 README/INDEX/上游 darwin-skill/karpathy-guidelines)`name`/`description` 必填
+- agents/[0-9]*.md 16 个文件 frontmatter `name`/`description`/`tools` 必填
+- skills/*.md(排除 README/INDEX/上游 darwin-skill/karpathy-guidelines)`name`/`description` 必填
 - registry.build_catalog() 加载后 16 expert 全在,且 name 字段与 file slug 协同(只看 frontmatter name)
 - 所有 agent 文件名形如 `NN-中文.md`(NN 两位数 01-16),序号连续无跳
 

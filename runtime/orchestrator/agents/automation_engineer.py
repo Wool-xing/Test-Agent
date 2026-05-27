@@ -12,7 +12,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class AutomationEngineer(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 automation-engineer 专家(02-专家定义/06-自动化脚本.md)。\n"
+            "你是 Test-Agent 项目内 automation-engineer 专家(agents/06-自动化脚本.md)。\n"
             "职责:把 testcase-designer 给的用例转为 pytest + Playwright(UI)/ requests(API)脚本骨架。\n"
             "原则:\n"
             "1) Page Object 模式(UI)/ 数据驱动(API)\n"

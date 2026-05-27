@@ -1,4 +1,4 @@
-# runtime/orchestrator/agents/ 索引(V1.32.5)
+# runtime/orchestrator/agents/ 索引(V1.36.0)
 
 > 真 LLM-driven expert runner · 16 核心 expert 全落地 · 主宪章 §40 真 agent 落地 canon。
 
@@ -6,11 +6,11 @@
 
 | Runner | 角色源 | 上游 | 产物 |
 |--------|--------|------|------|
-| `requirements-analyst` | 02-专家定义/02-需求分析.md | PRD(artifact_text) | `requirements_summary.json` |
-| `automation-engineer` | 02-专家定义/06-自动化脚本.md | requirements-analyst | `automation_scripts_plan.json` |
-| `test-executor` | 02-专家定义/07-测试执行.md | automation-engineer | `execution_plan.json` |
-| `bug-manager` | 02-专家定义/08-Bug管理.md | test-executor | `bug_drafts.json`(BugTracker-ready) |
-| `test-lead` | 02-专家定义/01-测试主管.md | 全链路 | `final_verdict_*.json`(上线决策) |
+| `requirements-analyst` | agents/02-需求分析.md | PRD(artifact_text) | `requirements_summary.json` |
+| `automation-engineer` | agents/06-自动化脚本.md | requirements-analyst | `automation_scripts_plan.json` |
+| `test-executor` | agents/07-测试执行.md | automation-engineer | `execution_plan.json` |
+| `bug-manager` | agents/08-Bug管理.md | test-executor | `bug_drafts.json`(BugTracker-ready) |
+| `test-lead` | agents/01-测试主管.md | 全链路 | `final_verdict_*.json`(上线决策) |
 
 ## 0 未实现(V1.32 rollout 完成)
 

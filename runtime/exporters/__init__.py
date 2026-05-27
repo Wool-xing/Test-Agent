@@ -6,4 +6,4 @@ New formats: xmind / markmap / opml / freemind / plantuml(按用户选).
 Registered exporters expose `.export(tree: TestCaseTree, target: Path) -> Path`.
 """
 
-from runtime.exporters.base import Exporter, REGISTRY, TestCaseNode, TestCaseTree, register  # noqa: F401
+from runtime.exporters.base import REGISTRY, Exporter, TestCaseNode, TestCaseTree, register  # noqa: F401

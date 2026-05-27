@@ -2,7 +2,7 @@
 """
 P0 冒烟用例最小示例。
 演示：pytest fixture 注入 + Page Object 调用 + 断言。
-完整 Test-Agent 工作流的 P0 冒烟门禁见 03-技能定义/smoke-test.md（≥95% 通过率）。
+完整 Test-Agent 工作流的 P0 冒烟门禁见 skills/smoke-test.md（≥95% 通过率）。
 """
 import sys
 from pathlib import Path

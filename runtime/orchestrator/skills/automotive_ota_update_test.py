@@ -1,8 +1,10 @@
 """automotive-ota-update-test · OTA 升级测试编排 (V1.31.0)."""
 from __future__ import annotations
+
 from pathlib import Path
-from typing import Any
+
 from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, register_skill
+
 
 @register_skill("automotive-ota-update-test")
 class AutomotiveOtaUpdateTest(AgentRunner):

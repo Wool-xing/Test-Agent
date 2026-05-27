@@ -8,7 +8,6 @@ from __future__ import annotations
 import ast
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 
 class ImportGraph:
@@ -16,8 +15,8 @@ class ImportGraph:
 
     def __init__(self, root: str | Path):
         self.root = Path(root)
-        self._imports: Dict[str, Set[str]] = {}   # module → {modules it imports}
-        self._imported_by: Dict[str, Set[str]] = {}  # module → {modules that import it}
+        self._imports: dict[str, set[str]] = {}   # module → {modules it imports}
+        self._imported_by: dict[str, set[str]] = {}  # module → {modules that import it}
 
     def scan(self, max_files: int = 500) -> int:
         """Scan all .py files under root, build bidirectional import graph."""
@@ -39,35 +38,34 @@ class ImportGraph:
                         imported = alias.name.split(".")[0]
                         self._imports[module].add(imported)
                         self._imported_by.setdefault(imported, set()).add(module)
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        imported = node.module.split(".")[0]
-                        self._imports[module].add(imported)
-                        self._imported_by.setdefault(imported, set()).add(module)
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    imported = node.module.split(".")[0]
+                    self._imports[module].add(imported)
+                    self._imported_by.setdefault(imported, set()).add(module)
             count += 1
         return count
 
-    def affected_modules(self, changed_files: List[str]) -> Set[str]:
+    def affected_modules(self, changed_files: list[str]) -> set[str]:
         """Given a list of changed file paths, return all modules potentially affected.
 
         Includes:
           - The changed modules themselves
           - Any module that imports them (1‑hop downstream)
         """
-        changed_modules: Set[str] = set()
+        changed_modules: set[str] = set()
         for cf in changed_files:
             m = _path_to_module(Path(cf), self.root)
             if m:
                 changed_modules.add(m)
 
-        affected: Set[str] = set(changed_modules)
+        affected: set[str] = set(changed_modules)
         for m in changed_modules:
             downstream = self._imported_by.get(m, set())
             affected.update(downstream)
 
         return affected
 
-    def affected_tests(self, changed_files: List[str], test_dirs: List[str] | None = None) -> List[str]:
+    def affected_tests(self, changed_files: list[str], test_dirs: list[str] | None = None) -> list[str]:
         """Find test files most likely impacted by changed_files.
 
         Returns sorted list of test file paths.
@@ -78,7 +76,7 @@ class ImportGraph:
         affected = self.affected_modules(changed_files)
 
         # Find test files that import affected modules or are in test dirs
-        candidates: List[str] = []
+        candidates: list[str] = []
         for f in self.root.rglob("test_*.py"):
             if ".venv" in f.parts or "__pycache__" in f.parts:
                 continue
@@ -92,10 +90,9 @@ class ImportGraph:
                         if alias.name.split(".")[0] in affected:
                             candidates.append(str(f.relative_to(self.root)))
                             break
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module and node.module.split(".")[0] in affected:
-                        candidates.append(str(f.relative_to(self.root)))
-                        break
+                elif isinstance(node, ast.ImportFrom) and node.module and node.module.split(".")[0] in affected:
+                    candidates.append(str(f.relative_to(self.root)))
+                    break
 
         # Also include any test_*.py in test directories
         for td in test_dirs:
@@ -124,8 +121,8 @@ def _path_to_module(p: Path, root: Path) -> str:
 def analyze_impact(
     project_root: str | Path,
     base_branch: str = "main",
-    test_dirs: Optional[List[str]] = None,
-) -> Dict:
+    test_dirs: list[str] | None = None,
+) -> dict:
     """Main entry point: git diff → import graph → impacted test list.
 
     Returns:
@@ -143,7 +140,7 @@ def analyze_impact(
         raise FileNotFoundError(f"project root not found: {root}")
 
     # git diff
-    changed_files: List[str] = []
+    changed_files: list[str] = []
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "diff", "--name-only", f"{base_branch}...HEAD"],
@@ -151,7 +148,7 @@ def analyze_impact(
         )
         changed_files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]
     except Exception as e:
-        raise RuntimeError(f"git diff failed: {e}")
+        raise RuntimeError(f"git diff failed: {e}") from e
 
     if not changed_files:
         return {
@@ -203,7 +200,7 @@ def _cli() -> None:
 
     report = analyze_impact(Path(args.root), base_branch=args.base)
 
-    if getattr(args, "json"):
+    if args.json:
         print(_json.dumps(report, indent=2, ensure_ascii=False))
     else:
         print(f"Changed files:   {len(report['changed_files'])}")

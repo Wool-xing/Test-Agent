@@ -4,9 +4,9 @@
 内容与原 FULL_GUIDE.md 对应段完全一致, 仅拆不动语义。
 -->
 
-## 🧠 V1.32.0 运行时层(`runtime/`)
+## 🧠 V1.36.0 运行时层(`runtime/`)
 
-> 已有 16 专家 / 32 Skill / 49 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
+> 已有 16 专家 / 32 Skill / 78 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
 
 ### 模块拓扑
@@ -23,9 +23,9 @@ runtime/router                       ← LiteLLM 多厂商 + Ollama 兜底
    ▼
 runtime/orchestrator                 ← Prefect 2.x flow + Direct 降级执行器
    │
-   ├─► 02-专家定义/*.md              ← Claude Code 加载
-   ├─► 03-技能定义/*.md              ← Skill 调用
-   └─► 05-代码示例/*.py              ← 49 脚本(subprocess 隔离)
+   ├─► agents/*.md              ← Claude Code 加载
+   ├─► skills/*.md              ← Skill 调用
+   └─► utils/*.py              ← 67 脚本(subprocess 隔离)
    │
    ▼
 runtime/storage 飞轮                  ← Postgres+pgvector + MinIO
@@ -104,13 +104,13 @@ uvicorn runtime.api.main:app --port 8800
 - 5 类典型输入(web/api/mobile/desktop/ai-model)stub 路由 = 5/5(100%)
 - M1 门槛:多模型真测 ≥85%;不达 → 双模型投票
 
-### 与 16 专家 / 32 Skill / 49 utils 的关系
+### 与 16 专家 / 32 Skill / 78 utils 的关系
 
 | 项 | 关系 |
 |----|------|
 | 16 专家 `.md` | **不动**。`registry` 扫 frontmatter,`router` 喂 LLM 选用 |
 | 32 Skill `.md` | **不动**。同上 |
-| 49 utils `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
+| 78 utils `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
 | `utils/` 通知/Bug | 复用 `generate_report.py` / `zentao_bug_manager.py` |
 
 任何专家/Skill/脚本**新增**或**修改**仍按宪章 §1 同步铁律走;`runtime/` 是新增 **调度** 层,不重复实现专家逻辑。
@@ -121,7 +121,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 ## 📜 LICENSE / CHANGELOG / CONTRIBUTING / SECURITY
 
 - **LICENSE**：MIT（详见 [`LICENSE`](../../LICENSE)）
-- **CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.32.0 含 17 版累积 / expert rollout 收尾 / skill rollout 全 14/14 完成）
+- **CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.43.0 / Phase 3+4+5 落版 + 32/32 skill active 全 production）
 - **VERSION**：详见 [`VERSION`](../../VERSION)
 - **CONTRIBUTING**：详见 [`CONTRIBUTING.md`](../../CONTRIBUTING.md)（含同步铁律 + RACI 矩阵）
 - **SECURITY**：详见 [`SECURITY.md`](../../SECURITY.md)（漏洞报告流程 + GitHub Security Advisories 入口）
@@ -131,11 +131,11 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 
 ## 🗺️ 项目当前状态与下次会话快速指引
 
-### 当前阶段（最后更新：2026-05-17）
+### 当前阶段（最后更新：2026-05-18）
 
-- **Phase**：Phase 2 前期（V1.32.0 · expert rollout 收尾 + skill rollout 完成 14/14）
+- **Phase**：Phase 2 前期（V1.36.0 · expert rollout 收尾 + skill rollout 全 16/16 完成）
 - **关键已交付**：16 expert (11p+5s) · 32 skill (23p+7s+0r+2v) · AgentChat · Bug 多适配 · 按需安装 · darwin-skill · MCP 6 件套 · Marketplace · 教学层 · 多 LLM config · 16 SkillRunner 全落地
-- **活跃 PR**：无（V1.32.0 release，2026-05-17）
+- **活跃 PR**：#124-#127 merged（V1.34-V1.36, 2026-05-18）
 
 ### 历史关键决议
 
@@ -143,7 +143,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 - 2026-05-11：FULL_GUIDE.md 确立永久宪章地位
 - 2026-05-11：darwin-skill 不消费运行数据（Via Negativa）；反问 KB 不进 V1.0.0
 - 2026-05-12 ~ 2026-05-14：V1.1-V1.14 runtime 层 + 教学层 + Marketplace + 渗透/车载 + Hermes + GBrain + Karpathy + ECC
-- 2026-05-15 ~ 2026-05-17：V1.15-V1.32 18 版迭代 — 16 expert 全 production + 23 SkillRunner 生产落地 + 多 LLM config + 深审修复 + GUI + Dashboard + Mobile
+- 2026-05-15 ~ 2026-05-18：V1.15-V1.36 22 版迭代 — 16 expert 全 production + 23 SkillRunner 生产落地 + 多 LLM config + 深审修复 + GUI + Dashboard + Mobile + 65发现全修
 
 ### 下次会话进入项目时，按顺序检查
 
@@ -155,8 +155,8 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 ### 来源与引用（认知史）
 
 - 第一至五轮（DeepSeek + Claude）：测试 Agent 架构 + 九大簇
-- V1.0.0 工程基线：14 agent + 14 skill + 49 utils + CI/CD（历史基线）
-- V1.1.0 ~ V1.32.0：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
+- V1.0.0 工程基线：14 agent + 14 skill + 76 utils + CI/CD（历史基线）
+- V1.1.0 ~ V1.36.0：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
 - 永久宪章糅合（2026-05-11/14/16）：FULL_GUIDE 工程主体 + 全局记忆哲学维度 + 持续回写
 
 ---

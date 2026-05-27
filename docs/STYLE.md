@@ -87,7 +87,7 @@
 
 | 场景 | 例外 |
 |------|------|
-| 上游引入文件 | `03-技能定义/(darwin-skill\|karpathy-guidelines)/*` 沿用上游样式,不批改 |
+| 上游引入文件 | `skills/(darwin-skill\|karpathy-guidelines)/*` 沿用上游样式,不批改 |
 | 自动生成文件 | `CHANGELOG.md` 由 Keep-a-Changelog 模板驱动 |
 | 本地笔记 | 项目根 gitignored 文件不受本约束 |
 

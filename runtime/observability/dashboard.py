@@ -6,7 +6,6 @@ Consumed by `runtime.api.main:get_dashboard`. Pure functions, no side effects.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -52,10 +51,7 @@ def build_decision_signal(runs: list[dict[str, Any]]) -> dict[str, Any]:
 
     # MTTD/MTTR estimates from run durations
     durations = [r.get("duration_ms", r.get("elapsed_ms", 0)) for r in runs if r.get("duration_ms") or r.get("elapsed_ms")]
-    if durations:
-        avg_dur = sum(durations) / len(durations) / 1000 / 60  # minutes
-    else:
-        avg_dur = 0
+    avg_dur = sum(durations) / len(durations) / 1000 / 60 if durations else 0  # minutes
 
     return {
         "pass_rate_pct": avg_pass,
@@ -142,7 +138,7 @@ def build_dashboard(workspace_dir: Path) -> dict[str, Any]:
     actions = build_action_items(runs, diagnostic["expert_heatmap"])
 
     total = len(runs)
-    pass_rates = [
+    [
         (r.get("succeeded", r.get("passed", 0)) / max(r.get("total", 1), 1))
         for r in runs
     ]

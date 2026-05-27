@@ -5,7 +5,12 @@ cd "$(dirname "$0")/.."
 echo "=== Building Python backend ==="
 bash scripts/build-python.sh
 echo "=== Building Web UI ==="
-cd ../runtime/web && npm ci && npm run build && cd -
+WEB_DIR="../runtime/web"
+if [ -f "$WEB_DIR/package.json" ]; then
+  (cd "$WEB_DIR" && npm ci && npm run build)
+else
+  echo "  (skip: $WEB_DIR/package.json not found)"
+fi
 echo "=== Building Electron ==="
 npm ci
 npm run build:electron

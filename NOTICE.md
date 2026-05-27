@@ -2,19 +2,19 @@
 
 Test-Agent 本体 MIT License。以下组件保留各自上游协议。
 
-## Upstream Skills(项目内 03-技能定义/ 子目录)
+## Upstream Skills(项目内 skills/ 子目录)
 
 | 路径 | 上游 | 协议 |
 |------|------|------|
-| `03-技能定义/darwin-skill/` | [alchaincyf/darwin-skill](https://github.com/alchaincyf/darwin-skill) | MIT |
-| `03-技能定义/karpathy-guidelines/` | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | MIT |
-| `03-技能定义/nuwa-skill/` | [alchaincyf/nuwa-skill](https://github.com/alchaincyf/nuwa-skill) | MIT |
+| `skills/darwin-skill/` | [alchaincyf/darwin-skill](https://github.com/alchaincyf/darwin-skill) | MIT |
+| `skills/karpathy-guidelines/` | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | MIT |
+| `skills/nuwa-skill/` | [alchaincyf/nuwa-skill](https://github.com/alchaincyf/nuwa-skill) | MIT |
 
 各子目录含本地 `LICENSE` 副本(完整 MIT 全文 + 上游作者署名)。
 
 ## Python 依赖(主要)
 
-详见 `04-配置文件/requirements.txt`。常用:
+详见 `config/requirements.txt`。常用:
 
 - pytest(MIT)/ Playwright(Apache 2.0)/ Appium(Apache 2.0)/ pywinauto(BSD-3-Clause)
 - JMeter(Apache 2.0)/ Allure(Apache 2.0)— 外部安装

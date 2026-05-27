@@ -10,7 +10,7 @@ from pathlib import Path
 import typer
 
 from runtime.api.parsers import parse_path
-from runtime.cli._shared import console, _SMOKE_PRD_FIXTURE
+from runtime.cli._shared import _SMOKE_PRD_FIXTURE, console
 
 
 def register(app: typer.Typer) -> None:
@@ -32,9 +32,8 @@ def register(app: typer.Typer) -> None:
             provider = os.getenv("TAGENT_LLM_PROVIDER", "(unset)")
             console.print(f"[bold yellow]⚠ --real-llm mode[/]  provider={provider}")
             console.print("  · Real LLM calls ~$1-3 / 60-120s (16 agents × multi-turn)")
-            if not yes:
-                if not typer.confirm("  Continue? (N=exit)", default=False):
-                    raise typer.Exit(0)
+            if not yes and not typer.confirm("  Continue? (N=exit)", default=False):
+                raise typer.Exit(0)
             if not skip_smoke:
                 from runtime.healthcheck.llm_smoke import run_llm_smoke
                 console.print("\n[bold]Pre-flight · doctor --llm-smoke (single round-trip)[/]")

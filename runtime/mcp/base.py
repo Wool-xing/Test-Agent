@@ -3,7 +3,7 @@
 Honors charter:
   - §18-12 决策可追溯:工具调用自动落 `decisions/{date}_mcp_{tool}_{run_id}.json`
   - §21 横切可复现性:run_id 注入 + seed 记录 + 失败 snapshot
-  - §1 同步铁律:服务列表必须与 `04-配置文件/.mcp.json` 一致
+  - §1 同步铁律:服务列表必须与 `config/.mcp.json` 一致
 """
 
 from __future__ import annotations
@@ -12,9 +12,10 @@ import functools
 import json
 import os
 import uuid
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Awaitable, Callable
+from typing import Any
 
 from loguru import logger
 
@@ -102,9 +103,9 @@ def make_server(name: str, version: str = "0.1.0"):
 async def run_stdio(server) -> None:
     """Run an MCP server over stdio."""
     try:
-        from mcp.server.stdio import stdio_server
-        from mcp.server.models import InitializationOptions
         from mcp.server import NotificationOptions
+        from mcp.server.models import InitializationOptions
+        from mcp.server.stdio import stdio_server
     except ImportError as e:
         raise RuntimeError("mcp SDK missing components") from e
     async with stdio_server() as (read, write):

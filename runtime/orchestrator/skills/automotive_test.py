@@ -3,9 +3,11 @@
 10 阶段: HARA+ASIL → 静态 MISRA → 单元 MC/DC → SIL/PIL → HIL → CAN → ADAS → OTA → 合规 → 报告
 """
 from __future__ import annotations
+
 from pathlib import Path
-from typing import Any
+
 from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, register_skill
+
 
 @register_skill("automotive-test")
 class AutomotiveTest(AgentRunner):

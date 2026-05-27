@@ -1,4 +1,4 @@
-"""Bridge standalone 05-代码示例 scripts into the orchestrator pipeline.
+"""Bridge standalone utils scripts into the orchestrator pipeline.
 
 Each adapter wraps a standalone script with:
 - Input normalization (DAG node inputs → CLI args / stdin JSON)
@@ -17,7 +17,7 @@ from loguru import logger
 
 
 def _scripts_dir() -> Path:
-    return Path(__file__).resolve().parents[3] / "05-代码示例"
+    return Path(__file__).resolve().parents[3] / "utils"
 
 
 def _run_script(script_name: str, args: list[str] | None = None,

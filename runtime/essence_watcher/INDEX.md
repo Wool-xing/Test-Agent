@@ -25,7 +25,7 @@
    c. 写 upstream update 文件
    d. 标 confidence: llm-draft-unreviewed
 5. 应用 policy.yaml:
-   - skill-related delta → 提议入 03-技能定义/
+   - skill-related delta → 提议入 skills/
    - rule-related delta → 提议入主宪章 § 待审
    - 其他 → 仅入 upstream 不动 Test-Agent
 ```
@@ -46,7 +46,7 @@ essence_watcher:
 ```yaml
 # 哪些 delta 自动提议入 Test-Agent
 auto_propose:
-  - skill_definitions          # 新 skill 名字 / 描述 / 元数据 → 提议 03-技能定义/
+  - skill_definitions          # 新 skill 名字 / 描述 / 元数据 → 提议 skills/
   - charter_rules             # 主宪章规则更新 → 提议 主宪章
   - safety_patterns           # 防护模式 → 提议 §24 safe-by-default
   - test_methodology          # 测试方法论新增 → 提议 §17/§21

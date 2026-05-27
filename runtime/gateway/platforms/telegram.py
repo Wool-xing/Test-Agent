@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import os
 
-from loguru import logger
-
 from runtime.gateway.base import DeliveryResult, Message, Platform, register
 
 

@@ -91,7 +91,8 @@ class LLMClient:
     def _extract_json(raw: str) -> dict[str, Any]:
         raw = raw.strip()
         if raw.startswith("```"):
-            raw = raw.strip("`")
+            # Strip exactly one fenced code block marker
+            raw = raw[3:-3].strip() if raw.endswith("```") else raw[3:]
             # strip leading lang tag e.g. ```json
             if "\n" in raw:
                 _, raw = raw.split("\n", 1)

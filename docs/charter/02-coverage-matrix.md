@@ -54,14 +54,14 @@
 | AI 对抗 / LLM 越狱 / Prompt Injection | ai_adversarial | ai-tester | ✅ |
 | 变异测试（用例有效性） | mutation_runner | testcase-designer | ✅ |
 | DORA 4 指标 + 缺陷密度 + 套件减重 | dora_metrics + suite_minimizer | bug-manager | ✅ |
-| 伦理 / 偏见审计（数据集/模型/决策公平性） | ai_adversarial + suite_minimizer（覆盖偏差） + 公平性指标 | ai-tester | ⚪ Phase 3 |
-| 沉默故障检测（无报警的恶化） | tracing_validator + web_vitals_collector + 阈值漂移检测 | test-executor | ⚪ Phase 3 |
+| 伦理 / 偏见审计（数据集/模型/决策公平性） | fairness_auditor.py + ai_adversarial + suite_minimizer（覆盖偏差） + 公平性指标 | ai-tester | ✅ |
+| 沉默故障检测（无报警的恶化） | silent_failure_detector.py + tracing_validator + web_vitals_collector + 阈值漂移检测 | test-executor | ✅ |
 | 决策可回放（任一判断可复现可反驳） | tracing_validator + history 归档 + 模型版本快照 | test-lead | ✅ |
-| 缺席者场景注入（残障/老年/未成年/未联网/精神危机） | a11y_scanner + i18n_checker + 边缘场景剧本库 | testcase-designer | ⚪ Phase 3 |
-| 证据链可采信性（司法/审计/监管送审） | dora_metrics + tracing_validator + 决策日志打包 | bug-manager | ⚪ Phase 4 |
-| 神圣性与跨文化禁忌边界（宗教/葬礼/儿童/纪念） | i18n_checker + 禁忌词/色/数/节日组合（本地化共建） | testcase-designer | ⚪ Phase 5 |
+| 缺席者场景注入（残障/老年/未成年/未联网/精神危机） | absentee_scenario_injector.py + a11y_scanner + i18n_checker + 边缘场景剧本库 | testcase-designer | ✅ |
+| 证据链可采信性（司法/审计/监管送审） | evidence_chain.py + dora_metrics + tracing_validator + 决策日志打包 | bug-manager | ✅ |
+| 神圣性与跨文化禁忌边界（宗教/葬礼/儿童/纪念） | i18n_checker + taboo_matrix + 禁忌词/色/数/节日组合（本地化共建） | testcase-designer | ✅ |
 | Skill 自进化（darwin-skill 双重评估 + 棘轮） | darwin-skill SKILL.md + results.tsv + 子 agent 实测 | test-lead 触发 | ✅ |
-| Bug 工具多适配（禅道/Jira/GitHub/Linear/Webhook） | bug_tracker_base + 5 adapter | bug-manager | ✅ |
+| Bug 工具多适配（5 套 tracker 全部实装） | bug_tracker_base + zentao/jira/github/linear/webhook_bug_manager | bug-manager | ✅ |
 | Agent 协作纪要（讨论/反问/通信落档） | agentchat_recorder + workspace/执行日志/discussions/ | test-lead | ✅ |
 
 ### 矩阵 C：用例设计方法（ISTQB 经典）
@@ -97,8 +97,8 @@
       /单元（70%）/         ← pytest + pytest-mock，秒级反馈
 ```
 
-**总覆盖率 ~95%**（含闭环：Bug 多适配 + 多端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
+**总覆盖率 ~90%**（含闭环：Bug 多适配 + 多端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
 
-剩 ~5% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
+剩 ~10% 为高度专业合规领域（HIPAA 医疗 / SOC2 金融 / DO-178C 航空 / IEC61508 工业控制）—— 业务方按需自加。
 
 ---

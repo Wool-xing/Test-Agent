@@ -44,7 +44,7 @@
 - **文件**: `.pre-commit-config.yaml` — `default_stages: [pre-commit]`
 - **文件**: `install.sh` — 加安全建议 (推荐 `git clone` over `curl|bash`)
 
-### #5 `05-代码示例/` 安全杂项
+### #5 `utils/` 安全杂项
 - `chaos_helper.py` — psutil absent → `RuntimeError` (not silent fallthrough)
 - `protocol_helper.py` — SOAP XML `xml.sax.saxutils.escape()`
 - `miniprogram_runner.py` — WebSocket `close()` wrap `try/finally`
@@ -63,10 +63,10 @@
 - **文件**: `README.md` + `README.zh-CN.md` — "8640 combinations" → "~12 common combinations tested in CI"; "95% aspirational" → "Coverage is broad but not exhaustive"
 - **文件**: `00-项目导航.md` — 移除 9 处 "主宪章 §X" 引用
 - **文件**: `ROADMAP.md` — 移除 3 处 "主宪章" 引用
-- **文件**: `05-代码示例/generate_report.py` — `generate_test_report()` 143→30 行, 提取 6 helper
-- **文件**: `05-代码示例/mobile_driver.py` — `run_monkey()` 107→55 行, 提取 2 helper
+- **文件**: `utils/generate_report.py` — `generate_test_report()` 143→30 行, 提取 6 helper
+- **文件**: `utils/mobile_driver.py` — `run_monkey()` 107→55 行, 提取 2 helper
 - **文件**: `runtime/router/llm_client.py` — `_stub_response()` 77 行 if/elif → dispatch table 8 条目
-- **文件**: `05-代码示例/fuzzer.py` — `ALL_PAYLOADS` 提升到模块级
+- **文件**: `utils/fuzzer.py` — `ALL_PAYLOADS` 提升到模块级
 
 ### #8 CLI 拆分 + 冒烟测试
 - **CLI 拆分** (680→39 行 main.py):
@@ -103,8 +103,8 @@
 - **修改**: `flows.py` + `direct.py` — skipped 独立追踪, 不计入 failures
 
 ### #12 共享 fixture 阻塞并行 ✅
-- **修改**: `04-配置文件/conftest.py:106` — `test_data` session→function + `tmp_path`
-- **修改**: `04-配置文件/conftest.py:150` — `browser_context` session→function
+- **修改**: `config/conftest.py:106` — `test_data` session→function + `tmp_path`
+- **修改**: `config/conftest.py:150` — `browser_context` session→function
 
 ### #13 DAG 执行进度 + 断路器 ✅
 - **修改**: `flows.py` + `direct.py` — `MAX_FAILURES=3` 断路器 + 进度日志
@@ -127,7 +127,7 @@
 - **不改**: `test_lead.py` — 独立使用，不破坏现有逻辑
 
 ### #16 Flaky 测试自动隔离 ✅
-- **修改**: `05-代码示例/flaky_detector.py` — 加 3 方法
+- **修改**: `utils/flaky_detector.py` — 加 3 方法
 - `detect_trends()` — P-F-P / F-P-F 模式检测 + confidence scoring
 - `generate_quarantine()` — 隔离清单 (pytest --deselect 兼容)
 - `generate_pytest_markers()` — @pytest.mark.flaky 配置生成
@@ -139,7 +139,7 @@
 - **不改**: `regression_scope.py` — 独立工具
 
 ### #18 需求可追溯性 ✅
-- **新建**: `05-代码示例/traceability_matrix.py` — 双向追溯矩阵
+- **新建**: `utils/traceability_matrix.py` — 双向追溯矩阵
 - `TraceabilityMatrix` 类 — 需求↔用例↔缺陷 自动链接
 - `to_markdown()` — markdown 表格导出
 - 覆盖率统计 + 未覆盖需求 + 孤儿 bug 检测
@@ -222,7 +222,7 @@
 - RiskItem (概率×影响=暴露) + RiskMatrix (summary/markdown export)
 
 ### #33 分类树方法（ISTQB 第10项）✅
-- `05-代码示例/classification_tree.py` — TreeModel + pairwise 组合生成 + 约束支持
+- `utils/classification_tree.py` — TreeModel + pairwise 组合生成 + 约束支持
 
 ---
 
@@ -233,7 +233,7 @@
 - 支持第三方包注册 agents/skills/backends (group=`tagent`)
 
 ### #35 测试数据合成引擎 ✅
-- `05-代码示例/data_synthesizer.py` — PII 自动检测 + 确定性地掩码
+- `utils/data_synthesizer.py` — PII 自动检测 + 确定性地掩码
 - `mask_pii()` — 邮件/手机/身份证/IP/信用卡 5 类检测
 - `synthesize_from_json()` — 递归 walk + 掩码 + 写入
 - `subset_json()` — 随机子集提取

@@ -25,7 +25,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class AutomotiveTester(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 automotive-tester 专家(02-专家定义/16-车载测试.md)。\n"
+            "你是 Test-Agent 项目内 automotive-tester 专家(agents/16-车载测试.md)。\n"
             "职责:基于 PRD + 车载上下文,生成 ASIL 评估 + 测试用例 + ADAS 场景 + OTA 计划 + 合规矩阵。\n"
             "原则:\n"
             "1) 识别子系统:ecu / adas / ivi / v2x / multi\n"

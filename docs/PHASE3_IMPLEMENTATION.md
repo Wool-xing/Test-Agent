@@ -230,7 +230,7 @@ if len(failures) >= MAX_FAILURES:
 | 9 | 3 文件 | 2 文件 | +120, ~10 | 低 | ✅ done |
 | 10 | 0 | 1 文件(direct.py) | ~30 | 中 | ✅ done |
 | 11 | 0 | 3 文件(tasks/flows/direct) | ~20 | 低 | ✅ done |
-| 12 | 0 | 1 文件(04-配置文件/conftest.py) | ~5 | 低 | ✅ done |
+| 12 | 0 | 1 文件(config/conftest.py) | ~5 | 低 | ✅ done |
 | 13 | 0 | 3 文件(flows/direct/tasks) | ~25 | 中 | ✅ done |
 | **合计** | **3** | **6 (实际7)** | **~210** | | **5/5 done** |
 
@@ -255,7 +255,7 @@ if len(failures) >= MAX_FAILURES:
 
 ## 实施记录 (2026-05-17)
 
-**#12** `04-配置文件/conftest.py`: `test_data` scope=session→function + tmp_path, `browser_context` scope=session→function. 消除并行文件冲突.
+**#12** `config/conftest.py`: `test_data` scope=session→function + tmp_path, `browser_context` scope=session→function. 消除并行文件冲突.
 **#11** `tasks.py` + `flows.py` + `direct.py`: on_failure=skip 节点设 summary.skipped=True, 不计入 failures. skipped 独立追踪.
 **#9** 新建 `runtime/self_healing/` (retry.py + locator_store.py + __init__.py). `scripts.py` subprocess.run 外包 with_retry. `direct.py` _run_node execute_node 外包 with_retry. 指数退避 3 次重试.
 **#10** `direct.py` 阻塞路径 + done_now 路径: 异常时 resubmit _run_node 最多 2 次, 指数退避 2^attempt 秒.

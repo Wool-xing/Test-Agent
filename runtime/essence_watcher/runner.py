@@ -11,7 +11,7 @@ import sys
 
 from loguru import logger
 
-from runtime.config.safety import SafeByDefaultBlocked, gate_curator_run, get_setting, is_allowed
+from runtime.config.safety import SafeByDefaultBlocked, is_allowed
 from runtime.essence_watcher.delta_extractor import extract_delta, write_update_report
 from runtime.essence_watcher.parser import list_repos
 from runtime.essence_watcher.tracker import detect_changes

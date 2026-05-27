@@ -13,9 +13,7 @@ Exposes:
 from __future__ import annotations
 
 import threading
-import time
-from collections import defaultdict
-from typing import Any
+from collections import defaultdict, deque
 
 
 class MetricsRegistry:
@@ -31,8 +29,9 @@ class MetricsRegistry:
         self.circuit_broken: int = 0
         self.last_pass_rate: float = 0.0
         # Histogram buckets (seconds): 0.1, 0.5, 1, 5, 10, 30, 60, 120, 300, 600
-        self.run_durations: list[float] = []
-        self.llm_call_durations: list[float] = []
+        self._MAX_HISTOGRAM_SAMPLES = 1000
+        self.run_durations: deque[float] = deque(maxlen=self._MAX_HISTOGRAM_SAMPLES)
+        self.llm_call_durations: deque[float] = deque(maxlen=self._MAX_HISTOGRAM_SAMPLES)
         self.HISTOGRAM_BUCKETS = [0.1, 0.5, 1.0, 5.0, 10.0, 30.0, 60.0, 120.0, 300.0, 600.0]
 
     def inc_runs(self) -> None:
@@ -47,14 +46,10 @@ class MetricsRegistry:
     def record_run_duration(self, seconds: float) -> None:
         with self._lock:
             self.run_durations.append(seconds)
-            if len(self.run_durations) > 1000:
-                self.run_durations = self.run_durations[-500:]
 
     def record_llm_duration(self, seconds: float) -> None:
         with self._lock:
             self.llm_call_durations.append(seconds)
-            if len(self.llm_call_durations) > 1000:
-                self.llm_call_durations = self.llm_call_durations[-500:]
 
     def inc_agent_error(self, agent_name: str) -> None:
         with self._lock:
@@ -68,7 +63,7 @@ class MetricsRegistry:
         with self._lock:
             self.circuit_broken = 1 if broken else 0
 
-    def _bucket_counts(self, values: list[float]) -> dict[float, int]:
+    def _bucket_counts(self, values: deque[float]) -> dict[float, int]:
         counts: dict[float, int] = {}
         for b in self.HISTOGRAM_BUCKETS:
             counts[b] = sum(1 for v in values if v <= b)

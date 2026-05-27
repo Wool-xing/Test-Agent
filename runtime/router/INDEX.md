@@ -5,8 +5,8 @@
 | 文件 | 用途 |
 |------|------|
 | `llm_client.py` | LiteLLM 多厂商封装 + Ollama 兜底 |
-| `expert_loader.py` | 扫描 `02-专家定义/*.md` frontmatter |
-| `skill_loader.py` | 扫描 `03-技能定义/*.md` frontmatter |
+| `expert_loader.py` | 扫描 `agents/*.md` frontmatter |
+| `skill_loader.py` | 扫描 `skills/*.md` frontmatter |
 | `prompt.py` | 路由 system prompt(指导 LLM 选专家+Skill) |
 | `schema.py` | DAG/Decision Pydantic 模型 |
 | `router.py` | 主路由:被测物 → Decision(experts/skills/order/confidence/rationale) |

@@ -1,7 +1,7 @@
 # mcp 索引
 
 > 主宪章 §16 预留 6 件套,V1.2.0(M2)实现。
-> 当前 `04-配置文件/.mcp.json` 仅启用 filesystem;本目录服务通过 `04-配置文件/.mcp.json` 启用。
+> 当前 `config/.mcp.json` 仅启用 filesystem;本目录服务通过 `config/.mcp.json` 启用。
 
 ## 模块清单
 
@@ -23,7 +23,7 @@ python -m runtime.mcp.test_orchestrator.server     # stdio mode
 python -m runtime.mcp.test_orchestrator.server --http 8801  # http mode
 ```
 
-或注册到 `04-配置文件/.mcp.json`:
+或注册到 `config/.mcp.json`:
 
 ```json
 {

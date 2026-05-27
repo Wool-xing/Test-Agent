@@ -49,7 +49,7 @@ def test_router_starts_with_requirements_analyst():
 
 
 def test_router_ends_with_test_lead_decision():
-    """DAG 末节点 = test-lead 决策(主宪章 §40 + 02-专家定义/README.md 流程
+    """DAG 末节点 = test-lead 决策(主宪章 §40 + agents/README.md 流程
     "bug-manager → report-generator → test-lead 决策")。report-generator 倒数第二。"""
     art = TargetArtifact(kind="text", text="generic web system")
     decision = route(art, client=LLMClient(provider="stub", fallback="stub"))

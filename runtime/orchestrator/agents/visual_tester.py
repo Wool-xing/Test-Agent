@@ -19,7 +19,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class VisualTester(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 visual-tester 专家(02-专家定义/12-视觉游戏测试.md)。\n"
+            "你是 Test-Agent 项目内 visual-tester 专家(agents/12-视觉游戏测试.md)。\n"
             "职责:基于 PRD + UI 描述,生成视觉测试点 + 视觉对比脚本片段 + 容差配置。\n"
             "原则:\n"
             "1) 识别视觉目标类型:web-canvas / webgl / unity / unreal / mobile-game / ocr / visual-regression\n"

@@ -48,8 +48,8 @@ tagent doctor --agents
 验证 16 expert agents 全部就绪。输出类似：
 
 ```
-✓ 02-专家定义/01-测试主管.md            test-lead
-✓ 02-专家定义/02-需求分析.md            requirements-analyst
+✓ agents/01-测试主管.md            test-lead
+✓ agents/02-需求分析.md            requirements-analyst
 ... (16 agents total)
 ```
 

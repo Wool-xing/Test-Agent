@@ -3,9 +3,23 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 import pytest
+
+# Inject utils/ and all subdirectories into sys.path
+# V1.42.0: utils/ reorganized from flat into 12 functional subdirectories
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+_UTILS_DIR = _PROJECT_ROOT / "utils"
+if _UTILS_DIR.is_dir() and str(_UTILS_DIR) not in sys.path:
+    sys.path.insert(0, str(_UTILS_DIR))
+    for _sub in _UTILS_DIR.iterdir():
+        if _sub.is_dir() and not _sub.name.startswith(("_", ".")) and str(_sub) not in sys.path:
+            sys.path.insert(0, str(_sub))
 
 
 @pytest.fixture(autouse=True)

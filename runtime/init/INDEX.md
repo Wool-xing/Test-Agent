@@ -6,7 +6,7 @@
 
 | 文件 | 用途 |
 |------|------|
-| `matrix.py` | 加载 `04-配置文件/templates/matrix.yaml`(单源真理) |
+| `matrix.py` | 加载 `config/templates/matrix.yaml`(单源真理) |
 | `wizard.py` | 交互向导 + `from_args()` 非交互 + `from_preset()` 预设 |
 | `renderer.py` | 把 `InitAnswers` + matrix + 模板 → `.env` + `tagent.yml` + `STARTUP.md` |
 
@@ -42,7 +42,7 @@ tagent init --overwrite
 - 新 LLM provider → `llm_providers:` 加节
 - 新 BugTracker → `bug_trackers:` 加节(主宪章 §37 6 adapter 之外加)
 - 新通知渠道 → `notifiers:` 加节(主宪章 §36 6 渠道之外加)
-- 新测试类型 → `test_types:` 加节 + 同步 `02-专家定义/` 加平台 expert(如需)
+- 新测试类型 → `test_types:` 加节 + 同步 `agents/` 加平台 expert(如需)
 
 ## 矩阵规模
 
@@ -51,5 +51,5 @@ tagent init --overwrite
 ## 相关
 
 - 主宪章 §1(同步铁律)+ §5(多格式 I/O)+ §7(一键部署)+ §36(多端)+ §37(BugTracker)
-- 模板:[`04-配置文件/templates/`](../../04-配置文件/templates/INDEX.md)
+- 模板:[`config/templates/`](../../config/templates/INDEX.md)
 - 集成 CLI:`runtime/cli/main.py` `init` 子命令

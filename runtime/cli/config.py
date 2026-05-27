@@ -121,7 +121,7 @@ def cmd_list() -> None:
     for name, info in COMPAT_EXAMPLES.items():
         typer.echo(f"  {name:18s} {info}")
     typer.echo("")
-    typer.echo("📖 Full cookbook: 04-配置文件/llm-providers.md")
+    typer.echo("📖 Full cookbook: config/llm-providers.md")
 
 
 @config_app.command("show")
@@ -215,4 +215,4 @@ def cmd_unset(
     _write_env(env_path, env)
     typer.echo(f"✅ 已移除 {key} (原值: {old_value})")
     typer.echo(f"   备份: {env_path}.bak")
-    typer.echo(f"   下一步: tagent config use <provider> 重设, 或 tagent config show 验证")
+    typer.echo("   下一步: tagent config use <provider> 重设, 或 tagent config show 验证")

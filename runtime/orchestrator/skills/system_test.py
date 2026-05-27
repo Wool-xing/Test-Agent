@@ -4,7 +4,7 @@ V1.26.0 minimum viable (ROADMAP skill rollout #4 落地):
 - LLM 读 PRD + 上游 system-tester expert 产物 → 6 阶段执行计划
   (环境检查 / IoT 测试 / 音视频校验 / 链路追踪 / 消息队列 / 报告归档)
   + 质量门禁 + 子场景路由策略
-- 不实装 03-技能定义/system-test.md 全部职责 (SSH 真跑 / 串口读写
+- 不实装 skills/system-test.md 全部职责 (SSH 真跑 / 串口读写
   / FFmpeg 解码 / Jaeger 查询 / Kafka consumer 等留后续深化)
 - 输出执行计划 JSON, 真执行守护在 utils 层 (iot_helper / media_validator
   / tracing_validator / mq_helper)
@@ -22,7 +22,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class SystemTest(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 system-test skill(03-技能定义/system-test.md)。\n"
+            "你是 Test-Agent 项目内 system-test skill(skills/system-test.md)。\n"
             "职责:基于 PRD + 上游 system-tester expert 产物,编排系统集成测试 6 阶段执行计划。\n"
             "原则:\n"
             "1) 识别子场景:iot / audiovideo / tracing / mq / multi (可复合)\n"

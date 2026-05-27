@@ -29,16 +29,16 @@ def _version_callback(
 
 
 # Register command modules
-from runtime.cli.commands.bootstrap import register as _reg_bootstrap
-from runtime.cli.commands.catalog import register as _reg_catalog
-from runtime.cli.commands.demo import register as _reg_demo
-from runtime.cli.commands.doctor import register as _reg_doctor
-from runtime.cli.commands.export import register as _reg_export
-from runtime.cli.commands.init import register as _reg_init
-from runtime.cli.commands.market import register as _reg_market
-from runtime.cli.commands.readiness import register as _reg_readiness
-from runtime.cli.commands.run import register_run as _reg_run
-from runtime.cli.commands.selftest import register as _reg_selftest
+from runtime.cli.commands.bootstrap import register as _reg_bootstrap  # noqa: E402
+from runtime.cli.commands.catalog import register as _reg_catalog  # noqa: E402
+from runtime.cli.commands.demo import register as _reg_demo  # noqa: E402
+from runtime.cli.commands.doctor import register as _reg_doctor  # noqa: E402
+from runtime.cli.commands.export import register as _reg_export  # noqa: E402
+from runtime.cli.commands.init import register as _reg_init  # noqa: E402
+from runtime.cli.commands.market import register as _reg_market  # noqa: E402
+from runtime.cli.commands.readiness import register as _reg_readiness  # noqa: E402
+from runtime.cli.commands.run import register_run as _reg_run  # noqa: E402
+from runtime.cli.commands.selftest import register as _reg_selftest  # noqa: E402
 
 _reg_bootstrap(app)
 _reg_catalog(app)

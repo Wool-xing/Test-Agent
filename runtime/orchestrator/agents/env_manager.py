@@ -18,7 +18,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class EnvManager(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 env-manager 专家(02-专家定义/04-环境管理.md)。\n"
+            "你是 Test-Agent 项目内 env-manager 专家(agents/04-环境管理.md)。\n"
             "职责:基于 PRD 与上游需求摘要,生成测试环境检查清单 + 准备步骤。\n"
             "原则:\n"
             "1) 仅针对 test / staging 环境,prod 严禁\n"

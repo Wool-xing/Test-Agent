@@ -1,0 +1,171 @@
+# ============================================================
+# 依赖版本管理策略：
+#   ① == 锁定（CI 可复现）+ Dependabot 周扫描自动 PR + pip-audit 拦 CVE
+#   ② [稳定层] 升级需跑全量回归（regression-test）
+#   ③ [可选]   按需启用，注释解开 pip install
+#   ④ [外部]   非 pip 包，需独立安装（见部署说明）
+#   ⑤ 详细策略见 01-快速开始/配置清单.md "依赖管理章节"
+# ============================================================
+
+# ===== [稳定层] 测试框架核心 =====
+pytest>=9.0.3                      # [稳定层] CVE-2025-71176 tmpdir 已修于 9.0.3
+pytest-xdist>=3.6.1                 # [稳定层] 并行执行
+pytest-rerunfailures>=14.0          # [稳定层] 失败重试
+pytest-timeout>=2.3.1               # [稳定层] 用例超时
+pytest-cov>=5.0.0                   # [稳定层] 代码覆盖率
+pytest-mock>=3.14.0                 # [稳定层] Mock 工具
+pytest-playwright>=0.5.2            # [稳定层] Playwright 官方 pytest 插件
+allure-pytest>=2.13.5               # [稳定层] Allure 报告
+
+# ===== [稳定层] UI 自动化 =====
+playwright==1.59.0                 # [稳定层] major 升级 dependabot 已锁
+
+# ===== [稳定层] API 测试 =====
+requests==2.33.0                   # [稳定层]（修 CVE-2026-25645 extract_zipped_paths Insecure Temp File，2.32.4 仅修 netrc/verify）
+
+# ===== [稳定层] 性能测试 =====
+locust==2.43.4                     # [稳定层] 备用 Python 压测
+# JMeter 5.6.3 [外部]，需独立装 Java + JMeter（见部署说明）
+
+# ===== [稳定层] 测试数据工厂 =====
+faker==20.1.0                      # [稳定层]
+factory-boy==3.3.0                 # [稳定层]
+
+# ===== [稳定层] 数据库 =====
+psycopg2-binary==2.9.12             # [稳定层] PostgreSQL（按实际数据库选其一）
+pymysql==1.1.3                     # [稳定层] MySQL（修 GHSA SQL 注入）
+SQLAlchemy==2.0.49                 # [稳定层] ORM
+
+# ===== [稳定层] 配置 =====
+PyYAML==6.0.1                      # [稳定层] regression_modules.yaml 解析
+
+# ===== [稳定层] Excel/文档（PRD 多格式加载也用）=====
+openpyxl==3.1.2                    # [稳定层] Excel
+python-docx==1.1.0                 # [稳定层] Word
+pdfplumber==0.10.3                 # [稳定层] PDF 解析（主）
+pypdf==6.10.2                      # [稳定层] PDF 解析（备）—— 替代停维护的 PyPDF2，5.1→6.10 修 ~22 个 RAM/infinite-loop CVE
+beautifulsoup4==4.12.2             # [稳定层] HTML/URL PRD 解析
+
+# ===== [稳定层] 工具 =====
+python-dotenv==1.2.2               # [稳定层] .env 加载（修 CVE-2026-28684 symlink rename，1.0.1 仍含洞）
+tenacity==8.2.3                    # [稳定层] 重试库
+loguru==0.7.2                      # [稳定层] 增强日志
+
+# ===== [稳定层] 验收测试 BDD =====
+pytest-bdd==7.0.0                  # [稳定层] BDD 框架
+
+# ===== [稳定层] 契约测试 =====
+jsonschema==4.21.0                 # [稳定层] JSON Schema 验证
+
+# ===== [稳定层] 报告 =====
+reportlab==4.0.7                   # [稳定层] PDF 报告
+python-pptx==0.6.23                # [稳定层] PPTX 报告 + PRD pptx 输入
+
+# ===== [稳定层] 通知（webhook 直连，无需 SDK 包，requests 已含）=====
+
+# ============================================================
+# 扩展平台测试（按需启用）
+# ============================================================
+
+# ===== [可选] 移动端（10-移动测试）=====
+Appium-Python-Client==5.3.1        # [可选] Android/iOS 自动化
+selenium==4.43.0                   # [可选] WebDriver 协议
+websocket-client==1.8.0            # [稳定层] 同步 WebSocket（小程序协议 + EXE WS 测试）—— 1.8 兼容 selenium 4.43 (~=1.8)
+websockets==12.0                   # [稳定层] 异步 WebSocket（高并发性能测试）
+
+# ===== [可选] 桌面（11-桌面测试）=====
+# pywinauto==0.6.8                 # [可选] 仅 Windows
+# uiautomation==2.0.20              # [可选] 仅 Windows
+pyautogui==0.9.54                  # [可选] 跨平台键鼠 + 截图
+mss>=7.0.1,<10                     # [可选] 跨平台高速截图（宽松版本，避免与 Pillow 冲突）
+psutil==5.9.6                      # [稳定层] 进程性能采集
+
+# ===== [可选] 视觉/游戏（12-视觉游戏测试）=====
+# airtest==1.4.3                   # [可选 · 需手动装] airtest 1.4.x 仍硬 pin mss==6.1.0 + numpy<2.0 + opencv-contrib<=4.6.0.66，与本仓 mss>=7.0.1 / numpy 2.x / opencv-python 4.13 全冲突。需自维隔离 venv 安装。
+opencv-python==4.13.0.92           # [可选] 图像处理
+scikit-image==0.24.0               # [可选] SSIM 视觉对比 (Py 3.12 原生支持, 0.22→0.24 修跨包 numpy 冲突)
+imagehash==4.3.2                   # [可选] 感知哈希 (4.3.1→4.3.2 修小 CVE)
+pytesseract==0.3.10                # [可选] OCR（外部需装 tesseract 二进制）
+Pillow==12.2.0                     # [可选] 图像（11→12.2 修 CVE-2026-25990 PSD heap overflow/FITS GZIP bomb/font integer overflow 等 5 个 high+moderate）
+# paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
+
+# ===== [可选] 系统集成（13-系统集成测试）=====
+paramiko==4.0.0                    # [可选] SSH（修 CVE-2026-44405 RSA SHA-1 algorithm，3.x 不修）
+pyserial==3.5                      # [可选] 串口
+paho-mqtt==1.6.1                   # [可选] MQTT
+# pymodbus==3.5.4                  # [可选] Modbus 工业协议
+ffmpeg-python==0.2.0               # [可选] FFmpeg 命令封装（外部需装 ffmpeg）
+kafka-python==2.0.2                # [可选] Kafka
+pika==1.3.2                        # [可选] RabbitMQ
+
+# ===== [可选] AI/ML（14-AI模型测试）=====
+scikit-learn==1.5.2                # [可选] 模型评估（修 GHSA data leakage）
+scipy==1.13.1                      # [可选] 漂移检测（KS）—— 1.11.4→1.13.1 Py 3.12 官方支持 + 与 scikit-image 0.24 / sklearn 1.5 numpy 兼容
+# alibi-detect==0.12.0             # [可选] 漂移高级检测
+# deepeval==0.20.50                # [可选] LLM 评估
+
+# ===== [可选] 安全扫描 =====
+bandit==1.7.6                      # [稳定层] SAST Python 代码扫描
+safety==3.0.1                      # [稳定层] 依赖 CVE 检查
+# OWASP ZAP DAST [外部]：daemon 模式（zap.sh -daemon -port 8080）
+# Burp Suite Pro [外部]：商业工具，启 REST API
+# pip-audit                        # CI 临时安装，无需固定
+
+# ===== [可选] 区块链测试 =====
+# web3==6.15.1                     # [可选] 以太坊 + EVM 链
+# slither-analyzer==0.10.0         # [可选] 智能合约静态分析（需 solc）
+
+# ===== [可选] AI 对抗 =====
+# foolbox==3.3.4                   # [可选] CV 对抗
+# adversarial-robustness-toolbox==1.17.1  # [可选]
+
+# ===== [可选] 变异测试 =====
+# mutmut==2.4.5                    # [可选] 变异测试 mutmut
+
+# ===== 弱网 / 混沌 / soak（utils.network_throttle / chaos_helper / soak_runner）=====
+# tc + netem [外部]：Linux 内置（需 root）
+# Toxiproxy [外部]：docker run shopify/toxiproxy
+# stress-ng [外部]：apt install stress-ng（chaos_helper 自动 fallback Python loop）
+
+# ===== [稳定层] 安全 XML 解析（utils/quality_gate, runtime/integrity）=====
+defusedxml==0.7.1                  # [稳定层] XXE/亿笑/decompression bomb 防护
+
+# ============================================================
+# 外部工具（[外部]，非 pip，需独立安装。详见 01-快速开始/部署说明.md）
+# ============================================================
+# - JMeter 5.6.3（Java 8+ 必装）
+# - Allure CLI 2.x
+# - Java JRE 8+（JMeter / Allure 均依赖）
+# - tesseract（OCR 二进制）
+# - ffmpeg + ffprobe（音视频）
+# - Appium server（npm install -g appium）
+# - 微信开发者工具（小程序）
+# - lighthouse（npm install -g lighthouse，A11y/Web Vitals）
+# - pa11y（npm install -g pa11y，A11y）
+# - Foundry / forge（区块链智能合约）
+# - kubectl（K8s 混沌测试）
+
+# ============================================================
+# V1.1.0 运行时层(`runtime/`)依赖 — 全部 [可选]
+# 仅启用 V1.1.0 运行时(AI 路由+Prefect+飞轮+FastAPI/CLI)时安装
+# 完整列表见 runtime/pyproject.toml
+# ============================================================
+
+# ===== [可选 · runtime 核心] =====
+# mcp>=1.0.0                       # V1.2.0 MCP SDK(6 件套 server:test-orchestrator/protocol-adapter/evidence-vault/defect-tracker/knowledge-base/compliance-checker)
+# litellm>=1.55.0                  # 多厂商 LLM 路由(Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)
+# prefect>=2.20.0,<3.0             # 编排引擎(可选,Direct 执行器在 prefect 缺席时自动接管)
+# fastapi>=0.115.0                 # HTTP 入口
+# uvicorn[standard]>=0.32.0        # ASGI server
+# typer>=0.13.0                    # CLI
+# rich>=13.9.0                     # 终端美化
+# pydantic-settings>=2.6.0         # env-driven 配置(pydantic v2)
+# alembic>=1.13.0                  # DB 迁移
+# psycopg[binary]>=3.2.0           # postgres 驱动(替代 psycopg2)
+# pgvector>=0.3.0                  # pgvector ORM 类型
+# minio>=7.2.0                     # MinIO 客户端
+# opentelemetry-api>=1.27.0        # OTel
+# opentelemetry-sdk>=1.27.0
+# opentelemetry-exporter-otlp>=1.27.0
+# opentelemetry-instrumentation-fastapi>=0.48b0
+httpx[http2]>=0.27.0               # APNs (HTTP/2 强制) + 异步 HTTP API client

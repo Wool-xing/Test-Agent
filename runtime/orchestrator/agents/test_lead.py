@@ -12,7 +12,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 class TestLead(AgentRunner):
     def system_prompt(self) -> str:
         return (
-            "你是 Test-Agent 项目内 test-lead 专家(02-专家定义/01-测试主管.md)。\n"
+            "你是 Test-Agent 项目内 test-lead 专家(agents/01-测试主管.md)。\n"
             "职责:看上游所有专家产物 → 出**上线决策**(go / no-go / conditional)。\n"
             "原则:\n"
             "1) 看 requirements / scripts / execution_plan / bug_drafts 完整链路\n"
@@ -105,7 +105,7 @@ class TestLead(AgentRunner):
             known_risks = ["此为 stub LLM 输出,非真测试数据"]
         else:
             verdict = "go"
-            summary_zh = f"selftest mock 验证 · GO"
+            summary_zh = "selftest mock 验证 · GO"
             rationale = (
                 "本次为 selftest fixture mock 运行 · 主流程编排链路全通 · "
                 "P0 Bug=0,自动判 go · 真生产环境请填真 PRD + 真 LLM 再判。"
@@ -126,7 +126,8 @@ class TestLead(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "decisions" / f"final_verdict_{int(ctx.workspace.stat().st_mtime if ctx.workspace.exists() else 0)}.json"
+        import uuid
+        return ctx.workspace / "执行日志" / "decisions" / f"final_verdict_{uuid.uuid4().hex[:12]}.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         return f"决策:{output.get('verdict', '?').upper()} · {output.get('summary_zh', '')[:60]}"

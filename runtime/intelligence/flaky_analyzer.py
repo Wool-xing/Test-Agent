@@ -10,13 +10,12 @@ Key design (per Google ICSE 2026 paper):
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
-import subprocess
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 
 @dataclass
@@ -82,10 +81,8 @@ def _parse_log_line(line: str, source: str) -> LogEntry | None:
     ts_match = re.match(r'(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})', line)
     ts = time.time()
     if ts_match:
-        try:
+        with contextlib.suppress(ValueError):
             ts = time.mktime(time.strptime(ts_match.group(1)[:19], "%Y-%m-%dT%H:%M:%S"))
-        except ValueError:
-            pass
 
     level = "INFO"
     for lv in ["ERROR", "CRITICAL", "WARN", "WARNING", "INFO", "DEBUG"]:
@@ -105,11 +102,11 @@ def diagnose_heuristic(test_name: str, logs: list[LogEntry],
     """Heuristic root cause analysis (no LLM required).
     Production path should use diagnose_with_llm()."""
 
-    errors = [l for l in logs if l.level in ("ERROR", "CRITICAL")]
-    test_errors = [l for l in errors if l.source == "test"]
-    sut_errors = [l for l in errors if l.source == "sut"]
-    db_errors = [l for l in errors if l.source == "db"]
-    network_errors = [l for l in errors if l.source == "network"]
+    errors = [e for e in logs if e.level in ("ERROR", "CRITICAL")]
+    test_errors = [e for e in errors if e.source == "test"]
+    sut_errors = [e for e in errors if e.source == "sut"]
+    db_errors = [e for e in errors if e.source == "db"]
+    network_errors = [e for e in errors if e.source == "network"]
 
     # Rule 1: Only test errors → test logic issue
     if test_errors and not sut_errors and not db_errors and not network_errors:
@@ -260,14 +257,12 @@ def _parse_llm_response(raw: str, test_name: str) -> DiagnosisResult:
 
     logs_match = re.search(r'==Most Relevant Log Lines==\s*\n(.+?)(?=\n==|$)', raw, re.DOTALL)
     if logs_match:
-        log_lines = [l.strip("- ") for l in logs_match.group(1).strip().split("\n") if l.strip()]
+        log_lines = [line.strip("- ") for line in logs_match.group(1).strip().split("\n") if line.strip()]
 
     conf_match = re.search(r'==Confidence==\s*\n([\d.]+)', raw)
     if conf_match:
-        try:
+        with contextlib.suppress(ValueError):
             confidence = float(conf_match.group(1))
-        except ValueError:
-            pass
 
     return DiagnosisResult(
         conclusion=conclusion or f"Analysis for {test_name}",

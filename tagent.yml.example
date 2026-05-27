@@ -2,7 +2,7 @@
 # ║ 这是【参考 schema】, 非 runtime 配置文件。改本文件不会生效。         ║
 # ║                                                                      ║
 # ║ 真正生效的配置: 项目根下 `tagent.yml` (跑 `tagent init` 生成)        ║
-# ║ 完整 schema 来源: `04-配置文件/templates/base.tagent.yml.tpl`        ║
+# ║ 完整 schema 来源: `config/templates/base.tagent.yml.tpl`              ║
 # ║                                                                      ║
 # ║ 想开启 safety gate / 自动化 / 危险操作 → 改 `tagent.yml`,而非本文件 ║
 # ╚══════════════════════════════════════════════════════════════════════╝

@@ -4,7 +4,7 @@
 
 | 文件 | 用途 |
 |------|------|
-| `registry.py` | 扫 02-专家定义/*.md + 03-技能定义/*.md frontmatter,生成内存目录 |
+| `registry.py` | 扫 agents/*.md + skills/*.md frontmatter,生成内存目录 |
 | `catalog.json` | 启动时生成,可手动 dump 给 LLM 用 |
 
 ## frontmatter 约定(已有)

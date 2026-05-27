@@ -17,16 +17,16 @@
 | 根目录 | README.md | 简明入口（≤ 200 行） | 所有用户 |
 | **根目录** | **00-项目导航.md** | **按职责分类速查（通用流程 / 平台专项 / 协议 / 输入 / CI）** | **所有用户** |
 | **根目录** | **FULL_GUIDE.md（本文档）** | **永久宪章 + 完整指南** | **所有用户** |
-| `01-快速开始/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
-| `01-快速开始/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
-| `01-快速开始/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
-| `01-快速开始/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
-| `02-专家定义/` | 16 个 .md（9 核心 + 5 平台 + 2 垂直） + README 索引 | Agent 定义文件 | 开发人员 |
-| `03-技能定义/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
-| `04-配置文件/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
-| `04-配置文件/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `05-代码示例/` | utils（49 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
-| `06-CICD集成/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
+| `docs/getting-started/` | 使用手册.md | 快速上手指南 + FAQ | 所有用户 |
+| `docs/getting-started/` | 部署说明.md | 跨平台部署（Win/Mac/Linux 含 Java/JMeter/Allure） | 运维/测试 |
+| `docs/getting-started/` | 配置清单.md | 一站式配置文档（.env 全字段 + Secrets + Webhook 申请） | 所有用户 |
+| `docs/getting-started/` | 交付物清单.md | 测试计划 / 测试报告 / Bug 等对外提交物落地位置与责任 | 所有用户 |
+| `agents/` | 16 个 .md（9 核心 + 5 平台 + 2 垂直） + README 索引 | Agent 定义文件 | 开发人员 |
+| `skills/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
+| `config/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
+| `config/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
+| `utils/` | utils（78 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
+| `ci/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---
 
@@ -110,17 +110,20 @@
 | 决策回放器 | 任一判断可复现、可反驳 | 工程层 | `workspace/执行日志/decisions/` + tracing | ✅ |
 | 数字考古学家 | 追溯遗留系统初始假设 | 文明层 | Phase 4 知识图谱冷启动 | ❌ |
 | 缓慢暴力监测器 | 跨发布周期跟踪代际效应 | 文明层 | 需多年数据积累，Phase 4 | ❌ |
-| 缺席者画像生成器 | 强制注入边缘用户场景 | 文明/权力层 | a11y_scanner + i18n_checker + 边缘剧本库 | ⚪ |
+| 缺席者画像生成器 | 强制注入边缘用户场景 | 文明/权力层 | absentee_scenario_injector.py (9组场景) | ✅ |
 | 现实缝合力探针 | 测试平台对半真半假内容的免疫 | 社会权力层 | ai_adversarial 扩展 | ⚪ |
+| 公平性审计器 | 数据集/模型/决策公平性指标 (DI/EO/校准/交叉) | 社会权力层 | fairness_auditor.py | ✅ |
+| 沉默故障探测器 | 无报警漂移检测/趋势分析/多源聚合 | 工程层 | silent_failure_detector.py | ✅ |
+| 缺席者场景注入器 | 9组边缘场景(残障/老年/未成年/离线/危机/非母语)剧本库+章节生成 | 文明/权力层 | absentee_scenario_injector.py | ✅ |
 | 末日哨兵 | 计算"这一次就是那一次"概率 | 文明层 | 需监管/学界共识授权，Phase 4 | ❌ |
-| 神圣性守护器 | 识别宗教/纪念场景的不可亵渎边界 | 簇 9 | i18n_checker 禁忌矩阵扩展 | ❌ |
+| 神圣性守护器 | 识别宗教/纪念场景的不可亵渎边界 | 簇 9 | i18n_checker + taboo_matrix 禁忌矩阵 | ✅ |
 | 精神危机响应器 | 模拟危机状态用户、验证交接路径 | 簇 9 | 缺席者剧本库子集 | ❌ |
 | 踩踏推演器 | 群体情绪与系统反馈的正反馈回路 | 簇 9 | chaos_helper 扩展 | ❌ |
-| 司法证据包生成器 | 决策链、模型版本、数据集打包 | 簇 9 | dora_metrics + decisions/ 打包脚本 | ⚪ |
+| 司法证据包生成器 | 决策链、模型版本、数据集打包 | 簇 9 | evidence_chain.py + dora_metrics + decisions/ 打包脚本 | ✅ |
 | 禁忌矩阵 | 跨文化禁忌词/色/数/节日组合 | 簇 9 | i18n_checker 本地化共建 | ❌ |
-| Bug 多适配引擎 | 5 套 tracker 切换 | 工程层 | `utils/bug_tracker_*.py` | ✅ |
+| Bug 多适配引擎 | 5 套 tracker 切换 | 工程层 | `utils/bug_tracker_base.py` + `zentao_bug_manager.py` + `jira_bug_manager.py` + `github_bug_manager.py` + `linear_bug_manager.py` + `webhook_bug_manager.py` | ✅ |
 | AgentChat 协调器 | 讨论触发 / 中枢路由 / 反问留档 | 工程层 | test-lead + `discussions/` | ✅ |
-| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `install.sh` + frontmatter requires_layer | ✅ |
+| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `requirements/` (base/mobile/desktop/visual/system/ai/perf 七文件) + `install.sh` | ✅ |
 | darwin-skill 自进化 | skill 文本结构棘轮优化 | 工程/元层 | `.claude/skills/darwin-skill/` | ✅ |
 
 ---
@@ -164,7 +167,7 @@
 
 **探索 + 元工具 4 个**：`build-your-own-x-explorer` + `karpathy-guidelines` + `darwin-skill` + `nuwa-skill`
 
-> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [03-技能定义/README.md](../../03-技能定义/README.md)。
+> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [skills/README.md](../../skills/README.md)。
 
 ### 工程级质量门禁（分层）
 

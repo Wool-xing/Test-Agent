@@ -7,7 +7,7 @@ from pathlib import Path
 
 import typer
 
-from runtime.cli._shared import build_artifact, console, print_dag, _kernel
+from runtime.cli._shared import _kernel, build_artifact, console, print_dag
 from runtime.tutor.i18n import set_lang
 from runtime.tutor.verbosity import set_mode
 
@@ -41,8 +41,8 @@ def register_run(app: typer.Typer) -> None:
     @app.command()
     def plan(
         target: str = typer.Argument(...),
-        note: str = typer.Option("", "--note"),
-        out: Path | None = typer.Option(None, "--out", help="write decision JSON to file"),
+        note: str = typer.Option("", "--note"),  # noqa: B008
+        out: Path | None = typer.Option(None, "--out", help="write decision JSON to file"),  # noqa: B008
     ):
         """Plan only (no execution)."""
         art = build_artifact(target, note)

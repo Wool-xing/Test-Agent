@@ -1,0 +1,37 @@
+# Quality Gates Configuration (canonical — single source of truth)
+# 门禁引擎 quality_gate_engine.py 读取此文件。
+# 用户修改此文件即可调整门禁阈值，无需改代码。
+# 同步链: 此文件 → CI 文档(ci/CICD集成说明.md) → agent 01(agents/01-测试主管.md)
+# 修改后必须更新 CI 文档和 agent 01 中的对应数值。
+
+smoke:
+  min_pass_rate_pct: 95
+  p0_bug_count_max: 0
+  api_response_ms_max: 3000
+
+regression:
+  min_pass_rate_pct: 90
+  p0_pass_rate_pct: 100
+  p1_pass_rate_pct: 95
+  min_coverage_pct: 80
+  max_flaky_pct: 5
+  new_p0_bug_count_max: 0
+
+performance_ci_quick:
+  min_tps: 20
+  max_p95_ms: 800
+  max_avg_ms: 400
+  max_error_pct: 1.0
+
+performance_full:
+  min_tps: 100
+  max_p95_ms: 500
+  max_avg_ms: 200
+  max_error_pct: 1.0
+  max_baseline_regression_pct: 20
+
+release:
+  require_smoke: true
+  require_regression: true
+  require_perf_full: false
+  require_bug_review: true

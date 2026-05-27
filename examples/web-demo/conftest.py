@@ -2,7 +2,7 @@
 """
 Web Demo 最小 conftest.py
 仅含 Playwright browser/page fixture，演示 Page Object 模式接入。
-完整 Test-Agent 工作流 conftest 见 04-配置文件/conftest.py（含 EnvConfig / api_client / cleanup_tracker / 失败截图 hook 等）。
+完整 Test-Agent 工作流 conftest 见 config/conftest.py（含 EnvConfig / api_client / cleanup_tracker / 失败截图 hook 等）。
 """
 import os
 import pytest

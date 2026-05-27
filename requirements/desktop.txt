@@ -1,0 +1,8 @@
+# ===== desktop — 桌面端测试 =====
+# 安装: pip install -r requirements/desktop.txt
+-r base.txt
+
+pyautogui==0.9.54
+mss>=7.0.1,<10
+# pywinauto==0.6.8     # 仅 Windows — 取消注释启用
+# uiautomation==2.0.20  # 仅 Windows — 取消注释启用

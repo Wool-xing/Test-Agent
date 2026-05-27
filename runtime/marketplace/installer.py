@@ -14,10 +14,10 @@ from pathlib import Path
 
 from loguru import logger
 
-from runtime.config.settings import get_settings
 from runtime.config.safety import SafeByDefaultBlocked, is_allowed
+from runtime.config.settings import get_settings
 from runtime.marketplace.catalog import Entry, find, load_local, save_local
-from runtime.marketplace.verifier import GateResult, run_all_gates
+from runtime.marketplace.verifier import run_all_gates
 
 
 def _market_dir() -> Path:

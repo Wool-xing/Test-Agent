@@ -8,12 +8,11 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 # Default journey → module mapping (extend via workspace/journey_map.json)
-DEFAULT_JOURNEYS: Dict[str, List[str]] = {
+DEFAULT_JOURNEYS: dict[str, list[str]] = {
     "Registration": ["auth/register", "signup", "user/create"],
     "Login": ["auth/login", "session", "login"],
     "Payment": ["payment/", "order/", "checkout", "billing"],
@@ -25,7 +24,7 @@ DEFAULT_JOURNEYS: Dict[str, List[str]] = {
 }
 
 
-def load_journey_map(source: Optional[str | Path] = None) -> Dict[str, List[str]]:
+def load_journey_map(source: str | Path | None = None) -> dict[str, list[str]]:
     """Load journey map from JSON file, or use defaults."""
     if source:
         p = Path(source)
@@ -36,9 +35,9 @@ def load_journey_map(source: Optional[str | Path] = None) -> Dict[str, List[str]
 
 
 def map_failures_to_journeys(
-    failures: List[Dict],
-    journey_map: Optional[Dict[str, List[str]]] = None,
-) -> Dict[str, List[Dict]]:
+    failures: list[dict],
+    journey_map: dict[str, list[str]] | None = None,
+) -> dict[str, list[dict]]:
     """Given a list of {name, ...} failures, return journeys → affected failures.
 
     Args:
@@ -50,7 +49,7 @@ def map_failures_to_journeys(
     if journey_map is None:
         journey_map = load_journey_map()
 
-    impacted: Dict[str, List[Dict]] = {}
+    impacted: dict[str, list[dict]] = {}
     unmatched = list(failures)
 
     for journey, patterns in journey_map.items():
@@ -72,9 +71,9 @@ def map_failures_to_journeys(
 
 
 def journey_impact_report(
-    failures: List[Dict],
-    journey_map: Optional[Dict[str, List[str]]] = None,
-) -> Dict:
+    failures: list[dict],
+    journey_map: dict[str, list[str]] | None = None,
+) -> dict:
     """Generate full journey impact report.
 
     Returns:
@@ -104,7 +103,7 @@ def journey_impact_report(
     }
 
 
-def to_markdown(report: Dict) -> str:
+def to_markdown(report: dict) -> str:
     lines = [
         "# Journey Impact Report",
         "",
@@ -154,7 +153,6 @@ def _cli() -> None:
 
 # Late import for CLI
 from runtime.config.settings import get_settings  # noqa: E402
-
 
 if __name__ == "__main__":
     _cli()

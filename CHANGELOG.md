@@ -11,7 +11,173 @@
 
 ## [Unreleased]
 
+### Added
+- agent-introspection-debugging skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/agent_introspection_debugging.py`) — 5 维自省 (decision_replay / tool_calls / token_consumption / context / state_machine) + findings + recommendations
+- build-your-own-x-explorer skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/build_your_own_x_explorer.py`) — 场景识别 + byox 13 类 KB 推荐 + 时间预算警告
+
+### Changed
+- 2 vision skill 升 production: `agent-introspection-debugging` + `build-your-own-x-explorer` (frontmatter `SKILL_IMPL_STATUS: vision` → `production`)
+- skill rollout 总数: 16 → 18 (中央 `runtime/tests/test_skill_runners.py` `ALL_SKILL_RUNNERS` 同步加 2 行)
+- skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
+- runtime/orchestrator/skills/__init__.py: 聚合 import 新增 agent_introspection_debugging + build_your_own_x_explorer
+
 _后续累积变更入此节;切版本时移到下方版本节。_
+
+---
+
+## [v1.43.0] - 2026-05-19
+
+### Added
+- fairness_auditor.py: 伦理/偏见审计 (Phase 3.1) — dataset bias + model fairness (6 metrics: DI/SPD/EO/equalized_odds/calibration/predictive_parity) + intersectional + decision audit
+- 20 unit tests for fairness_auditor (runtime/tests/test_utils_fairness.py)
+- ai_validator.run_bias_audit(): integrated pipeline calling fairness_auditor
+
+- silent_failure_detector.py: 沉默故障检测 (Phase 3.2) — threshold drift + Mann-Kendall trend + OLS slope + sliding window + multi-source (tracing/web_vitals/prometheus) + batch_detect()
+- 21 unit tests for silent_failure_detector (runtime/tests/test_utils_silent_failure.py)
+
+- absentee_scenario_injector.py: 缺席者场景注入 (Phase 3.3) — 9 absentee groups (visual/motor/hearing/cognitive/elderly/minor/offline/crisis/non-native) × 21 canonical scenarios + charter generation + coverage reporting
+- 20 unit tests for absentee_scenario_injector (runtime/tests/test_utils_absentee.py)
+
+- evidence_chain.py: 证据链可采信性打包器 (Phase 4) — SHA-256 hash chain + multi-source collection (decisions/DORA/tracing/baselines/history) + ISO 27001/SOC2/NIST 800-53/GDPR compliance mapping + JSON package + Markdown custody report + integrity verification
+- 39 unit tests for evidence_chain (runtime/tests/test_utils_evidence_chain.py)
+- ai_validator.run_evidence_chain_audit(): integrated pipeline calling evidence_chain
+
+- taboo_matrix.py: 神圣性与跨文化禁忌矩阵 (Phase 5) — 135 entries across 16 locales in 5 dimensions: taboo words (50), taboo colors (23), taboo numbers (22), taboo holiday periods (26), sacred context rules (14)
+- i18n_checker.py Phase 5 extensions: audit_taboo_words(), audit_taboo_colors(), audit_taboo_numbers(), audit_taboo_holidays(), audit_sacred_contexts(), run_taboo_audit() — combined entry point with structured JSON report
+- 84 unit tests for Phase 5: test_utils_taboo_matrix.py (30 tests) + test_utils_i18n_taboo.py (54 tests)
+
+### Changed
+- coverage matrix: 伦理/偏见审计 ✅ (was Phase 3)
+- coverage matrix: 沉默故障检测 ✅ (was Phase 3)
+- coverage matrix: 缺席者场景注入 ✅ (was Phase 3) — PHASE 3 COMPLETE
+- coverage matrix: 证据链可采信性 ✅ (was Phase 4) — PHASE 4 DELIVERED
+- vision-dimensions: 公平性审计器 + 沉默故障探测器 + 缺席者场景注入器 ✅
+- vision-dimensions: 司法证据包生成器 ✅ (was ⚪)
+- 14-AI模型测试.md: fairness section expanded with 6-metric audit example
+- VERSION: 1.42.0 → 1.43.0
+- runtime/__init__.py: __version__ "1.40.0" → "1.43.0" (catch-up sync, was lagging)
+- runtime/pyproject.toml: version "1.42.0" → "1.43.0"
+
+---
+
+---
+
+## [v1.37.0] - 2026-05-18
+
+### Added
+- Bug Tracker 5 适配器: `jira_bug_manager.py` / `github_bug_manager.py` / `linear_bug_manager.py` / `webhook_bug_manager.py`
+- Quality Gate Engine: `quality_gate_engine.py` + `config/quality_gates.yaml` (YAML 驱动门禁)
+- Layered requirements: `requirements/{base,mobile,desktop,visual,system,ai,perf}.txt` (按需安装引擎)
+- CI `compileall runtime/` syntax check
+
+### Fixed
+- H16: Expert count clarified (9 含 test-lead vs 8 被协调)
+- H18: Skills README completed (13→32 business + 3 meta skills)
+- M12: `run_file` BackgroundTasks unified (was raw threading.Thread)
+- M14: RACI matrix expanded to 18 columns (pentest + automotive)
+- M15: `requires_layer` frontmatter field documented in CONTRIBUTING.md
+- M19: automotive-test checker reference fixed (`Nonexistent mcp-compliance-checker` → `compliance/engine.py`)
+
+### Changed
+- Utils count: 67 → 73 (6 new modules)
+- 3 charter items: Bug多适配 ✅ / 按需安装 ✅ / 门禁YAML ✅
+
+---
+
+## [v1.36.0] - 2026-05-18
+
+### Added
+- chaos_helper_v2.py: blast radius + steady-state hypothesis + 6 fault types
+- state_machine_tester_v2.py: N-switch coverage + executable guards + weighted walk
+- db_test_helper_v2.py: MySQL/SQLite + isolation levels + FK/constraint testing + connection pooling
+- bdd_runner_v2.py: Gherkin parser + pytest-bdd integration + coverage scanner
+- carbon_scheduler.py: electricityMap + CodeCarbon integration + green budget tracking
+- canary_config.py: Argo Rollouts CRD generation + Mann-Whitney analysis + error budget burn rate
+
+### Security
+- runtime/backends/ssh.py: known_hosts=None (was (), disabling host verification)
+- runtime/backends/docker.py: shlex.quote(cmd) before shell execution
+- runtime/api/main.py: constant-time bearer token comparison (secrets.compare_digest)
+- runtime/orchestrator/adapters/perf_orchestrator.py: fix SyntaxError (nonlocal outside function) + UnboundLocalError + missing import os
+- runtime/api/main.py: fix ResultStore TypeError (dict [] assignment → .put())
+- runtime/orchestrator/hooks.py: hook failures now logged at debug level (was silent pass)
+- runtime/observability/prometheus_metrics.py: list→deque(maxlen=1000) prevents unbounded growth
+- runtime/api/result_store.py: threading.Lock→RLock prevents deadlock in __contains__
+- runtime/router/llm_client.py + agents/base.py: fix strip("`") corrupting backtick content
+- runtime/api/endpoints/stream.py: fix race condition (setdefault) + store ensure_future task refs
+
+### Fixed
+- runtime/orchestrator/release_readiness.py: fix --from-summary AttributeError (Path wrapping)
+- runtime/orchestrator/direct.py: guard pool.shutdown() against uninitialized pool
+- runtime/tests/test_cli_commands.py: remove unregistered search/list/plan commands
+- skills/darwin-skill/scripts/screenshot.mjs: replace hardcoded /Users/alchain/ path
+- skills/nuwa-skill/references/skill-template.md: remove upstream author X/Twitter branding
+
+### Changed
+- VERSION: 1.32.5 → 1.36.0
+- runtime/__init__.py: __version__ "1.32.5" → "1.36.0"
+- runtime/pyproject.toml: version "1.32.0" → "1.36.0"
+- desktop/package.json + mobile/package.json: "1.32.0" → "1.36.0"
+- Global: "49 utils" → "67 utils" across all documentation (~25 locations)
+
+---
+
+## [v1.35.0] - 2026-05-18
+
+### Added
+- flaky_guard.py: pytest plugin + Chi-squared analysis + auto-quarantine + failure clustering
+- api_security_scanner_v2.py: complete OWASP API Top 10 2023 + JWT attack matrix (key confusion, kid injection, jku/x5u, expiry bypass)
+- data_factory_v2.py: 8 entity types + FK relationships + salted PII + CSV/SQL export
+- perf_orchestrator.py: unified performance orchestration + progressive load (10%→50%→100%→120%)
+- event_test_harness.py: Kafka/RabbitMQ/SQS + schema validation
+- visual_regression.py: multi-engine (pixelmatch + SSIM + Butteraugli)
+- flaky_analyzer.py: LLM root cause analysis (Google Auto-Diagnose style)
+- test_prioritizer.py: ML-based test ordering (git-diff→Bag-of-Words)
+- differential_tester.py: cross-implementation comparison + Mann-Whitney U significance
+- eu_ai_act.py: EU AI Act Annex III + Art.9-15 audit, compliance deadline 2026-08-02
+- supply_chain.py: CycloneDX SBOM + SLSA verification + Sigstore signing
+
+---
+
+## [v1.34.0] - 2026-05-18
+
+### Added
+- Settings 14-field + max_tokens configurable
+- IDE integration (.vscode/.editorconfig/devcontainer)
+- Docker hardening
+- script_bridge.py: 5 standalone scripts wired into orchestrator
+- a11y_scanner_v2.py: WCAG 2.2 with 78 criteria
+- suite_minimizer_v2.py: similarity-clustering based test minimization
+- Prometheus /metrics endpoint
+- Request-ID correlation middleware
+- WebSocket streaming for real-time run progress
+- ResultStore with LRU eviction
+- property_tester.py: Hypothesis PBT with 6 templates
+- contract_test_generator.py: OpenAPI→Pact generation
+- schema_fuzzer.py: JSON Schema-based fuzzing
+- Compliance engine
+- Desktop IPC extension (14 methods)
+- Data lifecycle manager
+- DORA 2025 metrics tracker
+
+---
+
+## [v1.33.0] - 2026-05-17
+
+### Added
+- Complete MASTER_PLAN execution (38/38 items across 8 phases)
+
+---
+
+## [v1.32.5] - 2026-05-17
+
+### Security
+- utils: shell injection hardening, hardcoded credential removal, API auth, silent failure fixes
+- CI: pin ludeeus/action-shellcheck@2.0.0
+- generate_report.py: split 143-line function → 6 helpers
+- mobile_driver.py: split 107-line function → helper extraction
+- _stub_response: 77-line if/elif chain → dispatch table
+- fuzzer.py: PAYLOAD_LIBRARY values hoist to module-level ALL_PAYLOADS
 
 ---
 
@@ -28,8 +194,8 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ## [v1.32.3] - 2026-05-17
 
 ### Changed
-- router/llm_client.py: _stub_response 77-line if/elif chain → _STUB_TARGETS dispatch table
-- fuzzer.py: sum(PAYLOAD_LIBRARY.values(), []) hoist to module-level ALL_PAYLOADS
+- router/llm_client.py: `_stub_response` 77-line if/elif chain → `_STUB_TARGETS` dispatch table
+- fuzzer.py: `sum(PAYLOAD_LIBRARY.values(), [])` hoist to module-level `ALL_PAYLOADS`
 
 ---
 
@@ -185,10 +351,10 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ### Added(V1.12.0 · `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
 
 - **新模块 `runtime/init/`**:
-  - `matrix.py`:`load_matrix()` 加载 `04-配置文件/templates/matrix.yaml`(单源真理)
+  - `matrix.py`:`load_matrix()` 加载 `config/templates/matrix.yaml`(单源真理)
   - `wizard.py`:`run_wizard()` 交互向导 · `from_args()` 非交互 · `from_preset()` 5 预设
   - `renderer.py`:`render_all()` 把 InitAnswers + matrix + 模板 → `.env` + `tagent.yml` + `STARTUP.md`
-- **新模板库 `04-配置文件/templates/`**:
+- **新模板库 `config/templates/`**:
   - `matrix.yaml` 单源真理:**8 测试类型 × 6 平台 × 5 LLM × 6 BugTracker × 6 通知 = 8640 组合**
   - `base.env.tpl` · `base.tagent.yml.tpl` · `STARTUP.md.tpl`(`{{var}}` 占位)
 - **CLI**:`tagent init [--test-type] [--platform] [--llm] [--bug-tracker] [--notifier] [--preset] [--out] [--overwrite]`
@@ -213,7 +379,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 ### Fixed(V1.11.0 · 同步铁律批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
 
 - **同步铁律(§1)执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
-  - `00-项目导航.md` · `02-专家定义/{01,07,08,09}.md` · `02-专家定义/README.md` · `03-技能定义/{README,test-coordinator,zentao-bug-submission}.md` · `04-配置文件/mcp-server-impl.md` · `05-代码示例/{README.md,api_retry_util.py}` · `06-CICD集成/{INDEX,CICD集成说明}.md` · `01-快速开始/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
+  - `00-项目导航.md` · `agents/{01,07,08,09}.md` · `agents/README.md` · `skills/{README,test-coordinator,zentao-bug-submission}.md` · `config/mcp-server-impl.md` · `utils/{README.md,api_retry_util.py}` · `ci/{INDEX,CICD集成说明}.md` · `docs/getting-started/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
 - **adapter 修 V1.10 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
   - 现 `tagent selftest --e2e --strict` **100% PASS 8/8**(原 88% 7/8)
   - generate_report.py 默认注入 `--data=workspace/执行日志/_selftest_summary.json`,fixture 自动生成
@@ -273,7 +439,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **教学层 KB 扩 13 大类**(原 12 → 13,加 `13-build-your-own/`):
   - INDEX + 10 P0 测试相关卡(database/network-stack/web-server/git/search-engine/shell/regex-engine/programming-language/web-browser/bot)
   - 每卡含 `estimated_time_hours` + 测试映射 + 推荐路径
-- **主 skill**:`03-技能定义/build-your-own-x-explorer.md`(引导式 deep-dive 推荐)
+- **主 skill**:`skills/build-your-own-x-explorer.md`(引导式 deep-dive 推荐)
 - **Marketplace 4 lane 系统**(对标 Claude Code 官方):
   - `marketplace/{skills,agents,mcp,hooks}/` 目录
   - `marketplace/INDEX.md` + `registry.json` + `_safety_policy.yaml`(4 关安全门 + 3 信任级源)
@@ -290,7 +456,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **上游参考扩 2 条目**:
   - `karpathy-skills.md`(125k★ · LLM 写代码 4 原则元层)
   - `everything-claude-code.md`(179k★ · AI agent harness 性能优化 200 skill / 53 agent / Homunculus instincts / Selective install)
-- **Karpathy 4 原则**(主宪章 §27,元层贯穿):Think Before / Simplicity First / Surgical Changes / Goal-Driven Execution;`03-技能定义/karpathy-guidelines/SKILL.md` 部署 upstream 原文(类 darwin-skill 不改本地)
+- **Karpathy 4 原则**(主宪章 §27,元层贯穿):Think Before / Simplicity First / Surgical Changes / Goal-Driven Execution;`skills/karpathy-guidelines/SKILL.md` 部署 upstream 原文(类 darwin-skill 不改本地)
 - **ECC 6 测试 skill 入库**(对测试有用的,§28):
   - `tdd-workflow` · TDD 80%+ 覆盖
   - `verification-loop` · 5-phase verify(build→typecheck→lint→test→coverage)
@@ -311,8 +477,8 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 - **上游参考扩**:`pentest-ai-agents.md` 合并萃取 pentagi(黑盒)+ shannon(白盒);10 节;含对比表+应用 checklist
 - **2 新专家**:
-  - `02-专家定义/15-渗透测试.md` `pentest-tester`(白盒+黑盒+5 攻击域 + Static-Dynamic Correlation + PoC-only)
-  - `02-专家定义/16-车载测试.md` `automotive-tester`(ISO 26262 + AUTOSAR + HIL/SIL/MIL/PIL + ADAS + OTA + V2X)
+  - `agents/15-渗透测试.md` `pentest-tester`(白盒+黑盒+5 攻击域 + Static-Dynamic Correlation + PoC-only)
+  - `agents/16-车载测试.md` `automotive-tester`(ISO 26262 + AUTOSAR + HIL/SIL/MIL/PIL + ADAS + OTA + V2X)
 - **7 新 pentest skill**:
   - `pentest-coordinator`(主)/ `pentest-recon` / `pentest-vuln` / `pentest-exploit` / `pentest-web` / `pentest-api` / `pentest-report`
 - **5 新 automotive skill**:
@@ -403,14 +569,14 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - §20 Phase 触发条件(不绑月份)
   - How to apply 7-12 扩展项(铭文优先级 / 决策可追溯 / 纪要不可删 / darwin 棘轮 / 依赖补装反问 / 修改四关)
 - **行业适配参照表全删除**(主宪章 + FULL_GUIDE 双删)
-- **darwin-skill 入库**:`03-技能定义/darwin-skill/` 完整部署(SKILL.md + scripts/ + templates/ + assets/ + docs/),upstream 原文不改;13 Skill → 14 Skill
+- **darwin-skill 入库**:`skills/darwin-skill/` 完整部署(SKILL.md + scripts/ + templates/ + assets/ + docs/),upstream 原文不改;13 Skill → 14 Skill
 - **FULL_GUIDE.md 优化**:三公理/铭文 + 18 闭环段替换为"已迁主宪章 §X"指引(避免双份维护);Bug Tracker / 按需安装 / darwin / AgentChat 详节保留作为深度参考;附 runtime 章节(M1-11 留存)
 
 ### Added(V1.1.0 · 运行时层)
 
-- **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 49 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
+- **新增 `runtime/` 运行时层**:把 14 专家 + 13 Skill + 67 脚本从"文档+工具箱"升级为"可执行运行时"。已有定义/Skill/脚本**保持不动**(宪章铁律),`runtime/` 仅作调度层。
   - `runtime/router/`:AI 路由(LiteLLM 多厂商:Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)。被测物 → 专家+Skill DAG。含 stub provider 供 CI 离线测,准确率 5/5 类型(web/api/mobile/desktop/ai-model)
-  - `runtime/registry/`:扫 `02-专家定义/*.md` + `03-技能定义/*.md` frontmatter 生成统一目录(14 expert + 13 skill,实测通过)
+  - `runtime/registry/`:扫 `agents/*.md` + `skills/*.md` frontmatter 生成统一目录(14 expert + 13 skill,实测通过)
   - `runtime/orchestrator/`:**双轨**——Prefect 2.x flow(全功能,带 UI/重试/状态机)+ Direct 执行器(无 Prefect 也能跑,ThreadPoolExecutor 并发,降级方案)
   - `runtime/api/`:FastAPI 入口 `/run/text` `/run/file` `/run/url` `/status/{run_id}` `/report/{run_id}` `/catalog` `/health`。多格式上传 PDF/Word/MD/exe/APK/IPA/Docker/口头/URL/目录
   - `runtime/cli/`:Typer CLI `tagent run|plan|catalog|doctor`
@@ -432,16 +598,16 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ### Security（安全·上架前必修 Batch 1）
 
-- **修复 `eval()` 远程代码注入风险**：`05-代码示例/media_validator.py` 中 `get_video_meta()` 原通过 `eval(video.get("r_frame_rate"))` 解析 FFmpeg 外部输出，存在注入风险。改用 `fractions.Fraction` 安全解析。
+- **修复 `eval()` 远程代码注入风险**：`utils/media_validator.py` 中 `get_video_meta()` 原通过 `eval(video.get("r_frame_rate"))` 解析 FFmpeg 外部输出，存在注入风险。改用 `fractions.Fraction` 安全解析。
 - **移除占位邮箱**：`SECURITY.md` 与 `CODE_OF_CONDUCT.md` 移除 `security@example.com` / `conduct@example.com` 占位地址，统一指向 GitHub Security Advisories 私密通道；避免上架后被误用作真实联系方式。
 - **示例脱敏**：
-  - `02-专家定义/13-系统集成测试.md` 示例中 `SSHClient(host="192.168.1.100", user="root", password="...")` 改为 `os.getenv()` 读取，配合 `.env` 注入；同段 `IOT_SSH_HOST` 占位改为 `<DEVICE_IP>`。
-  - `02-专家定义/07-测试执行.md` 混沌命令示例中真实风格 IP `192.168.1.100` 改为占位 `<TARGET_IP>`。
+  - `agents/13-系统集成测试.md` 示例中 `SSHClient(host="192.168.1.100", user="root", password="...")` 改为 `os.getenv()` 读取，配合 `.env` 注入；同段 `IOT_SSH_HOST` 占位改为 `<DEVICE_IP>`。
+  - `agents/07-测试执行.md` 混沌命令示例中真实风格 IP `192.168.1.100` 改为占位 `<TARGET_IP>`。
 
 ### Changed（数字漂移修复 + URL 统一 Batch 2）
 
-- **顶层文档数字一致性**：`8 位专家 / 9 agent / 8 skill / 12 utils` 等过时数字全栈修正为 `14 agent / 13 skill / 49 utils`（核心 8 专家 + 平台扩展 5 专家 + test-lead 协调者）。涉及：`README_DETAIL.md` / `01-快速开始/使用手册.md` / `02-专家定义/01-测试主管.md` / `03-技能定义/test-coordinator.md` / `install.sh`。
-- **GitHub 仓库 URL 统一**：所有引用 `YOUR-USER/Test-Agent工作流搭建` 的位置统一为 `Wool-xing/Test-Agent`（权威英文仓库名；中文 `Test-Agent工作流搭建` 仅作目录别名）。fork 用户可用 `TEST_AGENT_REPO_URL` 环境变量覆盖。涉及：`01-快速开始/部署说明.md` / `01-快速开始/使用手册.md` / `README_DETAIL.md`。
+- **顶层文档数字一致性**：`8 位专家 / 9 agent / 8 skill / 12 utils` 等过时数字全栈修正为 `14 agent / 13 skill / 67 utils`（核心 8 专家 + 平台扩展 5 专家 + test-lead 协调者）。涉及：`README_DETAIL.md` / `docs/getting-started/使用手册.md` / `agents/01-测试主管.md` / `skills/test-coordinator.md` / `install.sh`。
+- **GitHub 仓库 URL 统一**：所有引用 `YOUR-USER/Test-Agent工作流搭建` 的位置统一为 `Wool-xing/Test-Agent`（权威英文仓库名；中文 `Test-Agent工作流搭建` 仅作目录别名）。fork 用户可用 `TEST_AGENT_REPO_URL` 环境变量覆盖。涉及：`docs/getting-started/部署说明.md` / `docs/getting-started/使用手册.md` / `README_DETAIL.md`。
 - **覆盖率口径统一为 ~95%**：原 `~99%` (README/README_DETAIL) vs `约 90%` (00-项目导航) 不一致，统一为 `~95%`，剩 5% 为高度专业合规领域（航空 DO-178C / 医疗 HIPAA / 工业控制 IEC61508）。
 
 ### Added
@@ -449,38 +615,38 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - 新建 `CHANGELOG.md` + `VERSION` 文件，启动语义版本管理。
 - **W3 信息架构重塑**：
   - `README_DETAIL.md` 改名为 `FULL_GUIDE.md`（宪章§0 文件分发策略：README.md 简明入口 ≤ 200 行 / FULL_GUIDE.md 详细指南）
-  - 新建 `01-快速开始/INDEX.md` / `04-配置文件/INDEX.md` / `06-CICD集成/INDEX.md`（宪章§3 每目录索引；02/03/05 已有 README.md 等价于 INDEX）
+  - 新建 `docs/getting-started/INDEX.md` / `config/INDEX.md` / `ci/INDEX.md`（宪章§3 每目录索引；02/03/05 已有 README.md 等价于 INDEX）
   - `README.md` 头加项目代号 `test-agent-team` + 版本 + License
   - `README.md` 删除三视角矩阵段（迁移至 FULL_GUIDE.md，避免双份维护）
   - `README.md` 行数从 240 降至 168 行
 - **W3 安全增强**：
-  - `49 个 utils .py` 文件头加 `# SPDX-License-Identifier: MIT`（合规标识）
+  - `67 个 utils .py` 文件头加 `# SPDX-License-Identifier: MIT`（合规标识）
   - `.pre-commit-config.yaml` 加 gitleaks hook（凭据扫描）
   - `.gitignore` 补漏：`.ruff_cache/` / `*.jtl` / `*.pem` / `*.key` / `*.crt` / `*.p12` / `*.pfx` / `*.jks` / `id_rsa` / `id_ed25519` / `coverage.xml` / `pip-wheel-metadata/`
 - **W3 收尾 · 方法论沉淀（F'+J+K）**：
   - `CONTRIBUTING.md` 末尾追加：**同步铁律段**（联动改动清单速查 + 自动化保障）+ **RACI 协作矩阵浓缩版**（14 专家 × 35 测试维度，含责任边界冲突解决与质量门禁联动）
   - `FULL_GUIDE.md` 末尾追加：**测试架构合理性深度章节**（6 子节：金字塔 2024 现代版 / Shift-Left 7 层 / Shift-Right 9 层 / 可观测三柱 + 测试可视化 / 五层质量门禁 + Flaky vs Reruns 哲学 / 调整路径 Phase 2-4 落地点）
   - 新建 `examples/web-demo/`：8 文件最小可跑 Web 测试示例（pytest + Playwright + Page Object，演示 `https://playwright.dev`，5 分钟跑通）
-  - `FULL_GUIDE.md:395` 漏修补救：`utils/*.py（12 个）` → `49 个，含 __init__.py`
+  - `FULL_GUIDE.md:395` 漏修补救：`utils/*.py（12 个）` → `67 个，含 __init__.py`
 
 ### Notes
 
 W1+W2+W3 合并提交：上架前必修安全 + 数字漂移修复 + URL 统一 + 信息架构重塑（FULL_GUIDE/INDEX/SPDX/gitleaks）。
 后续 W4 博客 + Show HN 准备 待执行。
 
-> 注：本仓库 GitHub Actions CI 已配 `permissions: contents: read` 最小权限（F3）；CodeQL 显式声明 per-job 权限。pre-commit 已含 `detect-private-key` + .env 防护 + 14/13/49 文件统计。
+> 注：本仓库 GitHub Actions CI 已配 `permissions: contents: read` 最小权限（F3）；CodeQL 显式声明 per-job 权限。pre-commit 已含 `detect-private-key` + .env 防护 + 14/13/67 文件统计。
 
 ---
 
 ---
 
-## [1.0.0] - 2026-05-10
+## [v1.0.0] - 2026-05-10
 
 ### Added
 
 - 14 测试专家 Agent（核心 9 + 平台扩展 5）
 - 13 测试技能 Skill（通用 8 + 平台 5）
-- 49 utils Python 工具模块
+- 67 utils Python 工具模块
 - GitHub Actions + Jenkins 双 CICD
 - Dependabot 周扫描 + pip-audit/safety CVE 拦截
 - 多格式 PRD 加载（md/pdf/docx/xlsx/zip/png/url/html/pptx）
