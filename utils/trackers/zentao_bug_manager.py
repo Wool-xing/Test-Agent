@@ -11,7 +11,11 @@ import requests
 from dotenv import load_dotenv
 
 # 同包 import（部署后 utils/ 在 sys.path 中）
-from utils.protocols.api_retry_util import call_with_retry
+try:
+    from utils.protocols.api_retry_util import call_with_retry
+except ImportError:
+    # CI/test 环境 sys.path 含 utils/ 但不含项目根
+    from protocols.api_retry_util import call_with_retry
 
 load_dotenv()
 logger = logging.getLogger(__name__)
