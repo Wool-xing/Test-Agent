@@ -12,6 +12,22 @@
 ## [Unreleased]
 
 ### Added
+- agent-introspection-debugging skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/agent_introspection_debugging.py`) — 5 维自省 (decision_replay / tool_calls / token_consumption / context / state_machine) + findings + recommendations
+- build-your-own-x-explorer skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/build_your_own_x_explorer.py`) — 场景识别 + byox 13 类 KB 推荐 + 时间预算警告
+
+### Changed
+- 2 vision skill 升 production: `agent-introspection-debugging` + `build-your-own-x-explorer` (frontmatter `SKILL_IMPL_STATUS: vision` → `production`)
+- skill rollout 总数: 16 → 18 (中央 `runtime/tests/test_skill_runners.py` `ALL_SKILL_RUNNERS` 同步加 2 行)
+- skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
+- runtime/orchestrator/skills/__init__.py: 聚合 import 新增 agent_introspection_debugging + build_your_own_x_explorer
+
+_后续累积变更入此节;切版本时移到下方版本节。_
+
+---
+
+## [v1.43.0] - 2026-05-19
+
+### Added
 - fairness_auditor.py: 伦理/偏见审计 (Phase 3.1) — dataset bias + model fairness (6 metrics: DI/SPD/EO/equalized_odds/calibration/predictive_parity) + intersectional + decision audit
 - 20 unit tests for fairness_auditor (runtime/tests/test_utils_fairness.py)
 - ai_validator.run_bias_audit(): integrated pipeline calling fairness_auditor
@@ -38,8 +54,11 @@
 - vision-dimensions: 公平性审计器 + 沉默故障探测器 + 缺席者场景注入器 ✅
 - vision-dimensions: 司法证据包生成器 ✅ (was ⚪)
 - 14-AI模型测试.md: fairness section expanded with 6-metric audit example
+- VERSION: 1.42.0 → 1.43.0
+- runtime/__init__.py: __version__ "1.40.0" → "1.43.0" (catch-up sync, was lagging)
+- runtime/pyproject.toml: version "1.42.0" → "1.43.0"
 
-_后续累积变更入此节;切版本时移到下方版本节。_
+---
 
 ---
 

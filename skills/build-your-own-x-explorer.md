@@ -2,7 +2,7 @@
 name: build-your-own-x-explorer
 description: "Build-your-own-X 教学引导 Skill。按用户当前测试场景推荐对应 byox 教程深度学习路径;每条标 estimated_time_hours;主宪章 §31 教学层 13 大类落地。"
 tools: Read, Write, Grep, Glob
-SKILL_IMPL_STATUS: vision
+SKILL_IMPL_STATUS: production
 ---
 
 # build-your-own-x-explorer
