@@ -432,11 +432,15 @@ def setup_venv(python_bin, project_root):
     else:
         subprocess.run([pip_cmd, "install", "-r", req_file], env=pip_env, check=True)
 
-    # Playwright
+    # Playwright 浏览器（按需安装，UI 测试才用）
+    if IS_WINDOWS:
+        playwright_cmd = os.path.join(venv_dir, "Scripts", "playwright.exe")
+    else:
+        playwright_cmd = os.path.join(venv_dir, "bin", "playwright")
     try:
-        subprocess.run(["playwright", "install", "chromium", "--with-deps"], check=True)
+        subprocess.run([playwright_cmd, "install", "chromium", "--with-deps"], check=True)
     except Exception:
-        print("⚠️ Playwright deps 安装失败，UI 测试需手动 'playwright install chromium --with-deps'")
+        print(f"⚠️ Playwright 浏览器安装失败，如需 UI 测试请手动运行：{playwright_cmd} install chromium --with-deps")
 
 
 def timezone_is_cn():
