@@ -5,6 +5,8 @@ tools: Read, Write, Edit, Grep, Glob
 SKILL_IMPL_STATUS: script
 ---
 
+> **JMeter 版本兼容**: 本模板不硬编码 `saveConfig`，结果保存配置走 `jmeter.properties` 默认值，兼容 JMeter 5.0 ~ 5.6.3。ThreadGroup 含 `${变量}` 的属性统一用 `stringProp`，避免跨版本参数化失效。
+
 # JMeter 性能脚本生成
 
 ## 触发方式
@@ -159,9 +161,9 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
       <!-- 线程组 -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup"
                    testname="并发用户组" enabled="true">
-        <intProp name="ThreadGroup.num_threads">${THREADS}</intProp>
-        <intProp name="ThreadGroup.ramp_time">${RAMPUP}</intProp>
-        <longProp name="ThreadGroup.duration">${DURATION}</longProp>
+        <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMPUP}</stringProp>
+        <stringProp name="ThreadGroup.duration">${DURATION}</stringProp>
         <longProp name="ThreadGroup.delay">0</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -250,24 +252,6 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector"
                          testname="聚合报告" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
-          <objProp>
-            <name>saveConfig</name>
-            <value class="SampleSaveConfiguration">
-              <time>true</time><latency>true</latency><timestamp>true</timestamp>
-              <success>true</success><label>true</label><code>true</code>
-              <responseMessage>true</responseMessage><threadName>true</threadName>
-              <dataType>true</dataType><encoding>false</encoding>
-              <assertions>true</assertions><subresults>true</subresults>
-              <responseData>false</responseData><samplerData>false</samplerData>
-              <xml>false</xml><fieldNames>true</fieldNames>
-              <responseHeaders>false</responseHeaders><requestHeaders>false</requestHeaders>
-              <responseDataOnError>false</responseDataOnError>
-              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-              <bytes>true</bytes><sentBytes>true</sentBytes>
-              <url>true</url><threadCounts>true</threadCounts>
-              <idleTime>true</idleTime><connectTime>true</connectTime>
-            </value>
-          </objProp>
           <stringProp name="filename">workspace/执行日志/jmeter-results/result.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
