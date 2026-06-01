@@ -69,6 +69,7 @@ python install.py /path/to/your-test-project
 > **Windows 用户**：如果 curl 报 `CRYPT_E_NO_REVOCATION_CHECK`，改用 PowerShell：
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
+> python install.py /path/to/your-test-project
 > ```
 
 **预期耗时**: 约 10-15 min（含 pip install + Playwright chromium 下载）。CN 网络自动检测并配清华 PyPI 镜像。

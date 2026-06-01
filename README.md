@@ -67,6 +67,7 @@ python install.py /path/to/your-test-project
 > **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell instead:
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
+> python install.py /path/to/your-test-project
 > ```
 
 **Expected duration**: ~10-15 min (includes pip install + Playwright chromium download). CN networks auto-detect and use Tsinghua PyPI mirror.
