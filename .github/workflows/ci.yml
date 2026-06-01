@@ -96,7 +96,7 @@ jobs:
 
   # ===== 3. install.py 脚本检查 =====
   install-syntax:
-    name: install.sh 语法
+    name: install.py 语法
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
