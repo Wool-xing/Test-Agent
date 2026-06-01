@@ -25,6 +25,7 @@
 """
 
 import os
+import stat
 import sys
 import shutil
 import subprocess
@@ -385,11 +386,13 @@ def setup_venv(python_bin, project_root):
 
     if IS_WINDOWS:
         pip_cmd = os.path.join(venv_dir, "Scripts", "pip")
+        python_exe = os.path.join(venv_dir, "Scripts", "python.exe")
     else:
         pip_cmd = os.path.join(venv_dir, "bin", "pip")
+        python_exe = os.path.join(venv_dir, "bin", "python")
 
-    # pip 升级
-    subprocess.run([pip_cmd, "install", "--upgrade", "pip", "-q"], check=True)
+    # pip 升级（pip>=25.3 要求通过 python -m pip 方式升级）
+    subprocess.run([python_exe, "-m", "pip", "install", "--upgrade", "pip", "-q"], check=True)
 
     # CN 镜像检测
     pip_index_url = os.environ.get("PIP_INDEX_URL")
@@ -463,6 +466,12 @@ def finish(project_root):
     print(msg)
 
 
+def _rmtree_onerror(func, path, _exc_info):
+    """Windows git objects are read-only, clear attribute before retry."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
 def main():
     banner()
 
@@ -517,10 +526,10 @@ def main():
     finally:
         # 清理临时目录
         if os.path.isdir(template_dir_parent):
-            shutil.rmtree(template_dir_parent)
+            shutil.rmtree(template_dir_parent, onerror=_rmtree_onerror)
         tmp = backed.pop("__tmp__", None)
         if tmp and os.path.isdir(tmp):
-            shutil.rmtree(tmp)
+            shutil.rmtree(tmp, onerror=_rmtree_onerror)
 
 
 if __name__ == "__main__":
