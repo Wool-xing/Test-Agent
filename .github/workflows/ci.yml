@@ -369,6 +369,7 @@ jobs:
         env:
           TAGENT_LLM_PROVIDER: stub
           TAGENT_LLM_PROVIDER_FALLBACK: stub
+          PREFECT_SERVER_ALLOW_EPHEMERAL_MODE: 'false'
         run: |
           python -m pytest runtime/tests/ \
             --ignore=runtime/tests/test_router_real.py \
