@@ -107,7 +107,7 @@
 | 反目标函数引擎 | 对自身策略对抗性拆解 | 工程/元层 | `utils/mutation_runner.py` + suite_minimizer | ✅ |
 | 拓扑流形观测器 | 学习系统"气氛"，捕捉弱信号 | 抽象元层 | tracing_validator + web_vitals_collector | ✅ |
 | 熵减祭司 | 监测测试热寂、焚毁僵尸用例 | 抽象元层 | `utils/suite_minimizer.py` | ✅ |
-| 决策回放器 | 任一判断可复现、可反驳 | 工程层 | `workspace/执行日志/decisions/` + tracing | ✅ |
+| 决策回放器 | 任一判断可复现、可反驳 | 工程层 | `workspace/测试报告/decisions/` + tracing | ✅ |
 | 数字考古学家 | 追溯遗留系统初始假设 | 文明层 | Phase 4 知识图谱冷启动 | ❌ |
 | 缓慢暴力监测器 | 跨发布周期跟踪代际效应 | 文明层 | 需多年数据积累，Phase 4 | ❌ |
 | 缺席者画像生成器 | 强制注入边缘用户场景 | 文明/权力层 | absentee_scenario_injector.py (9组场景) | ✅ |

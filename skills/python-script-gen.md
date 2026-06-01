@@ -206,5 +206,5 @@ $env:HEADLESS="false"; pytest workspace/自动化脚本/python/tests/test_p0_smo
 
 # 生成 Allure 报告
 pytest workspace/自动化脚本/python/tests/ \
-    --alluredir=workspace/执行日志/allure-results -v
+    --alluredir=workspace/测试报告/allure-results -v
 ```

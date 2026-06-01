@@ -56,7 +56,7 @@ pytest workspace/自动化脚本/python/ \
     -v -m "p0" \
     --timeout=60 \
     -n 2 \
-    --alluredir=workspace/执行日志/allure-results \
+    --alluredir=workspace/测试报告/allure-results \
     --junitxml=workspace/执行日志/smoke-results.xml \
     --tb=short \
     --no-header
@@ -75,7 +75,7 @@ python -m utils.ci_quality_gate \
 ### 阶段6：报告生成（1 分钟，缓冲）
 
 ```bash
-allure generate workspace/执行日志/allure-results \
+allure generate workspace/测试报告/allure-results \
     --output workspace/执行日志/allure-report \
     --clean
 ```

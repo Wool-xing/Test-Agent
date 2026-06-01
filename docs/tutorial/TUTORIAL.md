@@ -75,7 +75,7 @@ Step 3/4 · tagent selftest --e2e (16 agent DAG · stub LLM · 0 cost)
 Step 4/4 · Artifacts
   · workspace/测试用例/testcases_sample.xlsx
   · workspace/测试报告/测试报告_*.docx
-  · workspace/执行日志/bug_drafts.json
+  · workspace/测试报告/bug_drafts.json
 
 ✓ demo done
 ```

@@ -180,10 +180,10 @@ APP_SRC_PATH
 
 ```bash
 # 本地查看
-allure serve workspace/执行日志/allure-results
+allure serve workspace/测试报告/allure-results
 
 # 生成静态报告
-allure generate workspace/执行日志/allure-results \
+allure generate workspace/测试报告/allure-results \
     --output workspace/执行日志/allure-report --clean
 ```
 

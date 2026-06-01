@@ -280,7 +280,7 @@ def pytest_configure(config):
         "workspace/测试报告",
         "workspace/自动化脚本/python",
         "workspace/自动化脚本/jmeter",
-        "workspace/执行日志/allure-results",
+        "workspace/测试报告/allure-results",
         "workspace/执行日志/截图",
         "workspace/执行日志/jmeter-results",
         "workspace/执行日志/jmeter-report",

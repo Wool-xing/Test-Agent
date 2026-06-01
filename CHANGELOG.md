@@ -317,11 +317,11 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **Kernel.submit 注入 `artifact_text`**(`runtime/api/deps.py`):每 DAG 节点 inputs 自动带原始 PRD 文本(20KB cap)
 - **stub web-system DAG 加 test-lead**(`runtime/router/llm_client.py`):覆盖完整 9 节点 e2e 流程
 - **5 真 runner 产物落盘**:
-  - `workspace/执行日志/requirements_summary.json`(需求摘要 + P0/P1 + 风险区)
-  - `workspace/执行日志/automation_scripts_plan.json`(脚本规划 + fixture 复用)
-  - `workspace/执行日志/execution_plan.json`(4 阶段 + 失败 4 分类 + Flaky 规则)
-  - `workspace/执行日志/bug_drafts.json`(BugTracker-ready Bug 草案 + severity 1-4)
-  - `workspace/执行日志/decisions/final_verdict_*.json`(test-lead go/no-go 决策,标 `requires_human_signoff: true`)
+  - `workspace/需求分析/requirements_summary.json`(需求摘要 + P0/P1 + 风险区)
+  - `workspace/测试计划/automation_scripts_plan.json`(脚本规划 + fixture 复用)
+  - `workspace/测试计划/execution_plan.json`(4 阶段 + 失败 4 分类 + Flaky 规则)
+  - `workspace/测试报告/bug_drafts.json`(BugTracker-ready Bug 草案 + severity 1-4)
+  - `workspace/测试报告/decisions/final_verdict_*.json`(test-lead go/no-go 决策,标 `requires_human_signoff: true`)
 - **录制脚本**(`scripts/`):
   - `_demo-commands.sh`:实际 demo 命令序列(被 record-demo-* 调)
   - `record-demo-asciinema.sh`:`asciinema rec` 自动录,产 .cast 可上传 asciinema.org 或转 GIF/SVG
@@ -382,7 +382,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `00-项目导航.md` · `agents/{01,07,08,09}.md` · `agents/README.md` · `skills/{README,test-coordinator,zentao-bug-submission}.md` · `config/mcp-server-impl.md` · `utils/{README.md,api_retry_util.py}` · `ci/{INDEX,CICD集成说明}.md` · `docs/getting-started/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
 - **adapter 修 V1.10 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
   - 现 `tagent selftest --e2e --strict` **100% PASS 8/8**(原 88% 7/8)
-  - generate_report.py 默认注入 `--data=workspace/执行日志/_selftest_summary.json`,fixture 自动生成
+  - generate_report.py 默认注入 `--data=workspace/测试报告/_selftest_summary.json`,fixture 自动生成
 - **主宪章扩**:
   - §36 多端通知 canon(扩 §6,6 渠道权威清单 + env 字段 + 业务语言铁律)
   - §37 BugTracker canon(扩 §12,6 adapter 权威清单 + measurement env + 措辞规范)
@@ -542,7 +542,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `runtime/mcp/defect_tracker/`:工单桥 5 工具(create/get/update/query_bugs/list_trackers),默认 zentao + 预留扩展位(主宪章 §12 契约)
   - `runtime/mcp/knowledge_base/`:pgvector 向量检索 4 工具(embed/index_case/index_defect/search_similar),LiteLLM embedding + stub 兜底
   - `runtime/mcp/compliance_checker/`:行业合规规则 3 工具(list_profiles/get_profile/check_compliance);10 框架 profile 起步空载(SOC2/PCI-DSS/HIPAA/IEC 62304/IEC 61508/ISO 26262/DO-178C/GDPR/PIPL/CCPA)
-  - 共享基类 `runtime/mcp/base.py`:make_server / run_stdio / @tool_decision_logged(决策落 `workspace/执行日志/decisions/` 符合主宪章 §18-12)
+  - 共享基类 `runtime/mcp/base.py`:make_server / run_stdio / @tool_decision_logged(决策落 `workspace/测试报告/decisions/` 符合主宪章 §18-12)
 - **行业合规规则插槽** `profiles/compliance/`:10 框架空载示例 YAML,真规则由领域专家+test-lead 双签签字后入库
 - **飞轮回灌路由**(M2-9):`runtime/router/retrieval.py` 历史相似用例 → LLM prompt few-shot;router 透明集成,无 KB 时降级
 - **真模型路由测试套件**(M2-7):`runtime/tests/test_router_real.py` 20 样本(4 类型 × 5)真模型测试;门槛单模型 ≥85%、双模型投票 ≥95%;无 API key 自动 skip;失败自动落 decisions/ 含 seed+模型版本+输入快照(主宪章 §21 横切准则)

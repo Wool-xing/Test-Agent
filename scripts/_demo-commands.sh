@@ -57,8 +57,8 @@ prompt "ls workspace/执行日志/*.json"
 ls workspace/执行日志/*.json 2>/dev/null
 sleep 2
 
-prompt "cat workspace/执行日志/decisions/final_verdict_*.json | head -10"
-cat workspace/执行日志/decisions/final_verdict_*.json 2>/dev/null | head -12
+prompt "cat workspace/测试报告/decisions/final_verdict_*.json | head -10"
+cat workspace/测试报告/decisions/final_verdict_*.json 2>/dev/null | head -12
 sleep 4
 
 # CTA
