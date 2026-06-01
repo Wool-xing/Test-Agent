@@ -100,7 +100,7 @@ pika==1.3.2                        # [可选] RabbitMQ
 
 # ===== [可选] AI/ML（14-AI模型测试）=====
 scikit-learn==1.5.2                # [可选] 模型评估（修 GHSA data leakage）
-scipy==1.13.1                      # [可选] 漂移检测（KS）—— 1.11.4→1.13.1 Py 3.12 官方支持 + 与 scikit-image 0.24 / sklearn 1.5 numpy 兼容
+scipy==1.13.1; python_version < "3.14"   # [可选] 漂移检测（KS）—— 1.11.4→1.13.1 Py 3.12 官方支持 + 与 scikit-image 0.24 / sklearn 1.5 numpy 兼容；Py>=3.14 暂无 wheel，自动跳过
 # alibi-detect==0.12.0             # [可选] 漂移高级检测
 # deepeval==0.20.50                # [可选] LLM 评估
 

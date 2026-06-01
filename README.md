@@ -13,29 +13,32 @@
 
 ---
 
-## ⚡ 30-second demo
+## 🚀 Quick Start
+
+> Prerequisite: Python 3.x. Git & Node.js auto-installed if missing (winget / brew / apt / apk).
+>
+> ⚠️ This project includes offensive security tools (pentest skill / SSRF probes / AI adversarial templates). Read [SECURITY.md](SECURITY.md) authorization requirements before running pentest or AI-adversarial workflows.
 
 ```bash
-# Prerequisite: Python 3.x
-# Git & Node.js auto-installed if missing (winget / brew / apt / apk)
+# Download install script
+curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
 
-python install.py ~/test-agent-project
-
-# Optional: enable autonomous runtime (16 LLM-driven agents)
-cd ~/test-agent-project/runtime && pip install -e .
-tagent demo            # 0 API key · stub LLM · 30s end-to-end
+# Deploy to your project directory (any path works)
+python install.py D:\Test-Agent              # Windows example, any drive or folder
+python install.py ~/test-agent-project       # macOS / Linux example, any folder
 ```
 
-Outputs: test cases (Excel + xmind + markmap + opml) + Word report + decision logs, all under `workspace/`.
+> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell:
+> ```powershell
+> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
+> python install.py D:\Test-Agent   # example, any drive or folder works
+> ```
 
-Ready to run on your project?
+**Expected duration**: ~10–15 min (includes pip install + Playwright chromium download). CN networks auto-detect and use Tsinghua PyPI mirror.
 
-```bash
-tagent init --preset saas-web     # or: minimal / mobile-android / security-pentest
-# → produces .env + tagent.yml + STARTUP.md (5-step onboarding guide)
-```
+After deployment, outputs under `workspace/`: test cases (Excel + xmind + markmap + opml) + Word report + decision logs.
 
-Matrix-driven config: 8 test types × 6 platforms × 5 LLMs × 6 trackers × 6 channels. In practice, ~12 common combinations are tested in CI; the full 8640-grid is a config matrix, not a coverage claim. See [`config/templates/INDEX.md`](config/templates/INDEX.md).
+**Next**: edit `.env` → `claude /login` → `cd project-dir && claude` → inside Claude: `/smoke-test`
 
 ---
 
@@ -51,28 +54,6 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 - **6 notify channels** — WeChat Work · Lark/Feishu · DingTalk · Slack · Email · MS Teams
 - **MCP integration** — 6 server modules implemented (test-orchestrator active by default; 5 others ready to enable in `.mcp.json`)
 - **Self-test scaffolding** — L1 lint + L2 mock CI active in CI; L3 real-LLM + L4 weekly cron require `ANTHROPIC_API_KEY` secret (not configured in this repo by default)
-
-## 🚀 Install
-
-> Python 3.x required (script runtime). Git & Node.js auto-installed on demand via winget (Windows) / brew (macOS) / apt/dnf/pacman/apk (Linux).
-
-```bash
-# Download install script (review before running)
-curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
-
-# Deploy to your project directory
-python install.py /path/to/your-test-project
-# e.g. python install.py D:\Test-Agent
-```
-
-> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell:
-> ```powershell
-> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
-> python install.py /path/to/your-test-project
-> # e.g. python install.py D:\Test-Agent
-> ```
-
-**Expected duration**: ~10-15 min (includes pip install + Playwright chromium download). CN networks auto-detect and use Tsinghua PyPI mirror.
 
 ## 🖥 Desktop App (Windows + macOS)
 
