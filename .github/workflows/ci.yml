@@ -94,23 +94,19 @@ jobs:
           pip install safety
           safety check -r config/requirements.txt --short-report || true
 
-  # ===== 3. install.sh 脚本检查 =====
-  shell-check:
-    name: install.sh 语法
+  # ===== 3. install.py 脚本检查 =====
+  python-syntax:
+    name: install.py 语法
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - name: ShellCheck
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          severity: warning
-          scandir: '.'
-          additional_files: 'install.sh'
+      - name: Python 语法检查
+        run: python -m py_compile install.py
 
-  # ===== 3b. install.sh macOS 真机端到端 =====
+  # ===== 3b. install.py macOS 真机端到端 =====
   macos-real-install:
-    name: install.sh macOS 端到端 (实跑)
+    name: install.py macOS 端到端 (实跑)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
@@ -119,20 +115,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: 跑 install.sh /tmp/test-target (LOCAL_SRC=PR)
+      - name: 跑 install.py /tmp/test-target (LOCAL_SRC=PR)
         env:
           TEST_AGENT_LOCAL_SRC: ${{ github.workspace }}
           CI: "true"
         run: |
           mkdir -p /tmp/test-target
-          set -o pipefail
-          bash install.sh /tmp/test-target 2>&1 | tee /tmp/install.log
-          echo "INSTALL_EXIT=${PIPESTATUS[0]}"
-          test "${PIPESTATUS[0]}" -eq 0
+          python install.py /tmp/test-target 2>&1 | tee /tmp/install.log
 
       - name: 验关键 artifacts
         run: |
-          # install.sh 实际部署结构 (非源仓 mirror, 而是 Claude Code 项目脚手架):
+          # install.py 实际部署结构 (非源仓 mirror, 而是 Claude Code 项目脚手架):
           #   agents/[0-9]*.md → .claude/agents/
           #   skills/*.md → .claude/skills/
           #   utils/*.py → utils/
@@ -150,7 +143,7 @@ jobs:
                    .github/workflows/test.yml; do
             test -f "/tmp/test-target/$f" || { echo "❌ 缺文件: $f"; exit 1; }
           done
-          # 报实际拷贝计数 (不写死 expected — install.sh log 自报, CI 不重复 assert)
+          # 报实际拷贝计数 (不写死 expected — install.py log 自报, CI 不重复 assert)
           agent_n=$(find /tmp/test-target/.claude/agents -maxdepth 1 -name '[0-9]*.md' | wc -l | tr -d ' ')
           skill_md_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
           skill_dir_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
@@ -162,7 +155,7 @@ jobs:
           # 验 utils/ 内 script 存在
           test -f "/tmp/test-target/utils/reporting/generate_report.py" \
             || { echo "❌ 缺 utils/reporting/generate_report.py (拷贝丢)"; exit 1; }
-          echo "✅ install.sh macOS 实跑 OK"
+          echo "✅ install.py macOS 实跑 OK"
 
       - name: 上传 install.log (失败时排错用)
         if: failure()
