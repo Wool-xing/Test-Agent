@@ -64,7 +64,7 @@ curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/
 python install.py /path/to/your-test-project
 ```
 
-> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell instead:
+> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell. Recommended path: `D:\Test-Agent`.
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
 > python install.py /path/to/your-test-project
