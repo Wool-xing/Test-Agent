@@ -95,13 +95,13 @@ jobs:
           safety check -r config/requirements.txt --short-report || true
 
   # ===== 3. install.py 脚本检查 =====
-  python-syntax:
-    name: install.py 语法
+  install-syntax:
+    name: install.sh 语法
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - name: Python 语法检查
+      - name: Python 语法检查 (install.py)
         run: python -m py_compile install.py
 
   # ===== 3b. install.py macOS 真机端到端 =====
