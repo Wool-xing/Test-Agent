@@ -129,7 +129,7 @@ jobs:
 
       - name: 创建工作目录
         run: |
-          mkdir -p workspace/执行日志/allure-results
+          mkdir -p workspace/测试报告/allure-results
           mkdir -p workspace/执行日志/截图
           mkdir -p workspace/测试数据
 
@@ -139,7 +139,7 @@ jobs:
             -n 2 \
             --timeout=60 \
             --tb=short \
-            --alluredir=workspace/执行日志/allure-results \
+            --alluredir=workspace/测试报告/allure-results \
             --junitxml=workspace/执行日志/smoke-results.xml \
             -v
         env:
@@ -192,7 +192,7 @@ jobs:
 
       - name: 创建工作目录
         run: |
-          mkdir -p workspace/执行日志/allure-results
+          mkdir -p workspace/测试报告/allure-results
           mkdir -p workspace/执行日志/截图
           mkdir -p workspace/执行日志/coverage-report
 
@@ -207,7 +207,7 @@ jobs:
             --cov-report=xml:workspace/执行日志/coverage.xml \
             --cov-report=html:workspace/执行日志/coverage-report \
             --cov-fail-under=80 \
-            --alluredir=workspace/执行日志/allure-results \
+            --alluredir=workspace/测试报告/allure-results \
             --junitxml=workspace/执行日志/regression-results.xml \
             -v
         env:

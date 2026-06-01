@@ -18,7 +18,7 @@ SKILL_IMPL_STATUS: production
 
 | 维 | 工具 |
 |----|------|
-| **决策回放** | `workspace/执行日志/decisions/` JSON 时间序 |
+| **决策回放** | `workspace/测试报告/decisions/` JSON 时间序 |
 | **工具调用** | OTel span(`runtime/observability/otel.py`)+ Loguru |
 | **token 消耗** | LLM provider header + LiteLLM 记账 |
 | **上下文** | prompt 长度 + 截断点 + 主-子 session 隔离审查 |

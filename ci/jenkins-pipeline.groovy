@@ -53,7 +53,7 @@ pipeline {
 
         // 工作目录
         WORKSPACE_DIR     = "${WORKSPACE}/workspace"
-        ALLURE_DIR        = "${WORKSPACE_DIR}/执行日志/allure-results"
+        ALLURE_DIR        = "${WORKSPACE_DIR}/测试报告/allure-results"
         SCREENSHOT_DIR    = "${WORKSPACE_DIR}/执行日志/截图"
         APP_SRC_PATH      = "./src"
         JMETER_VERSION    = "5.6.3"
@@ -85,7 +85,7 @@ pipeline {
                     set -e
                     pip install -r requirements.txt --quiet
                     playwright install chromium --with-deps
-                    mkdir -p workspace/执行日志/allure-results
+                    mkdir -p workspace/测试报告/allure-results
                     mkdir -p workspace/执行日志/截图
                     mkdir -p workspace/执行日志/jmeter-results
                     mkdir -p workspace/执行日志/jmeter-report

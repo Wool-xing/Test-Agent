@@ -182,7 +182,7 @@ pytest -m "p0 or p1" \
     --cov="${APP_SRC_PATH:-./src}" \
     --cov-report=xml:workspace/执行日志/coverage.xml \
     --cov-fail-under=80 \
-    --alluredir=workspace/执行日志/allure-results \
+    --alluredir=workspace/测试报告/allure-results \
     --junitxml=workspace/执行日志/regression-results.xml
 ```
 

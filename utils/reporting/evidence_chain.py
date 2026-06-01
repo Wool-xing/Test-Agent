@@ -244,7 +244,7 @@ def build_evidence_chain(
     )
 
     # 1. Decision logs
-    dec_dir = decisions_dir or Path("workspace/执行日志/decisions/")
+    dec_dir = decisions_dir or Path("workspace/测试报告/decisions/")
     decisions = collect_decisions(dec_dir)
     if decisions:
         chain.add(EvidenceItem(
@@ -479,7 +479,7 @@ def quick_package(workspace_dir: Path | None = None) -> EvidencePackage:
     if workspace_dir is None:
         workspace_dir = Path("workspace")
     return build_evidence_chain(
-        decisions_dir=workspace_dir / "执行日志/decisions/",
+        decisions_dir=workspace_dir / "测试报告/decisions/",
         baseline_path=workspace_dir / "执行日志/baselines/perf_baseline.json",
         history_dir=workspace_dir / "执行日志/history/",
     )
