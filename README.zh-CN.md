@@ -23,15 +23,15 @@
 # 下载部署脚本
 curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
 
-# 部署到你的项目目录
-python install.py D:\Test-Agent              # Windows
-python install.py ~/test-agent-project       # macOS / Linux
+# 部署到你的项目目录（路径可任意指定）
+python install.py D:\Test-Agent              # Windows 示例，可改为其他盘符或目录
+python install.py ~/test-agent-project       # macOS / Linux 示例，可改为其他目录
 ```
 
 > **Windows 用户**：如果 curl 报 `CRYPT_E_NO_REVOCATION_CHECK`，改用 PowerShell：
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
-> python install.py D:\Test-Agent
+> python install.py D:\Test-Agent   # 示例，可改为其他盘符或目录
 > ```
 
 **预期耗时**：约 10–15 min（含 pip install + Playwright chromium 下载）。CN 网络自动配清华 PyPI 镜像。

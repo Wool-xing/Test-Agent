@@ -23,15 +23,15 @@
 # Download install script
 curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
 
-# Deploy to your project directory
-python install.py D:\Test-Agent              # Windows
-python install.py ~/test-agent-project       # macOS / Linux
+# Deploy to your project directory (any path works)
+python install.py D:\Test-Agent              # Windows example, any drive or folder
+python install.py ~/test-agent-project       # macOS / Linux example, any folder
 ```
 
 > **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell:
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
-> python install.py D:\Test-Agent
+> python install.py D:\Test-Agent   # example, any drive or folder works
 > ```
 
 **Expected duration**: ~10–15 min (includes pip install + Playwright chromium download). CN networks auto-detect and use Tsinghua PyPI mirror.
