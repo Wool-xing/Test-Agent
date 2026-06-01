@@ -94,8 +94,11 @@ def _run_decision(decision_dict: dict, run_id: str) -> dict:
         from runtime.orchestrator.flows import run_decision_flow
 
         return run_decision_flow(decision_dict, run_id)
-    except ImportError as e:
-        logger.debug("prefect unavailable ({}); using direct executor", e)
+    except (ImportError, Exception) as e:
+        if not isinstance(e, ImportError):
+            logger.debug("prefect flow failed ({}); using direct executor", e)
+        else:
+            logger.debug("prefect unavailable ({}); using direct executor", e)
         from runtime.orchestrator.direct import run_decision_direct
 
         return run_decision_direct(decision_dict, run_id)
