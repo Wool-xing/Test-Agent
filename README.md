@@ -55,6 +55,8 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 ## 🚀 Install
 
 > Python 3.x required (script runtime). Git & Node.js auto-installed on demand via winget (Windows) / brew (macOS) / apt/dnf/pacman/apk (Linux).
+>
+> ⚠️ This project includes offensive security tools (pentest skill / SSRF probes / AI adversarial templates). Read [SECURITY.md](SECURITY.md) authorization requirements before running pentest or AI-adversarial workflows.
 
 ```bash
 # Download install script (review before running)
