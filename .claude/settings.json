@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python check_version.py"
+            "command": "python config/check_version.py"
           }
         ],
         "description": "Check for Test-Agent updates (24h cooldown)"
