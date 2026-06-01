@@ -60,14 +60,14 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 # Download install script (review before running)
 curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
 
-# Deploy (default: ./Test-Agent)
-python install.py /path/to/your-test-project
+# Deploy. Windows: D:\Test-Agent   Linux/macOS: ~/test-agent-project
+python install.py D:\Test-Agent
 ```
 
-> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell. Recommended path: `D:\Test-Agent`.
+> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell:
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
-> python install.py /path/to/your-test-project
+> python install.py D:\Test-Agent
 > ```
 
 **Expected duration**: ~10-15 min (includes pip install + Playwright chromium download). CN networks auto-detect and use Tsinghua PyPI mirror.
