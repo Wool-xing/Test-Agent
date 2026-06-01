@@ -16,11 +16,13 @@
 ## ⚡ 30-second demo
 
 ```bash
-git clone https://github.com/Wool-xing/Test-Agent.git
-cd Test-Agent && bash install.sh ~/test-agent-project
+# Prerequisite: Python 3.x
+# Git & Node.js auto-installed if missing (winget / brew / apt / apk)
+
+python install.py ~/test-agent-project
 
 # Optional: enable autonomous runtime (16 LLM-driven agents)
-cd Test-Agent/runtime && pip install -e .
+cd ~/test-agent-project/runtime && pip install -e .
 tagent demo            # 0 API key · stub LLM · 30s end-to-end
 ```
 
@@ -52,15 +54,17 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 
 ## 🚀 Install
 
-> ⚠️ This project includes attack-surface utilities (pentest skills / SSRF probes / AI adversarial templates). See [SECURITY.md](SECURITY.md) for authorization requirements before running pentest or AI-adversarial workflows.
+> Python 3.x required (script runtime). Git & Node.js auto-installed on demand via winget (Windows) / brew (macOS) / apt/dnf/pacman/apk (Linux).
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
+# Download install script (review before running)
+curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
+
+# Deploy (default: ./Test-Agent)
+python install.py /path/to/your-test-project
 ```
 
-**Expected duration**: ~10-15 min on global PyPI; ~10-15 min on CN networks (Tsinghua mirror auto-configured if `LANG=zh_*` or timezone `+0800`). Override via `export PIP_INDEX_URL=<url>` before running.
-
-Then `tagent init` to scaffold `.env`/`tagent.yml`/`STARTUP.md` — no more 30 mins of hand-editing.
+**Expected duration**: ~10-15 min (includes pip install + Playwright chromium download). CN networks auto-detect and use Tsinghua PyPI mirror.
 
 ## 🖥 Desktop App (Windows + macOS)
 
@@ -111,7 +115,7 @@ Test-Agent/
 ├── docs/theory/            ← 22 teaching KB cards across 13 categories
 ├── profiles/compliance/    ← 10 industry compliance YAML profiles
 ├── marketplace/            ← Community skills / agents / mcp / hooks (4 lanes, 4-gate verify)
-├── install.sh              ← one-line deploy
+├── install.py              ← one-command cross-platform deploy
 ├── README.md               ← This file
 ├── FULL_GUIDE.md           ← Full engineering guide
 ├── CHANGELOG.md            ← Version log
