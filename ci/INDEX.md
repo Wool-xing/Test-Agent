@@ -21,7 +21,7 @@
 | `ci/github-actions-test.yml` | **用户分发模板**：用户 fork/部署后跑业务测试 | 用户自己的 repo |
 | `ci/jenkins-pipeline.groovy` | **用户分发模板**：Jenkins 流水线 | 用户自己的 Jenkins |
 
-> install.sh 在部署时把 `ci/github-actions-test.yml` 拷贝到 `<PROJECT_ROOT>/.github/workflows/test.yml`，把 `jenkins-pipeline.groovy` 拷贝到 `<PROJECT_ROOT>/Jenkinsfile`。
+> install.py 在部署时把 `ci/github-actions-test.yml` 拷贝到 `<PROJECT_ROOT>/.github/workflows/test.yml`，把 `jenkins-pipeline.groovy` 拷贝到 `<PROJECT_ROOT>/Jenkinsfile`。
 
 ## 流水线总览（用户分发模板）
 

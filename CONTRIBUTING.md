@@ -15,8 +15,8 @@
    - `00-项目导航.md` 加一行
    - `01-测试主管.md` 路由表（如平台扩展）
    - `utils/prd_loader.PLATFORM_KEYWORDS` 加关键词（如平台扩展）
-   - `install.sh` agents 数组加文件名
-   - `docs/getting-started/部署说明.md` PowerShell + bash 拷贝清单加
+   - `install.py` agents 数组加文件名
+   - `docs/getting-started/部署说明.md` 拷贝清单加
 
 ---
 
@@ -37,7 +37,7 @@
    - `00-项目导航.md` 加一行
    - `docs/getting-started/使用手册.md` skill 详解段加描述
    - `01-测试主管.md` 快速命令清单加一行
-   - `install.sh` skills 数组加文件名
+   - `install.py` skills 数组加文件名
    - `docs/getting-started/部署说明.md` 拷贝清单加
 
 ---
@@ -55,7 +55,7 @@
    - `config/.env.example` 加配置字段
    - `config/conftest.py` `pytest_configure` 加产出目录
    - `config/pytest.ini` markers 加新标记
-   - `install.sh` utils 数组 + 数字
+   - `install.py` utils 数组 + 数字
    - `docs/getting-started/部署说明.md` 拷贝清单 + 数字
 
 ---
@@ -128,11 +128,11 @@ pytest --collect-only
 
 | 改动类型 | 必同步至 |
 |---------|---------|
-| 新增/删除 Agent | `agents/README.md` + `00-项目导航.md` + `install.sh` agents 数组 + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS` |
-| 新增/删除 Skill | `skills/README.md` + `00-项目导航.md` + `install.sh` skills 数组 + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单 |
-| 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers + `install.sh` utils 数组 |
-| 数字变化（18/32+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.sh + ci.yml `file-count` job 校验 |
-| URL/repo 名变化 | grep `Wool-xing/Test-Agent` 全替换 + `install.sh::REPO_URL` + `dependabot.yml` |
+| 新增/删除 Agent | `agents/README.md` + `00-项目导航.md` + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS`（install.py 用 glob 自动发现，无需手动加文件名） |
+| 新增/删除 Skill | `skills/README.md` + `00-项目导航.md` + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单（install.py 用 glob 自动发现） |
+| 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers（install.py 用 os.walk 自动发现 .py） |
+| 数字变化（18/32+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.py + ci.yml `file-count` job 校验 |
+| URL/repo 名变化 | grep `Wool-xing/Test-Agent` 全替换 + `install.py::REPO_URL` + `dependabot.yml` |
 | 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `agents/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
 
 ### 自动化保障
