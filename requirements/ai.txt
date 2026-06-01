@@ -3,8 +3,8 @@
 -r base.txt
 
 numpy==1.26.4
-scikit-learn==1.5.2
-scipy==1.13.1
+scikit-learn==1.8.0
+scipy==1.17.1
 # alibi-detect==0.12.0      # 漂移高级检测
 # deepeval==0.20.50         # LLM 评估
 # foolbox==3.3.4            # CV 对抗
