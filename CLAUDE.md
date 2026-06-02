@@ -59,7 +59,7 @@ Standalone CLI (tagent)              AI Agent Mode (Claude Code)
    runtime/orchestrator              Agent defs (agents/*.md)
         │                                      │
         ▼                                      ▼
-   utils/*.py (78 modules)           utils/*.py (78 modules)
+   utils/*.py (79 modules)           utils/*.py (79 modules)
 ```
 
 Both paths converge at the utils execution layer.
@@ -70,7 +70,7 @@ Both paths converge at the utils execution layer.
 |------|-------|
 | Agent definitions | `agents/` (16 agents) |
 | Skill workflow docs | `skills/` (35 skills) |
-| Python utils | `utils/` (78 modules) |
+| Python utils | `utils/` (79 modules) |
 | Runtime (CLI + orchestrator + MCP) | `runtime/` |
 | Config templates | `config/` (incl. `.env.example`) |
 | Test outputs | `workspace/` |
