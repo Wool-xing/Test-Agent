@@ -17,6 +17,7 @@ htmlcov/
 
 # workspace 测试产出（敏感 + 体积大）
 workspace/测试数据/
+workspace/automotive/
 workspace/测试用例/
 workspace/测试计划/
 workspace/需求分析/
