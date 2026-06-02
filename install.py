@@ -69,6 +69,7 @@ REPO_BRANCH = os.environ.get("TEST_AGENT_REPO_BRANCH", "main")
 
 PRESERVE_FILES = [
     ".env",
+    "quality_gates.yaml",
     os.path.join("workspace", "测试数据", "test_data.json"),
     os.path.join("workspace", "测试报告", "baselines", "perf_baseline.json"),
     "workspace/regression_modules.yaml",
@@ -341,11 +342,22 @@ def copy_config(template_dir, project_root):
     """拷贝配置文件。"""
     print("→ 拷贝配置文件...")
     config_dir = os.path.join(template_dir, "config")
-    files = ["conftest.py", "pytest.ini", ".mcp.json", "requirements.txt", "check_version.py"]
+    files = [
+        "conftest.py", "pytest.ini", ".mcp.json", "requirements.txt",
+        "check_version.py", "quality_gates.yaml",
+    ]
     for f in files:
         src = os.path.join(config_dir, f)
         if os.path.isfile(src):
             shutil.copy2(src, project_root)
+
+    # 拷贝项目模板（STARTUP.md.tpl / .env.tpl / .tagent.yml.tpl / matrix.yaml 等）
+    tmpl_src = os.path.join(config_dir, "templates")
+    tmpl_dst = os.path.join(project_root, "templates")
+    if os.path.isdir(tmpl_src):
+        if os.path.exists(tmpl_dst):
+            shutil.rmtree(tmpl_dst)
+        shutil.copytree(tmpl_src, tmpl_dst)
 
     # .env — 仅在不存在时创建
     env_dst = os.path.join(project_root, ".env")
@@ -422,7 +434,8 @@ def copy_top_level_docs(template_dir, project_root):
     docs = [
         "LICENSE", "NOTICE.md", "SECURITY.md", "CONTRIBUTING.md",
         "CODE_OF_CONDUCT.md", "ROADMAP.md", "README.md", "README.zh-CN.md",
-        "CHANGELOG.md", "VERSION", "FULL_GUIDE.md", "tagent.yml.example",
+        "CHANGELOG.md", "VERSION", "FULL_GUIDE.md", "AGENTS.md", "CLAUDE.md",
+        "tagent.yml.example",
     ]
     for f in docs:
         src = os.path.join(template_dir, f)
