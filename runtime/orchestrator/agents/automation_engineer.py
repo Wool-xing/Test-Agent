@@ -63,7 +63,7 @@ class AutomationEngineer(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "automation_scripts_plan.json"
+        return ctx.workspace / "测试报告" / "automation_scripts_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         scripts = output.get("scripts", [])

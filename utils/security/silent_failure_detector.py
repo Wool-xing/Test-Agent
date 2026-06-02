@@ -386,7 +386,7 @@ class SlidingWindowStore:
 # ═══════════════════════════════════════════════════════════════
 
 def export_report(report: SilentFailureReport,
-                  output_dir: str = "workspace/执行日志/silent-failures") -> str:
+                  output_dir: str = "workspace/测试报告/silent-failures") -> str:
     """Export SilentFailureReport as JSON."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")

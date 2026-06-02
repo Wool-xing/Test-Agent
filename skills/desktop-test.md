@@ -88,7 +88,7 @@ python -m utils.websocket_helper load \
 ```bash
 python -m utils.desktop_driver collect-perf \
     --pid <PID> --duration 60 \
-    --output workspace/执行日志/desktop-perf/
+    --output workspace/测试报告/desktop-perf/
 ```
 
 ## 质量门禁
@@ -116,7 +116,7 @@ steps:
 ```text
 workspace/
 ├── 自动化脚本/python/desktop/{windows,macos,electron}/
-└── 执行日志/
+└── 测试报告/
     ├── desktop-screenshots/
     ├── desktop-perf/
     ├── win-event-log/

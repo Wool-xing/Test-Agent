@@ -537,7 +537,7 @@ def audit_decision_fairness(
 # Report export
 # ═══════════════════════════════════════════════════════════════
 
-def export_bias_report(report: BiasReport, output_dir: str = "workspace/执行日志/ai-fairness") -> str:
+def export_bias_report(report: BiasReport, output_dir: str = "workspace/测试报告/ai-fairness") -> str:
     """Export a BiasReport as JSON to the fairness workspace directory."""
     from datetime import datetime
 

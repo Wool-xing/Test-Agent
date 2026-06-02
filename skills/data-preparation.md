@@ -171,7 +171,7 @@ atexit.register(manager.cleanup)
 |------|------|--------|
 | `workspace/测试数据/test_data.json` | pytest 功能测试账号（conftest fixture 自动加载） | conftest / automation-engineer |
 | `workspace/测试数据/jmeter_users.csv` | JMeter 参数化数据 | jmeter-script-gen / test-executor |
-| `workspace/执行日志/数据准备报告_{日期}.json` | 数据准备详情 | test-lead |
+| `workspace/测试报告/数据准备报告_{日期}.json` | 数据准备详情 | test-lead |
 
 ## ⚠️ 数据安全要求
 

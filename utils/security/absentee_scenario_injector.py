@@ -379,7 +379,7 @@ def generate_charter(scenario: Scenario, module: str = "", duration_min: int = 3
 def generate_batch_charters(
     groups: list[str] | None = None,
     severity: str = "P0",
-    output_dir: str = "workspace/测试用例/charters/absentee",
+    output_dir: str = "workspace/测试用例/absentee",
     module: str = "",
 ) -> list[str]:
     """Generate SBTM charters for all matching scenarios and write to files."""
@@ -437,7 +437,7 @@ def coverage_report(injected_scenarios: list[dict] | None = None) -> dict:
 
 def export_injection_plan(
     scenarios: list[dict],
-    output_dir: str = "workspace/执行日志/absentee-scenarios",
+    output_dir: str = "workspace/测试报告/absentee-scenarios",
 ) -> str:
     """Export the absentee scenario injection plan as JSON."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)

@@ -134,7 +134,7 @@ def main():
     parser = argparse.ArgumentParser(description="JMeter JTL 解析 + 性能门禁")
     parser.add_argument("jtl", help="JTL 文件路径")
     parser.add_argument("--mode", choices=["full", "ci_quick"], default="full")
-    parser.add_argument("--baseline", default="workspace/执行日志/baselines/perf_baseline.json")
+    parser.add_argument("--baseline", default="workspace/测试报告/baselines/perf_baseline.json")
     parser.add_argument("--update-baseline", action="store_true", help="本次结果写入基线")
     parser.add_argument("--regression-max-pct", type=float, default=20.0)
     args = parser.parse_args()

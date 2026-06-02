@@ -60,7 +60,7 @@ def scan_with_axe(page, url: Optional[str] = None) -> Dict:
 
 # ===== Lighthouse a11y =====
 
-def scan_with_lighthouse(url: str, output_dir: str = "workspace/执行日志/a11y") -> Dict:
+def scan_with_lighthouse(url: str, output_dir: str = "workspace/测试报告/a11y") -> Dict:
     """需 npm install -g lighthouse"""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     out_json = Path(output_dir) / "lighthouse_a11y.json"

@@ -195,8 +195,8 @@
 
 - **指数退避重试**：`utils/api_retry_util.call_with_retry`（10s → 20s → 40s）
 - **pytest-xdist** 并行执行（默认 4 进程，可调）
-- **Flaky 检测与隔离**：`utils/flaky_detector` + `workspace/执行日志/history/` 归档
-- **性能基线管理**：`workspace/执行日志/baselines/perf_baseline.json`，仅 release+full+PASS 自动更新
+- **Flaky 检测与隔离**：`utils/flaky_detector` + `workspace/测试报告/history/` 归档
+- **性能基线管理**：`workspace/测试报告/baselines/perf_baseline.json`，仅 release+full+PASS 自动更新
 - **CI/CD 就绪**：GitHub Actions + Jenkins，性能阶段双模式分层
 - **MCP 收口**：当前仅启用 filesystem；通知/Bug 走 SDK 直连
 

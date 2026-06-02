@@ -80,10 +80,10 @@ $ bash install.sh --add visual,ai
 
 1. **依赖自检**：agent / skill 启动时读取自身 frontmatter `requires_layer`，与已装层并集对比
 2. **缺则反问**：缺失则停下反问，列层级 + 关键包 + 预估安装时间 + 影响范围
-   
+
    > 示例："`/visual-test` 需要 visual 层（airtest + opencv-python + pytesseract，约 80MB / 2-5 分钟）。现在补装？(Y/n)"
 3. **触发补装**：用户同意 → 调 `install.sh --add visual` → 增量补装
-4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/执行日志/discussions/{date}_dependency-asks.md`
+4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/测试报告/discussions/{date}_dependency-asks.md`
 5. **拒绝处置**：用户拒绝 → agent / skill 降级（如可降级，例如 `/visual-test` 退化为纯 pytest）或拒绝执行并落 `decisions/`，**不静默继续假装能跑**
 
 **为什么不静默自动装**：跨平台环境差异大（特别是 system 层涉及系统级工具 Java / Node / FFmpeg），强行装可能污染用户环境。符合「Agent 能力越强谦卑义务越重」公理。
@@ -254,7 +254,7 @@ your-test-project/
 │   ├── 测试计划/  需求分析/  测试用例/  测试数据/
 │   ├── 自动化脚本/python/  jmeter/
 │   ├── regression_modules.yaml        ← 回归范围配置（可选）
-│   └── 执行日志/
+│   └── 测试报告/
 │       ├── allure-results/  allure-report/
 │       ├── jmeter-results/  jmeter-report/
 │       ├── coverage.xml  coverage-report/

@@ -184,13 +184,13 @@ allure serve workspace/测试报告/allure-results
 
 # 生成静态报告
 allure generate workspace/测试报告/allure-results \
-    --output workspace/执行日志/allure-report --clean
+    --output workspace/测试报告/allure-report --clean
 ```
 
 ### 报告目录结构
 
 ```text
-workspace/执行日志/
+workspace/测试报告/
 ├── allure-results/                # Allure 原始数据
 ├── allure-report/                 # Allure 静态 HTML
 ├── jmeter-results/result.jtl      # JMeter 原始结果

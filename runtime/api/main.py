@@ -189,8 +189,8 @@ def list_history() -> dict:
     ws = get_settings().workspace_dir
     runs: list[dict] = []
 
-    # Scan workspace/_demo and workspace/执行日志 for run outputs
-    for scan_dir in [ws / "_demo", ws / "执行日志"]:
+    # Scan workspace/_demo and workspace/测试报告 for run outputs
+    for scan_dir in [ws / "_demo", ws / "测试报告"]:
         if not scan_dir.exists():
             continue
         for f in sorted(scan_dir.rglob("*.json"), reverse=True):

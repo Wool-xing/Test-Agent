@@ -65,7 +65,7 @@ pytest -m "ai and llm" -v
 ## 输出文件
 
 ```text
-workspace/执行日志/
+workspace/测试报告/
 ├── ai-eval/
 ├── ai-drift/
 ├── ai-fairness/

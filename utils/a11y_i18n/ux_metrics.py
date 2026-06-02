@@ -103,7 +103,7 @@ def error_recovery_rate(error_count: int, recovery_count: int) -> float:
 # ===== 持久化 =====
 
 def save_ux_report(summaries: List[Dict],
-                   output_dir: str = "workspace/执行日志/ux") -> str:
+                   output_dir: str = "workspace/测试报告/ux") -> str:
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     path = Path(output_dir) / f"ux_{datetime.now():%Y%m%d_%H%M%S}.json"
     path.write_text(json.dumps(summaries, indent=2, ensure_ascii=False), encoding="utf-8")

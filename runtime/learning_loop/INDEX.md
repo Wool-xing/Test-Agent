@@ -27,5 +27,5 @@ learning_loop/curator   (协调:何时跑+谁来跑)
         ↓ 触发
 darwin-skill/SKILL.md   (执行:8 维评分+棘轮)
         ↓ 落
-workspace/执行日志/skill-evolution/results.tsv
+workspace/测试报告/skill-evolution/results.tsv
 ```

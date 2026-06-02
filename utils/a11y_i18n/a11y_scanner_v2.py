@@ -342,7 +342,7 @@ def full_scan(page, url: str) -> A11yReport:
 # External tool wrappers (backward compat with v1)
 # ═══════════════════════════════════════════════════════════════
 
-def scan_with_lighthouse(url: str, output_dir: str = "workspace/执行日志/a11y") -> dict:
+def scan_with_lighthouse(url: str, output_dir: str = "workspace/测试报告/a11y") -> dict:
     """Run Lighthouse a11y audit. Requires: npm install -g lighthouse"""
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
