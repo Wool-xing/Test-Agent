@@ -70,7 +70,7 @@ REPO_BRANCH = os.environ.get("TEST_AGENT_REPO_BRANCH", "main")
 PRESERVE_FILES = [
     ".env",
     os.path.join("workspace", "测试数据", "test_data.json"),
-    os.path.join("workspace", "执行日志", "baselines", "perf_baseline.json"),
+    os.path.join("workspace", "测试报告", "baselines", "perf_baseline.json"),
     "workspace/regression_modules.yaml",
 ]
 
@@ -286,19 +286,18 @@ def create_dirs(project_root):
         os.path.join("workspace", "测试用例"),
         os.path.join("workspace", "测试数据"),
         os.path.join("workspace", "测试报告"),
-        os.path.join("workspace", "测试用例", "charters"),
+        os.path.join("workspace", "测试报告", "allure-results"),
+        os.path.join("workspace", "测试报告", "jmeter-results"),
+        os.path.join("workspace", "测试报告", "jmeter-report"),
+        os.path.join("workspace", "测试报告", "coverage-report"),
+        os.path.join("workspace", "测试报告", "baselines"),
+        os.path.join("workspace", "测试报告", "history"),
+        os.path.join("workspace", "截图"),
         os.path.join("workspace", "自动化脚本", "python", "pages"),
         os.path.join("workspace", "自动化脚本", "python", "api"),
         os.path.join("workspace", "自动化脚本", "python", "tests"),
         os.path.join("workspace", "自动化脚本", "python", "scripts"),
         os.path.join("workspace", "自动化脚本", "jmeter"),
-        os.path.join("workspace", "执行日志", "allure-results"),
-        os.path.join("workspace", "执行日志", "jmeter-results"),
-        os.path.join("workspace", "执行日志", "jmeter-report"),
-        os.path.join("workspace", "执行日志", "coverage-report"),
-        os.path.join("workspace", "执行日志", "baselines"),
-        os.path.join("workspace", "执行日志", "history"),
-        os.path.join("workspace", "执行日志", "截图"),
         "memory",
     ]
     for d in dirs:
@@ -388,6 +387,26 @@ def copy_utils(template_dir, project_root):
                 shutil.copy2(src, dst)
                 count += 1
     print(f"  ✓ {count} 个 .py 文件已拷贝")
+
+
+def copy_runtime(template_dir, project_root):
+    """拷贝 runtime 目录下所有 .py 文件（MCP servers / orchestrator / router 等）。"""
+    print("→ 拷贝 runtime...")
+    runtime_src = os.path.join(template_dir, "runtime")
+    runtime_dst = os.path.join(project_root, "runtime")
+    count = 0
+    skip = {".pyc", "__pycache__", ".ruff_cache", ".pytest_cache", ".egg-info"}
+    for root, dirs, files in os.walk(runtime_src):
+        dirs[:] = [d for d in dirs if d not in skip]
+        for f in files:
+            if f.endswith(".py") or f.endswith(".md"):
+                src = os.path.join(root, f)
+                rel = os.path.relpath(src, runtime_src)
+                dst = os.path.join(runtime_dst, rel)
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                shutil.copy2(src, dst)
+                count += 1
+    print(f"  ✓ {count} 个文件已拷贝")
 
 
 def copy_ci(template_dir, project_root):
@@ -499,13 +518,17 @@ def finish(project_root):
 
  项目目录: {project_root}
 
- 下一步：
- 1. 编辑 {project_root}/.env（最少 8 必填字段，详见 配置清单.md）
- 2. 安装 Java JRE 17 + JMeter 5.6.3 + Allure CLI（详见 部署说明.md）
- 3. claude /login                           # 首次登录 Claude Code
- 4. cd {project_root} && claude              # 启动
- 5. cd {project_root} && claude              # 进入项目
- 6. 阅读 skills/smoke-test.md 工作流        # 第一次冒烟验证
+ === 独立使用（不需 AI）===
+   pip install -e {project_root}/runtime/
+   tagent run "path/to/prd.md"          # 一键执行
+   tagent doctor                        # 健康检查
+   tagent catalog                       # 查看所有专家和技能
+
+ === AI 协作模式 ===
+   1. 编辑 {project_root}/.env
+   2. claude /login
+   3. cd {project_root} && claude
+   4. AI 会自动读取 CLAUDE.md，请确保它遵循 skills/ 流程文档
 
 {'=' * 50}
 """
@@ -625,6 +648,7 @@ def do_update():
         copy_skills(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
 
@@ -692,6 +716,7 @@ def main():
         copy_skills(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
 
