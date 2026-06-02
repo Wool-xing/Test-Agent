@@ -7,6 +7,7 @@ Does NOT modify existing code — integration is voluntary.
 from __future__ import annotations
 
 import json
+import os
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,7 +15,7 @@ from typing import Any
 
 from loguru import logger
 
-_DEFAULT_DIR = Path("workspace/测试报告/audit")
+_DEFAULT_DIR = Path(f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/audit")
 _lock = threading.Lock()
 
 

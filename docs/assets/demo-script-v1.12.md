@@ -41,7 +41,7 @@ tagent doctor --agents
 tagent demo
 
 # Step 6 · 看产物(树形)
-ls -la workspace/测试用例/ workspace/测试报告/
+ls -la workspace/测试用例/ workspace/测试报告/{项目名}/
 ```
 
 ---

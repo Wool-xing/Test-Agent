@@ -11,6 +11,7 @@ SLA（Service Level Agreement）：对外承诺，违反有惩罚
 """
 import json
 import logging
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="SLO/SLI 验证")
     parser.add_argument("--metrics", required=True, help="JSON 文件含 metrics")
     parser.add_argument("--slos", default=None, help="JSON 文件含 SLO 定义")
-    parser.add_argument("--output", default="workspace/测试报告/slo_report.json")
+    parser.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/slo_report.json")
     args = parser.parse_args()
     metrics = json.loads(Path(args.metrics).read_text(encoding="utf-8"))
     slos = json.loads(Path(args.slos).read_text(encoding="utf-8")) if args.slos else None

@@ -89,11 +89,11 @@ class MobileTest(AgentRunner):
             '  "outputs": {\n'
             '    "test_scripts_dir": "workspace/自动化脚本/python/mobile/",\n'
             '    "miniprogram_dir": "workspace/自动化脚本/python/miniprogram/",\n'
-            '    "perf_dir": "workspace/测试报告/mobile-perf/",\n'
-            '    "logcat_dir": "workspace/测试报告/logcat/",\n'
-            '    "ios_syslog_dir": "workspace/测试报告/ios-syslog/",\n'
-            '    "screenshot_dir": "workspace/测试报告/screenshots/",\n'
-            '    "monkey_dir": "workspace/测试报告/monkey/",\n'
+            '    "perf_dir": "workspace/测试报告/{项目名}/mobile-perf/",\n'
+            '    "logcat_dir": "workspace/测试报告/{项目名}/logcat/",\n'
+            '    "ios_syslog_dir": "workspace/测试报告/{项目名}/ios-syslog/",\n'
+            '    "screenshot_dir": "workspace/测试报告/{项目名}/screenshots/",\n'
+            '    "monkey_dir": "workspace/测试报告/{项目名}/monkey/",\n'
             '    "allure_dir": "workspace/Allure/mobile/{run_id}/"\n'
             "  },\n"
             '  "risks": ["string,如 设备断连 / Appium session 超时 / 云真机 API 限速"],\n'
@@ -178,9 +178,9 @@ class MobileTest(AgentRunner):
                     "estimated_min": 5,
                     "outputs": [
                         "workspace/Allure/mobile/selftest-20260516-000002/",
-                        "workspace/测试报告/mobile-perf/",
-                        "workspace/测试报告/logcat/",
-                        "workspace/测试报告/screenshots/",
+                        "workspace/测试报告/{项目名}/mobile-perf/",
+                        "workspace/测试报告/{项目名}/logcat/",
+                        "workspace/测试报告/{项目名}/screenshots/",
                     ],
                     "depends_on": ["test_execution"],
                 },
@@ -214,11 +214,11 @@ class MobileTest(AgentRunner):
             "outputs": {
                 "test_scripts_dir": "workspace/自动化脚本/python/mobile/",
                 "miniprogram_dir": "workspace/自动化脚本/python/miniprogram/",
-                "perf_dir": "workspace/测试报告/mobile-perf/",
-                "logcat_dir": "workspace/测试报告/logcat/",
-                "ios_syslog_dir": "workspace/测试报告/ios-syslog/",
-                "screenshot_dir": "workspace/测试报告/screenshots/",
-                "monkey_dir": "workspace/测试报告/monkey/",
+                "perf_dir": "workspace/测试报告/{项目名}/mobile-perf/",
+                "logcat_dir": "workspace/测试报告/{项目名}/logcat/",
+                "ios_syslog_dir": "workspace/测试报告/{项目名}/ios-syslog/",
+                "screenshot_dir": "workspace/测试报告/{项目名}/screenshots/",
+                "monkey_dir": "workspace/测试报告/{项目名}/monkey/",
                 "allure_dir": "workspace/Allure/mobile/selftest-20260516-000002/",
             },
             "risks": [

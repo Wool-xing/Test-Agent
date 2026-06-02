@@ -50,7 +50,7 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
          ↳ 阅读: https://playwright.dev
 
 [18s]  Step 7/8: report-generator
-         ↳ 生成 Allure 报告 → workspace/测试报告/
+         ↳ 生成 Allure 报告 → workspace/测试报告/{项目名}/
 
 [22s]  done: 8/8 ok · 报告 → http://localhost:5050
        

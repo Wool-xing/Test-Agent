@@ -180,17 +180,17 @@ APP_SRC_PATH
 
 ```bash
 # 本地查看
-allure serve workspace/测试报告/allure-results
+allure serve workspace/测试报告/{项目名}/allure-results
 
 # 生成静态报告
-allure generate workspace/测试报告/allure-results \
-    --output workspace/测试报告/allure-report --clean
+allure generate workspace/测试报告/{项目名}/allure-results \
+    --output workspace/测试报告/{项目名}/allure-report --clean
 ```
 
 ### 报告目录结构
 
 ```text
-workspace/测试报告/
+workspace/测试报告/{项目名}/
 ├── allure-results/                # Allure 原始数据
 ├── allure-report/                 # Allure 静态 HTML
 ├── jmeter-results/result.jtl      # JMeter 原始结果

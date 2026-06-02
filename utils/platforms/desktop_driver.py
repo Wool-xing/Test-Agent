@@ -231,8 +231,10 @@ def save_perf(samples: list, output_dir: str, prefix: str = "desktop_perf") -> s
 
 # ===== 跨平台截图 =====
 
-def screenshot(output: str = "workspace/测试报告/screenshots/desktop/screen.png"):
+def screenshot(output: str = None):
     """跨平台截图"""
+    if output is None:
+        output = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/screenshots/desktop/screen.png"
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     try:
         import pyautogui
@@ -260,10 +262,10 @@ def main():
     perf = sub.add_parser("collect-perf")
     perf.add_argument("--pid", type=int, required=True)
     perf.add_argument("--duration", type=int, default=60)
-    perf.add_argument("--output", default="workspace/测试报告/desktop-perf")
+    perf.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/desktop-perf")
 
     shot = sub.add_parser("screenshot")
-    shot.add_argument("--output", default="workspace/测试报告/screenshots/desktop/screen.png")
+    shot.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/screenshots/desktop/screen.png")
 
     args = parser.parse_args()
     if args.cmd == "collect-perf":

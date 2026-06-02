@@ -44,6 +44,11 @@ for _utils_dir in _UTILS_CANDIDATES:
                     sys.path.insert(0, str(_sub))
 
 
+# ===== 输出路径：按项目归类（委托 utils/paths.py）=====
+
+from paths import get_project_name, get_output_dir, current_run_id
+
+
 # ===== 环境配置 =====
 
 @dataclass
@@ -246,7 +251,7 @@ def pytest_runtest_makereport(item, call):
             try:
                 page = item.funcargs.get("page")
                 if page:
-                    screenshot_dir = Path("workspace/测试报告/screenshots")
+                    screenshot_dir = get_output_dir("screenshots", current_run_id())
                     screenshot_dir.mkdir(parents=True, exist_ok=True)
                     fname = f"{item.name}_{rep.when}_{datetime.now().strftime('%H%M%S')}.png"
                     page.screenshot(path=str(screenshot_dir / fname))
@@ -272,57 +277,17 @@ def pytest_configure(config):
         _DIRS_INITIALIZED = True
         return
 
+    project = get_project_name()
     workflow_dirs = [
         "workspace/测试计划",
         "workspace/需求分析",
         "workspace/测试用例",
         "workspace/测试数据",
-        "workspace/测试报告",
         "workspace/自动化脚本/python",
         "workspace/自动化脚本/jmeter",
-        "workspace/测试报告/allure-results",
-        "workspace/测试报告/screenshots",
-        "workspace/测试报告/jmeter-results",
-        "workspace/测试报告/jmeter-report",
-        "workspace/测试报告/coverage-report",
-        "workspace/测试报告/baselines",
-        "workspace/测试报告/history",
-        # 扩展平台产出目录
-        "workspace/测试报告/mobile-perf",
-        "workspace/测试报告/monkey",
-        "workspace/测试报告/logcat",
-        "workspace/测试报告/ios-syslog",
-        "workspace/测试报告/desktop-perf",
-        "workspace/测试报告/screenshots/desktop",
-        "workspace/测试报告/win-event-log",
-        "workspace/测试报告/mac-console",
-        "workspace/测试报告/visual-diff",
-        "workspace/测试报告/airtest-report",
-        "workspace/测试报告/iot-logs",
-        "workspace/测试报告/media-frames",
-        "workspace/测试报告/tracing",
-        "workspace/测试报告/mq-logs",
-        "workspace/测试报告/ai-eval",
-        "workspace/测试报告/ai-drift",
-        "workspace/测试报告/ai-fairness",
-        "workspace/测试报告/llm-cases",
-        # 非功能 8 维度产出
-        "workspace/测试报告/security",
-        "workspace/测试报告/compat",
-        "workspace/测试报告/weak-network",
-        "workspace/测试报告/soak",
-        "workspace/测试报告/chaos",
-        "workspace/测试报告/ux",
-        "workspace/测试报告/usability",
-        "workspace/测试报告/exploratory",
-        # 新增维度产出
-        "workspace/测试报告/web-vitals",
-        "workspace/测试报告/a11y",
-        "workspace/测试报告/i18n",
-        "workspace/测试报告/mutation",
-        "workspace/测试报告/dora",
-        "workspace/测试报告/blockchain",
-        "workspace/测试报告/adversarial",
+        # 项目级持久目录（跨 run 共享）
+        f"workspace/测试报告/{project}/baselines",
+        f"workspace/测试报告/{project}/history",
         "workspace/自动化脚本/python/features",
         "workspace/自动化脚本/python/i18n",
         "workspace/自动化脚本/python/pacts",

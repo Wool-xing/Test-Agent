@@ -246,11 +246,13 @@ def run_monkey(
     pct_touch: int = 40, pct_motion: int = 25, pct_nav: int = 15,
     pct_majornav: int = 10, pct_syskeys: int = 5,
     pct_appswitch: int = 2, pct_anyevent: int = 3,
-    output_dir: str = "workspace/测试报告/monkey",
+    output_dir: str = None,
     extra_args: Optional[list] = None,
     timeout: int = 3600,
 ) -> dict:
     """Execute Android Monkey stability test. Returns crash/ANR summary."""
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/monkey"
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path(output_dir) / f"monkey_{package}_{ts}.log"
@@ -288,8 +290,10 @@ def run_monkey(
 # ===== logcat 归档 =====
 
 def archive_logcat(serial: Optional[str] = None,
-                   output: str = "workspace/测试报告/logcat") -> Optional[str]:
+                   output: str = None) -> Optional[str]:
     """归档 Android logcat"""
+    if output is None:
+        output = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/logcat"
     Path(output).mkdir(parents=True, exist_ok=True)
     file = Path(output) / f"logcat_{datetime.now():%Y%m%d_%H%M%S}.log"
     cmd = ["adb"]
@@ -318,7 +322,7 @@ def main():
     perf.add_argument("--platform", choices=["android", "ios"], required=True)
     perf.add_argument("--package", required=True)
     perf.add_argument("--duration", type=int, default=60)
-    perf.add_argument("--output", default="workspace/测试报告/mobile-perf")
+    perf.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/mobile-perf")
 
     log = sub.add_parser("archive-logcat")
     log.add_argument("--serial", default=None)
@@ -329,7 +333,7 @@ def main():
     monkey.add_argument("--throttle", type=int, default=200)
     monkey.add_argument("--seed", type=int, default=None)
     monkey.add_argument("--serial", default=None)
-    monkey.add_argument("--output", default="workspace/测试报告/monkey")
+    monkey.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/monkey")
     monkey.add_argument("--timeout", type=int, default=3600)
 
     args = parser.parse_args()

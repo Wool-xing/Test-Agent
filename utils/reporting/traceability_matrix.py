@@ -31,7 +31,7 @@ class TraceabilityMatrix:
         matrix = TraceabilityMatrix()
         matrix.load_prd("workspace/需求分析/prd.md")
         matrix.load_testcases("workspace/测试用例/")
-        matrix.load_bugs("workspace/测试报告/bug_drafts.json")
+        matrix.load_bugs("workspace/测试报告/{项目名}/bug_drafts.json")
         report = matrix.build()
     """
 

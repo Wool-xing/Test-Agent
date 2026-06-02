@@ -7,7 +7,7 @@
 ## 🤝 AgentChat 协作协议（讨论 / 通信 / 反问）
 
 > 解决三个问题：(1) agent 之间何时讨论；(2) 怎么通信不撞车；(3) 何时反问用户、怎么反问。
-> **底线**：所有讨论、反问、跨 agent 协调都留可追溯纪要——`workspace/测试报告/discussions/{YYYYMMDD}_{topic}.md`，归档不可删。
+> **底线**：所有讨论、反问、跨 agent 协调都留可追溯纪要——`workspace/测试报告/{项目名}/discussions/{YYYYMMDD}_{topic}.md`，归档不可删。
 
 ### 1. 讨论触发条件（非每次都开会）
 

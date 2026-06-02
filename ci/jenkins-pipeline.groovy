@@ -85,13 +85,13 @@ pipeline {
                     set -e
                     pip install -r requirements.txt --quiet
                     playwright install chromium --with-deps
-                    mkdir -p workspace/测试报告/allure-results
-                    mkdir -p workspace/测试报告/screenshots
-                    mkdir -p workspace/测试报告/jmeter-results
-                    mkdir -p workspace/测试报告/jmeter-report
-                    mkdir -p workspace/测试报告/coverage-report
-                    mkdir -p workspace/测试报告/baselines
-                    mkdir -p workspace/测试报告/history
+                    mkdir -p workspace/测试报告/{项目名}/allure-results
+                    mkdir -p workspace/测试报告/{项目名}/screenshots
+                    mkdir -p workspace/测试报告/{项目名}/jmeter-results
+                    mkdir -p workspace/测试报告/{项目名}/jmeter-report
+                    mkdir -p workspace/测试报告/{项目名}/coverage-report
+                    mkdir -p workspace/测试报告/{项目名}/baselines
+                    mkdir -p workspace/测试报告/{项目名}/history
                     mkdir -p workspace/测试报告
                     mkdir -p workspace/测试用例
                     mkdir -p workspace/测试数据
@@ -117,7 +117,7 @@ pipeline {
                         --tb=short \
                         --alluredir="${ALLURE_DIR}" \
                         --junitxml="${WORKSPACE_DIR}/测试报告/smoke-results.xml" \
-                        -v 2>&1 | tee workspace/测试报告/smoke.log
+                        -v 2>&1 | tee workspace/测试报告/{项目名}/smoke.log
                 '''
             }
             post {
@@ -154,10 +154,10 @@ pipeline {
                                 --reruns=2 --reruns-delay=5 \
                                 --timeout=120 \
                                 --cov="${APP_SRC_PATH}" \
-                                --cov-report=xml:workspace/测试报告/coverage-api.xml \
+                                --cov-report=xml:workspace/测试报告/{项目名}/coverage-api.xml \
                                 --alluredir="${ALLURE_DIR}" \
                                 --junitxml="${WORKSPACE_DIR}/测试报告/api-results.xml" \
-                                -v 2>&1 | tee workspace/测试报告/api.log
+                                -v 2>&1 | tee workspace/测试报告/{项目名}/api.log
                         '''
                     }
                 }
@@ -170,17 +170,17 @@ pipeline {
                                 --reruns=2 --reruns-delay=5 \
                                 --timeout=180 \
                                 --cov="${APP_SRC_PATH}" \
-                                --cov-report=xml:workspace/测试报告/coverage-ui.xml \
+                                --cov-report=xml:workspace/测试报告/{项目名}/coverage-ui.xml \
                                 --alluredir="${ALLURE_DIR}" \
                                 --junitxml="${WORKSPACE_DIR}/测试报告/ui-results.xml" \
-                                -v 2>&1 | tee workspace/测试报告/ui.log
+                                -v 2>&1 | tee workspace/测试报告/{项目名}/ui.log
                         '''
                     }
                 }
             }
             post {
                 always {
-                    junit allowEmptyResults: true, testResults: 'workspace/测试报告/api-results.xml,workspace/测试报告/ui-results.xml'
+                    junit allowEmptyResults: true, testResults: 'workspace/测试报告/{项目名}/api-results.xml,workspace/测试报告/{项目名}/ui-results.xml'
                     script {
                         env.STAGE_REGRESSION_OK = (currentBuild.currentResult == 'SUCCESS') ? 'true' : 'false'
                     }
@@ -252,7 +252,7 @@ EOF
                                 -Jtarget_port="${TARGET_PORT}" \
                                 -Jthreads=${THREADS} -Jrampup=${RAMPUP} -Jduration=${DURATION} \
                                 -j "${WORKSPACE_DIR}/测试报告/jmeter-results/jmeter.log" \
-                                2>&1 | tee workspace/测试报告/jmeter.log
+                                2>&1 | tee workspace/测试报告/{项目名}/jmeter.log
                         '''
 
                         // 5) 解析 + 性能门禁（基线对比，仅 full+release+PASS 才更新）
@@ -275,7 +275,7 @@ EOF
             post {
                 always {
                     archiveArtifacts(
-                        artifacts: 'workspace/测试报告/jmeter-results/**,workspace/测试报告/jmeter-report/**,workspace/测试报告/baselines/**',
+                        artifacts: 'workspace/测试报告/{项目名}/jmeter-results/**,workspace/测试报告/{项目名}/jmeter-report/**,workspace/测试报告/{项目名}/baselines/**',
                         allowEmptyArchive: true
                     )
                 }
@@ -286,7 +286,7 @@ EOF
                             sh """
                                 curl -s -X POST "${WECHAT_WEBHOOK}" \
                                   -H 'Content-Type: application/json' \
-                                  -d '{"msgtype":"markdown","markdown":{"content":"⚠️ **性能测试未达标** | 构建#${BUILD_NUMBER} | 模式:${PERF_MODE} | [查看报告](${BUILD_URL}artifact/workspace/测试报告/jmeter-report/index.html)"}}'
+                                  -d '{"msgtype":"markdown","markdown":{"content":"⚠️ **性能测试未达标** | 构建#${BUILD_NUMBER} | 模式:${PERF_MODE} | [查看报告](${BUILD_URL}artifact/workspace/测试报告/{项目名}/jmeter-report/index.html)"}}'
                             """
                         }
                     }
@@ -306,14 +306,14 @@ EOF
                     set -e
                     pytest \
                         --cov="${APP_SRC_PATH}" \
-                        --cov-report=xml:workspace/测试报告/coverage.xml \
-                        --cov-report=html:workspace/测试报告/coverage-report \
+                        --cov-report=xml:workspace/测试报告/{项目名}/coverage.xml \
+                        --cov-report=html:workspace/测试报告/{项目名}/coverage-report \
                         --cov-fail-under=80 \
                         --timeout=300 \
                         -q
                 '''
                 publishHTML(target: [
-                    reportDir:       'workspace/测试报告/coverage-report',
+                    reportDir:       'workspace/测试报告/{项目名}/coverage-report',
                     reportFiles:     'index.html',
                     reportName:      '代码覆盖率报告',
                     keepAll:         true,
@@ -340,7 +340,7 @@ EOF
         always {
             // 多扩展名拆开（Jenkins ant pattern 不支持 brace expansion）
             archiveArtifacts(
-                artifacts: 'workspace/测试报告/**/*.xml,workspace/测试报告/**/*.log,workspace/测试报告/**/*.png,workspace/测试报告/**/*.json',
+                artifacts: 'workspace/测试报告/{项目名}/**/*.xml,workspace/测试报告/{项目名}/**/*.log,workspace/测试报告/{项目名}/**/*.png,workspace/测试报告/{项目名}/**/*.json',
                 allowEmptyArchive: true
             )
         }
@@ -372,7 +372,7 @@ EOF
         cleanup {
             sh '''
                 find workspace/测试数据 -name "*.json" -mtime +7 -delete 2>/dev/null || true
-                find workspace/测试报告/screenshots -name "*.png" -mtime +3 -delete 2>/dev/null || true
+                find workspace/测试报告/{项目名}/screenshots -name "*.png" -mtime +3 -delete 2>/dev/null || true
             '''
         }
     }
