@@ -25,7 +25,7 @@
 | `skills/` | 32 个 Skill 文件（业务 skill） + 3 个元 Skill 子目录 + README 索引 | 可复用测试技能 | 开发人员 |
 | `config/` | conftest.py / pytest.ini / .env.example / .mcp.json / requirements.txt | 配置文件集合 | 开发人员 |
 | `config/` | mcp-server-impl.md | MCP server 自实现教程（zentao/wechat/feishu/dingtalk 骨架） | 高级开发 |
-| `utils/` | utils（78 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
+| `utils/` | utils（79 个 .py + init）+ README 索引（多分类） | 完整可运行 Python 工具集 | 开发人员 |
 | `ci/` | github-actions-test.yml / jenkins-pipeline.groovy / 集成说明.md | CI/CD 流水线（含 JMeter 性能阶段） | DevOps |
 
 ---
@@ -107,7 +107,7 @@
 | 反目标函数引擎 | 对自身策略对抗性拆解 | 工程/元层 | `utils/mutation_runner.py` + suite_minimizer | ✅ |
 | 拓扑流形观测器 | 学习系统"气氛"，捕捉弱信号 | 抽象元层 | tracing_validator + web_vitals_collector | ✅ |
 | 熵减祭司 | 监测测试热寂、焚毁僵尸用例 | 抽象元层 | `utils/suite_minimizer.py` | ✅ |
-| 决策回放器 | 任一判断可复现、可反驳 | 工程层 | `workspace/测试报告/decisions/` + tracing | ✅ |
+| 决策回放器 | 任一判断可复现、可反驳 | 工程层 | `workspace/测试报告/{项目名}/decisions/` + tracing | ✅ |
 | 数字考古学家 | 追溯遗留系统初始假设 | 文明层 | Phase 4 知识图谱冷启动 | ❌ |
 | 缓慢暴力监测器 | 跨发布周期跟踪代际效应 | 文明层 | 需多年数据积累，Phase 4 | ❌ |
 | 缺席者画像生成器 | 强制注入边缘用户场景 | 文明/权力层 | absentee_scenario_injector.py (9组场景) | ✅ |
@@ -195,8 +195,8 @@
 
 - **指数退避重试**：`utils/api_retry_util.call_with_retry`（10s → 20s → 40s）
 - **pytest-xdist** 并行执行（默认 4 进程，可调）
-- **Flaky 检测与隔离**：`utils/flaky_detector` + `workspace/执行日志/history/` 归档
-- **性能基线管理**：`workspace/执行日志/baselines/perf_baseline.json`，仅 release+full+PASS 自动更新
+- **Flaky 检测与隔离**：`utils/flaky_detector` + `workspace/测试报告/{项目名}/history/` 归档
+- **性能基线管理**：`workspace/测试报告/{项目名}/baselines/perf_baseline.json`，仅 release+full+PASS 自动更新
 - **CI/CD 就绪**：GitHub Actions + Jenkins，性能阶段双模式分层
 - **MCP 收口**：当前仅启用 filesystem；通知/Bug 走 SDK 直连
 

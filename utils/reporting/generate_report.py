@@ -13,6 +13,9 @@ from typing import Dict, List, Optional
 
 import requests
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from paths import get_output_dir, current_run_id
+
 logger = logging.getLogger(__name__)
 
 
@@ -429,7 +432,7 @@ def main():
     with open(args.data, encoding="utf-8") as f:
         data = json.load(f)
 
-    output = args.output or f"workspace/测试报告/测试报告_{datetime.now().strftime('%Y%m%d')}.docx"
+    output = args.output or str(get_output_dir("reports", current_run_id()) / f"测试报告_{datetime.now().strftime('%Y%m%d')}.docx")
     generate_test_report(data, output)
 
     if args.notify:

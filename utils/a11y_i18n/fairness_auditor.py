@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -537,7 +538,9 @@ def audit_decision_fairness(
 # Report export
 # ═══════════════════════════════════════════════════════════════
 
-def export_bias_report(report: BiasReport, output_dir: str = "workspace/执行日志/ai-fairness") -> str:
+def export_bias_report(report: BiasReport, output_dir: str = None) -> str:
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/ai-fairness"
     """Export a BiasReport as JSON to the fairness workspace directory."""
     from datetime import datetime
 

@@ -84,10 +84,10 @@ class SystemTest(AgentRunner):
             '    "mq": {"utils": ["mq_helper"], "optional": false}\n'
             "  },\n"
             '  "outputs": {\n'
-            '    "iot_dir": "workspace/执行日志/iot-logs/",\n'
-            '    "media_dir": "workspace/执行日志/media-logs/",\n'
-            '    "trace_dir": "workspace/执行日志/trace-logs/",\n'
-            '    "mq_dir": "workspace/执行日志/mq-logs/",\n'
+            '    "iot_dir": "workspace/测试报告/{项目名}/iot-logs/",\n'
+            '    "media_dir": "workspace/测试报告/{项目名}/media-logs/",\n'
+            '    "trace_dir": "workspace/测试报告/{项目名}/trace-logs/",\n'
+            '    "mq_dir": "workspace/测试报告/{项目名}/mq-logs/",\n'
             '    "allure_dir": "workspace/Allure/system/{run_id}/"\n'
             "  },\n"
             '  "risks": ["string,如 SSH 超时 / 串口断连 / MQTT broker 离线 / Kafka offset 丢失"],\n'
@@ -172,10 +172,10 @@ class SystemTest(AgentRunner):
                     "estimated_min": 5,
                     "outputs": [
                         "workspace/Allure/system/selftest-20260516-000004/",
-                        "workspace/执行日志/iot-logs/",
-                        "workspace/执行日志/media-logs/",
-                        "workspace/执行日志/trace-logs/",
-                        "workspace/执行日志/mq-logs/",
+                        "workspace/测试报告/{项目名}/iot-logs/",
+                        "workspace/测试报告/{项目名}/media-logs/",
+                        "workspace/测试报告/{项目名}/trace-logs/",
+                        "workspace/测试报告/{项目名}/mq-logs/",
                     ],
                     "depends_on": ["iot_test", "media_validation", "tracing_validation", "mq_validation"],
                 },
@@ -199,10 +199,10 @@ class SystemTest(AgentRunner):
                 "mq": {"utils": ["mq_helper"], "optional": False},
             },
             "outputs": {
-                "iot_dir": "workspace/执行日志/iot-logs/",
-                "media_dir": "workspace/执行日志/media-logs/",
-                "trace_dir": "workspace/执行日志/trace-logs/",
-                "mq_dir": "workspace/执行日志/mq-logs/",
+                "iot_dir": "workspace/测试报告/{项目名}/iot-logs/",
+                "media_dir": "workspace/测试报告/{项目名}/media-logs/",
+                "trace_dir": "workspace/测试报告/{项目名}/trace-logs/",
+                "mq_dir": "workspace/测试报告/{项目名}/mq-logs/",
                 "allure_dir": "workspace/Allure/system/selftest-20260516-000004/",
             },
             "risks": [
@@ -218,7 +218,7 @@ class SystemTest(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "system_test_plan.json"
+        return ctx.workspace / "测试报告" / "system_test_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         phases = len(output.get("phases", []))

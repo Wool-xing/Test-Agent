@@ -111,7 +111,7 @@ class MobileTester(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "mobile_test_plan.json"
+        return ctx.workspace / "测试报告" / "mobile_test_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         cases = len(output.get("test_cases", []))

@@ -67,7 +67,7 @@ repos:
       # 文件统计校验（防误删 agent/skill/utils）
       - id: file-count-check
         name: Agents/Skills/Utils 数量校验
-        entry: bash -c 'A=$(ls agents/[0-9]*.md 2>/dev/null | wc -l); S=$(ls skills/*.md 2>/dev/null | grep -v README | wc -l); U=$(find utils -name "*.py" ! -name "__init__.py" 2>/dev/null | wc -l); [ "$A" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $A)"; exit 1; }; [ "$S" -eq "32" ] || { echo "❌ Skills count mismatch (expected 32, got $S)"; exit 1; }; [ "$U" -eq "78" ] || { echo "❌ Utils count mismatch (expected 78, got $U)"; exit 1; }; echo "✅ File counts correct"'
+        entry: bash -c 'A=$(ls agents/[0-9]*.md 2>/dev/null | wc -l); S=$(ls skills/*.md 2>/dev/null | grep -v README | wc -l); U=$(find utils -name "*.py" ! -name "__init__.py" 2>/dev/null | wc -l); [ "$A" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $A)"; exit 1; }; [ "$S" -eq "32" ] || { echo "❌ Skills count mismatch (expected 32, got $S)"; exit 1; }; [ "$U" -eq "79" ] || { echo "❌ Utils count mismatch (expected 79, got $U)"; exit 1; }; echo "✅ File counts correct"'
         language: system
         pass_filenames: false
         always_run: true

@@ -145,7 +145,7 @@ output:
 ### Step 4：环境健康（env-manager）
 
 ```text
-output: workspace/执行日志/环境检查_{时间戳}.json
+output: workspace/测试报告/{项目名}/环境检查_{时间戳}.json
 失败 → 重试 10/20/40s → 仍失败则阻止后续步骤
 ```
 
@@ -180,10 +180,10 @@ output:
 pytest -m "p0 or p1" \
     -n 4 --reruns=2 --reruns-delay=5 --timeout=120 \
     --cov="${APP_SRC_PATH:-./src}" \
-    --cov-report=xml:workspace/执行日志/coverage.xml \
+    --cov-report=xml:workspace/测试报告/{项目名}/coverage.xml \
     --cov-fail-under=80 \
-    --alluredir=workspace/测试报告/allure-results \
-    --junitxml=workspace/执行日志/regression-results.xml
+    --alluredir=workspace/测试报告/{项目名}/allure-results \
+    --junitxml=workspace/测试报告/{项目名}/regression-results.xml
 ```
 
 阻塞条件：通过率 < 90% 时停止，不执行性能测试。
@@ -203,8 +203,8 @@ fi
 # TARGET_HOST/PROTOCOL/PORT 由 conftest 或 .env 解析（不含协议前缀）
 jmeter -n \
     -t workspace/自动化脚本/jmeter/test_plan.jmx \
-    -l workspace/执行日志/jmeter-results/result.jtl \
-    -e -o workspace/执行日志/jmeter-report/ \
+    -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
+    -e -o workspace/测试报告/{项目名}/jmeter-report/ \
     -Jtarget_host="${TARGET_HOST}" \
     -Jtarget_protocol="${TARGET_PROTOCOL:-http}" \
     -Jtarget_port="${TARGET_PORT:-80}" \
@@ -212,9 +212,9 @@ jmeter -n \
 
 # 解析 + 门禁
 python -m utils.jmeter_result_parser \
-    workspace/执行日志/jmeter-results/result.jtl \
+    workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode "${PERF_MODE}" \
-    --baseline workspace/执行日志/baselines/perf_baseline.json
+    --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json
 ```
 
 ### Step 9：Bug 管理（bug-manager）
@@ -237,7 +237,7 @@ output:
   - Word 测试报告（含性能基准对比）
   - Excel 数据报告
   - 多端通知:企业微信/飞书/钉钉/Slack/邮件/Teams（自动跳过未配置）
-保存：workspace/测试报告/
+保存：workspace/测试报告/{项目名}/
 ```
 
 ### Step 11：最终决策（test-lead）
@@ -301,7 +301,7 @@ workspace/
 │   ├── python/
 │   └── jmeter/
 │       └── test_plan.jmx
-└── 执行日志/
+└── 测试报告/
     ├── allure-results/
     ├── allure-report/
     ├── coverage.xml

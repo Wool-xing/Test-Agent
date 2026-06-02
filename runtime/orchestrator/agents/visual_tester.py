@@ -114,7 +114,7 @@ class VisualTester(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "visual_test_plan.json"
+        return ctx.workspace / "测试报告" / "visual_test_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         points = len(output.get("visual_test_points", []))

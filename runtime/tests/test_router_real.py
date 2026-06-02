@@ -65,7 +65,7 @@ SAMPLES: list[tuple[str, str]] = [
 def _decisions_log(record: dict) -> Path:
     """Charter §18-12 决策可追溯: log each routing decision."""
     s = get_settings()
-    d = s.resolve(s.workspace_dir) / "执行日志" / "decisions"
+    d = s.resolve(s.workspace_dir) / "测试报告" / "decisions"
     d.mkdir(parents=True, exist_ok=True)
     ts = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     target = d / f"{ts}_router_real_test_{record.get('sample_id', 'x')}.json"

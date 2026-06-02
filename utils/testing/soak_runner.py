@@ -11,6 +11,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from paths import get_output_dir, current_run_id
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +22,7 @@ def soak_test(scenario: Callable[[], None],
               duration_hours: float = 24,
               interval_sec: int = 10,
               metric_proc_pid: Optional[int] = None,
-              output_dir: str = "workspace/执行日志/soak") -> Dict:
+              output_dir: str = None) -> Dict:
     """
     长时稳定性测试。
     scenario: 单次业务调用函数（无返回，无参数）
@@ -26,6 +30,8 @@ def soak_test(scenario: Callable[[], None],
     interval_sec: 两次调用间隔
     metric_proc_pid: 监控指定进程 PID（采集 CPU/内存）
     """
+    if output_dir is None:
+        output_dir = str(get_output_dir("soak", current_run_id()))
     import psutil
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)

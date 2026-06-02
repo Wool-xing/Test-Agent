@@ -21,6 +21,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from paths import get_output_dir, current_run_id
+
 logger = logging.getLogger(__name__)
 
 # ── Compliance standards reference ──
@@ -174,7 +178,7 @@ def collect_tracing_validation(trace_results: list[dict[str, Any]]) -> dict[str,
 def collect_baselines(baseline_path: Path | None = None) -> dict[str, Any]:
     """Collect performance baseline data."""
     if baseline_path is None:
-        baseline_path = Path("workspace/执行日志/baselines/perf_baseline.json")
+        baseline_path = get_output_dir("baselines") / "perf_baseline.json"
     if not baseline_path.exists():
         return {"available": False, "path": str(baseline_path)}
     try:
@@ -187,7 +191,7 @@ def collect_baselines(baseline_path: Path | None = None) -> dict[str, Any]:
 def collect_test_history(history_dir: Path | None = None) -> list[dict[str, Any]]:
     """Collect recent test execution history metadata."""
     if history_dir is None:
-        history_dir = Path("workspace/执行日志/history/")
+        history_dir = get_output_dir("history")
     items: list[dict[str, Any]] = []
     if not history_dir.exists():
         return items
@@ -244,7 +248,7 @@ def build_evidence_chain(
     )
 
     # 1. Decision logs
-    dec_dir = decisions_dir or Path("workspace/测试报告/decisions/")
+    dec_dir = decisions_dir or get_output_dir("decisions")
     decisions = collect_decisions(dec_dir)
     if decisions:
         chain.add(EvidenceItem(
@@ -363,7 +367,7 @@ def export_package(package: EvidencePackage,
     """Export evidence package as JSON file."""
     if output_path is None:
         output_path = Path(
-            f"workspace/执行日志/evidence/{package.package_id}.json")
+            str(get_output_dir("evidence", current_run_id()) / f"{package.package_id}.json"))
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     serialized: dict[str, Any] = {
@@ -407,7 +411,7 @@ def export_chain_of_custody_report(
     """Export human-readable chain of custody report as Markdown."""
     if output_path is None:
         output_path = Path(
-            f"workspace/执行日志/evidence/{package.package_id}_custody.md")
+            str(get_output_dir("evidence", current_run_id()) / f"{package.package_id}_custody.md"))
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     lines = [
@@ -477,9 +481,13 @@ def ci_summary(package: EvidencePackage) -> dict[str, Any]:
 def quick_package(workspace_dir: Path | None = None) -> EvidencePackage:
     """Build evidence package from default workspace paths."""
     if workspace_dir is None:
-        workspace_dir = Path("workspace")
+        return build_evidence_chain(
+            decisions_dir=get_output_dir("decisions"),
+            baseline_path=get_output_dir("baselines") / "perf_baseline.json",
+            history_dir=get_output_dir("history"),
+        )
     return build_evidence_chain(
         decisions_dir=workspace_dir / "测试报告/decisions/",
-        baseline_path=workspace_dir / "执行日志/baselines/perf_baseline.json",
-        history_dir=workspace_dir / "执行日志/history/",
+        baseline_path=workspace_dir / "测试报告/baselines/perf_baseline.json",
+        history_dir=workspace_dir / "测试报告/history/",
     )

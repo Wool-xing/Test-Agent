@@ -55,7 +55,7 @@ class RequirementsAnalyst(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "requirements_summary.json"
+        return ctx.workspace / "测试报告" / "requirements_summary.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         feats = output.get("features", [])

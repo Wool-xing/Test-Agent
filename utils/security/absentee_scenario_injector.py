@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -379,7 +380,7 @@ def generate_charter(scenario: Scenario, module: str = "", duration_min: int = 3
 def generate_batch_charters(
     groups: list[str] | None = None,
     severity: str = "P0",
-    output_dir: str = "workspace/测试用例/charters/absentee",
+    output_dir: str = "workspace/测试用例/absentee",
     module: str = "",
 ) -> list[str]:
     """Generate SBTM charters for all matching scenarios and write to files."""
@@ -437,9 +438,11 @@ def coverage_report(injected_scenarios: list[dict] | None = None) -> dict:
 
 def export_injection_plan(
     scenarios: list[dict],
-    output_dir: str = "workspace/执行日志/absentee-scenarios",
+    output_dir: str = None,
 ) -> str:
     """Export the absentee scenario injection plan as JSON."""
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/absentee-scenarios"
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = Path(output_dir) / f"absentee_plan_{ts}.json"
