@@ -59,7 +59,9 @@ def extract_frame(video: str, timestamp_sec: float, output: str) -> str:
 
 def compare_frames(video_a: str, video_b: str, timestamps: List[float],
                    ssim_threshold: float = 0.95,
-                   tmp_dir: str = "workspace/测试报告/media-frames") -> List[Dict]:
+                   tmp_dir: str = None) -> List[Dict]:
+    if tmp_dir is None:
+        tmp_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/media-frames"
     """
     在指定时间点抽帧对比两个视频，返回差异帧列表。
     """

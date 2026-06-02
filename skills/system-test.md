@@ -89,7 +89,7 @@ pytest -m "system and p0" -v
 ## 输出文件
 
 ```text
-workspace/测试报告/
+workspace/测试报告/{项目名}/
 ├── iot-logs/
 ├── media-frames/
 ├── tracing/

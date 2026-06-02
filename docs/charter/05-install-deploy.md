@@ -83,7 +83,7 @@ $ bash install.sh --add visual,ai
 
    > 示例："`/visual-test` 需要 visual 层（airtest + opencv-python + pytesseract，约 80MB / 2-5 分钟）。现在补装？(Y/n)"
 3. **触发补装**：用户同意 → 调 `install.sh --add visual` → 增量补装
-4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/测试报告/discussions/{date}_dependency-asks.md`
+4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/测试报告/{项目名}/discussions/{date}_dependency-asks.md`
 5. **拒绝处置**：用户拒绝 → agent / skill 降级（如可降级，例如 `/visual-test` 退化为纯 pytest）或拒绝执行并落 `decisions/`，**不静默继续假装能跑**
 
 **为什么不静默自动装**：跨平台环境差异大（特别是 system 层涉及系统级工具 Java / Node / FFmpeg），强行装可能污染用户环境。符合「Agent 能力越强谦卑义务越重」公理。

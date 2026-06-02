@@ -68,15 +68,15 @@ pytest -m "visual and ocr" -v
 
 ```bash
 python -m utils.visual_helper diff \
-    --current workspace/测试报告/screenshots/login_current.png \
+    --current workspace/测试报告/{项目名}/screenshots/login_current.png \
     --baseline workspace/自动化脚本/python/visual/baselines/login_baseline.png \
-    --output workspace/测试报告/screenshots/visual-diff/login_diff.png
+    --output workspace/测试报告/{项目名}/screenshots/visual-diff/login_diff.png
 ```
 
 ### Step 5：基线更新（如确认 UI 变更合理）
 
 ```bash
-cp workspace/测试报告/screenshots/login_current.png \
+cp workspace/测试报告/{项目名}/screenshots/login_current.png \
    workspace/自动化脚本/python/visual/baselines/login_baseline.png
 git add workspace/自动化脚本/python/visual/baselines/
 git commit -m "chore: update visual baseline for login"

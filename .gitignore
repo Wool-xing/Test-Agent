@@ -17,13 +17,13 @@ htmlcov/
 
 # workspace 测试产出（敏感 + 体积大）
 workspace/测试数据/
-workspace/测试报告/
+workspace/测试报告/*/
 workspace/_outputs/
 workspace/feedback/
 workspace/自动化脚本/
 
-# 但保留 workspace/测试报告/baselines/（性能基线需提交）
-!workspace/测试报告/baselines/
+# 但保留各项目 baselines/（性能基线需提交）
+!workspace/测试报告/*/baselines/
 
 # ===== 敏感配置 =====
 .env

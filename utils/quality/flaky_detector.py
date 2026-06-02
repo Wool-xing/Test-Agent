@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 """
 Flaky 测试检测器
-依赖：pytest 启用 --junitxml 输出到 workspace/测试报告/history/
+依赖：pytest 启用 --junitxml 输出到 workspace/测试报告/{PROJECT_NAME}/history/
 被引用方：regression-test skill
 """
 import json
@@ -9,6 +9,10 @@ import logging
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, List
+
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from paths import get_output_dir, current_run_id
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +22,11 @@ class FlakyTestDetector:
 
     def __init__(
         self,
-        history_dir: str = "workspace/测试报告/history",
+        history_dir: str = None,
         history_limit: int = 5,
         quarantine_threshold: float = 0.3,
     ):
-        self.history_dir = Path(history_dir)
+        self.history_dir = Path(history_dir) if history_dir else get_output_dir("history")
         self.history_limit = history_limit
         self.quarantine_threshold = quarantine_threshold
 
@@ -113,8 +117,10 @@ class FlakyTestDetector:
             })
         return sorted(trends, key=lambda x: x["confidence"], reverse=True)
 
-    def generate_quarantine(self, flaky_list: List[Dict], output_path: str = "workspace/测试报告/quarantine.txt") -> Path:
+    def generate_quarantine(self, flaky_list: List[Dict], output_path: str = None) -> Path:
         """生成隔离清单 — 每行一个 test_id，供 pytest --deselect 或 CI skip。"""
+        if output_path is None:
+            output_path = str(get_output_dir("quarantine", current_run_id()) / "quarantine.txt")
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
         lines = [f"# Flaky quarantine — {len(flaky_list)} tests — {__import__('datetime').datetime.now():%Y-%m-%d %H:%M}"]
@@ -125,8 +131,10 @@ class FlakyTestDetector:
         logger.info(f"quarantine list written: {out} ({len(flaky_list)} tests)")
         return out
 
-    def generate_pytest_markers(self, flaky_list: List[Dict], output_path: str = "workspace/测试报告/flaky_markers.ini") -> Path:
+    def generate_pytest_markers(self, flaky_list: List[Dict], output_path: str = None) -> Path:
         """生成 pytest marker 配置 — 标记 flaky 用例为 @pytest.mark.flaky。"""
+        if output_path is None:
+            output_path = str(get_output_dir("quarantine", current_run_id()) / "flaky_markers.ini")
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
         lines = ["[pytest]", "markers ="]
@@ -147,11 +155,11 @@ class FlakyTestDetector:
         return out
 
 
-def archive_junit(src: str, dest_dir: str = "workspace/测试报告/history"):
+def archive_junit(src: str, dest_dir: str = None):
     """把本次 junit-xml 归档到 history 目录（按时间命名）"""
     from datetime import datetime
     src_p = Path(src)
-    dest_p = Path(dest_dir)
+    dest_p = Path(dest_dir) if dest_dir else get_output_dir("history")
     dest_p.mkdir(parents=True, exist_ok=True)
     name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{src_p.name}"
     target = dest_p / name
@@ -164,7 +172,7 @@ if __name__ == "__main__":
     import argparse
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description="Flaky 检测 + 趋势分析 + 隔离")
-    parser.add_argument("--history", default="workspace/测试报告/history")
+    parser.add_argument("--history", default=None)
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--archive", help="本次 junit-xml 路径（归档后再检测）")
     parser.add_argument("--trends", action="store_true", help="输出趋势分析")

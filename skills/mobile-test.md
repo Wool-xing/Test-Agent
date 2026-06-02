@@ -95,7 +95,7 @@ python -m utils.mobile_driver collect-perf \
     --platform android \
     --package com.example.app \
     --duration 60 \
-    --output workspace/测试报告/mobile-perf/
+    --output workspace/测试报告/{项目名}/mobile-perf/
 ```
 
 ### Step 5b：Android Monkey 稳定性（可选，长时压测）
@@ -118,9 +118,9 @@ pytest -m "mobile and android and stability" -v
 ```
 
 monkey 自动产出：
-- `workspace/测试报告/monkey/monkey_<package>_<时间>.log`（事件序列）
-- `workspace/测试报告/monkey/monkey_<package>_<时间>.json`（摘要：crash/anr/duration）
-- `workspace/测试报告/logcat/logcat_<时间>.log`（同步归档）
+- `workspace/测试报告/{项目名}/monkey/monkey_<package>_<时间>.log`（事件序列）
+- `workspace/测试报告/{项目名}/monkey/monkey_<package>_<时间>.json`（摘要：crash/anr/duration）
+- `workspace/测试报告/{项目名}/logcat/logcat_<时间>.log`（同步归档）
 
 ### Step 6：报告与归档
 

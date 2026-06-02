@@ -300,7 +300,7 @@ claude /mcp                       # 打开 MCP 面板
 ```python
 import logging
 logging.basicConfig(
-    filename="workspace/测试报告/mcp-zentao.log",
+    filename="workspace/测试报告/{项目名}/mcp-zentao.log",
     level=logging.DEBUG,
 )
 ```

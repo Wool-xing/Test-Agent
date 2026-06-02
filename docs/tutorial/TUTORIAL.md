@@ -74,8 +74,8 @@ Step 3/4 · tagent selftest --e2e (16 agent DAG · stub LLM · 0 cost)
   ✓ DAG executed: 9/9 ok (100%)
 Step 4/4 · Artifacts
   · workspace/测试用例/testcases_sample.xlsx
-  · workspace/测试报告/测试报告_*.docx
-  · workspace/测试报告/bug_drafts.json
+  · workspace/测试报告/{项目名}/测试报告_*.docx
+  · workspace/测试报告/{项目名}/bug_drafts.json
 
 ✓ demo done
 ```
@@ -111,5 +111,5 @@ tagent serve
 
 1. 加 `--debug` flag 看详细日志
 2. 跑 `tagent doctor` 检查环境
-3. 看 `workspace/测试报告/` 下的 JSON/XML 产物
+3. 看 `workspace/测试报告/{项目名}/` 下的 JSON/XML 产物
 4. GitHub Issues: https://github.com/Wool-xing/Test-Agent/issues
