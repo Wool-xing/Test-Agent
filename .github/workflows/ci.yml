@@ -293,7 +293,7 @@ jobs:
           echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
           [ "$AGENTS" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $AGENTS)"; exit 1; }
           [ "$SKILLS" -eq "32" ] || { echo "❌ Skills count mismatch (expected 32, got $SKILLS)"; exit 1; }
-          [ "$UTILS" -eq "78" ] || { echo "❌ Utils count mismatch (expected 78, got $UTILS)"; exit 1; }
+          [ "$UTILS" -eq "79" ] || { echo "❌ Utils count mismatch (expected 79, got $UTILS)"; exit 1; }
           echo "✅ File counts correct"
 
       - name: 验证 .gitignore 排除源 MD
