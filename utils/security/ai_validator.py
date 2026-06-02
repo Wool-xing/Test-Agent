@@ -124,7 +124,7 @@ def fairness_metrics(dataset: str, sensitive_attr: str, endpoint: str) -> Dict:
 
 
 def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
-                   output_dir: str = "workspace/执行日志/ai-fairness") -> Dict:
+                   output_dir: str = "workspace/测试报告/ai-fairness") -> Dict:
     """Run full fairness audit via fairness_auditor and return summary dict."""
     import pandas as pd
 
@@ -164,7 +164,7 @@ def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
 
 
 def run_silent_failure_audit(
-    output_dir: str = "workspace/执行日志/ai-silent-failure",
+    output_dir: str = "workspace/测试报告/ai-silent-failure",
     trace_durations_ms: Optional[List[float]] = None,
     web_vitals_data: Optional[Dict] = None,
     prometheus_counter_data: Optional[Dict] = None,
@@ -267,7 +267,7 @@ def run_silent_failure_audit(
 
 def run_evidence_chain_audit(
     decisions_dir: Optional[str] = None,
-    output_dir: str = "workspace/执行日志/evidence",
+    output_dir: str = "workspace/测试报告/evidence",
 ) -> Dict:
     """Build evidence chain package from workspace and export JSON + custody report."""
     from utils.reporting.evidence_chain import (
@@ -344,7 +344,7 @@ def llm_eval(endpoint: str, prompt: str, expected_format: Optional[str] = None,
 
 # ===== 报告 =====
 
-def save_eval_report(metrics: Dict, output_dir: str = "workspace/执行日志/ai-eval",
+def save_eval_report(metrics: Dict, output_dir: str = "workspace/测试报告/ai-eval",
                      prefix: str = "eval") -> str:
     from datetime import datetime
     Path(output_dir).mkdir(parents=True, exist_ok=True)

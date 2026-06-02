@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 """
 Flaky 测试检测器
-依赖：pytest 启用 --junitxml 输出到 workspace/执行日志/history/
+依赖：pytest 启用 --junitxml 输出到 workspace/测试报告/history/
 被引用方：regression-test skill
 """
 import json
@@ -18,7 +18,7 @@ class FlakyTestDetector:
 
     def __init__(
         self,
-        history_dir: str = "workspace/执行日志/history",
+        history_dir: str = "workspace/测试报告/history",
         history_limit: int = 5,
         quarantine_threshold: float = 0.3,
     ):
@@ -113,7 +113,7 @@ class FlakyTestDetector:
             })
         return sorted(trends, key=lambda x: x["confidence"], reverse=True)
 
-    def generate_quarantine(self, flaky_list: List[Dict], output_path: str = "workspace/执行日志/quarantine.txt") -> Path:
+    def generate_quarantine(self, flaky_list: List[Dict], output_path: str = "workspace/测试报告/quarantine.txt") -> Path:
         """生成隔离清单 — 每行一个 test_id，供 pytest --deselect 或 CI skip。"""
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -125,7 +125,7 @@ class FlakyTestDetector:
         logger.info(f"quarantine list written: {out} ({len(flaky_list)} tests)")
         return out
 
-    def generate_pytest_markers(self, flaky_list: List[Dict], output_path: str = "workspace/执行日志/flaky_markers.ini") -> Path:
+    def generate_pytest_markers(self, flaky_list: List[Dict], output_path: str = "workspace/测试报告/flaky_markers.ini") -> Path:
         """生成 pytest marker 配置 — 标记 flaky 用例为 @pytest.mark.flaky。"""
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -147,7 +147,7 @@ class FlakyTestDetector:
         return out
 
 
-def archive_junit(src: str, dest_dir: str = "workspace/执行日志/history"):
+def archive_junit(src: str, dest_dir: str = "workspace/测试报告/history"):
     """把本次 junit-xml 归档到 history 目录（按时间命名）"""
     from datetime import datetime
     src_p = Path(src)
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     import argparse
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description="Flaky 检测 + 趋势分析 + 隔离")
-    parser.add_argument("--history", default="workspace/执行日志/history")
+    parser.add_argument("--history", default="workspace/测试报告/history")
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--archive", help="本次 junit-xml 路径（归档后再检测）")
     parser.add_argument("--trends", action="store_true", help="输出趋势分析")

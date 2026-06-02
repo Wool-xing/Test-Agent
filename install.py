@@ -292,7 +292,7 @@ def create_dirs(project_root):
         os.path.join("workspace", "测试报告", "coverage-report"),
         os.path.join("workspace", "测试报告", "baselines"),
         os.path.join("workspace", "测试报告", "history"),
-        os.path.join("workspace", "截图"),
+        os.path.join("workspace", "测试报告", "screenshots"),
         os.path.join("workspace", "自动化脚本", "python", "pages"),
         os.path.join("workspace", "自动化脚本", "python", "api"),
         os.path.join("workspace", "自动化脚本", "python", "tests"),

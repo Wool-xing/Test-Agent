@@ -15,7 +15,7 @@ from loguru import logger
 def scan_runs(workspace_dir: Path) -> list[dict[str, Any]]:
     """Scan workspace for completed run summaries (JSON files with 'total' key)."""
     all_runs: list[dict[str, Any]] = []
-    for scan_dir in [workspace_dir / "_demo", workspace_dir / "执行日志"]:
+    for scan_dir in [workspace_dir / "_demo", workspace_dir / "测试报告"]:
         if not scan_dir.exists():
             continue
         for f in scan_dir.rglob("*.json"):

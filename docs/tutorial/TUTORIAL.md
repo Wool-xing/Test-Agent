@@ -111,5 +111,5 @@ tagent serve
 
 1. 加 `--debug` flag 看详细日志
 2. 跑 `tagent doctor` 检查环境
-3. 看 `workspace/执行日志/` 下的 JSON/XML 产物
+3. 看 `workspace/测试报告/` 下的 JSON/XML 产物
 4. GitHub Issues: https://github.com/Wool-xing/Test-Agent/issues

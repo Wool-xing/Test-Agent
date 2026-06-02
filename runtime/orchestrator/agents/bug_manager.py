@@ -103,7 +103,7 @@ class BugManager(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "bug_drafts.json"
+        return ctx.workspace / "测试报告" / "bug_drafts.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         s = output.get("summary", {})

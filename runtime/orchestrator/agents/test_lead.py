@@ -127,7 +127,7 @@ class TestLead(AgentRunner):
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
         import uuid
-        return ctx.workspace / "执行日志" / "decisions" / f"final_verdict_{uuid.uuid4().hex[:12]}.json"
+        return ctx.workspace / "测试报告" / "decisions" / f"final_verdict_{uuid.uuid4().hex[:12]}.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         return f"决策:{output.get('verdict', '?').upper()} · {output.get('summary_zh', '')[:60]}"

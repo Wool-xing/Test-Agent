@@ -66,7 +66,7 @@ class EvalHarness(AgentRunner):
             '    "seed_fixed": 42\n'
             "  },\n"
             '  "phases": [\n'
-            '    {"phase": 1, "name": "eval_config", "estimated_min": 5, "config": {"capture_mode": "opt-in", "output_dir": "workspace/执行日志/eval/", "seed": 42, "k_samples": 10}, "depends_on": []},\n'
+            '    {"phase": 1, "name": "eval_config", "estimated_min": 5, "config": {"capture_mode": "opt-in", "output_dir": "workspace/测试报告/eval/", "seed": 42, "k_samples": 10}, "depends_on": []},\n'
             '    {"phase": 2, "name": "pass_at_k", "estimated_min": 20, "cases": [{"test_id": "string", "prompt": "string", "expected": "string", "k": 10, "threshold": 0.7}], "depends_on": ["eval_config"]},\n'
             '    {"phase": 3, "name": "stability_check", "estimated_min": 15, "cases": [{"test_id": "string", "prompt": "string", "runs": 5, "metric": "top1_consistency|jaccard_k|semantic_equiv"}], "depends_on": ["eval_config"]},\n'
             '    {"phase": 4, "name": "latency_check", "estimated_min": 10, "cases": [{"test_id": "string", "endpoint": "string", "runs": 100, "metrics": ["p50_ms", "p95_ms", "p99_ms"]}], "depends_on": ["eval_config"]},\n'
@@ -81,10 +81,10 @@ class EvalHarness(AgentRunner):
             '    "pii_leak": 0\n'
             "  },\n"
             '  "outputs": {\n'
-            '    "eval_dir": "workspace/执行日志/eval/",\n'
-            '    "capture_dir": "workspace/执行日志/eval/captures/",\n'
-            '    "replay_dir": "workspace/执行日志/eval/replays/",\n'
-            '    "report_dir": "workspace/执行日志/eval/reports/",\n'
+            '    "eval_dir": "workspace/测试报告/eval/",\n'
+            '    "capture_dir": "workspace/测试报告/eval/captures/",\n'
+            '    "replay_dir": "workspace/测试报告/eval/replays/",\n'
+            '    "report_dir": "workspace/测试报告/eval/reports/",\n'
             '    "allure_dir": "workspace/Allure/eval/{run_id}/"\n'
             "  },\n"
             '  "risks": ["string,如 黄金集过小致 overfit / prompt 顺序敏感 / 非确定性模型 top-1 随机"],\n'
@@ -112,7 +112,7 @@ class EvalHarness(AgentRunner):
                     "estimated_min": 5,
                     "config": {
                         "capture_mode": "opt-in",
-                        "output_dir": "workspace/执行日志/eval/",
+                        "output_dir": "workspace/测试报告/eval/",
                         "seed": 42,
                         "k_samples": 10,
                     },
@@ -156,8 +156,8 @@ class EvalHarness(AgentRunner):
                     "estimated_min": 5,
                     "outputs": [
                         "workspace/Allure/eval/selftest-20260516-000005/",
-                        "workspace/执行日志/eval/reports/",
-                        "workspace/执行日志/eval/captures/",
+                        "workspace/测试报告/eval/reports/",
+                        "workspace/测试报告/eval/captures/",
                     ],
                     "depends_on": ["pass_at_k", "stability_check", "latency_check"],
                 },
@@ -171,10 +171,10 @@ class EvalHarness(AgentRunner):
                 "pii_leak": 0,
             },
             "outputs": {
-                "eval_dir": "workspace/执行日志/eval/",
-                "capture_dir": "workspace/执行日志/eval/captures/",
-                "replay_dir": "workspace/执行日志/eval/replays/",
-                "report_dir": "workspace/执行日志/eval/reports/",
+                "eval_dir": "workspace/测试报告/eval/",
+                "capture_dir": "workspace/测试报告/eval/captures/",
+                "replay_dir": "workspace/测试报告/eval/replays/",
+                "report_dir": "workspace/测试报告/eval/reports/",
                 "allure_dir": "workspace/Allure/eval/selftest-20260516-000005/",
             },
             "risks": [
@@ -189,7 +189,7 @@ class EvalHarness(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "eval_harness_plan.json"
+        return ctx.workspace / "测试报告" / "eval_harness_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         phases = len(output.get("phases", []))

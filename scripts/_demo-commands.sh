@@ -25,7 +25,7 @@ step() {
 }
 
 # 清干净(录制前)
-rm -rf workspace/_demo workspace/执行日志/*.json workspace/测试用例/_smoke_out workspace/_init_smoke 2>/dev/null || true
+rm -rf workspace/_demo workspace/测试报告/*.json workspace/测试用例/_smoke_out workspace/_init_smoke 2>/dev/null || true
 
 # Step 1 · init
 step "Step 1/4 · 一键初始化(stub LLM,0 API key)"
@@ -53,8 +53,8 @@ sleep 3
 
 # Outro · 看产物
 step "产物清单"
-prompt "ls workspace/执行日志/*.json"
-ls workspace/执行日志/*.json 2>/dev/null
+prompt "ls workspace/测试报告/*.json"
+ls workspace/测试报告/*.json 2>/dev/null
 sleep 2
 
 prompt "cat workspace/测试报告/decisions/final_verdict_*.json | head -10"

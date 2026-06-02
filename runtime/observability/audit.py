@@ -14,7 +14,7 @@ from typing import Any
 
 from loguru import logger
 
-_DEFAULT_DIR = Path("workspace/执行日志/audit")
+_DEFAULT_DIR = Path("workspace/测试报告/audit")
 _lock = threading.Lock()
 
 

@@ -99,7 +99,7 @@ def register(app: typer.Typer) -> None:
 
         console.print("\n[bold]Step 4/4 · Artifacts[/]")
         artifacts = []
-        for d in (Path("workspace/测试用例"), Path("workspace/测试报告"), Path("workspace/执行日志")):
+        for d in (Path("workspace/测试用例"), Path("workspace/测试报告")):
             if d.exists():
                 for f in sorted(d.glob("**/*")):
                     if f.is_file() and not f.name.startswith("_"):

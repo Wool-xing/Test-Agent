@@ -18,7 +18,7 @@ def soak_test(scenario: Callable[[], None],
               duration_hours: float = 24,
               interval_sec: int = 10,
               metric_proc_pid: Optional[int] = None,
-              output_dir: str = "workspace/执行日志/soak") -> Dict:
+              output_dir: str = "workspace/测试报告/soak") -> Dict:
     """
     长时稳定性测试。
     scenario: 单次业务调用函数（无返回，无参数）

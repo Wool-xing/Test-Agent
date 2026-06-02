@@ -86,7 +86,7 @@ from utils.zentao_bug_manager import ZentaoBugManager
 
 manager = ZentaoBugManager()
 
-with open("workspace/执行日志/regression_summary.json", encoding="utf-8") as f:
+with open("workspace/测试报告/regression_summary.json", encoding="utf-8") as f:
     results = json.load(f)
 
 submitted = manager.batch_submit_from_failures(

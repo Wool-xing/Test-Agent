@@ -174,7 +174,7 @@ def collect_tracing_validation(trace_results: list[dict[str, Any]]) -> dict[str,
 def collect_baselines(baseline_path: Path | None = None) -> dict[str, Any]:
     """Collect performance baseline data."""
     if baseline_path is None:
-        baseline_path = Path("workspace/执行日志/baselines/perf_baseline.json")
+        baseline_path = Path("workspace/测试报告/baselines/perf_baseline.json")
     if not baseline_path.exists():
         return {"available": False, "path": str(baseline_path)}
     try:
@@ -187,7 +187,7 @@ def collect_baselines(baseline_path: Path | None = None) -> dict[str, Any]:
 def collect_test_history(history_dir: Path | None = None) -> list[dict[str, Any]]:
     """Collect recent test execution history metadata."""
     if history_dir is None:
-        history_dir = Path("workspace/执行日志/history/")
+        history_dir = Path("workspace/测试报告/history/")
     items: list[dict[str, Any]] = []
     if not history_dir.exists():
         return items
@@ -363,7 +363,7 @@ def export_package(package: EvidencePackage,
     """Export evidence package as JSON file."""
     if output_path is None:
         output_path = Path(
-            f"workspace/执行日志/evidence/{package.package_id}.json")
+            f"workspace/测试报告/evidence/{package.package_id}.json")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     serialized: dict[str, Any] = {
@@ -407,7 +407,7 @@ def export_chain_of_custody_report(
     """Export human-readable chain of custody report as Markdown."""
     if output_path is None:
         output_path = Path(
-            f"workspace/执行日志/evidence/{package.package_id}_custody.md")
+            f"workspace/测试报告/evidence/{package.package_id}_custody.md")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     lines = [
@@ -480,6 +480,6 @@ def quick_package(workspace_dir: Path | None = None) -> EvidencePackage:
         workspace_dir = Path("workspace")
     return build_evidence_chain(
         decisions_dir=workspace_dir / "测试报告/decisions/",
-        baseline_path=workspace_dir / "执行日志/baselines/perf_baseline.json",
-        history_dir=workspace_dir / "执行日志/history/",
+        baseline_path=workspace_dir / "测试报告/baselines/perf_baseline.json",
+        history_dir=workspace_dir / "测试报告/history/",
     )

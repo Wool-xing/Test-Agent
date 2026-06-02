@@ -94,7 +94,7 @@ class EnvManager(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "env_checklist.json"
+        return ctx.workspace / "测试报告" / "env_checklist.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         checks = len(output.get("env_checks", []))

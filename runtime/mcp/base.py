@@ -28,7 +28,7 @@ def new_run_id(prefix: str = "mcp") -> str:
 
 def _decisions_dir() -> Path:
     s = get_settings()
-    d = s.resolve(s.workspace_dir) / "执行日志" / "decisions"
+    d = s.resolve(s.workspace_dir) / "测试报告" / "decisions"
     d.mkdir(parents=True, exist_ok=True)
     return d
 
