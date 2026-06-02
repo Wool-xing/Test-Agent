@@ -299,6 +299,7 @@ def create_dirs(project_root):
         os.path.join("workspace", "执行日志", "baselines"),
         os.path.join("workspace", "执行日志", "history"),
         os.path.join("workspace", "执行日志", "截图"),
+        "memory",
     ]
     for d in dirs:
         os.makedirs(os.path.join(project_root, d), exist_ok=True)
@@ -409,7 +410,7 @@ def copy_top_level_docs(template_dir, project_root):
     docs = [
         "LICENSE", "NOTICE.md", "SECURITY.md", "CONTRIBUTING.md",
         "CODE_OF_CONDUCT.md", "ROADMAP.md", "README.md", "README.zh-CN.md",
-        "CHANGELOG.md", "VERSION",
+        "CHANGELOG.md", "VERSION", "FULL_GUIDE.md", "tagent.yml.example",
     ]
     for f in docs:
         src = os.path.join(template_dir, f)
@@ -503,7 +504,8 @@ def finish(project_root):
  2. 安装 Java JRE 17 + JMeter 5.6.3 + Allure CLI（详见 部署说明.md）
  3. claude /login                           # 首次登录 Claude Code
  4. cd {project_root} && claude              # 启动
- 5. 在 Claude 提示符内: > /smoke-test       # 第一次冒烟验证
+ 5. cd {project_root} && claude              # 进入项目
+ 6. 阅读 skills/smoke-test.md 工作流        # 第一次冒烟验证
 
 {'=' * 50}
 """

@@ -48,7 +48,7 @@ python install.py ~/test-agent-project       # macOS / Linux example, any folder
 
 After deployment, outputs under `workspace/`: test cases (Excel + xmind + markmap + opml) + Word report + decision logs.
 
-**Next**: edit `.env` → `claude /login` → `cd project-dir && claude` → `/smoke-test`
+**Next**: `cp config/.env.example .env` → edit `.env` → `cd project-dir && claude` → read `skills/smoke-test.md` workflow, run agents per the flow
 
 ## 🖥 Desktop App
 
