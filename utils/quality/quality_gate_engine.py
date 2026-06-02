@@ -4,7 +4,7 @@
 Replaces hardcoded GATES dict in ci_quality_gate.py with YAML-configurable
 thresholds. Users edit the YAML, not the code.
 
-默认配置文件: config/quality_gates.yaml
+默认查找: ./quality_gates.yaml (部署) → ./config/quality_gates.yaml (源码)
 可通过 QUALITY_GATE_CONFIG 环境变量覆盖路径。
 """
 
@@ -26,7 +26,9 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CONFIG = Path(__file__).resolve().parent.parent / "config" / "quality_gates.yaml"
+_cfg_deployed = Path(__file__).resolve().parent.parent.parent / "quality_gates.yaml"
+_cfg_source = Path(__file__).resolve().parent.parent.parent / "config" / "quality_gates.yaml"
+DEFAULT_CONFIG = _cfg_deployed if _cfg_deployed.exists() else _cfg_source
 
 
 def _load_yaml_config(path: str | Path) -> dict[str, Any]:
@@ -236,7 +238,7 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(description="Quality Gate Engine (YAML-driven)")
-    parser.add_argument("--config", help="YAML 配置文件路径 (默认: config/quality_gates.yaml)")
+    parser.add_argument("--config", help="YAML 配置文件路径 (默认: 项目根 quality_gates.yaml)")
     parser.add_argument("--smoke-xml", help="冒烟 junit xml 路径")
     parser.add_argument("--regression-xml", help="回归 junit xml 路径")
     parser.add_argument("--coverage-xml", help="coverage.xml 路径")

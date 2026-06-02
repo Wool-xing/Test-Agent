@@ -248,6 +248,8 @@ your-test-project/
 ├── .claude/{agents,skills}/           ← 16 agent + 32 skill（业务） + 3 元 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
+├── CLAUDE.md                          ← AI Agent 行为指令（Claude Code 必读）
+├── AGENTS.md                          ← Agent 目录（16 专家）
 ├── utils/                             ← 79 个 .py + __init__
 ├── src/                               ← 被测系统源码（cov 指向）
 ├── workspace/
@@ -265,7 +267,8 @@ your-test-project/
 │       ├── skill-evolution/           ← darwin-skill results.tsv + 成果卡片
 │       ├── 截图/  报告/
 ├── conftest.py / pytest.ini / requirements.txt
-├── .mcp.json / .env
+├── .mcp.json / .env / quality_gates.yaml
+├── templates/                         ← tagent init 模板
 ```
 
 ---
