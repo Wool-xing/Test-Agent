@@ -17,7 +17,12 @@ htmlcov/
 
 # workspace 测试产出（敏感 + 体积大）
 workspace/测试数据/
-workspace/测试报告/*/
+workspace/测试报告/**
+workspace/测试用例/
+workspace/测试计划/
+workspace/需求分析/
+workspace/执行日志/
+workspace/audit/
 workspace/_outputs/
 workspace/feedback/
 workspace/自动化脚本/
@@ -40,6 +45,8 @@ workspace/自动化脚本/
 Thumbs.db
 
 # ===== Claude Code =====
+.claude/agents/
+.claude/skills/
 .claude/cache/
 .claude/sessions/
 
