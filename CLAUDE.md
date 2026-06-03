@@ -25,8 +25,9 @@
 cd project-dir
 pip install -e runtime/          # first time only
 tagent run "path/to/prd.md"      # router + orchestrator end-to-end
-tagent plan "path/to/prd.md"     # plan only (no execution)
 tagent catalog                   # list 16 experts + 32 skills
+tagent status <run_id>           # check run status
+tagent report <run_id>           # full execution report
 tagent doctor                    # health check
 ```
 
