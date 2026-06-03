@@ -16,6 +16,7 @@
 - build-your-own-x-explorer skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/build_your_own_x_explorer.py`) — 场景识别 + byox 13 类 KB 推荐 + 时间预算警告
 
 ### Changed
+- CLI `tagent run`: `--mode`/`--lang` 改为可选（默认读 `$TAGENT_MODE`/`$TAGENT_LANG` 环境变量，fallback `exec`/`zh`）；裸 `tagent` 显示简洁常用命令摘要
 - 2 vision skill 升 production: `agent-introspection-debugging` + `build-your-own-x-explorer` (frontmatter `SKILL_IMPL_STATUS: vision` → `production`)
 - skill rollout 总数: 16 → 18 (中央 `runtime/tests/test_skill_runners.py` `ALL_SKILL_RUNNERS` 同步加 2 行)
 - skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)

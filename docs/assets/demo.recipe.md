@@ -34,7 +34,7 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 [0s]   tagent --version
        v1.8.0
 
-[3s]   tagent run "测试 https://playwright.dev 首页+导航 → 验证标题+CTA 按钮" --mode learn --lang zh
+[3s]   tagent run "测试 https://playwright.dev 首页+导航 → 验证标题+CTA 按钮" --mode learn
        
 [6s]   Step 1/8: requirements-analyst
          ↳ 原因: 任何测试必先理解被测物;Web 系统先解析需求

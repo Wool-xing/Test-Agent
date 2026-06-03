@@ -1,6 +1,8 @@
-"""Typer CLI: `tagent run|status|report|catalog|doctor`."""
+"""Typer CLI: `tagent run|plan|catalog|doctor`."""
 
 from __future__ import annotations
+
+import sys as _sys
 
 import typer
 
@@ -25,6 +27,16 @@ def _version_callback(
         _os.environ["TAGENT_LOG_LEVEL"] = "DEBUG"
     if version:
         console.print(f"Test-Agent Runtime v{runtime.__version__}")
+        raise typer.Exit(0)
+    # bare `tagent` (no subcommand, no --version) → concise summary
+    if len(_sys.argv) == 1:
+        console.print(f"\n[bold]Test-Agent Runtime[/] v{runtime.__version__}\n")
+        console.print("[bold]常用命令:[/]")
+        console.print("  tagent run <target>        一键执行测试 (PRD / URL / 文本)")
+        console.print("  tagent plan <target>       仅规划路由, 不执行")
+        console.print("  tagent catalog             列出所有专家 + 技能")
+        console.print("  tagent doctor              环境自检\n")
+        console.print("[dim]tagent --help  查看完整命令列表[/]\n")
         raise typer.Exit(0)
 
 
