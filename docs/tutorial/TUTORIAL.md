@@ -84,20 +84,17 @@ Step 4/4 · Artifacts
 
 ```bash
 # 用你自己的 PRD
-tagent run --prd docs/my-feature.md
+tagent run docs/my-feature.md
 
 # 或用在线文档
-tagent run --prd https://your-wiki.com/prd/page
-
-# 看结果
-tagent report
+tagent run https://your-wiki.com/prd/page
 ```
 
 在浏览器看 Dashboard：
 
 ```bash
-tagent serve
-# → http://127.0.0.1:8800/dashboard
+uvicorn runtime.api.main:app --port 8800
+# → http://127.0.0.1:8800/docs
 ```
 
 ## 进阶
