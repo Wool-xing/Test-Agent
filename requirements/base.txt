@@ -13,7 +13,7 @@ allure-pytest>=2.13.5
 pytest-bdd==7.0.0
 
 # UI 自动化
-playwright==1.59.0
+playwright==1.60.0
 
 # API 测试
 requests==2.33.0
