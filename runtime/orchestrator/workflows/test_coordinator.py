@@ -67,7 +67,7 @@ class TestCoordinatorPipeline:
     ]
 
     def run(self, target: str) -> PipelineResult:
-        """Execute the full pipeline. Returns PipelineResult with step details."""
+        """Execute the full pipeline per skills/test-coordinator.md."""
         result = PipelineResult(ok=True)
         run_id = f"tc-{int(time.time())}"
         console.print(f"[bold]Test Coordinator Pipeline[/] ({run_id})")
@@ -83,17 +83,19 @@ class TestCoordinatorPipeline:
                 result.summary = f"Target outside workspace: {target}"
                 return result
 
-        # Phase 0: Pre-flight
-        missing = self._preflight()
+        # Step 0: Pre-flight checklist (test-coordinator.md Step 0)
+        platform_hints = self._detect_platform(target)
+        missing = self._preflight(platform_hints)
         if missing:
-            console.print(f"[red]Pre-flight failed: {', '.join(missing)}[/]")
+            self._print_checklist(platform_hints, missing)
             result.ok = False
             result.aborted_at = "preflight"
             result.summary = f"Missing: {', '.join(missing)}"
             return result
 
-        # Phase 1: PRD load + route
-        routing = self._route_target(target)
+        # Step 1: PRD load + platform identification (test-coordinator.md Step 1)
+        prd_text = self._load_prd(target)
+        routing = self._route_target(prd_text or target)
         console.print(f"[dim]Router → {routing}[/dim]")
 
         # Execute each step
@@ -136,17 +138,76 @@ class TestCoordinatorPipeline:
         console.print(f"[bold]{result.summary}[/]")
         return result
 
-    def _preflight(self) -> list[str]:
-        """Check required env vars and tools. Returns list of missing items."""
+    def _preflight(self, platform_hints: list[str] | None = None) -> list[str]:
+        """Step 0: Pre-flight checklist per test-coordinator.md."""
         missing = []
-        # Check Python version
         import sys
         if sys.version_info < (3, 10):
             missing.append("Python 3.10+ required")
-        # Check workspace exists
         if not _WORKSPACE.is_dir():
             missing.append(f"workspace directory not found: {_WORKSPACE}")
+
+        hints = set(platform_hints or [])
+        # Platform-specific checks from test-coordinator.md Step 0
+        if "desktop_windows" in hints:
+            if not os.environ.get("WIN_APP_PATH"):
+                missing.append("WIN_APP_PATH (.env) — EXE完整路径")
+            try:
+                import pyautogui  # noqa: F401
+            except ImportError:
+                missing.append("pip install pyautogui (desktop test)")
+        if "mobile_android" in hints or "mobile_ios" in hints:
+            if not os.environ.get("ANDROID_HOME") and "android" in str(hints):
+                missing.append("ANDROID_HOME (.env)")
+        if "api" in hints or "web" in hints:
+            if not os.environ.get("TEST_APP_URL"):
+                missing.append("TEST_APP_URL (.env)")
         return missing
+
+    def _detect_platform(self, target: str) -> list[str]:
+        """Simple keyword-based platform detection for preflight checklist."""
+        text = target.lower()
+        hints = []
+        if any(w in text for w in ("exe", "windows", "desktop", "win32", "pywinauto")):
+            hints.append("desktop_windows")
+        if any(w in text for w in ("android", "apk", "adb")):
+            hints.append("mobile_android")
+        if any(w in text for w in ("ios", "ipa", "xcode")):
+            hints.append("mobile_ios")
+        if any(w in text for w in ("api", "rest", "graphql", "endpoint", "http")):
+            hints.append("api")
+        if any(w in text for w in ("web", "browser", "playwright", "selenium", "page")):
+            hints.append("web")
+        if any(w in text for w in ("can", "automotive", "adas", "ota", "ecu")):
+            hints.append("automotive")
+        return hints
+
+    def _print_checklist(self, platform_hints: list[str], missing: list[str]) -> None:
+        """Print pre-flight checklist per test-coordinator.md Step 0."""
+        from rich.panel import Panel
+        detected = ", ".join(platform_hints) if platform_hints else "generic"
+        lines = [f"Detected: {detected}", ""]
+        lines.append("[bold]Required:[/]")
+        for m in missing:
+            lines.append(f"  [red]✗[/] {m}")
+        lines.append("")
+        lines.append("[dim]Fix missing items and re-run.[/]")
+        console.print(Panel("\n".join(lines), title="Pre-flight Checklist", title_align="left"))
+
+    def _load_prd(self, target: str) -> str | None:
+        """Step 1: Load PRD via prd_loader per test-coordinator.md."""
+        try:
+            from utils.prd_loader import load_prd, suggest_agents
+            text, meta = load_prd(target)
+            if text:
+                agents = suggest_agents(text)
+                console.print(f"[dim]PRD loaded: {len(text)} chars, agents: {agents}[/]")
+                return text[:5000]  # cap for LLM context
+        except ImportError:
+            pass
+        except Exception:
+            pass
+        return None
 
     def _route_target(self, target: str) -> str:
         """Quick routing: what does the router want for this target?"""

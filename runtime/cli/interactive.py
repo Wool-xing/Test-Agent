@@ -448,6 +448,7 @@ def _cmd_export(args: str) -> None:
         lines.append(m.content)
         lines.append("")
 
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")
     console.print(f"[green]Exported to {path}[/]")
 
