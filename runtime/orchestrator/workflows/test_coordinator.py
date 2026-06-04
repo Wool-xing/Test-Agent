@@ -164,21 +164,21 @@ class TestCoordinatorPipeline:
                 inputs={"target": target, "pipeline_step": name},
                 run_id=f"tc-{int(t0)}",
             )
-            return {
+            stdout = getattr(outcome, "stdout", "")
+            result = {
                 "ok": getattr(outcome, "ok", True),
-                "stdout": getattr(outcome, "stdout", ""),
+                "stdout": stdout,
                 "duration_ms": (time.time() - t0) * 1000,
             }
+            # Extract structured metrics from test outputs for gate enforcement
+            from runtime.orchestrator.metrics.parser import extract_metrics
+            result["metrics"] = extract_metrics({"stdout": str(stdout)})
+            return result
         except Exception as exc:
-            return {"ok": False, "stdout": str(exc), "duration_ms": 0}
+            return {"ok": False, "stdout": str(exc), "duration_ms": 0, "metrics": {}}
 
     def _check_gates(self, step_name: str, outcome: dict) -> str | None:
-        """Check gate conditions after specific steps. Returns block reason or None.
-
-        TODO: extract real metrics from outcome['stdout'] (junit XML / JMeter JTL).
-        Currently uses stub values — gates always pass. See PR #191 review.
-        """
-        # Try to extract structured metrics from outcome
+        """Check gate conditions after specific steps. Returns block reason or None."""
         metrics = outcome.get("metrics", {}) if isinstance(outcome, dict) else {}
 
         if step_name == "smoke-test":
