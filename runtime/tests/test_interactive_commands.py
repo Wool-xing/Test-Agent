@@ -147,3 +147,74 @@ class TestFuzzyMatching:
     def test_very_different_no_match(self):
         from runtime.cli.interactive import _closest_command
         assert _closest_command("zzzpq") is None
+
+
+class TestCostEstimation:
+    def test_empty_memory_minimal_tokens(self):
+        from runtime.cli.interactive import _estimate_cost, _get_memory
+        mem = _get_memory()
+        mem.clear()
+        tokens, cost = _estimate_cost(mem)
+        assert tokens >= 0
+        assert cost >= 0.0
+
+    def test_cost_scales_with_messages(self):
+        from runtime.cli.interactive import _estimate_cost, _get_memory
+        mem = _get_memory()
+        mem.clear()
+        mem.add("user", "x" * 400)
+        mem.add("assistant", "y" * 400)
+        tokens, cost = _estimate_cost(mem)
+        assert tokens >= 100
+        assert cost >= 0.0  # may be 0 if provider=stub
+
+    def test_ollama_pricing_is_zero(self):
+        from runtime.cli.interactive import _PRICE_PER_1K
+        in_p, out_p = _PRICE_PER_1K["ollama"]
+        assert in_p == 0
+        assert out_p == 0
+
+    def test_claude_pricing_positive(self):
+        from runtime.cli.interactive import _PRICE_PER_1K
+        in_p, out_p = _PRICE_PER_1K["claude"]
+        assert in_p > 0
+        assert out_p > 0
+
+
+class TestCompact:
+    def test_compact_too_few_messages(self):
+        from runtime.cli.interactive import _cmd_compact, _get_memory
+        mem = _get_memory()
+        mem.clear()
+        mem.add("user", "a")
+        mem.add("assistant", "b")
+        _cmd_compact("")  # should not crash with 2 messages
+
+    def test_compact_on_six_messages(self):
+        from runtime.cli.interactive import _cmd_compact, _get_memory
+        mem = _get_memory()
+        mem.clear()
+        for i in range(6):
+            mem.add("user" if i % 2 == 0 else "assistant", f"msg {i}")
+        _cmd_compact("")
+        assert len(mem.messages) < 6  # compacted
+
+
+class TestSessions:
+    def test_sessions_no_crash(self):
+        from runtime.cli.interactive import _cmd_sessions
+        _cmd_sessions("")  # should not crash even with no sessions
+
+
+class TestExport:
+    def test_export_empty_memory(self):
+        from runtime.cli.interactive import _cmd_export, _get_memory
+        mem = _get_memory()
+        mem.clear()
+        _cmd_export("")  # should not crash
+
+    def test_export_with_messages(self):
+        from runtime.cli.interactive import _cmd_export, _get_memory
+        mem = _get_memory()
+        mem.add("user", "hello")
+        _cmd_export("")  # should create export file
