@@ -43,7 +43,7 @@ function startBackend(): Promise<void> {
           stdio: ["ignore", "pipe", "pipe"],
         });
       } else {
-        backendProcess = spawn(cmd, args, {
+        backendProcess = spawn(getBackendPath(), [], {
           env: {
             ...process.env,
             TAGENT_API_PORT: String(BACKEND_PORT),
