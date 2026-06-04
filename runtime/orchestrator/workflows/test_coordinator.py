@@ -105,7 +105,11 @@ class TestCoordinatorPipeline:
 
             console.print(f"  [{i}/{len(self.SEQUENCE)}] {name}...", end=" ")
             try:
-                outcome = self._execute_node(name, kind, target)
+                # Step 4 (env-manager): retry on failure per test-coordinator.md
+                if name == "env-manager":
+                    outcome = self._execute_with_retry(name, kind, target)
+                else:
+                    outcome = self._execute_node(name, kind, target)
                 step.status = "ok" if outcome.get("ok", True) else "failed"
                 step.output = str(outcome.get("stdout", ""))[:200]
                 step.duration_ms = outcome.get("duration_ms", 0)
@@ -136,6 +140,10 @@ class TestCoordinatorPipeline:
         result.summary = self._build_summary(result)
         console.print()
         console.print(f"[bold]{result.summary}[/]")
+
+        # Step 10+: Notification (best-effort)
+        self._notify(result.summary)
+
         return result
 
     def _preflight(self, platform_hints: list[str] | None = None) -> list[str]:
@@ -208,6 +216,31 @@ class TestCoordinatorPipeline:
         except Exception:
             pass
         return None
+
+    def _execute_with_retry(self, name: str, kind: str, target: str) -> dict[str, Any]:
+        """Step 4 (env-manager): retry on failure per test-coordinator.md.
+        Retry delays: 10s → 20s → 40s. Abort after 3 failures.
+        """
+        delays = [10, 20, 40]
+        for attempt, delay in enumerate(delays, 1):
+            outcome = self._execute_node(name, kind, target)
+            if outcome.get("ok"):
+                return outcome
+            console.print(f"[yellow]retry {attempt}/{len(delays)} in {delay}s...[/]", end=" ")
+            time.sleep(delay)
+        console.print("[red]env-manager failed after 3 retries[/]")
+        return {"ok": False, "stdout": "env-manager exhausted retries", "duration_ms": 0}
+
+    def _notify(self, summary: str) -> None:
+        """Post-pipeline notification per test-coordinator.md Step 10."""
+        webhook = os.environ.get("TAGENT_NOTIFY_URL", "")
+        if not webhook:
+            return
+        try:
+            import requests
+            requests.post(webhook, json={"text": summary}, timeout=5)
+        except Exception:
+            pass  # notification is best-effort
 
     def _route_target(self, target: str) -> str:
         """Quick routing: what does the router want for this target?"""
