@@ -36,13 +36,13 @@ def test_registry_expert_status_counts():
 
 
 def test_registry_skill_status_counts():
-    """Skill 32 = 25 production + 7 script + 0 rollout + 0 vision (V1.43.0 全 skill rollout 完成 + 2 ex-vision 实装)。"""
+    """Skill 32 = 25 production + 7 script + 0 rollout + 0 vision (V1.x 全 skill rollout 完成 + 2 ex-vision 实装)。"""
     cat = get_catalog()
     counts = Counter(e.impl_status for e in cat.skills.values())
     assert counts.get("production", 0) == 25, f"skill production 应 25,实 {counts.get('production')}"
     assert counts.get("script", 0) == 7
     assert counts.get("rollout", 0) == 0, f"skill rollout 应 0,实 {counts.get('rollout')}"
-    assert counts.get("vision", 0) == 0, f"skill vision 应 0 (V1.43.0 后),实 {counts.get('vision')}"
+    assert counts.get("vision", 0) == 0, f"skill vision 应 0 (V1.x 后),实 {counts.get('vision')}"
 
 
 # ---------- router 层:_validate_against_catalog warn ----------
@@ -80,7 +80,7 @@ def test_router_does_not_falsely_flag_production_skill():
 
 
 def test_router_flags_vision_skill():
-    # V1.43.0 2 ex-vision skill (agent-introspection-debugging / build-your-own-x-explorer) 已实装为 production。
+    # V1.x 2 ex-vision skill (agent-introspection-debugging / build-your-own-x-explorer) 已实装为 production。
     # vision 分支与 rollout 共用 router._validate_against_catalog 同一 if (rollout, vision) 路径,
     # 现 catalog 无 vision skill,此 test 改测 unknown skill (走相同 hard-block warn 分支),保留覆盖语义。
     cat = get_catalog()
@@ -132,7 +132,7 @@ def test_execute_node_allows_production_skill():
 
 
 def test_execute_node_rejects_vision_skill():
-    # V1.43.0 2 ex-vision skill 已实装,catalog 无 vision skill。
+    # V1.x 2 ex-vision skill 已实装,catalog 无 vision skill。
     # vision hard-block 分支与 rollout 共用 execute_node 同一拒绝路径,
     # 此 test 改测 unknown skill (走 returncode=2 同分支),保留覆盖语义。
     r = execute_node("phantom-vision-skill", "skill")

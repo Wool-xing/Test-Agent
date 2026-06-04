@@ -99,11 +99,11 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
         ["project_name","run_id","loops","asil_required","fault_injection","platform","outputs","risks","confidence"],
     ),
     (
-        "agent-introspection-debugging",  # V1.43.0
+        "agent-introspection-debugging",  # V1.x
         ["project_name","run_id","target_run_id","dimensions","findings","recommendations","outputs","confidence"],
     ),
     (
-        "build-your-own-x-explorer",  # V1.43.0
+        "build-your-own-x-explorer",  # V1.x
         ["project_name","run_id","user_scenario","detected_concepts","recommendations","warnings","outputs","confidence"],
     ),
 ]

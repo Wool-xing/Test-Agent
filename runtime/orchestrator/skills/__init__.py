@@ -1,10 +1,10 @@
-"""Real LLM-driven skill runners (V1.43.0 · ALL 18/18 rollout + 2 ex-vision complete).
+"""Real LLM-driven skill runners (V1.x · ALL 18/18 rollout + 2 ex-vision complete).
 
 18 production runners across 4 domains:
 - General: mobile-test, visual-test, system-test, eval-harness
 - Pentest: pentest-coordinator, pentest-recon, pentest-vuln, pentest-exploit, pentest-api, pentest-web, pentest-report
 - Automotive: automotive-test, automotive-can-bus-test, automotive-adas-scenario, automotive-ota-update-test, automotive-hil-loop-test
-- Meta (V1.43.0 ex-vision): agent-introspection-debugging, build-your-own-x-explorer
+- Meta (V1.x ex-vision): agent-introspection-debugging, build-your-own-x-explorer
 """
 
 from runtime.orchestrator.agents.base import (  # noqa: F401
