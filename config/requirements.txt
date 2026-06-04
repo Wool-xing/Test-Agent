@@ -105,8 +105,8 @@ scipy==1.13.1; python_version < "3.14"   # [可选] 漂移检测（KS）—— 1
 # deepeval==0.20.50                # [可选] LLM 评估
 
 # ===== [可选] 安全扫描 =====
-bandit==1.7.6                      # [稳定层] SAST Python 代码扫描
-safety==3.0.1                      # [稳定层] 依赖 CVE 检查
+bandit==1.8.6                      # [稳定层] SAST Python 代码扫描
+safety==3.8.1                      # [稳定层] 依赖 CVE 检查
 # OWASP ZAP DAST [外部]：daemon 模式（zap.sh -daemon -port 8080）
 # Burp Suite Pro [外部]：商业工具，启 REST API
 # pip-audit                        # CI 临时安装，无需固定

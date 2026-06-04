@@ -50,8 +50,8 @@ reportlab==4.0.7
 python-pptx==0.6.23
 
 # 安全扫描
-bandit==1.7.6
-safety==3.0.1
+bandit==1.8.6
+safety==3.8.1
 
 # WebSocket（通用）
 websocket-client==1.8.0
