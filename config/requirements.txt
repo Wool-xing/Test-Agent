@@ -168,4 +168,4 @@ defusedxml==0.7.1                  # [稳定层] XXE/亿笑/decompression bomb �
 # opentelemetry-sdk>=1.27.0
 # opentelemetry-exporter-otlp>=1.27.0
 # opentelemetry-instrumentation-fastapi>=0.48b0
-httpx[http2]>=0.27.0               # APNs (HTTP/2 强制) + 异步 HTTP API client
+httpx[http2]>=0.28.1               # APNs (HTTP/2 强制) + 异步 HTTP API client
