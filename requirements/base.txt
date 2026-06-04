@@ -40,7 +40,7 @@ beautifulsoup4==4.12.2
 # 工具
 python-dotenv==1.2.2
 tenacity==8.2.3
-loguru==0.7.2
+loguru==0.7.3
 
 # 契约测试
 jsonschema==4.21.0
