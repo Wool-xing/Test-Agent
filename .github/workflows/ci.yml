@@ -13,6 +13,15 @@ permissions:
   contents: read
 
 jobs:
+  # ===== 0. 版本号一致性（最快，无外部依赖）=====
+  version-check:
+    name: 版本号一致性检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check version consistency
+        run: python scripts/check_version_consistency.py
+
   # ===== 1. utils/ 代码质量 =====
   lint-utils:
     name: utils/ Ruff + 类型检查
