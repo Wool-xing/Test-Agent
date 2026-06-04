@@ -46,6 +46,7 @@ from runtime.cli.commands.market import register as _reg_market  # noqa: E402
 from runtime.cli.commands.readiness import register as _reg_readiness  # noqa: E402
 from runtime.cli.commands.run import register_run as _reg_run  # noqa: E402
 from runtime.cli.commands.selftest import register as _reg_selftest  # noqa: E402
+from runtime.cli.commands.test_coordinator import register as _reg_test_coordinator  # noqa: E402
 
 _reg_bootstrap(app)
 _reg_catalog(app)
@@ -57,6 +58,7 @@ _reg_market(app)
 _reg_readiness(app)
 _reg_run(app)
 _reg_selftest(app)
+_reg_test_coordinator(app)
 
 if __name__ == "__main__":
     app()

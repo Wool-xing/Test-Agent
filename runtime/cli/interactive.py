@@ -136,9 +136,9 @@ def _handle_natural_language(text: str) -> None:
         return
 
     mem = _get_memory()
-    mem.add("user", text)
+    has_history = len(mem.messages) > 0
     context_input = mem.build_context(text)
-    has_history = len(mem.messages) > 1
+    mem.add("user", text)  # add AFTER build_context to avoid duplicating current input
     summary = text[:80] + ("..." if len(text) > 80 else "")
 
     if has_history:
@@ -163,9 +163,9 @@ def _handle_natural_language(text: str) -> None:
     except KeyboardInterrupt:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
-    except Exception as exc:
-        console.print(f"  [red]Error: {exc}[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
-        mem.add("assistant", f"[Error: {exc}]")
+    except Exception:
+        console.print(f"  [red]Error[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
+        mem.add("assistant", "[Error: command failed]")
 
 
 # ── Fuzzy matching (thefuck-style) ─────────────────────────────────
@@ -358,12 +358,13 @@ def _handle_slash(text: str) -> None:
 
     try:
         cmd.handler(args)
-    except SystemExit:
-        pass
+    except SystemExit as e:
+        if e.code and e.code != 0:
+            console.print(f"[red]Command failed (exit {e.code})[/]")
     except KeyboardInterrupt:
         console.print("\n[yellow]Cancelled.[/]")
-    except Exception as exc:
-        console.print(f"[red]Failed: {exc}[/]")
+    except Exception:
+        console.print("[red]Command failed[/]")
 
 
 # ── Persistence ───────────────────────────────────────────────────
