@@ -606,8 +606,8 @@ def _read_template_version(template_dir):
 
 
 def _write_local_version(project_root, version):
-    """写入 .version 文件供后续更新检测。"""
-    vf = os.path.join(project_root, ".version")
+    """写入 VERSION 文件供后续更新检测。"""
+    vf = os.path.join(project_root, "VERSION")
     with open(vf, "w", encoding="utf-8") as f:
         f.write(version + "\n")
 
@@ -654,9 +654,13 @@ def _update_deps(project_root):
 
 def do_update():
     """轻量更新：克隆最新模板 → 比较版本 → 拷贝文件 → 更新依赖 → 保留用户数据。"""
-    version_file = os.path.join(PROJECT_ROOT, ".version")
+    version_file = os.path.join(PROJECT_ROOT, "VERSION")
+    legacy_file = os.path.join(PROJECT_ROOT, ".version")
+    # Migration: rename legacy .version to VERSION if VERSION is missing
+    if not os.path.isfile(version_file) and os.path.isfile(legacy_file):
+        os.rename(legacy_file, version_file)
     if not os.path.isfile(version_file):
-        print(f"❌ 未找到 .version 文件")
+        print(f"❌ 未找到 VERSION 文件")
         print(f"   当前目录: {os.getcwd()}")
         print(f"   查找路径: {version_file}")
         print(f"   请先执行完整安装：python install.py <目录>")
@@ -787,7 +791,7 @@ def main():
         # 10. 恢复用户数据
         restore_user_data(PROJECT_ROOT, backed)
 
-        # 11. 写入 .version 供后续更新检测
+        # 11. 写入 VERSION 供后续更新检测
         version = _read_template_version(template_dir)
         if version:
             _write_local_version(PROJECT_ROOT, version)

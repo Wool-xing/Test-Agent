@@ -150,17 +150,25 @@ def _handle_natural_language(text: str) -> None:
         console.print(f"[dim]\"{summary}\"[/]")
 
     t0 = time.time()
+    _old_argv = None
     try:
-        import sys as _sys
+        import sys as _sys, contextlib, io
+
+        _old_argv = _sys.argv[:]
         _sys.argv = ["tagent", "run", context_input]
 
         with console.status("[bold green]Routing...", spinner="dots"):
             from runtime.cli.commands.run import run as _run
-            _run()
+            _capture = io.StringIO()
+            with contextlib.redirect_stdout(_capture):
+                _run()
 
         elapsed = (time.time() - t0) * 1000
+        output = _capture.getvalue().strip()
+        if output:
+            console.print(output)
         console.print(f"  [dim]Completed in {elapsed:.0f}ms[/]")
-        mem.add("assistant", f"[Run: {text}]")
+        mem.add("assistant", output[:500] if output else f"[Run: {text[:100]}]")
     except SystemExit:
         pass
     except KeyboardInterrupt:
@@ -169,6 +177,10 @@ def _handle_natural_language(text: str) -> None:
     except Exception:
         console.print(f"  [red]Error[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Error: command failed]")
+    finally:
+        if _old_argv is not None:
+            import sys as _sys
+            _sys.argv = _old_argv
 
 
 # ── Fuzzy matching (thefuck-style) ─────────────────────────────────

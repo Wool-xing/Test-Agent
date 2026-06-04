@@ -52,6 +52,17 @@ def all_commands() -> list[CommandDef]:
     return list(COMMAND_REGISTRY)
 
 
+def _run_with_argv(cmd: list[str], fn) -> None:
+    """Execute fn with temporary sys.argv, restoring afterward."""
+    import sys
+    old = sys.argv[:]
+    try:
+        sys.argv = cmd
+        fn()
+    finally:
+        sys.argv = old
+
+
 # ── Short, memorable commands ────────────────────────────────────
 
 
@@ -96,10 +107,8 @@ def _cmd_run(args: str) -> None:
         from runtime.cli._shared import console
         console.print("[red]Usage: /run <path|URL|text>[/]")
         return
-    import sys as _sys
-    _sys.argv = ["tagent", "run"] + args.split()
     from runtime.cli.commands.run import run
-    run()
+    _run_with_argv(["tagent", "run"] + args.split(), run)
 
 
 @register("plan", "Plan only", aliases=["p"], args_hint="<target>")
@@ -108,55 +117,41 @@ def _cmd_plan(args: str) -> None:
         from runtime.cli._shared import console
         console.print("[red]Usage: /plan <path|URL|text>[/]")
         return
-    import sys as _sys
-    _sys.argv = ["tagent", "plan"] + args.split()
     from runtime.cli.commands.run import plan
-    plan()
+    _run_with_argv(["tagent", "plan"] + args.split(), plan)
 
 
 @register("doctor", "Health check", aliases=["health"], args_hint="[--agents] [--probe]")
 def _cmd_doctor(args: str) -> None:
-    import sys as _sys
-    _sys.argv = ["tagent", "doctor"] + (args.split() if args.strip() else [])
     from runtime.cli.commands.doctor import doctor
-    doctor()
+    _run_with_argv(["tagent", "doctor"] + (args.split() if args.strip() else []), doctor)
 
 
 @register("ls", "List experts + skills", aliases=["list", "catalog"])
 def _cmd_ls(args: str) -> None:
-    import sys as _sys
-    _sys.argv = ["tagent", "catalog"]
     from runtime.cli.commands.catalog import catalog
-    catalog()
+    _run_with_argv(["tagent", "catalog"], catalog)
 
 
 @register("setup", "Generate config", aliases=["init"], args_hint="[--preset ...]")
 def _cmd_setup(args: str) -> None:
-    import sys as _sys
-    _sys.argv = ["tagent", "init"] + (args.split() if args.strip() else [])
     from runtime.cli.commands.init import init_project
-    init_project()
+    _run_with_argv(["tagent", "init"] + (args.split() if args.strip() else []), init_project)
 
 
 @register("ready", "Release readiness", aliases=["readiness"])
 def _cmd_ready(args: str) -> None:
-    import sys as _sys
-    _sys.argv = ["tagent", "readiness"] + (args.split() if args.strip() else [])
     from runtime.cli.commands.readiness import readiness
-    readiness()
+    _run_with_argv(["tagent", "readiness"] + (args.split() if args.strip() else []), readiness)
 
 
 @register("check", "Framework self-test", aliases=["selftest"], args_hint="[--e2e] [--strict]")
 def _cmd_check(args: str) -> None:
-    import sys as _sys
-    _sys.argv = ["tagent", "selftest"] + (args.split() if args.strip() else [])
     from runtime.cli.commands.selftest import selftest
-    selftest()
+    _run_with_argv(["tagent", "selftest"] + (args.split() if args.strip() else []), selftest)
 
 
 @register("demo", "Quick demo", args_hint="[--real-llm]")
 def _cmd_demo(args: str) -> None:
-    import sys as _sys
-    _sys.argv = ["tagent", "demo"] + (args.split() if args.strip() else [])
     from runtime.cli.commands.demo import demo
-    demo()
+    _run_with_argv(["tagent", "demo"] + (args.split() if args.strip() else []), demo)
