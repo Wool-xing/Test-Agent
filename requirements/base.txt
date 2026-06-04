@@ -61,4 +61,4 @@ websockets==12.0
 psutil==5.9.6
 
 # HTTP 异步
-httpx[http2]>=0.27.0
+httpx[http2]>=0.28.1
