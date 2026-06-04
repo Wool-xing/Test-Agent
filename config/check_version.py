@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Check if Test-Agent update is available. Called by Claude Code Stop hook.
 
-Reads .version from project root, fetches remote VERSION via HTTP.
+Reads VERSION from project root, fetches remote VERSION via HTTP.
 Prints notification only when newer version available.
-Rate-limited: checks at most once per 24h via .version_last_check timestamp.
+Rate-limited: checks at most once per 24h via VERSION_last_check timestamp.
 """
 import os
 import time
@@ -16,13 +16,17 @@ CHECK_INTERVAL = 86400  # 24 hours
 
 def main():
     project_root = os.getcwd()
-    version_file = os.path.join(project_root, ".version")
+    version_file = os.path.join(project_root, "VERSION")
+    legacy_file = os.path.join(project_root, ".version")
+    # Migration: rename legacy .version to VERSION if VERSION is missing
+    if not os.path.isfile(version_file) and os.path.isfile(legacy_file):
+        os.rename(legacy_file, version_file)
 
     if not os.path.isfile(version_file):
         return  # Not a Test-Agent project, skip silently
 
     # Rate limit: check at most once per CHECK_INTERVAL
-    last_check_file = os.path.join(project_root, ".version_last_check")
+    last_check_file = os.path.join(project_root, "VERSION_last_check")
     now = time.time()
     if os.path.isfile(last_check_file):
         try:
