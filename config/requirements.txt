@@ -70,8 +70,8 @@ python-pptx==0.6.23                # [稳定层] PPTX 报告 + PRD pptx 输入
 # ===== [可选] 移动端（10-移动测试）=====
 Appium-Python-Client==5.3.1        # [可选] Android/iOS 自动化
 selenium==4.43.0                   # [可选] WebDriver 协议
-websocket-client==1.8.0            # [稳定层] 同步 WebSocket（小程序协议 + EXE WS 测试）—— 1.8 兼容 selenium 4.43 (~=1.8)
-websockets==12.0                   # [稳定层] 异步 WebSocket（高并发性能测试）
+websocket-client==1.9.0            # [稳定层] 同步 WebSocket（小程序协议 + EXE WS 测试）—— 1.8 兼容 selenium 4.43 (~=1.8)
+websockets==15.0.1                   # [稳定层] 异步 WebSocket（高并发性能测试）
 
 # ===== [可选] 桌面（11-桌面测试）=====
 # pywinauto==0.6.8                 # [可选] 仅 Windows
@@ -90,13 +90,13 @@ Pillow==12.2.0                     # [可选] 图像（11→12.2 修 CVE-2026-25
 # paddleocr==2.7.0.3               # [可选] 备选 OCR（重，按需启用）
 
 # ===== [可选] 系统集成（13-系统集成测试）=====
-paramiko==4.0.0                    # [可选] SSH（修 CVE-2026-44405 RSA SHA-1 algorithm，3.x 不修）
+paramiko==5.0.0                    # [可选] SSH（修 CVE-2026-44405 RSA SHA-1 algorithm，3.x 不修）
 pyserial==3.5                      # [可选] 串口
-paho-mqtt==1.6.1                   # [可选] MQTT
+paho-mqtt==2.1.0                   # [可选] MQTT
 # pymodbus==3.5.4                  # [可选] Modbus 工业协议
 ffmpeg-python==0.2.0               # [可选] FFmpeg 命令封装（外部需装 ffmpeg）
-kafka-python==2.0.2                # [可选] Kafka
-pika==1.3.2                        # [可选] RabbitMQ
+kafka-python==2.3.2                # [可选] Kafka
+pika==1.4.1                        # [可选] RabbitMQ
 
 # ===== [可选] AI/ML（14-AI模型测试）=====
 scikit-learn==1.6.1                # [可选] 模型评估（修 GHSA data leakage）
