@@ -55,10 +55,13 @@ def lead_time_for_changes(git_dir: str = ".",
     从 git commit 时间到部署时间的间隔（小时）。
     简化版：取最近 commit 时间 vs 最近成功 prod 部署时间。
     """
-    proc = subprocess.run(
-        ["git", "log", "--pretty=format:%H,%ct", "-n", "100"],
-        cwd=git_dir, capture_output=True, text=True,
-    )
+    try:
+        proc = subprocess.run(
+            ["git", "log", "--pretty=format:%H,%ct", "-n", "100"],
+            cwd=git_dir, capture_output=True, text=True,
+        )
+    except FileNotFoundError:
+        return {"error": "git not available — DORA lead time requires git in PATH"}
     if not deployments:
         return {"error": "需提供 deployments 数据"}
 

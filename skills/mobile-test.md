@@ -95,7 +95,7 @@ python -m utils.mobile_driver collect-perf \
     --platform android \
     --package com.example.app \
     --duration 60 \
-    --output workspace/执行日志/mobile-perf/
+    --output workspace/测试报告/{项目名}/mobile-perf/
 ```
 
 ### Step 5b：Android Monkey 稳定性（可选，长时压测）
@@ -118,9 +118,9 @@ pytest -m "mobile and android and stability" -v
 ```
 
 monkey 自动产出：
-- `workspace/执行日志/monkey/monkey_<package>_<时间>.log`（事件序列）
-- `workspace/执行日志/monkey/monkey_<package>_<时间>.json`（摘要：crash/anr/duration）
-- `workspace/执行日志/logcat/logcat_<时间>.log`（同步归档）
+- `workspace/测试报告/{项目名}/monkey/monkey_<package>_<时间>.log`（事件序列）
+- `workspace/测试报告/{项目名}/monkey/monkey_<package>_<时间>.json`（摘要：crash/anr/duration）
+- `workspace/测试报告/{项目名}/logcat/logcat_<时间>.log`（同步归档）
 
 ### Step 6：报告与归档
 
@@ -183,7 +183,7 @@ driver.orientation = "LANDSCAPE"
 workspace/
 ├── 自动化脚本/python/mobile/             # 移动端 page object + 用例
 ├── 自动化脚本/python/miniprogram/        # 小程序用例
-└── 执行日志/
+└── 测试报告/
     ├── mobile-perf/                     # 性能采集 JSON
     ├── logcat/                          # Android 日志
     ├── ios-syslog/                      # iOS 日志

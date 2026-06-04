@@ -5,6 +5,8 @@ tools: Read, Write, Edit, Grep, Glob
 SKILL_IMPL_STATUS: script
 ---
 
+> **JMeter 版本兼容**: 本模板不硬编码 `saveConfig`，结果保存配置走 `jmeter.properties` 默认值，兼容 JMeter 5.0 ~ 5.6.3。ThreadGroup 含 `${变量}` 的属性统一用 `stringProp`，避免跨版本参数化失效。
+
 # JMeter 性能脚本生成
 
 ## 触发方式
@@ -22,7 +24,7 @@ SKILL_IMPL_STATUS: script
 □ 目标接口信息：URL（解析为 host/protocol/port 三参，不含协议前缀）
 □ 性能目标：目标 TPS / P95 / 并发数（决定 PERF_MODE）
 □ workspace/自动化脚本/jmeter/ 目录已存在（conftest 自动建）
-□ workspace/执行日志/baselines/perf_baseline.json（基线对比，可选）
+□ workspace/测试报告/{项目名}/baselines/perf_baseline.json（基线对比，可选）
 ```
 
 ## 数据流（与其他 Agent 闭环）
@@ -159,9 +161,9 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
       <!-- 线程组 -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup"
                    testname="并发用户组" enabled="true">
-        <intProp name="ThreadGroup.num_threads">${THREADS}</intProp>
-        <intProp name="ThreadGroup.ramp_time">${RAMPUP}</intProp>
-        <longProp name="ThreadGroup.duration">${DURATION}</longProp>
+        <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMPUP}</stringProp>
+        <stringProp name="ThreadGroup.duration">${DURATION}</stringProp>
         <longProp name="ThreadGroup.delay">0</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -250,25 +252,7 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector"
                          testname="聚合报告" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
-          <objProp>
-            <name>saveConfig</name>
-            <value class="SampleSaveConfiguration">
-              <time>true</time><latency>true</latency><timestamp>true</timestamp>
-              <success>true</success><label>true</label><code>true</code>
-              <responseMessage>true</responseMessage><threadName>true</threadName>
-              <dataType>true</dataType><encoding>false</encoding>
-              <assertions>true</assertions><subresults>true</subresults>
-              <responseData>false</responseData><samplerData>false</samplerData>
-              <xml>false</xml><fieldNames>true</fieldNames>
-              <responseHeaders>false</responseHeaders><requestHeaders>false</requestHeaders>
-              <responseDataOnError>false</responseDataOnError>
-              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-              <bytes>true</bytes><sentBytes>true</sentBytes>
-              <url>true</url><threadCounts>true</threadCounts>
-              <idleTime>true</idleTime><connectTime>true</connectTime>
-            </value>
-          </objProp>
-          <stringProp name="filename">workspace/执行日志/jmeter-results/result.jtl</stringProp>
+          <stringProp name="filename">workspace/测试报告/{项目名}/jmeter-results/result.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
 
@@ -316,8 +300,8 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
 # CI 默认：ci_quick
 jmeter -n \
   -t workspace/自动化脚本/jmeter/test_plan.jmx \
-  -l workspace/执行日志/jmeter-results/result.jtl \
-  -e -o workspace/执行日志/jmeter-report/ \
+  -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
+  -e -o workspace/测试报告/{项目名}/jmeter-report/ \
   -Jtarget_host="${TARGET_HOST}" \
   -Jtarget_protocol="${TARGET_PROTOCOL:-http}" \
   -Jtarget_port="${TARGET_PORT:-80}" \
@@ -326,8 +310,8 @@ jmeter -n \
 # 完整压测：full（手动 / release）
 jmeter -n \
   -t workspace/自动化脚本/jmeter/test_plan.jmx \
-  -l workspace/执行日志/jmeter-results/result.jtl \
-  -e -o workspace/执行日志/jmeter-report/ \
+  -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
+  -e -o workspace/测试报告/{项目名}/jmeter-report/ \
   -Jtarget_host="${TARGET_HOST}" \
   -Jtarget_protocol="${TARGET_PROTOCOL:-http}" \
   -Jtarget_port="${TARGET_PORT:-80}" \
@@ -336,7 +320,7 @@ jmeter -n \
 # 阶梯加压
 jmeter -n \
   -t workspace/自动化脚本/jmeter/stepped_load.jmx \
-  -l workspace/执行日志/jmeter-results/stepped_result.jtl \
+  -l workspace/测试报告/{项目名}/jmeter-results/stepped_result.jtl \
   -Jtarget_host="${TARGET_HOST}"
 ```
 
@@ -357,14 +341,14 @@ jmeter -n \
 ```bash
 # CI quick
 python -m utils.jmeter_result_parser \
-    workspace/执行日志/jmeter-results/result.jtl \
+    workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode ci_quick
 
 # Full + 基线对比 + 通过则更新基线
 python -m utils.jmeter_result_parser \
-    workspace/执行日志/jmeter-results/result.jtl \
+    workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode full \
-    --baseline workspace/执行日志/baselines/perf_baseline.json \
+    --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json \
     --update-baseline
 ```
 
@@ -399,8 +383,8 @@ python -m utils.jmeter_result_parser \
     "regression_pct": 3.2,
     "is_regression": false
   },
-  "html_report": "workspace/执行日志/jmeter-report/index.html",
-  "jtl_file": "workspace/执行日志/jmeter-results/result.jtl"
+  "html_report": "workspace/测试报告/{项目名}/jmeter-report/index.html",
+  "jtl_file": "workspace/测试报告/{项目名}/jmeter-results/result.jtl"
 }
 ```
 
@@ -415,7 +399,7 @@ workspace/自动化脚本/jmeter/
 workspace/测试数据/
 └── jmeter_users.csv           # 参数化数据（data-preparer 生成）
 
-workspace/执行日志/
+workspace/测试报告/{项目名}/
 ├── jmeter-results/result.jtl  # 原始结果（CSV）
 ├── jmeter-report/index.html   # JMeter HTML 可视化
 └── baselines/perf_baseline.json
@@ -430,7 +414,7 @@ workspace/执行日志/
 ✅ 每个请求必须有响应断言（防静默失败）
 ✅ JSONPostProcessor 提取 Token（不用旧名 JSONPathExtractor）
 ✅ 登录失败时 If Controller 中止后续请求
-✅ 结果保存到 workspace/执行日志/jmeter-results/
+✅ 结果保存到 workspace/测试报告/{项目名}/jmeter-results/
 ✅ 解析与门禁统一调 utils/jmeter_result_parser.py
 ✅ 性能 Bug 提交给 bug-manager（标题：[性能]-[接口名]-[指标超标]）
 ```

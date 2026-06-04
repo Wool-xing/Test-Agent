@@ -62,7 +62,7 @@
 | 神圣性与跨文化禁忌边界（宗教/葬礼/儿童/纪念） | i18n_checker + taboo_matrix + 禁忌词/色/数/节日组合（本地化共建） | testcase-designer | ✅ |
 | Skill 自进化（darwin-skill 双重评估 + 棘轮） | darwin-skill SKILL.md + results.tsv + 子 agent 实测 | test-lead 触发 | ✅ |
 | Bug 工具多适配（5 套 tracker 全部实装） | bug_tracker_base + zentao/jira/github/linear/webhook_bug_manager | bug-manager | ✅ |
-| Agent 协作纪要（讨论/反问/通信落档） | agentchat_recorder + workspace/执行日志/discussions/ | test-lead | ✅ |
+| Agent 协作纪要（讨论/反问/通信落档） | agentchat_recorder + workspace/测试报告/{项目名}/discussions/ | test-lead | ✅ |
 
 ### 矩阵 C：用例设计方法（ISTQB 经典）
 

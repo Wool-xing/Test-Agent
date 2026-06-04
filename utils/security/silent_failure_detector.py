@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -386,7 +387,9 @@ class SlidingWindowStore:
 # ═══════════════════════════════════════════════════════════════
 
 def export_report(report: SilentFailureReport,
-                  output_dir: str = "workspace/执行日志/silent-failures") -> str:
+                  output_dir: str = None) -> str:
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/silent-failures"
     """Export SilentFailureReport as JSON."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")

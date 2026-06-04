@@ -33,7 +33,7 @@ def _archive_dir() -> Path:
 
 def _decisions_log(action: str, name: str, payload: dict) -> Path:
     s = get_settings()
-    d = s.resolve(s.workspace_dir) / "执行日志" / "decisions"
+    d = s.resolve(s.workspace_dir) / "测试报告" / "decisions"
     d.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     p = d / f"{ts}_marketplace_{action}_{name}.json"

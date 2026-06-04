@@ -124,7 +124,9 @@ def fairness_metrics(dataset: str, sensitive_attr: str, endpoint: str) -> Dict:
 
 
 def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
-                   output_dir: str = "workspace/执行日志/ai-fairness") -> Dict:
+                   output_dir: str = None) -> Dict:
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/ai-fairness"
     """Run full fairness audit via fairness_auditor and return summary dict."""
     import pandas as pd
 
@@ -164,7 +166,7 @@ def run_bias_audit(dataset: str, sensitive_attrs: list[str], endpoint: str,
 
 
 def run_silent_failure_audit(
-    output_dir: str = "workspace/执行日志/ai-silent-failure",
+    output_dir: str = None,
     trace_durations_ms: Optional[List[float]] = None,
     web_vitals_data: Optional[Dict] = None,
     prometheus_counter_data: Optional[Dict] = None,
@@ -172,6 +174,8 @@ def run_silent_failure_audit(
     custom_configs: Optional[List] = None,
 ) -> Dict:
     """Run silent failure detection across all data sources and return summary dict."""
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/ai-silent-failure"
     from datetime import datetime, timezone
     from utils.security.silent_failure_detector import (
         collect_from_tracing,
@@ -267,9 +271,11 @@ def run_silent_failure_audit(
 
 def run_evidence_chain_audit(
     decisions_dir: Optional[str] = None,
-    output_dir: str = "workspace/执行日志/evidence",
+    output_dir: str = None,
 ) -> Dict:
     """Build evidence chain package from workspace and export JSON + custody report."""
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/evidence"
     from utils.reporting.evidence_chain import (
         build_evidence_chain,
         export_package,
@@ -344,8 +350,10 @@ def llm_eval(endpoint: str, prompt: str, expected_format: Optional[str] = None,
 
 # ===== 报告 =====
 
-def save_eval_report(metrics: Dict, output_dir: str = "workspace/执行日志/ai-eval",
+def save_eval_report(metrics: Dict, output_dir: str = None,
                      prefix: str = "eval") -> str:
+    if output_dir is None:
+        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/ai-eval"
     from datetime import datetime
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     path = Path(output_dir) / f"{prefix}_{datetime.now():%Y%m%d_%H%M%S}.json"

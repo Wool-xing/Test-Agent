@@ -56,7 +56,7 @@ class TestExecutor(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "execution_plan.json"
+        return ctx.workspace / "测试报告" / "execution_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         plan = output.get("execution_plan", [])

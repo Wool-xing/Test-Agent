@@ -1,6 +1,6 @@
 # 🤖 Test-Agent
 
-> **AI 测试 Agent 框架 · 开源 · 多 LLM · 5 秒上手**
+> **AI 测试 Agent 框架 · 开源 · 多 LLM · 一键部署**
 
 [![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
@@ -13,109 +13,54 @@
 
 ---
 
-## ⚡ 30 秒 demo
+Test-Agent 将任何软件 / EXE / APK / Docker 镜像 / API 变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告，由 16 个 AI Agent 全自主完成。
 
-```bash
-git clone https://github.com/Wool-xing/Test-Agent.git
-cd Test-Agent && bash install.sh ~/test-agent-project
-
-# 可选:启用自主运行时 (16 个真 LLM-driven agent)
-cd Test-Agent/runtime && pip install -e .
-tagent demo            # 0 API key · stub LLM · 30 秒看完整产物
-```
-
-产物:测试用例(Excel + xmind + markmap + opml)+ Word 报告 + 决策日志,全在 `workspace/`。
-
-要在自己项目跑?
-
-```bash
-tagent init --preset 国内-web    # 或:minimal / saas-web / mobile-android / security-pentest
-# → 产 .env + tagent.yml + STARTUP.md(5 步上手指南)
-```
-
-矩阵驱动配置:8 测试类型 × 6 平台 × 5 LLM × 6 tracker × 6 通道。实际 CI 验证约 12 种常用组合；完整 8640 网格是配置矩阵，不是覆盖率声明。见 [`config/templates/INDEX.md`](config/templates/INDEX.md)。
+- **全平台** — Web · API · Android · iOS · 微信小程序 · Windows · macOS · Linux · 车载 · IoT · AI/LLM · 区块链
+- **全协议** — HTTP(S) · gRPC · WebSocket · TCP/UDP · GraphQL · MQTT · CAN-bus · Kafka · Modbus · …
+- **多 LLM 无锁定** — 内置 6 厂商（Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama）+ OpenAI 兼容通道接任意厂商，3 个 env 零代码
+- **边用边学** — `--mode learn` 每步含理论引用（22 卡跨 13 大类）
+- **safe-by-default** — 沙箱执行 · PII 脱敏 · Prompt 注入扫描 · decisions 审计链
 
 ---
 
-## Test-Agent 是什么?
+## 🚀 快速开始
 
-Test-Agent 让任何软件 / EXE / APK / Docker 镜像 / API,变成**完整测试过的项目**——从需求解析到 PoC 验证的 Bug 报告,全自主。为 QA 团队、安全研究员、车载测试工程师、以及任何想**用 AI 测试同时学测试理论**的人而生。
-
-- **16 专家 Agent** (11 production + 5 script — V1.x rollout 收尾,见 [ROADMAP.md](ROADMAP.md)) — 功能 · 安全 · 移动 · 桌面 · AI 模型 · 车载 · 渗透 ……
-- **30 个活跃 Skill** (23 production + 7 script) **+ 2 个 vision-only**（方法论参考，不可执行）**+ 3 元 Skill** — TDD · E2E · 回归 · 渗透 · 车载 CAN · eval-harness ……
-- **49 生产工具** — pytest · Playwright · JMeter · Appium · Burp · Allure · OpenCV ……
-- **多 LLM(任厂商即插即用)** — 内置 6 厂商 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + **OpenAI 兼容兜底通道** 接其他任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 变量, 零代码改动. 速查手册: [`config/llm-providers.md`](config/llm-providers.md)
-- **BugTracker** — 1 已实装(禅道);5 计划(Jira · GitHub · GitLab · Linear · Webhook,见 roadmap)
-- **6 通知渠道** — 企微 · 飞书 · 钉钉 · Slack · 邮件 · Teams
-- **MCP 集成** — 6 模块已实现(test-orchestrator 默认启用;其余 5 件套在 `.mcp.json` 中按需启用)
-- **自检脚手架** — L1 lint + L2 mock CI 已在 CI 激活;L3 真 LLM + L4 周自检需配置 `ANTHROPIC_API_KEY` secret(本仓默认未配)
-
-## 🚀 安装
-
-> ⚠️ 本项目含攻击面工具(渗透 skill / SSRF 探针 / AI 对抗模板)。运行 pentest 或 AI-adversarial 工作流前请阅 [SECURITY.md](SECURITY.md) 中的授权要求。
+> 前提：Python 3.x。Git / Node.js 缺失时自动安装（winget / brew / apt / apk）。
+>
+> ⚠️ 本项目含攻击面工具（渗透 skill / SSRF 探针 / AI 对抗模板）。运行 pentest 或 AI-adversarial 工作流前请阅 [SECURITY.md](SECURITY.md)。
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
+# 下载部署脚本
+curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
+
+# 部署到你的项目目录（路径可任意指定）
+python install.py D:\Test-Agent              # Windows 示例，可改为其他盘符或目录
+python install.py ~/test-agent-project       # macOS / Linux 示例，可改为其他目录
 ```
 
-**预期耗时**: 全球 PyPI 约 10-15 min; CN 网络约 10-15 min (自动检测 `LANG=zh_*` 或时区 `+0800` 配清华镜像). 自定义 `export PIP_INDEX_URL=<url>` 覆盖.
+> **Windows 用户**：如果 curl 报 `CRYPT_E_NO_REVOCATION_CHECK`，改用 PowerShell：
+> ```powershell
+> Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
+> python install.py D:\Test-Agent   # 示例，可改为其他盘符或目录
+> ```
 
-然后 `tagent init` 自动生成 `.env`/`tagent.yml`/`STARTUP.md`——不用再花 30 分钟手填字段。
+**预期耗时**：约 10–15 min（含 pip 依赖 + Playwright 浏览器）。CN 网络自动配清华 PyPI 镜像。
 
-## 🖥 桌面应用 (Windows + macOS)
+部署后 `workspace/` 下即见产物：测试用例（Excel + xmind + markmap + opml）+ Word 报告 + 决策日志。
+
+**下一步**：编辑 `.env` → `claude /login` → `cd 项目目录 && claude` → `/smoke-test`
+
+## 🖥 桌面应用
 
 [![Download](https://img.shields.io/badge/下载-最新版本-blue)](https://github.com/Wool-xing/Test-Agent/releases)
 
-无需安装 Python/Node/Docker。下载安装包即可开始测试。
+无需 Python / Node / Docker，下载安装包即用。
 
-## 🎯 5 大核心能力
+## 📸 截图
 
-1. **全平台** — Web / API / Android / iOS / 微信小程序 / Windows EXE / macOS / Linux / Electron / 游戏 / IoT / 音视频 / AI/LLM / 区块链 / 车载
-2. **全协议** — HTTP(S) / gRPC / WebSocket / TCP / UDP / GraphQL / SOAP / MQTT / SSH / 串口 / Kafka / RabbitMQ / Modbus / CAN-bus / SOME-IP / DoIP / UDS
-3. **多 LLM 无锁定(任厂商)** — `tagent config use <name>` 切换 6 内置 (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama), `tagent config use-compat` 接 **OpenAI 兼容兜底** 任意厂商 (智谱 / 豆包 / Kimi / 百川 / 讯飞 / …), 3 个 env 零代码. 见 [`config/llm-providers.md`](config/llm-providers.md)
-4. **边用边学** — `--mode learn` 每步输出含**理论引用**(22 卡跨 13 大类:工具 / 编程 / 基础理论 / 策略 / 方法 / 协议 / 平台 / 门禁 / 安全 / AI 测试 / 合规 / 流程 / Build-Your-Own)
-5. **safe-by-default** — 沙箱 / PII 脱敏 / 运行时 Prompt 注入扫描 / 4 关 Marketplace 验证 / decisions 审计链
-
-## 📊 覆盖度
-
-- **产品形态**:Web · API · 移动 · 桌面 · IoT · AI · 区块链 · 车载 · 嵌入式 · Serverless
-- **测试类型**:功能 / 性能 / 安全 / 兼容 / 弱网 / 稳定 / 可靠性 / 可访问性 / 契约 / 视觉 / i18n / 可观测性 / 混沌 / 变异 / AI 特有(幻觉 / Prompt 注入 / 漂移 / 公平性)/ 合规
-- **用例设计方法**:等价类 · 边界值 · 判定表 · 状态迁移 · 配对 · 正交 · 探索性 SBTM · 风险驱动 · TDD · BDD · ATDD
-- **质量门禁**:冒烟 → 回归 → performance_ci_quick → performance_full → release(5 层)
-
-覆盖面在上述类别较广但不穷尽。领域专项门禁（航空 DO-178C / 医疗 HIPAA / 工业 IEC 61508）以 skeleton 合规 YAML 形态提供，受监管行业生产使用需领域专家评审。
-
-## 📖 设计文档
-
-项目设计思路、架构决策、方法论详见 [FULL_GUIDE.md](FULL_GUIDE.md)。上游开源致谢见 [NOTICE.md](NOTICE.md)。
-
-## 📂 项目结构
-
-```text
-Test-Agent/
-├── 00-项目导航.md           ← 5 维度分类速查
-├── docs/getting-started/             ← 使用手册 / 部署 / 配置 / 交付物
-├── agents/             ← 16 个专家 Agent (11 production + 5 script + 0 rollout)
-├── skills/             ← 32 个业务 Skill (23 production + 7 script + 0 rollout + 2 vision) + 3 个元 Skill
-├── config/             ← conftest / pytest.ini / .env / .mcp.json
-├── utils/             ← 78 个生产工具
-├── ci/             ← GitHub Actions + Jenkins
-├── runtime/                ← V1.x 运行时(router/orchestrator/MCP/web/scheduler/subagent/learning_loop/backends/gateway/tutor/essence_watcher/marketplace)
-├── docs/charter/           ← 愿景宪章(7 子文件: vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license)
-├── docs/theory/            ← 22 教学 KB 卡片跨 13 大类
-├── profiles/compliance/    ← 10 行业合规 YAML
-├── marketplace/            ← 社区 skills / agents / mcp / hooks(4 lane,4 关验证)
-├── install.sh              ← 一键部署
-├── README.md / README.zh-CN.md
-├── FULL_GUIDE.md           ← 完整工程指南
-├── CHANGELOG.md            ← 版本日志
-└── LICENSE / SECURITY.md / CONTRIBUTING.md / CODE_OF_CONDUCT.md
-```
-
-> **Skill 全生命周期(元工具)**:
-> - **现状(A · 方法论参考)**:各子目录 SKILL.md 为 skill 设计参考材料。
-> - **当下可用(B · 人物视角扩展)**:用 `nuwa-skill` 蒸馏新人物视角(Naval / 芒格 / 费曼);用 `darwin-skill` 优化人物视角 skill。
-> - **V2.x 路线图(C · 测试领域适配)**:改造 nuwa 为测试 skill / agent 蒸馏器;改造 darwin 为测试领域 8 维评分。
+| 上传 | 仪表盘 | 目录 | 历史 |
+|------|--------|------|------|
+| ![上传](docs/assets/screenshots/upload.png) | ![仪表盘](docs/assets/screenshots/dashboard.png) | ![目录](docs/assets/screenshots/catalog.png) | ![历史](docs/assets/screenshots/history.png) |
 
 ## 📚 文档导航
 
@@ -123,35 +68,46 @@ Test-Agent/
 |------|------|
 | **首次用户** | [快速开始](docs/getting-started/INDEX.md) → [部署说明](docs/getting-started/部署说明.md) |
 | **QA 工程师** | [使用手册](docs/getting-started/使用手册.md) → [Skill 目录](skills/) |
-| **架构师 / SRE** | [架构深度](docs/charter/06-test-architecture.md) → [Runtime 章节](docs/charter/07-runtime-license.md) → [Runtime 模块](runtime/INDEX.md) |
+| **架构师 / SRE** | [架构深度](docs/charter/06-test-architecture.md) → [Runtime 模块](runtime/INDEX.md) |
 | **安全研究员** | [渗透专家](agents/15-渗透测试.md) → [pentest-coordinator](skills/pentest-coordinator.md) |
 | **车载测试** | [车载专家](agents/16-车载测试.md) → [ASIL 工作流](skills/automotive-test.md) |
 | **贡献者** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](marketplace/INDEX.md) |
 
+## 📊 覆盖度
+
+- **产品形态**: Web · API · 移动 · 桌面 · IoT · AI · 区块链 · 车载 · 嵌入式 · Serverless
+- **测试类型**: 功能 / 性能 / 安全 / 兼容 / 弱网 / 稳定性 / 可访问性 / 视觉 / i18n / 混沌 / 变异 / AI 特有 / 合规
+- **质量门禁**: 冒烟 → 回归 → performance_ci_quick → performance_full → release（5 层）
+
+## 📂 项目结构
+
+```text
+Test-Agent/
+├── agents/             ← 16 个专家 Agent
+├── skills/             ← 32 个业务 Skill + 3 元 Skill
+├── utils/              ← 79 个生产工具（pytest · Playwright · JMeter · Appium · …）
+├── config/             ← conftest / pytest.ini / .mcp.json
+├── runtime/            ← V1.x 运行时（router · orchestrator · MCP · …）
+├── ci/                 ← GitHub Actions + Jenkins
+├── docs/               ← 使用手册 / 架构 / 教学 / 合规
+├── marketplace/        ← 社区 skills / agents / mcp / hooks
+├── install.py          ← 跨平台一键部署
+└── README.md / README.zh-CN.md
+```
+
+详见 [FULL_GUIDE.md](FULL_GUIDE.md) 和 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 🛠️ 技术栈
 
-pytest 8.3 · Playwright 1.59 · Appium 5.3 · pywinauto · JMeter 5.6 · Allure · Airtest · OpenCV · Faker · SQLAlchemy 2.0 · MCP 1.0 · LiteLLM · Prefect · FastAPI · React 18 · Tailwind · Postgres+pgvector · MinIO · OpenTelemetry · Loguru · Docker Compose · GitHub Actions / Jenkins
+pytest 8.3 · Playwright 1.59 · Appium 5.3 · JMeter 5.6 · Allure · OpenCV · SQLAlchemy 2.0 · MCP 1.0 · LiteLLM · FastAPI · React 18 · Postgres+pgvector · Docker
 
 ## 🤝 贡献
 
-详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
-
-社区 marketplace 贡献(`marketplace/`)走 **4 验证关**(当前实现):签名存在性检查(计划中)→ 注入正则扫 → AST 语法解析(V1.x:替换为真 Docker 沙箱)→ frontmatter 检测评分(V1.x:替换为真 darwin-skill 评估器)。
+详见 [CONTRIBUTING.md](CONTRIBUTING.md)。社区 marketplace 走 4 关验证。
 
 ## 📜 许可
 
-MIT License — 详见 [LICENSE](LICENSE)。
-
-上游组件保留各自协议;详见 [NOTICE.md](NOTICE.md) 致谢。
-
-## 🙏 灵感来源(精髓汲取)
-
-- [hermes-agent](https://github.com/NousResearch/hermes-agent) — 封闭学习循环 + 7 后端 + 多平台 gateway
-- [gbrain](https://github.com/garrytan/gbrain) — KB 自连图谱 + eval 回放 + safe-by-default
-- [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) — LLM 写代码 4 原则
-- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — TDD / verification / harness-first
-- [pentagi](https://github.com/vxcontrol/pentagi) + [shannon](https://github.com/KeygraphHQ/shannon) — 渗透 agent 黑盒+白盒
-- [build-your-own-x](https://github.com/codecrafters-io/build-your-own-x) — 深度学习路径
+MIT License — 详见 [LICENSE](LICENSE)。上游组件保留各自协议，详见 [NOTICE.md](NOTICE.md)。
 
 ---
 

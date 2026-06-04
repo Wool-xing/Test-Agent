@@ -19,8 +19,8 @@ SKILL_IMPL_STATUS: production
 □ APP_SRC_PATH 指向被测系统源码（覆盖率指向）
 □ workspace/regression_modules.yaml 配置（git diff 影响分析，可选）
 □ JMeter 5.6.3 + Java JRE（性能阶段）
-□ workspace/执行日志/baselines/perf_baseline.json（基线对比，首次跑会建）
-□ workspace/执行日志/history/*.xml（Flaky 检测，至少 2 次执行后才有）
+□ workspace/测试报告/{项目名}/baselines/perf_baseline.json（基线对比，首次跑会建）
+□ workspace/测试报告/{项目名}/history/*.xml（Flaky 检测，至少 2 次执行后才有）
 ```
 
 ## 📋 执行流程
@@ -79,11 +79,11 @@ pytest workspace/自动化脚本/python/ \
     -n 4 --timeout=120 \
     --reruns=2 --reruns-delay=5 \
     --cov="${APP_SRC}" \
-    --cov-report=html:workspace/执行日志/coverage-report \
-    --cov-report=xml:workspace/执行日志/coverage.xml \
+    --cov-report=html:workspace/测试报告/{项目名}/coverage-report \
+    --cov-report=xml:workspace/测试报告/{项目名}/coverage.xml \
     --cov-fail-under=80 \
-    --alluredir=workspace/执行日志/regression-allure-results \
-    --junitxml=workspace/执行日志/regression-results.xml \
+    --alluredir=workspace/测试报告/{项目名}/regression-allure-results \
+    --junitxml=workspace/测试报告/{项目名}/regression-results.xml \
     --tb=short -q
 ```
 
@@ -96,8 +96,8 @@ pytest workspace/自动化脚本/python/ \
 ```bash
 # 归档当前 junit-xml 到 history
 python -m utils.flaky_detector \
-    --archive workspace/执行日志/regression-results.xml \
-    --history workspace/执行日志/history \
+    --archive workspace/测试报告/{项目名}/regression-results.xml \
+    --history workspace/测试报告/{项目名}/history \
     --limit 5
 # 输出 flaky 候选清单（JSON）：
 # [{"test_id": "...", "fail_rate_pct": 40.0, "history": ["passed","failed",...], "action": "quarantine"}]
@@ -114,8 +114,8 @@ python -m utils.flaky_detector \
 from utils.ci_quality_gate import parse_junit
 from pathlib import Path
 
-current = parse_junit("workspace/执行日志/regression-results.xml")
-history_files = sorted(Path("workspace/执行日志/history").glob("*.xml"))[-2:-1]
+current = parse_junit("workspace/测试报告/{项目名}/regression-results.xml")
+history_files = sorted(Path("workspace/测试报告/{项目名}/history").glob("*.xml"))[-2:-1]
 if history_files:
     previous = parse_junit(str(history_files[0]))
     print(f"通过率变化: {current['pass_rate_pct'] - previous['pass_rate_pct']:+.1f} pct")
@@ -139,8 +139,8 @@ fi
 
 jmeter -n \
     -t workspace/自动化脚本/jmeter/test_plan.jmx \
-    -l workspace/执行日志/jmeter-results/regression_perf.jtl \
-    -e -o workspace/执行日志/jmeter-report/ \
+    -l workspace/测试报告/{项目名}/jmeter-results/regression_perf.jtl \
+    -e -o workspace/测试报告/{项目名}/jmeter-report/ \
     -Jtarget_host="${TARGET_HOST}" \
     -Jtarget_protocol="${TARGET_PROTOCOL:-http}" \
     -Jtarget_port="${TARGET_PORT:-80}" \
@@ -148,9 +148,9 @@ jmeter -n \
 
 # 性能门禁 + 基线对比
 python -m utils.jmeter_result_parser \
-    workspace/执行日志/jmeter-results/regression_perf.jtl \
+    workspace/测试报告/{项目名}/jmeter-results/regression_perf.jtl \
     --mode "${PERF_MODE}" \
-    --baseline workspace/执行日志/baselines/perf_baseline.json \
+    --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json \
     --regression-max-pct 20
 ```
 

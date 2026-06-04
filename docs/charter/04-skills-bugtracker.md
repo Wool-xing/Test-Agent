@@ -15,7 +15,7 @@
   ├── SKILL.md                       ← 上游原文，禁止本地修改（防失同步）
   ├── templates/result-card*.html    ← 上游成果卡片模板
   └── scripts/screenshot.mjs         ← 上游截图脚本
-workspace/执行日志/skill-evolution/
+workspace/测试报告/{项目名}/skill-evolution/
   ├── results.tsv                    ← 9 列优化日志（含 eval_mode）
   ├── test-prompts/{skill}.json      ← 每个 skill 的实测 prompt 集
   └── result-cards/                  ← 成果卡片 PNG 归档

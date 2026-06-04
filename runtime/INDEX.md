@@ -16,7 +16,7 @@
 | 注册中心 | [registry/](registry/INDEX.md) | 扫描 16 专家 + 32 业务 Skill + 3 元 Skill frontmatter,统一目录 |
 | Prefect 编排 | [orchestrator/](orchestrator/INDEX.md) | 执行 DAG,断点续跑,产物归档 |
 | FastAPI 入口 | [api/](api/INDEX.md) | `/run` `/status` `/report` `/catalog` |
-| Typer CLI | [cli/](cli/INDEX.md) | `tagent run/status/report/catalog` |
+| Typer CLI | [cli/](cli/INDEX.md) | `tagent run/plan/catalog/doctor` |
 | 飞轮存储 | [storage/](storage/INDEX.md) | Postgres+pgvector + MinIO |
 | 观测 | [observability/](observability/INDEX.md) | OpenTelemetry + Loguru |
 | 配置 | `config/` | pydantic-settings |

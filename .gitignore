@@ -17,14 +17,57 @@ htmlcov/
 
 # workspace 测试产出（敏感 + 体积大）
 workspace/测试数据/
+workspace/automotive/
+workspace/测试用例/
+workspace/测试计划/
+workspace/需求分析/
 workspace/执行日志/
-workspace/测试报告/
+workspace/audit/
 workspace/_outputs/
 workspace/feedback/
 workspace/自动化脚本/
 
-# 但保留 workspace/执行日志/baselines/（性能基线需提交）
-!workspace/执行日志/baselines/
+# 测试报告 — 排除产物，保留 baselines/
+# 根级直接文件（临时报告、自检产物等）
+workspace/测试报告/*.md
+workspace/测试报告/*.docx
+workspace/测试报告/*.json
+# 旧式子目录（v1.42 前，无项目名层级）
+workspace/测试报告/allure-results/
+workspace/测试报告/allure-report/
+workspace/测试报告/jmeter-results/
+workspace/测试报告/jmeter-report/
+workspace/测试报告/decisions/
+workspace/测试报告/evidence/
+workspace/测试报告/reports/
+workspace/测试报告/security/
+workspace/测试报告/history/
+workspace/测试报告/quarantine/
+workspace/测试报告/soak/
+workspace/测试报告/ai-*/
+workspace/测试报告/web-vitals/
+workspace/测试报告/silent-failures/
+workspace/测试报告/audit/
+workspace/测试报告/screenshots/
+# 按 run_id 隔离的产出目录（时间戳格式: YYYYMMDD_HHMMSS_xxxxxx）
+workspace/测试报告/*/2*/
+# 项目级产出子目录（{项目名}/ 下）
+workspace/测试报告/*/screenshots/
+workspace/测试报告/*/allure-results/
+workspace/测试报告/*/allure-report/
+workspace/测试报告/*/jmeter-results/
+workspace/测试报告/*/jmeter-report/
+workspace/测试报告/*/decisions/
+workspace/测试报告/*/evidence/
+workspace/测试报告/*/reports/
+workspace/测试报告/*/security/
+workspace/测试报告/*/history/
+workspace/测试报告/*/quarantine/
+workspace/测试报告/*/soak/
+workspace/测试报告/*/ai-*/
+workspace/测试报告/*/web-vitals/
+workspace/测试报告/*/silent-failures/
+workspace/测试报告/*/audit/
 
 # ===== 敏感配置 =====
 .env
@@ -41,6 +84,8 @@ workspace/自动化脚本/
 Thumbs.db
 
 # ===== Claude Code =====
+.claude/agents/
+.claude/skills/
 .claude/cache/
 .claude/sessions/
 

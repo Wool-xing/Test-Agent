@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python config/check_version.py"
+          }
+        ],
+        "description": "Check for Test-Agent updates (24h cooldown)"
+      }
+    ]
+  }
+}

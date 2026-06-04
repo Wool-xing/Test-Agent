@@ -87,9 +87,9 @@ class VisualTest(AgentRunner):
             '  "outputs": {\n'
             '    "template_dir": "workspace/自动化脚本/python/visual/images/",\n'
             '    "baseline_dir": "workspace/自动化脚本/python/visual/baselines/",\n'
-            '    "diff_dir": "workspace/执行日志/visual-diffs/",\n'
-            '    "ocr_dir": "workspace/执行日志/visual-ocr/",\n'
-            '    "screenshot_dir": "workspace/执行日志/visual-screenshots/",\n'
+            '    "diff_dir": "workspace/测试报告/{项目名}/visual-diffs/",\n'
+            '    "ocr_dir": "workspace/测试报告/{项目名}/visual-ocr/",\n'
+            '    "screenshot_dir": "workspace/测试报告/{项目名}/screenshots/visual/",\n'
             '    "allure_dir": "workspace/Allure/visual/{run_id}/"\n'
             "  },\n"
             '  "risks": ["string,如 设备断连 / 分辨率差异致误报 / OCR 字体缺失 / 动态内容 false positive"],\n'
@@ -156,8 +156,8 @@ class VisualTest(AgentRunner):
                     "estimated_min": 5,
                     "outputs": [
                         "workspace/Allure/visual/selftest-20260516-000003/",
-                        "workspace/执行日志/visual-diffs/",
-                        "workspace/执行日志/visual-screenshots/",
+                        "workspace/测试报告/{项目名}/visual-diffs/",
+                        "workspace/测试报告/{项目名}/screenshots/visual/",
                     ],
                     "depends_on": ["visual_regression"],
                 },
@@ -182,9 +182,9 @@ class VisualTest(AgentRunner):
             "outputs": {
                 "template_dir": "workspace/自动化脚本/python/visual/images/",
                 "baseline_dir": "workspace/自动化脚本/python/visual/baselines/",
-                "diff_dir": "workspace/执行日志/visual-diffs/",
-                "ocr_dir": "workspace/执行日志/visual-ocr/",
-                "screenshot_dir": "workspace/执行日志/visual-screenshots/",
+                "diff_dir": "workspace/测试报告/{项目名}/visual-diffs/",
+                "ocr_dir": "workspace/测试报告/{项目名}/visual-ocr/",
+                "screenshot_dir": "workspace/测试报告/{项目名}/screenshots/visual/",
                 "allure_dir": "workspace/Allure/visual/selftest-20260516-000003/",
             },
             "risks": [
@@ -199,7 +199,7 @@ class VisualTest(AgentRunner):
         }
 
     def output_file(self, ctx: RunnerContext) -> Path | None:
-        return ctx.workspace / "执行日志" / "visual_test_plan.json"
+        return ctx.workspace / "测试报告" / "visual_test_plan.json"
 
     def summary(self, output: dict[str, Any]) -> str:
         phases = len(output.get("phases", []))

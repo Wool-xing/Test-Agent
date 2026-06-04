@@ -71,11 +71,11 @@ examples/web-demo/
 
 | 完整工作流 | 本 demo |
 |-----------|---------|
-| 16 Agent + 32 Skill + 78 utils | 仅 pytest + playwright |
+| 16 Agent + 32 Skill + 79 utils | 仅 pytest + playwright |
 | `.env` 配置 8 必填 | 不需 `.env` |
 | Allure / JMeter / BugTracker 集成 | 不集成 |
 | 冒烟 + 回归 + 性能门禁 | 仅 1 冒烟用例 |
-| `install.sh` 一键部署 | `pip install -r requirements.txt` 即可 |
+| `install.py` 一键部署 | `pip install -r requirements.txt` 即可 |
 
 **升级到完整工作流**：见根目录 [`README.md`](../../README.md) Quick Start 段。
 

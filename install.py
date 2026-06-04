@@ -10,8 +10,10 @@
     Git / Node.js — 脚本自动检测并安装（winget / brew / apt）
 
 用法：
-    python install.py /path/to/your-test-project      # 指定目录
-    python install.py                                  # 默认 ./Test-Agent
+    python install.py /path/to/your-test-project      # 完整安装到指定目录
+    python install.py                                  # 完整安装，默认 ./Test-Agent
+    python install.py --update                         # 轻量更新当前目录
+    python install.py /path/to/project --update        # 轻量更新指定目录
 
 安全提示：不要 pipe-to-python。先下载再审查后执行：
     curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
@@ -25,22 +27,56 @@
 """
 
 import os
+import stat
 import sys
 import shutil
 import subprocess
 import tempfile
 import glob
 import platform
+import argparse
+
+# Windows 中文终端默认 GBK，Unicode 输出（✓ ✅ → ⚠）直接炸。
+# 强制 UTF-8 输出，避免 UnicodeEncodeError。
+if sys.stdout.encoding.upper() != "UTF-8":
+    sys.stdout.reconfigure(encoding="utf-8")
 
 
-PROJECT_ROOT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.getcwd(), "Test-Agent")
+def _parse_args():
+    """解析命令行参数。"""
+    parser = argparse.ArgumentParser(
+        description="Test-Agent 工作流一键部署脚本",
+        epilog="安全提示：不要 pipe-to-python。先下载再审查后执行。",
+    )
+    parser.add_argument(
+        "path", nargs="?", default=None,
+        help="项目目录路径（默认: ./Test-Agent；--update 模式下默认当前目录）",
+    )
+    parser.add_argument(
+        "--update", action="store_true",
+        help="轻量更新：仅同步新文件 + 依赖，保留用户数据和 .venv",
+    )
+    _args = parser.parse_args()
+    return _args
+
+
+_ARGS = _parse_args()
+UPDATE_MODE = _ARGS.update
+
+if _ARGS.path:
+    PROJECT_ROOT = _ARGS.path
+elif UPDATE_MODE:
+    PROJECT_ROOT = os.getcwd()
+else:
+    PROJECT_ROOT = os.path.join(os.getcwd(), "Test-Agent")
 REPO_URL = os.environ.get("TEST_AGENT_REPO_URL", "https://github.com/Wool-xing/Test-Agent.git")
 REPO_BRANCH = os.environ.get("TEST_AGENT_REPO_BRANCH", "main")
 
 PRESERVE_FILES = [
     ".env",
+    "quality_gates.yaml",
     os.path.join("workspace", "测试数据", "test_data.json"),
-    os.path.join("workspace", "执行日志", "baselines", "perf_baseline.json"),
+    os.path.join("workspace", "测试报告", "baselines", "perf_baseline.json"),
     "workspace/regression_modules.yaml",
 ]
 
@@ -48,8 +84,9 @@ IS_WINDOWS = platform.system() == "Windows"
 
 
 def banner():
+    mode = "轻量更新" if UPDATE_MODE else "一键部署"
     print("=" * 50)
-    print(" Test-Agent 工作流一键部署 V1.42.0")
+    print(f" Test-Agent 工作流{mode}")
     print(f" 仓库:     {REPO_URL} ({REPO_BRANCH})")
     print(f" 项目目录: {PROJECT_ROOT}")
     print("=" * 50)
@@ -245,8 +282,10 @@ def create_dirs(project_root):
     """创建项目目录结构。"""
     print("→ 创建目录...")
     dirs = [
-        os.path.join(".claude", "agents"),
-        os.path.join(".claude", "skills"),
+        "agents",                          # runtime 直读（registry / catalog）
+        "skills",                          # runtime 直读
+        os.path.join(".claude", "agents"), # Claude Code 自动发现
+        os.path.join(".claude", "skills"), # Claude Code 自动发现
         os.path.join(".github", "workflows"),
         "utils",
         "src",
@@ -255,79 +294,107 @@ def create_dirs(project_root):
         os.path.join("workspace", "测试用例"),
         os.path.join("workspace", "测试数据"),
         os.path.join("workspace", "测试报告"),
-        os.path.join("workspace", "测试用例", "charters"),
         os.path.join("workspace", "自动化脚本", "python", "pages"),
         os.path.join("workspace", "自动化脚本", "python", "api"),
         os.path.join("workspace", "自动化脚本", "python", "tests"),
         os.path.join("workspace", "自动化脚本", "python", "scripts"),
         os.path.join("workspace", "自动化脚本", "jmeter"),
-        os.path.join("workspace", "执行日志", "allure-results"),
-        os.path.join("workspace", "执行日志", "jmeter-results"),
-        os.path.join("workspace", "执行日志", "jmeter-report"),
-        os.path.join("workspace", "执行日志", "coverage-report"),
-        os.path.join("workspace", "执行日志", "baselines"),
-        os.path.join("workspace", "执行日志", "history"),
-        os.path.join("workspace", "执行日志", "截图"),
+        "memory",
     ]
     for d in dirs:
         os.makedirs(os.path.join(project_root, d), exist_ok=True)
 
 
 def copy_agents(template_dir, project_root):
-    """拷贝 Agent 定义。"""
+    """拷贝 Agent 定义到 agents/（runtime 用）和 .claude/agents/（Claude Code 用）。"""
     print("→ 拷贝 Agent 定义...")
     agents_dir = os.path.join(template_dir, "agents")
-    dest_dir = os.path.join(project_root, ".claude", "agents")
-    os.makedirs(dest_dir, exist_ok=True)
+    # runtime 路径
+    runtime_dest = os.path.join(project_root, "agents")
+    os.makedirs(runtime_dest, exist_ok=True)
+    # Claude Code 路径
+    claude_dest = os.path.join(project_root, ".claude", "agents")
+    os.makedirs(claude_dest, exist_ok=True)
     count = 0
     for f in glob.glob(os.path.join(agents_dir, "[0-9]*.md")):
-        shutil.copy2(f, dest_dir)
+        shutil.copy2(f, runtime_dest)
+        shutil.copy2(f, claude_dest)
         count += 1
-    print(f"  已部署 {count} 个 Agent")
+    print(f"  已部署 {count} 个 Agent（agents/ + .claude/agents/）")
 
 
 def copy_skills(template_dir, project_root):
-    """拷贝 Skill 定义。"""
+    """拷贝 Skill 定义到 skills/（runtime 用）和 .claude/skills/（Claude Code 用）。"""
     print("→ 拷贝 Skill 定义...")
     skills_dir = os.path.join(template_dir, "skills")
-    dest_dir = os.path.join(project_root, ".claude", "skills")
-    os.makedirs(dest_dir, exist_ok=True)
+    runtime_dest = os.path.join(project_root, "skills")
+    os.makedirs(runtime_dest, exist_ok=True)
+    claude_dest = os.path.join(project_root, ".claude", "skills")
+    os.makedirs(claude_dest, exist_ok=True)
 
     md_count = 0
     for f in glob.glob(os.path.join(skills_dir, "*.md")):
         if os.path.basename(f) == "README.md":
             continue
-        shutil.copy2(f, dest_dir)
+        shutil.copy2(f, runtime_dest)
+        shutil.copy2(f, claude_dest)
         md_count += 1
 
     dir_count = 0
     for entry in os.listdir(skills_dir):
         sub = os.path.join(skills_dir, entry)
         if os.path.isdir(sub):
-            dst = os.path.join(dest_dir, entry)
-            if os.path.exists(dst):
-                shutil.rmtree(dst)
-            shutil.copytree(sub, dst)
+            # runtime
+            rdst = os.path.join(runtime_dest, entry)
+            if os.path.exists(rdst):
+                shutil.rmtree(rdst)
+            shutil.copytree(sub, rdst)
+            # Claude Code
+            cdst = os.path.join(claude_dest, entry)
+            if os.path.exists(cdst):
+                shutil.rmtree(cdst)
+            shutil.copytree(sub, cdst)
             dir_count += 1
 
-    print(f"  已部署 {md_count} 个业务 Skill + {dir_count} 个元 Skill 子目录")
+    print(f"  已部署 {md_count} 个业务 Skill + {dir_count} 个元 Skill 子目录（skills/ + .claude/skills/）")
 
 
 def copy_config(template_dir, project_root):
     """拷贝配置文件。"""
     print("→ 拷贝配置文件...")
     config_dir = os.path.join(template_dir, "config")
-    files = ["conftest.py", "pytest.ini", ".mcp.json", "requirements.txt"]
+    files = [
+        "conftest.py", "pytest.ini", ".mcp.json", "requirements.txt",
+        "check_version.py", "quality_gates.yaml",
+    ]
     for f in files:
         src = os.path.join(config_dir, f)
         if os.path.isfile(src):
             shutil.copy2(src, project_root)
 
+    # 拷贝项目模板（STARTUP.md.tpl / .env.tpl / .tagent.yml.tpl / matrix.yaml 等）
+    tmpl_src = os.path.join(config_dir, "templates")
+    tmpl_dst = os.path.join(project_root, "templates")
+    if os.path.isdir(tmpl_src):
+        if os.path.exists(tmpl_dst):
+            shutil.rmtree(tmpl_dst)
+        shutil.copytree(tmpl_src, tmpl_dst)
+
+    # .env — 仅在不存在时创建
     env_dst = os.path.join(project_root, ".env")
     if not os.path.isfile(env_dst):
         env_src = os.path.join(config_dir, ".env.example")
         if os.path.isfile(env_src):
             shutil.copy2(env_src, env_dst)
+
+    # .claude/settings.json — 部署版本检查 hook，仅在不存在时创建
+    claude_dir = os.path.join(project_root, ".claude")
+    settings_dst = os.path.join(claude_dir, "settings.json")
+    if not os.path.isfile(settings_dst):
+        settings_src = os.path.join(config_dir, "settings.json")
+        if os.path.isfile(settings_src):
+            os.makedirs(claude_dir, exist_ok=True)
+            shutil.copy2(settings_src, settings_dst)
 
 
 def copy_utils(template_dir, project_root):
@@ -346,6 +413,31 @@ def copy_utils(template_dir, project_root):
                 shutil.copy2(src, dst)
                 count += 1
     print(f"  ✓ {count} 个 .py 文件已拷贝")
+
+
+def copy_runtime(template_dir, project_root):
+    """拷贝 runtime 目录（pyproject.toml / Python / 前端 / Docker / MCP / 配置等）。"""
+    print("→ 拷贝 runtime...")
+    runtime_src = os.path.join(template_dir, "runtime")
+    runtime_dst = os.path.join(project_root, "runtime")
+    count = 0
+    skip_dirs = {"__pycache__", ".ruff_cache", ".pytest_cache", ".egg-info",
+                 "node_modules", ".git"}
+    skip_ext = {".pyc", ".pyo"}
+    skip_files = {".coverage", ".dockerignore", "tsconfig.tsbuildinfo"}
+    for root, dirs, files in os.walk(runtime_src):
+        dirs[:] = [d for d in dirs if d not in skip_dirs and not d.startswith(".")]
+        for f in files:
+            _, ext = os.path.splitext(f)
+            if ext in skip_ext or f in skip_files:
+                continue
+            src = os.path.join(root, f)
+            rel = os.path.relpath(src, runtime_src)
+            dst = os.path.join(runtime_dst, rel)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy2(src, dst)
+            count += 1
+    print(f"  ✓ {count} 个文件已拷贝")
 
 
 def copy_ci(template_dir, project_root):
@@ -368,7 +460,8 @@ def copy_top_level_docs(template_dir, project_root):
     docs = [
         "LICENSE", "NOTICE.md", "SECURITY.md", "CONTRIBUTING.md",
         "CODE_OF_CONDUCT.md", "ROADMAP.md", "README.md", "README.zh-CN.md",
-        "CHANGELOG.md", "VERSION",
+        "CHANGELOG.md", "VERSION", "FULL_GUIDE.md", "AGENTS.md", "CLAUDE.md",
+        "tagent.yml.example",
     ]
     for f in docs:
         src = os.path.join(template_dir, f)
@@ -385,11 +478,13 @@ def setup_venv(python_bin, project_root):
 
     if IS_WINDOWS:
         pip_cmd = os.path.join(venv_dir, "Scripts", "pip")
+        python_exe = os.path.join(venv_dir, "Scripts", "python.exe")
     else:
         pip_cmd = os.path.join(venv_dir, "bin", "pip")
+        python_exe = os.path.join(venv_dir, "bin", "python")
 
-    # pip 升级
-    subprocess.run([pip_cmd, "install", "--upgrade", "pip", "-q"], check=True)
+    # pip 升级（pip>=25.3 要求通过 python -m pip 方式升级）
+    subprocess.run([python_exe, "-m", "pip", "install", "--upgrade", "pip", "-q"], check=True)
 
     # CN 镜像检测
     pip_index_url = os.environ.get("PIP_INDEX_URL")
@@ -429,11 +524,35 @@ def setup_venv(python_bin, project_root):
     else:
         subprocess.run([pip_cmd, "install", "-r", req_file], env=pip_env, check=True)
 
-    # Playwright
+    # Playwright 浏览器（按需安装，UI 测试才用）
+    if IS_WINDOWS:
+        playwright_cmd = os.path.join(venv_dir, "Scripts", "playwright.exe")
+    else:
+        playwright_cmd = os.path.join(venv_dir, "bin", "playwright")
     try:
-        subprocess.run(["playwright", "install", "chromium", "--with-deps"], check=True)
+        subprocess.run([playwright_cmd, "install", "chromium", "--with-deps"], check=True)
     except Exception:
-        print("⚠️ Playwright deps 安装失败，UI 测试需手动 'playwright install chromium --with-deps'")
+        print(f"⚠️ Playwright 浏览器安装失败，如需 UI 测试请手动运行：{playwright_cmd} install chromium --with-deps")
+
+    # 将 runtime 作为可编辑包安装到 venv（tagent 命令即可用）
+    print("→ 安装 tagent CLI (pip install -e runtime/) ...")
+    runtime_dir = os.path.join(project_root, "runtime")
+    subprocess.run([pip_cmd, "install", "-e", runtime_dir], env=pip_env, check=True)
+
+
+def _create_wrappers(project_root):
+    """在项目根创建 tagent.bat / tagent 包装脚本，用户直接双击或用终端运行。"""
+    if IS_WINDOWS:
+        venv_python = os.path.join(project_root, ".venv", "Scripts", "python.exe")
+        bat_path = os.path.join(project_root, "tagent.bat")
+        with open(bat_path, "w", encoding="ascii") as f:
+            f.write(f'@echo off\n"{venv_python}" -m runtime.cli.main %*\n')
+    else:
+        venv_python = os.path.join(project_root, ".venv", "bin", "python")
+        sh_path = os.path.join(project_root, "tagent")
+        with open(sh_path, "w", encoding="ascii") as f:
+            f.write(f'#!/bin/sh\n"{venv_python}" -m runtime.cli.main "$@"\n')
+        os.chmod(sh_path, 0o755)
 
 
 def timezone_is_cn():
@@ -451,20 +570,172 @@ def finish(project_root):
 
  项目目录: {project_root}
 
- 下一步：
- 1. 编辑 {project_root}/.env（最少 8 必填字段，详见 配置清单.md）
- 2. 安装 Java JRE 17 + JMeter 5.6.3 + Allure CLI（详见 部署说明.md）
- 3. claude /login                           # 首次登录 Claude Code
- 4. cd {project_root} && claude              # 启动
- 5. 在 Claude 提示符内: > /smoke-test       # 第一次冒烟验证
+ === 独立使用（不需 AI）===
+   cd {project_root}
+   .\tagent.bat                        # Windows 终端
+   ./tagent                            # macOS / Linux 终端
+   tagent run "path/to/prd.md"         # 一键执行
+   tagent doctor                       # 健康检查
+   tagent catalog                      # 查看所有专家和技能
+
+ === AI 协作模式 ===
+   1. 编辑 {project_root}/.env → 设 TAGENT_LLM_PROVIDER + API key
+     内置: claude | openai | gemini | deepseek | qwen | ollama
+     OpenAI 兼容: 智谱/豆包/Kimi/百川/讯飞 (设 TAGENT_LLM_API_BASE)
+   2. cd {project_root} && claude      (或 cursor / Copilot / Windsurf)
+   3. AI 会自动读取 CLAUDE.md，请确保它遵循 skills/ 流程文档
 
 {'=' * 50}
 """
     print(msg)
 
 
+def _rmtree_onerror(func, path, _exc_info):
+    """Windows git objects are read-only, clear attribute before retry."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def _read_template_version(template_dir):
+    """读取模板 VERSION 文件。"""
+    vf = os.path.join(template_dir, "VERSION")
+    if os.path.isfile(vf):
+        with open(vf, encoding="utf-8") as f:
+            return f.read().strip()
+    return None
+
+
+def _write_local_version(project_root, version):
+    """写入 .version 文件供后续更新检测。"""
+    vf = os.path.join(project_root, ".version")
+    with open(vf, "w", encoding="utf-8") as f:
+        f.write(version + "\n")
+
+
+def _update_deps(project_root):
+    """使用已有 venv 安装/更新 Python 依赖（不重建 venv）。"""
+    if IS_WINDOWS:
+        python_exe = os.path.join(project_root, ".venv", "Scripts", "python.exe")
+        pip_cmd = os.path.join(project_root, ".venv", "Scripts", "pip")
+    else:
+        python_exe = os.path.join(project_root, ".venv", "bin", "python")
+        pip_cmd = os.path.join(project_root, ".venv", "bin", "pip")
+
+    if not os.path.isfile(python_exe):
+        print("⚠️ 未找到虚拟环境，跳过依赖更新")
+        return
+
+    subprocess.run([python_exe, "-m", "pip", "install", "--upgrade", "pip", "-q"], check=True)
+
+    # CN 镜像检测
+    pip_env = os.environ.copy()
+    if os.environ.get("TEST_AGENT_NO_CN_MIRROR", "0") != "1":
+        if any([
+            os.environ.get("LANG", "").startswith(("zh", "CN", "GB")),
+            timezone_is_cn(),
+        ]):
+            pip_env["PIP_INDEX_URL"] = "https://pypi.tuna.tsinghua.edu.cn/simple"
+            pip_env["PIP_TRUSTED_HOST"] = "pypi.tuna.tsinghua.edu.cn"
+
+    req_file = os.path.join(project_root, "requirements.txt")
+    print("→ 更新 Python 依赖...")
+    if IS_WINDOWS:
+        with open(req_file, encoding="utf-8") as f:
+            lines = f.readlines()
+        filtered = [l for l in lines if not l.startswith(("scikit-image", "scikit-learn", "opencv-python", "opencv-contrib-python"))]
+        fd, tmp = tempfile.mkstemp(suffix=".txt", prefix="tagent-update-req-")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.writelines(filtered)
+        subprocess.run([pip_cmd, "install", "-r", tmp], env=pip_env, check=True)
+        os.unlink(tmp)
+    else:
+        subprocess.run([pip_cmd, "install", "-r", req_file], env=pip_env, check=True)
+
+
+def do_update():
+    """轻量更新：克隆最新模板 → 比较版本 → 拷贝文件 → 更新依赖 → 保留用户数据。"""
+    version_file = os.path.join(PROJECT_ROOT, ".version")
+    if not os.path.isfile(version_file):
+        print(f"❌ 未找到 .version 文件")
+        print(f"   当前目录: {os.getcwd()}")
+        print(f"   查找路径: {version_file}")
+        print(f"   请先执行完整安装：python install.py <目录>")
+        print(f"   或切换到项目目录后执行：cd <项目目录> && python install.py --update")
+        sys.exit(1)
+
+    with open(version_file, encoding="utf-8") as f:
+        local_version = f.read().strip()
+
+    print(f"→ 当前版本: {local_version}")
+
+    template_dir_parent = tempfile.mkdtemp()
+    template_dir = os.path.join(template_dir_parent, "Test-Agent工作流搭建")
+
+    try:
+        local_src = os.environ.get("TEST_AGENT_LOCAL_SRC")
+        if local_src:
+            print(f"→ [dev mode] 复制本地源代码: {local_src} → {template_dir}")
+            shutil.copytree(local_src, template_dir)
+        else:
+            print("→ 检查更新...")
+            subprocess.run(
+                ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
+                check=True,
+            )
+
+        remote_version = _read_template_version(template_dir)
+        if remote_version is None:
+            print("❌ 无法读取远程版本信息")
+            sys.exit(1)
+
+        if local_version == remote_version:
+            print(f"✓ 已是最新版本 ({local_version})")
+            return
+
+        print(f"→ 新版本可用: {local_version} → {remote_version}")
+        print("→ 开始轻量更新（保留用户数据和 .venv）...")
+
+        # 备份用户数据
+        backed = backup_user_data(PROJECT_ROOT)
+
+        # 拷贝新文件（跳过 create_dirs / setup_venv / claude code 安装）
+        copy_agents(template_dir, PROJECT_ROOT)
+        copy_skills(template_dir, PROJECT_ROOT)
+        copy_config(template_dir, PROJECT_ROOT)
+        copy_utils(template_dir, PROJECT_ROOT)
+        copy_runtime(template_dir, PROJECT_ROOT)
+        copy_ci(template_dir, PROJECT_ROOT)
+        copy_top_level_docs(template_dir, PROJECT_ROOT)
+
+        # 恢复用户数据
+        restore_user_data(PROJECT_ROOT, backed)
+
+        # 更新依赖
+        _update_deps(PROJECT_ROOT)
+
+        # 重建包装脚本
+        _create_wrappers(PROJECT_ROOT)
+
+        # 写回新版本号
+        _write_local_version(PROJECT_ROOT, remote_version)
+
+        print("=" * 50)
+        print(f" ✅ 已更新到 {remote_version}")
+        print("=" * 50)
+
+    finally:
+        if os.path.isdir(template_dir_parent):
+            shutil.rmtree(template_dir_parent, onerror=_rmtree_onerror)
+        # cleanup backup tmp if any leftover (restore_user_data usually handles this)
+        # handled in finally block of main, but do_update has its own finally
+
+
 def main():
     banner()
+
+    if UPDATE_MODE:
+        do_update()
+        return
 
     # 1. 检查 + 自动安装前置工具
     ensure_prerequisites()
@@ -503,24 +774,33 @@ def main():
         copy_skills(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
 
-        # 7. Python 虚拟环境 + 依赖
+        # 7. Python 虚拟环境 + 依赖 + tagent CLI
         setup_venv(python_bin, PROJECT_ROOT)
 
-        # 8. 恢复用户数据
+        # 8. 创建 tagent.bat / tagent 包装脚本
+        _create_wrappers(PROJECT_ROOT)
+
+        # 10. 恢复用户数据
         restore_user_data(PROJECT_ROOT, backed)
+
+        # 11. 写入 .version 供后续更新检测
+        version = _read_template_version(template_dir)
+        if version:
+            _write_local_version(PROJECT_ROOT, version)
 
         finish(PROJECT_ROOT)
 
     finally:
         # 清理临时目录
         if os.path.isdir(template_dir_parent):
-            shutil.rmtree(template_dir_parent)
+            shutil.rmtree(template_dir_parent, onerror=_rmtree_onerror)
         tmp = backed.pop("__tmp__", None)
         if tmp and os.path.isdir(tmp):
-            shutil.rmtree(tmp)
+            shutil.rmtree(tmp, onerror=_rmtree_onerror)
 
 
 if __name__ == "__main__":

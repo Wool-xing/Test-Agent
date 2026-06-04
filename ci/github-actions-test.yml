@@ -129,8 +129,8 @@ jobs:
 
       - name: 创建工作目录
         run: |
-          mkdir -p workspace/执行日志/allure-results
-          mkdir -p workspace/执行日志/截图
+          mkdir -p workspace/测试报告/{项目名}/allure-results
+          mkdir -p workspace/测试报告/{项目名}/screenshots
           mkdir -p workspace/测试数据
 
       - name: 执行冒烟测试（P0）
@@ -139,8 +139,8 @@ jobs:
             -n 2 \
             --timeout=60 \
             --tb=short \
-            --alluredir=workspace/执行日志/allure-results \
-            --junitxml=workspace/执行日志/smoke-results.xml \
+            --alluredir=workspace/测试报告/{项目名}/allure-results \
+            --junitxml=workspace/测试报告/{项目名}/smoke-results.xml \
             -v
         env:
           HEADLESS: 'true'
@@ -149,15 +149,15 @@ jobs:
         if: always()
         run: |
           python -m utils.ci_quality_gate \
-            --smoke-xml workspace/执行日志/smoke-results.xml \
-            --output-json workspace/执行日志/smoke_gate_result.json
+            --smoke-xml workspace/测试报告/{项目名}/smoke-results.xml \
+            --output-json workspace/测试报告/{项目名}/smoke_gate_result.json
 
       - name: 上传冒烟产物
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: smoke-test-results
-          path: workspace/执行日志/
+          path: workspace/测试报告/{项目名}/
           retention-days: 7
 
   # ===== 3. 回归测试（P0+P1） =====
@@ -192,9 +192,9 @@ jobs:
 
       - name: 创建工作目录
         run: |
-          mkdir -p workspace/执行日志/allure-results
-          mkdir -p workspace/执行日志/截图
-          mkdir -p workspace/执行日志/coverage-report
+          mkdir -p workspace/测试报告/{项目名}/allure-results
+          mkdir -p workspace/测试报告/{项目名}/screenshots
+          mkdir -p workspace/测试报告/{项目名}/coverage-report
 
       - name: 执行回归测试（并行 4 进程）
         run: |
@@ -204,11 +204,11 @@ jobs:
             --reruns-delay=5 \
             --timeout=120 \
             --cov="${APP_SRC_PATH}" \
-            --cov-report=xml:workspace/执行日志/coverage.xml \
-            --cov-report=html:workspace/执行日志/coverage-report \
+            --cov-report=xml:workspace/测试报告/{项目名}/coverage.xml \
+            --cov-report=html:workspace/测试报告/{项目名}/coverage-report \
             --cov-fail-under=80 \
-            --alluredir=workspace/执行日志/allure-results \
-            --junitxml=workspace/执行日志/regression-results.xml \
+            --alluredir=workspace/测试报告/{项目名}/allure-results \
+            --junitxml=workspace/测试报告/{项目名}/regression-results.xml \
             -v
         env:
           HEADLESS: 'true'
@@ -217,16 +217,16 @@ jobs:
         if: always()
         run: |
           python -m utils.ci_quality_gate \
-            --regression-xml workspace/执行日志/regression-results.xml \
-            --coverage-xml workspace/执行日志/coverage.xml \
+            --regression-xml workspace/测试报告/{项目名}/regression-results.xml \
+            --coverage-xml workspace/测试报告/{项目名}/coverage.xml \
             --coverage-threshold 80 \
-            --output-json workspace/执行日志/regression_gate_result.json
+            --output-json workspace/测试报告/{项目名}/regression_gate_result.json
 
       - name: 上传覆盖率到 Codecov
         if: always() && needs.preflight.outputs.codecov_enabled == 'true'
         uses: codecov/codecov-action@v4
         with:
-          file: workspace/执行日志/coverage.xml
+          file: workspace/测试报告/{项目名}/coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
@@ -235,7 +235,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: regression-test-results
-          path: workspace/执行日志/
+          path: workspace/测试报告/{项目名}/
           retention-days: 14
 
   # ===== 4. JMeter 性能测试 =====
@@ -281,9 +281,9 @@ jobs:
 
       - name: 创建目录
         run: |
-          mkdir -p workspace/执行日志/jmeter-results
-          mkdir -p workspace/执行日志/jmeter-report
-          mkdir -p workspace/执行日志/baselines
+          mkdir -p workspace/测试报告/{项目名}/jmeter-results
+          mkdir -p workspace/测试报告/{项目名}/jmeter-report
+          mkdir -p workspace/测试报告/{项目名}/baselines
           mkdir -p workspace/测试数据
 
       - name: 生成 JMeter 参数化 CSV（调用 utils）
@@ -317,15 +317,15 @@ jobs:
           fi
           jmeter -n \
             -t workspace/自动化脚本/jmeter/test_plan.jmx \
-            -l workspace/执行日志/jmeter-results/result.jtl \
-            -e -o workspace/执行日志/jmeter-report/ \
+            -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
+            -e -o workspace/测试报告/{项目名}/jmeter-report/ \
             -Jtarget_host="${{ steps.target.outputs.host }}" \
             -Jtarget_protocol="${{ steps.target.outputs.protocol }}" \
             -Jtarget_port="${{ steps.target.outputs.port }}" \
             -Jthreads=${THREADS} \
             -Jrampup=${RAMPUP} \
             -Jduration=${DURATION} \
-            -j workspace/执行日志/jmeter-results/jmeter.log
+            -j workspace/测试报告/{项目名}/jmeter-results/jmeter.log
         continue-on-error: true
 
       - name: 解析 JTL + 性能门禁（含基线对比）
@@ -335,9 +335,9 @@ jobs:
             UPDATE_FLAG="--update-baseline"
           fi
           python -m utils.jmeter_result_parser \
-            workspace/执行日志/jmeter-results/result.jtl \
+            workspace/测试报告/{项目名}/jmeter-results/result.jtl \
             --mode "${PERF_MODE}" \
-            --baseline workspace/执行日志/baselines/perf_baseline.json \
+            --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json \
             --regression-max-pct 20 \
             ${UPDATE_FLAG}
 
@@ -346,7 +346,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: performance-test-results
-          path: workspace/执行日志/jmeter-results /workspace/执行日志/jmeter-report /workspace/执行日志/baselines
+          path: workspace/测试报告/{项目名}/jmeter-results /workspace/测试报告/{项目名}/jmeter-report /workspace/测试报告/{项目名}/baselines
           retention-days: 14
 
   # ===== 5. 发布 Allure 报告 =====
@@ -417,7 +417,7 @@ jobs:
 
       - name: 综合门禁检查
         run: |
-          # 解析时优先用每个 artifact 的固定相对路径（artifact 内保留原 workspace/执行日志/ 目录）
+          # 解析时优先用每个 artifact 的固定相对路径（artifact 内保留原 workspace/测试报告/{项目名}/ 目录）
           SMOKE="artifacts/smoke-test-results/smoke-results.xml"
           REGR="artifacts/regression-test-results/regression-results.xml"
           COV="artifacts/regression-test-results/coverage.xml"

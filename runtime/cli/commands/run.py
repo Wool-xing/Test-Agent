@@ -8,8 +8,8 @@ from pathlib import Path
 import typer
 
 from runtime.cli._shared import _kernel, build_artifact, console, print_dag
-from runtime.tutor.i18n import set_lang
-from runtime.tutor.verbosity import set_mode
+from runtime.tutor.i18n import Lang, set_lang
+from runtime.tutor.verbosity import Mode, set_mode
 
 
 def register_run(app: typer.Typer) -> None:
@@ -19,12 +19,18 @@ def register_run(app: typer.Typer) -> None:
         note: str = typer.Option("", "--note", help="extra hint to the router"),
         no_persist: bool = typer.Option(False, "--no-persist", help="skip DB write"),
         json_only: bool = typer.Option(False, "--json", help="print full result JSON only"),
-        mode: str = typer.Option("exec", "--mode", help="exec | learn | silent"),
-        lang: str = typer.Option("zh", "--lang", help="zh | en | zh-en"),
+        mode: Mode | None = typer.Option(  # noqa: B008
+            None, "--mode", help="exec | learn | silent (default: $TAGENT_MODE or exec)"
+        ),
+        lang: Lang | None = typer.Option(  # noqa: B008
+            None, "--lang", help="zh | en | zh-en (default: $TAGENT_LANG or zh)"
+        ),
     ):
         """Plan + execute a test run."""
-        set_mode(mode)
-        set_lang(lang)
+        if mode is not None:
+            set_mode(mode)
+        if lang is not None:
+            set_lang(lang)
         art = build_artifact(target, note)
         run_id, decision = _kernel.submit(art, persist=not no_persist)
         if not json_only:

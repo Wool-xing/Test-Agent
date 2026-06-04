@@ -16,6 +16,7 @@ Expert/Skill execution model:
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -96,13 +97,13 @@ SKILL_SCRIPT_MAP: dict[str, str | None] = {
 # Scripts that require CLI args; injected when DAG node provides no inputs.
 # Explicit DAG inputs always win; defaults only fill the gap.
 SCRIPT_DEFAULT_ARGS: dict[str, dict[str, str]] = {
-    "generate_report.py": {"data": "workspace/执行日志/_selftest_summary.json"},
+    "generate_report.py": {"data": f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/_selftest_summary.json"},
 }
 
 # Fixture content materialized on demand when a SCRIPT_DEFAULT_ARGS value points to
 # a missing file. Keys are workspace-relative paths.
 SCRIPT_FIXTURES: dict[str, dict] = {
-    "workspace/执行日志/_selftest_summary.json": {
+    f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/_selftest_summary.json": {
         "project_name": "Test-Agent selftest fixture",
         "version": "0.0.0-selftest",
         "environment": "ci",
