@@ -123,7 +123,7 @@
 | 禁忌矩阵 | 跨文化禁忌词/色/数/节日组合 | 簇 9 | i18n_checker 本地化共建 | ❌ |
 | Bug 多适配引擎 | 5 套 tracker 切换 | 工程层 | `utils/bug_tracker_base.py` + `zentao_bug_manager.py` + `jira_bug_manager.py` + `github_bug_manager.py` + `linear_bug_manager.py` + `webhook_bug_manager.py` | ✅ |
 | AgentChat 协调器 | 讨论触发 / 中枢路由 / 反问留档 | 工程层 | test-lead + `discussions/` | ✅ |
-| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `requirements/` (base/mobile/desktop/visual/system/ai/perf 七文件) + `install.sh` | ✅ |
+| 按需安装引擎 | 6 层依赖 + 运行时补装 | 工程层 | `requirements/` (base/mobile/desktop/visual/system/ai/perf 七文件) + `install.py` | ✅ |
 | darwin-skill 自进化 | skill 文本结构棘轮优化 | 工程/元层 | `.claude/skills/darwin-skill/` | ✅ |
 
 ---

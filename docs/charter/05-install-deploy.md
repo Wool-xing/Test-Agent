@@ -6,11 +6,11 @@
 
 ## 📦 按需安装与依赖分层
 
-> install.sh 不再一次性装全。**用户选了什么形态，才装什么依赖**——避免 mobile 用户被强装 desktop 工具，反之亦然。
+> install.py 不再一次性装全。**用户选了什么形态，才装什么依赖**——避免 mobile 用户被强装 desktop 工具，反之亦然。
 
 ### 1. 依赖六层划分（Phase 2 规划）
 
-> **当前状态**：`install.sh` 通过 `pip install -r requirements.txt` 统一安装。分层按需安装（按产品形态选择性装依赖）为 Phase 2 路线图项。`requirements/` 目录含规划文档。
+> **当前状态**：`install.py` 通过 `pip install -r requirements.txt` 统一安装。分层按需安装（按产品形态选择性装依赖）为 Phase 2 路线图项。`requirements/` 目录含规划文档。
 
 | 层 | requirements 文件 | 触发条件 | 关键包 |
 |----|----------------|---------|--------|
@@ -22,10 +22,10 @@
 | **ai** | `requirements/ai.txt` | 选择 AI / LLM 测试 | scikit-learn / scipy + LLM eval lib |
 | **perf**（推荐装） | `requirements/perf.txt` | 选择性能测试 | locust（JMeter 走外部 Java，不进 pip） |
 
-### 2. install.sh 交互流程
+### 2. install.py 交互流程
 
 ```bash
-$ bash install.sh /path/to/your-test-project
+$ python install.py /path/to/your-test-project
 
 [1/5] 检测 Python / Java / Node 环境...
 [2/5] 选择你要测试的产品形态（多选，空格分隔）：
@@ -56,12 +56,12 @@ optional_layer: [visual]   # 跨平台时按需
 ---
 ```
 
-install.sh 反向计算：用户选了哪些 skill / agent → 自动算出最小必装层并集。
+install.py 反向计算：用户选了哪些 skill / agent → 自动算出最小必装层并集。
 
 ### 4. 后期补装
 
 ```bash
-$ bash install.sh --add visual,ai
+$ python install.py --add visual,ai
 ```
 
 不重装 base，只增量补 visual / ai。dependency 冲突走 `pip install --upgrade-strategy only-if-needed` 防止已稳定包被改版本。
@@ -74,7 +74,7 @@ $ bash install.sh --add visual,ai
 
 ### 6. 运行时按需补装（agent / skill 入口自检）
 
-> 装机时未选的层，**运行时仍可触发** —— 不强迫用户重新跑 install.sh，但也不静默自动装。
+> 装机时未选的层，**运行时仍可触发** —— 不强迫用户重新跑 install.py，但也不静默自动装。
 
 **自检与补装回路**（5 步）：
 
@@ -82,7 +82,7 @@ $ bash install.sh --add visual,ai
 2. **缺则反问**：缺失则停下反问，列层级 + 关键包 + 预估安装时间 + 影响范围
 
    > 示例："`/visual-test` 需要 visual 层（airtest + opencv-python + pytesseract，约 80MB / 2-5 分钟）。现在补装？(Y/n)"
-3. **触发补装**：用户同意 → 调 `install.sh --add visual` → 增量补装
+3. **触发补装**：用户同意 → 调 `install.py --add visual` → 增量补装
 4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/测试报告/{项目名}/discussions/{date}_dependency-asks.md`
 5. **拒绝处置**：用户拒绝 → agent / skill 降级（如可降级，例如 `/visual-test` 退化为纯 pytest）或拒绝执行并落 `decisions/`，**不静默继续假装能跑**
 
@@ -146,17 +146,14 @@ $ bash install.sh --add visual,ai
 ### 1. GitHub 一键部署（最快）
 
 ```bash
-# Mac / Linux 一行远程部署
-curl -fsSL https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.sh | bash -s -- /path/to/your-test-project
-
-# 或先 clone 再本地跑
+# clone 后本地部署（跨平台：Windows / macOS / Linux）
 git clone https://github.com/Wool-xing/Test-Agent.git
-bash Test-Agent/install.sh /path/to/your-test-project
+python Test-Agent/install.py /path/to/your-test-project
 ```
 
 > 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `docs/getting-started/部署说明.md`。
 
-`install.sh` 自动完成：克隆模板 → 装 Claude Code → 建目录 → 拷贝全部文件 → 装 Python 依赖 + Playwright。
+`install.py` 自动完成：检测环境 → 克隆模板 → 建目录 → 拷贝全部文件 → 装 Python 依赖 + Playwright → 安装 tagent CLI。
 
 ### 2. 配置 .env（敏感信息）
 
@@ -166,14 +163,16 @@ cp .env.example .env
 # 编辑 .env，填入 TEST_APP_URL / TEST_DB_* / BUG_TRACKER + 对应字段 / WECHAT_WEBHOOK_URL 等
 ```
 
-### 3. 启动 Claude Code
+### 3. 启动 AI 工具
 
 ```bash
 cd your-test-project
-claude
+claude                   # Claude Code（推荐）
+cursor                   # Cursor
+# 或 GitHub Copilot / Windsurf / CodeBuddy 等
 ```
 
-### 4. 在 Claude Code 提示符使用斜杠技能
+### 4. 在 AI 提示符使用斜杠技能
 
 ```text
 > /smoke-test                          # 10 分钟 P0 冒烟
@@ -193,7 +192,7 @@ claude
 > 连续失败 5 次锁定 30 分钟。
 ```
 
-> 注：`>` 后面是 Claude Code 提示符的输入（斜杠技能或自然语言），**不是 shell 命令**。
+> 注：`>` 后面是 AI 工具的提示符输入，**不是 shell 命令**。LLM Provider 配置见 `.env`（内置 6 家 + OpenAI 兼容端点）。
 
 详细启动指引（含 Java/JMeter/Allure 安装、.env 必填、首次跑通验证）→ `docs/getting-started/使用手册.md` 顶部「🚀 启动指引」章节。
 

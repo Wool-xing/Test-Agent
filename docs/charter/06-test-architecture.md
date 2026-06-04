@@ -159,7 +159,7 @@
 | **darwin-skill 集成（自进化）** | ✅ V1.0.0 已并入 | Phase 1 | 上游 SKILL.md + workspace 落 results.tsv + 季度同步 |
 | **Bug Tracker 多适配** | ✅ V1.0.0 已并入 | Phase 1 | 5 套适配器（zentao/jira/github/linear/webhook）+ 工厂模式 |
 | **AgentChat 协作协议** | ✅ V1.0.0 已并入 | Phase 1 | discussions/ 纪要 + test-lead 中枢路由 + 反问 3 级预算 |
-| **按需安装与依赖分层** | ✅ V1.0.0 已并入 | Phase 1 | 6 requirements 文件 + install.sh 交互 + 运行时补装回路 |
+| **按需安装与依赖分层** | ✅ V1.0.0 已并入 | Phase 1 | 6 requirements 文件 + install.py + 运行时补装回路 |
 
 > **第三公理在此节兑现**：项目有意识地**少承诺**——文明级伦理议题（如缓慢暴力、末日哨兵、神圣性守护）我们承认其存在，但**不在工程路线图上假装能做**。如果未来接入特定行业（金融 / 医疗 / 司法）需要其中某项能力，由业务方按需单独立项，不绑进通用框架。
 
@@ -240,6 +240,5 @@
 | 棘轮机制 | 改进后总分必须严格高于改进前才保留；退步自动回滚——darwin-skill 与门禁共用 |
 
 ---
-
 
 ---

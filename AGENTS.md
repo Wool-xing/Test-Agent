@@ -23,7 +23,9 @@
 
 ```bash
 cd project-dir
-pip install -e runtime/          # first time only
+# install.py 已自动安装 tagent CLI 到 venv
+tagent.bat                        # Windows
+./tagent                          # macOS / Linux
 tagent run "path/to/prd.md"      # router + orchestrator end-to-end
 tagent catalog                   # list 16 experts + 32 skills
 tagent doctor                    # health check
@@ -33,10 +35,16 @@ tagent doctor                    # health check
 
 ```bash
 cd project-dir
-# Read skills/smoke-test.md first, then follow workflow
-# Call sub-agents per Skill doc sequence (requirements-analyst → testcase-designer → ...)
-# Outputs in workspace/
+# 任选其一: claude | cursor | GitHub Copilot | Windsurf | CodeBuddy 等
+# 配置 LLM Provider: 编辑 .env → TAGENT_LLM_PROVIDER + API key
+# 内置: claude | openai | gemini | deepseek | qwen | ollama
+# OpenAI 兼容: 智谱/豆包/Kimi/百川/讯飞 (设 TAGENT_LLM_API_BASE)
 ```
+
+**Agent 工作流:**
+1. Read `skills/<task>.md` first
+2. Follow Skill doc sequence (requirements-analyst → testcase-designer → ...)
+3. Outputs in workspace/
 
 ---
 
@@ -62,7 +70,7 @@ Both paths converge at the utils execution layer.
 | What | Where |
 |------|-------|
 | Agent definitions | `agents/` (16 agents) |
-| Skill workflow docs | `skills/` (35 skills) |
+| Skill workflow docs | `skills/` (32 skills + 3 meta-skill packages) |
 | Python utils | `utils/` (79 modules) |
 | Runtime (CLI + orchestrator + MCP) | `runtime/` |
 | Config templates | `config/` (incl. `.env.example`) |
