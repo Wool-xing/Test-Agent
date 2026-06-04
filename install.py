@@ -546,7 +546,7 @@ def _create_wrappers(project_root):
         venv_python = os.path.join(project_root, ".venv", "Scripts", "python.exe")
         bat_path = os.path.join(project_root, "tagent.bat")
         with open(bat_path, "w", encoding="ascii") as f:
-            f.write(f'@echo off\n"{venv_python}" -m runtime.cli.main %*\n')
+            f.write(f'@echo off\n"{venv_python}" -m runtime.cli.main %*\nif "%1"=="" pause\n')
     else:
         venv_python = os.path.join(project_root, ".venv", "bin", "python")
         sh_path = os.path.join(project_root, "tagent")
