@@ -31,7 +31,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r config/requirements.txt 2>&1 | tail -10
           # runtime 核心 (config/requirements.txt 里被标 [可选] 但 runtime 必需)
-          pip install litellm pydantic-settings typer rich loguru defusedxml fastapi python-multipart httpx
+          pip install litellm pydantic-settings typer rich loguru defusedxml fastapi python-multipart httpx prompt-toolkit
 
       - name: L1 frontmatter lint
         run: python -m runtime.healthcheck.agent_smoke
