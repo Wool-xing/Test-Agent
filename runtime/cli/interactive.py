@@ -168,43 +168,45 @@ def _handle_natural_language(text: str) -> None:
         mem.add("assistant", f"[Error: {exc}]")
 
 
-# ── Slash Command Dispatch ────────────────────────────────────────
+# ── Fuzzy matching (thefuck-style) ─────────────────────────────────
 
 
-def _handle_slash(text: str) -> None:
-    parts = text.lstrip("/").strip().split(maxsplit=1)
-    name = parts[0].lower()
-    args = parts[1] if len(parts) > 1 else ""
+def _closest_command(name: str) -> str | None:
+    """Find closest matching command for typo correction. Returns name or None."""
+    all_names = set(_BUILTIN_MAP.keys())
+    for cmd in COMMAND_REGISTRY:
+        all_names.add(cmd.name)
+        all_names.update(cmd.aliases)
 
-    builtins = {
-        "help": lambda a: _print_help(), "h": lambda a: _print_help(), "?": lambda a: _print_help(),
-        "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
-        "status": _cmd_status, "model": _cmd_model,
-        "tools": _cmd_tools,
-        "context": _cmd_context, "clear": _cmd_clear,
-        "session": _cmd_status,
-    }
+    best, best_dist = None, 999
+    for candidate in all_names:
+        d = _edit_distance(name, candidate)
+        if d < best_dist:
+            best, best_dist = candidate, d
 
-    if name in builtins:
-        try:
-            builtins[name](args)
-        except SystemExit:
-            raise
-        return
+    # Only suggest if reasonably close (max 2 edits for short, 3 for long)
+    threshold = 2 if len(name) <= 5 else 3
+    return best if best_dist <= threshold else None
 
-    cmd = resolve_command(name)
-    if cmd is None:
-        console.print(f"[red]Unknown: /{name}[/]  [dim](/help for commands)[/]")
-        return
 
-    try:
-        cmd.handler(args)
-    except SystemExit:
-        pass
-    except KeyboardInterrupt:
-        console.print("\n[yellow]Cancelled.[/]")
-    except Exception as exc:
-        console.print(f"[red]Failed: {exc}[/]")
+def _edit_distance(a: str, b: str) -> int:
+    """Levenshtein distance between two strings."""
+    if len(a) < len(b):
+        a, b = b, a
+    if len(b) == 0:
+        return len(a)
+
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a):
+        curr = [i + 1]
+        for j, cb in enumerate(b):
+            curr.append(min(
+                prev[j + 1] + 1,   # delete
+                curr[j] + 1,        # insert
+                prev[j] + (ca != cb),  # substitute
+            ))
+        prev = curr
+    return prev[-1]
 
 
 def _do_quit() -> None:
@@ -315,6 +317,53 @@ def _cmd_context(args: str) -> None:
 def _cmd_clear(args: str) -> None:
     _get_memory().clear()
     console.print("[dim]Cleared.[/]")
+
+
+# ── Slash Dispatch (after all cmd fns) ────────────────────────────
+
+
+_BUILTIN_MAP = {
+    "help": lambda a: _print_help(), "h": lambda a: _print_help(), "?": lambda a: _print_help(),
+    "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
+    "status": _cmd_status, "model": _cmd_model,
+    "tools": _cmd_tools,
+    "context": _cmd_context, "clear": _cmd_clear,
+    "session": _cmd_status,
+}
+
+
+def _handle_slash(text: str) -> None:
+    parts = text.lstrip("/").strip().split(maxsplit=1)
+    name = parts[0].lower()
+    args = parts[1] if len(parts) > 1 else ""
+
+    if name in _BUILTIN_MAP:
+        try:
+            _BUILTIN_MAP[name](args)
+        except SystemExit:
+            raise
+        return
+
+    cmd = resolve_command(name)
+    if cmd is None:
+        suggestion = _closest_command(name)
+        if suggestion:
+            console.print(
+                f"[red]Unknown: /{name}[/]  "
+                f"[dim]Did you mean [/][cyan]/{suggestion}[/][dim]?[/]"
+            )
+        else:
+            console.print(f"[red]Unknown: /{name}[/]  [dim](/help for commands)[/]")
+        return
+
+    try:
+        cmd.handler(args)
+    except SystemExit:
+        pass
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Cancelled.[/]")
+    except Exception as exc:
+        console.print(f"[red]Failed: {exc}[/]")
 
 
 # ── Persistence ───────────────────────────────────────────────────
