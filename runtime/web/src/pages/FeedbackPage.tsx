@@ -65,7 +65,7 @@ export default function FeedbackPage() {
     // Also try to submit to GitHub Issues if in desktop app
     if ((window as any).electronAPI?.isElectron) {
       try {
-        const body = `## ${type}: ${title}\n\n**Module**: ${module}\n**Email**: ${email || "N/A"}\n\n### Description\n${desc}\n\n---\n*Submitted via Test-Agent Desktop v1.32.0*`;
+        const body = `## ${type}: ${title}\n\n**Module**: ${module}\n**Email**: ${email || "N/A"}\n\n### Description\n${desc}\n\n---\n*Submitted via Test-Agent Desktop v1.0.0*`;
         fetch("http://localhost:8800/feedback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
