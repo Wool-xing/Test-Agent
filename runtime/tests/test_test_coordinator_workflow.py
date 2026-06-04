@@ -38,7 +38,6 @@ class TestPreflight:
         from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
         p = TestCoordinatorPipeline()
         missing = p._preflight()
-        # Python 3.10+ on all modern systems → should be empty
         assert isinstance(missing, list)
 
     def test_preflight_returns_list(self):
@@ -46,6 +45,47 @@ class TestPreflight:
         p = TestCoordinatorPipeline()
         result = p._preflight()
         assert isinstance(result, list)
+
+    def test_preflight_desktop_hints(self):
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
+        p = TestCoordinatorPipeline()
+        missing = p._preflight(["desktop_windows"])
+        assert isinstance(missing, list)
+
+
+class TestPlatformDetection:
+    def test_detect_desktop_windows(self):
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
+        p = TestCoordinatorPipeline()
+        hints = p._detect_platform("test this Windows EXE program")
+        assert "desktop_windows" in hints
+
+    def test_detect_api(self):
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
+        p = TestCoordinatorPipeline()
+        hints = p._detect_platform("test the REST API endpoint")
+        assert "api" in hints
+
+    def test_detect_web(self):
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
+        p = TestCoordinatorPipeline()
+        hints = p._detect_platform("browser based web application")
+        assert "web" in hints
+
+    def test_detect_multiple(self):
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
+        p = TestCoordinatorPipeline()
+        hints = p._detect_platform("test the API backend and web frontend")
+        assert "api" in hints
+        assert "web" in hints
+
+
+class TestPRDLoader:
+    def test_load_prd_handles_missing_file(self):
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
+        p = TestCoordinatorPipeline()
+        result = p._load_prd("/nonexistent/path.md")
+        assert result is None
 
 
 class TestPipelineResult:

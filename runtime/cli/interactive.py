@@ -448,6 +448,7 @@ def _cmd_export(args: str) -> None:
         lines.append(m.content)
         lines.append("")
 
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")
     console.print(f"[green]Exported to {path}[/]")
 
@@ -584,7 +585,10 @@ def start() -> None:
 
     session = _create_session()
     if session is None:
-        console.print("[dim](Tab completion unavailable in this terminal)[/]\n")
+        console.print(
+            "[dim](Tab completion not available in Git Bash / mintty. "
+            "Use cmd.exe, Windows Terminal, or PowerShell for full features.)[/]\n"
+        )
 
     while True:
         try:
