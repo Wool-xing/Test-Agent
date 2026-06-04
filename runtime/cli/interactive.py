@@ -112,9 +112,12 @@ def _print_help() -> None:
             ("/check [--e2e]", "Framework self-test"),
         ]),
         ("Session", [
-            ("/help", "This help"),
+            ("/cost", "Token usage and cost estimate"),
+            ("/sessions", "List saved sessions"),
+            ("/export", "Export conversation to markdown"),
+            ("/compact", "Summarize and compress context"),
             ("/context", "Full conversation history"),
-            ("/demo [--real-llm]", "Quick demo"),
+            ("/help", "This help"),
             ("/quit  (Ctrl+D)", "Save session and exit"),
         ]),
     ]
@@ -319,6 +322,152 @@ def _cmd_clear(args: str) -> None:
     console.print("[dim]Cleared.[/]")
 
 
+# ── /cost — token usage and cost estimate ─────────────────────────
+
+
+_PRICE_PER_1K = {  # $ per 1K tokens (input, output)
+    "claude": (0.003, 0.015),
+    "openai": (0.0025, 0.01),
+    "gemini": (0.000125, 0.000375),
+    "deepseek": (0.00027, 0.0011),
+    "qwen": (0.0005, 0.002),
+    "ollama": (0, 0),
+}
+
+
+def _estimate_cost(mem: ConversationMemory) -> tuple[int, float]:
+    """Estimate tokens and cost from conversation history. ~4 chars/token."""
+    total_chars = sum(len(m.content) for m in mem.messages)
+    user_chars = sum(len(m.content) for m in mem.messages if m.role == "user")
+    assistant_chars = total_chars - user_chars
+    in_tokens = max(user_chars // 4, 1)
+    out_tokens = max(assistant_chars // 4, 1)
+
+    provider = _current_provider()
+    in_price, out_price = _PRICE_PER_1K.get(provider, (0, 0))
+    cost = (in_tokens / 1000) * in_price + (out_tokens / 1000) * out_price
+    return in_tokens + out_tokens, cost
+
+
+def _cmd_cost(args: str) -> None:
+    from rich.panel import Panel
+
+    mem = _get_memory()
+    tokens, cost = _estimate_cost(mem)
+
+    info = [
+        f"Provider: [cyan]{_current_provider()}[/] → {_current_model()}",
+        f"Turns:    {len(mem.messages)}",
+        f"Est. tokens: ~{tokens:,} (input + output)",
+        f"Est. cost:   [bold]${cost:.4f}[/]",
+    ]
+    if _current_provider() == "ollama":
+        info.append("[dim]Ollama is local — no API cost[/]")
+    else:
+        info.append("[dim]Estimate based on ~4 chars/token. Real costs may vary.[/]")
+    console.print(Panel("\n".join(info), title="Cost", title_align="left"))
+
+
+# ── /sessions — list saved sessions ────────────────────────────────
+
+
+def _cmd_sessions(args: str) -> None:
+    from datetime import datetime
+    from rich.table import Table
+
+    if not _SESSION_DIR.is_dir():
+        console.print("[dim]No saved sessions.[/]")
+        return
+
+    files = sorted(_SESSION_DIR.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not files:
+        console.print("[dim]No saved sessions.[/]")
+        return
+
+    table = Table(title=f"Saved Sessions ({len(files)})", show_header=True)
+    table.add_column("Session ID", style="cyan")
+    table.add_column("Turns")
+    table.add_column("Date", style="dim")
+
+    for f in files[:10]:
+        sid = f.stem
+        try:
+            import json
+            data = json.loads(f.read_text(encoding="utf-8"))
+            turns = len(data.get("messages", []))
+        except Exception:
+            turns = "?"
+        mtime = datetime.fromtimestamp(f.stat().st_mtime).strftime("%m-%d %H:%M")
+        marker = " [bold green]← active[/]" if f.name == "active_session.json" else ""
+        table.add_row(sid, str(turns), mtime + marker)
+
+    console.print(table)
+
+
+# ── /export — export conversation to markdown ──────────────────────
+
+
+def _cmd_export(args: str) -> None:
+    from datetime import datetime
+
+    mem = _get_memory()
+    if not mem.messages:
+        console.print("[dim]Nothing to export.[/]")
+        return
+
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = _SESSION_DIR / f"export_{ts}.md"
+
+    lines = [
+        "# Test-Agent Session Export",
+        "",
+        f"**Session:** {mem.session_id}",
+        f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"**Turns:** {len(mem.messages)}",
+        f"**Provider:** {_current_provider()}",
+        "",
+        "---",
+        "",
+    ]
+    for m in mem.messages:
+        role = "You" if m.role == "user" else "Agent"
+        lines.append(f"### {role}")
+        lines.append("")
+        lines.append(m.content)
+        lines.append("")
+
+    path.write_text("\n".join(lines), encoding="utf-8")
+    console.print(f"[green]Exported to {path}[/]")
+
+
+# ── /compact — summarize and compress context ──────────────────────
+
+
+def _cmd_compact(args: str) -> None:
+    mem = _get_memory()
+    if len(mem.messages) <= 4:
+        console.print("[dim]Not enough conversation to compact.[/]")
+        return
+
+    kept = mem.messages[:2] + mem.messages[-2:]
+    removed = len(mem.messages) - 4
+
+    summary_parts = []
+    for m in mem.messages[2:-2]:
+        text = m.content[:80] + "..." if len(m.content) > 80 else m.content
+        summary_parts.append(f"[{m.role}]: {text}")
+
+    from runtime.cli.conversation import Message
+    summary_msg = Message(
+        role="assistant",
+        content=f"[Compacted {removed} turns]\n" + "\n".join(summary_parts[:10]),
+    )
+
+    mem._messages = kept[:2] + [summary_msg] + kept[2:]
+    console.print(f"[green]Compacted {removed} turns → summary.[/]")
+    console.print(f"[dim]Turns: {len(mem.messages)} · Chars: {sum(len(m.content) for m in mem.messages)}[/]")
+
+
 # ── Slash Dispatch (after all cmd fns) ────────────────────────────
 
 
@@ -327,6 +476,10 @@ _BUILTIN_MAP = {
     "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
     "status": _cmd_status, "model": _cmd_model,
     "tools": _cmd_tools,
+    "cost": _cmd_cost, "usage": _cmd_cost,
+    "sessions": _cmd_sessions,
+    "export": _cmd_export,
+    "compact": _cmd_compact,
     "context": _cmd_context, "clear": _cmd_clear,
     "session": _cmd_status,
 }
