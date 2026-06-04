@@ -28,8 +28,8 @@ locust==2.43.4                     # [稳定层] 备用 Python 压测
 # JMeter 5.6.3 [外部]，需独立装 Java + JMeter（见部署说明）
 
 # ===== [稳定层] 测试数据工厂 =====
-faker==20.1.0                      # [稳定层]
-factory-boy==3.3.0                 # [稳定层]
+faker==37.12.0                      # [稳定层]
+factory-boy==3.3.3                 # [稳定层]
 
 # ===== [稳定层] 数据库 =====
 psycopg2-binary==2.9.12             # [稳定层] PostgreSQL（按实际数据库选其一）
@@ -99,7 +99,7 @@ kafka-python==2.0.2                # [可选] Kafka
 pika==1.3.2                        # [可选] RabbitMQ
 
 # ===== [可选] AI/ML（14-AI模型测试）=====
-scikit-learn==1.5.2                # [可选] 模型评估（修 GHSA data leakage）
+scikit-learn==1.6.1                # [可选] 模型评估（修 GHSA data leakage）
 scipy==1.13.1; python_version < "3.14"   # [可选] 漂移检测（KS）—— 1.11.4→1.13.1 Py 3.12 官方支持 + 与 scikit-image 0.24 / sklearn 1.5 numpy 兼容；Py>=3.14 暂无 wheel，自动跳过
 # alibi-detect==0.12.0             # [可选] 漂移高级检测
 # deepeval==0.20.50                # [可选] LLM 评估
