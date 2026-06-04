@@ -61,7 +61,7 @@ def parse_jmeter_jtl(csv_text: str) -> dict[str, Any]:
         try:
             elapsed_values.append(int(fields[elapsed_idx]))
         except ValueError:
-            continue
+            pass  # corrupt elapsed, still check success below
         if fields[success_idx].strip().lower() != "true":
             failures += 1
 
