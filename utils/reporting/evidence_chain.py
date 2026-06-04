@@ -305,12 +305,15 @@ def build_evidence_chain(
 
     compliance = _map_compliance(chain)
 
+    from pathlib import Path as _EPath
+    _ev = _EPath(__file__).resolve().parents[2] / "VERSION"
+    _ev_ver = _ev.read_text(encoding="utf-8").strip() if _ev.is_file() else "1.0.0"
     pkg = EvidencePackage(
         package_id=f"EP-{now.strftime('%Y%m%d-%H%M%S')}",
         chain=chain,
         metadata=package_metadata or {
             "generator": "evidence_chain.py",
-            "version": "1.0.0",
+            "version": _ev_ver,
             "generated_by": os.environ.get("USER",
                                             os.environ.get("USERNAME", "unknown")),
         },

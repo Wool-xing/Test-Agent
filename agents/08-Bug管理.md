@@ -132,7 +132,7 @@ results = json.load(open("workspace/测试报告/{项目名}/regression_summary.
 submitted = manager.batch_submit_from_failures(
     failures=results["failures"],
     product_id=1,
-    build_version="v1.0.0-rc1",
+    build_version="v1.0.0",
 )
 # submitted: [{"case_id": ..., "bug_id": ..., "priority": "P0", "status": "submitted"}, ...]
 ```

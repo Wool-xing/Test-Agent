@@ -71,7 +71,7 @@ bug = manager.create_bug({
     "pri":      PRI_MAP["P0"],
     "type": "codeerror",
     "steps": "1. 打开登录页\n2. 输入账号密码\n3. 点击登录\n\n预期：跳转首页\n实际：404",
-    "buildFound": "v1.0.0-rc1",
+    "buildFound": "v1.0.0",
     "assignedTo": "frontend-lead",
 })
 print(f"Bug 已提交：#{bug.get('id')}")

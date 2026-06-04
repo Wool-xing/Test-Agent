@@ -207,6 +207,9 @@ class ZentaoBugManager:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    from pathlib import Path as _ZPath
+    _zv = _ZPath(__file__).resolve().parents[2] / "VERSION"
+    _zv_ver = _zv.read_text(encoding="utf-8").strip() if _zv.is_file() else "1.0.0"
     manager = ZentaoBugManager()
 
     bug = manager.create_bug({
@@ -223,7 +226,7 @@ if __name__ == "__main__":
         "severity": SEVERITY_MAP["P0"],
         "pri": PRI_MAP["P0"],
         "assignedTo": "frontend-lead",
-        "buildFound": "v1.0.0-rc1",
+        "buildFound": f"v{_zv_ver}",
     })
     print(f"Bug 已提交：#{bug.get('id')}")
     stats = manager.get_bug_stats(product_id=1)
