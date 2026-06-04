@@ -1,4 +1,4 @@
-# examples/ 索引(V1.42.0)
+# examples/ 索引
 
 > 端到端可跑示例 · 让新人 5 分钟内看到 Test-Agent 实际工作。
 
