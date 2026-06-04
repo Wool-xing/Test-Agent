@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 # Inject utils/ and all subdirectories into sys.path
-# V1.42.0: utils/ reorganized from flat into 12 functional subdirectories
+# V1.x: utils/ reorganized from flat into 12 functional subdirectories
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
