@@ -1,7 +1,6 @@
 """Slash command registry — single source of truth.
 
-Modeled after Hermes Agent's COMMAND_REGISTRY (hermes_cli/commands.py).
-One registry drives: CLI autocomplete, help output, command dispatch.
+Single registry drives CLI autocomplete, help output, command dispatch.
 """
 
 from __future__ import annotations
