@@ -44,8 +44,9 @@ LICENSE text eol=lf
 *.dmg binary
 *.jmx binary
 *.har binary
-*.png filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
+# LFS disabled — git-lfs not installed on all dev machines
+# *.png filter=lfs diff=lfs merge=lfs -text
+# *.jpg filter=lfs diff=lfs merge=lfs -text
 
 # linguist（GitHub 语言识别）
 05-代码示例/* linguist-language=Python

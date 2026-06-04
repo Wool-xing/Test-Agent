@@ -22,7 +22,7 @@ from runtime.orchestrator.workflows.gates import (
 )
 
 # Paths relative to project root
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
 _WORKSPACE = _PROJECT_ROOT / "workspace"
 
 
@@ -73,6 +73,15 @@ class TestCoordinatorPipeline:
         console.print(f"[bold]Test Coordinator Pipeline[/] ({run_id})")
         console.print(f"Target: {target[:100]}{'...' if len(target) > 100 else ''}")
         console.print()
+
+        # Validate target path (prevent traversal)
+        if target and not target.startswith(("http://", "https://")):
+            resolved = Path(target).resolve()
+            if not str(resolved).startswith(str(_PROJECT_ROOT.resolve())):
+                result.ok = False
+                result.aborted_at = "preflight"
+                result.summary = f"Target outside workspace: {target}"
+                return result
 
         # Phase 0: Pre-flight
         missing = self._preflight()
