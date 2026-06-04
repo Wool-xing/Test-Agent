@@ -9,13 +9,13 @@
 
 # ===== [稳定层] 测试框架核心 =====
 pytest>=9.0.3                      # [稳定层] CVE-2025-71176 tmpdir 已修于 9.0.3
-pytest-xdist>=3.6.1                 # [稳定层] 并行执行
-pytest-rerunfailures>=14.0          # [稳定层] 失败重试
-pytest-timeout>=2.3.1               # [稳定层] 用例超时
-pytest-cov>=5.0.0                   # [稳定层] 代码覆盖率
-pytest-mock>=3.14.0                 # [稳定层] Mock 工具
-pytest-playwright>=0.5.2            # [稳定层] Playwright 官方 pytest 插件
-allure-pytest>=2.13.5               # [稳定层] Allure 报告
+pytest-xdist>=3.8.0                 # [稳定层] 并行执行
+pytest-rerunfailures>=16.0.1          # [稳定层] 失败重试
+pytest-timeout>=2.4.0               # [稳定层] 用例超时
+pytest-cov>=7.1.0                   # [稳定层] 代码覆盖率
+pytest-mock>=3.15.1                 # [稳定层] Mock 工具
+pytest-playwright>=0.7.1            # [稳定层] Playwright 官方 pytest 插件
+allure-pytest>=2.16.0               # [稳定层] Allure 报告
 
 # ===== [稳定层] UI 自动化 =====
 playwright==1.60.0                 # [稳定层] major 升级 dependabot 已锁
@@ -52,7 +52,7 @@ tenacity==8.2.3                    # [稳定层] 重试库
 loguru==0.7.3                      # [稳定层] 增强日志
 
 # ===== [稳定层] 验收测试 BDD =====
-pytest-bdd==7.0.0                  # [稳定层] BDD 框架
+pytest-bdd==8.1.0                  # [稳定层] BDD 框架
 
 # ===== [稳定层] 契约测试 =====
 jsonschema==4.21.0                 # [稳定层] JSON Schema 验证

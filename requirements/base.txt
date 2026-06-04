@@ -3,14 +3,14 @@
 
 # 测试框架核心
 pytest>=9.0.3
-pytest-xdist>=3.6.1
-pytest-rerunfailures>=14.0
-pytest-timeout>=2.3.1
-pytest-cov>=5.0.0
-pytest-mock>=3.14.0
-pytest-playwright>=0.5.2
-allure-pytest>=2.13.5
-pytest-bdd==7.0.0
+pytest-xdist>=3.8.0
+pytest-rerunfailures>=16.0.1
+pytest-timeout>=2.4.0
+pytest-cov>=7.1.0
+pytest-mock>=3.15.1
+pytest-playwright>=0.7.1
+allure-pytest>=2.16.0
+pytest-bdd==8.1.0
 
 # UI 自动化
 playwright==1.60.0
