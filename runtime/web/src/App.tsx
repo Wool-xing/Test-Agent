@@ -9,7 +9,7 @@ export default function App() {
           <h1 className="text-lg font-semibold flex items-center gap-2">
             <Beaker className="w-5 h-5" aria-hidden="true" />
             <span>Test-Agent</span>
-            <span className="text-xs text-slate-500">v1.32.0</span>
+            <span className="text-xs text-slate-500">v1.0.0</span>
           </h1>
           <nav aria-label="Primary">
             <ul className="flex gap-4 text-sm">
@@ -64,7 +64,7 @@ export default function App() {
       </main>
       <footer className="border-t mt-auto" role="contentinfo">
         <div className="container mx-auto px-4 py-3 text-xs text-slate-500">
-          Test-Agent v1.32.0 · MIT License
+          Test-Agent v1.0.0 · MIT License
         </div>
       </footer>
     </div>

@@ -1,9 +1,9 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.0.0 (**expert rollout 收尾 + skill rollout 完成（16/16）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
+> 当前状态:V1.0.0 (**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
-> - **skill 30/32 active**(23 production + 7 script);0 rollout;2 暂为 V2 vision 方法论参考。
+> - **skill 32/32 active**(23 production + 7 script + 2 vision→production);0 rollout;0 vision。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
 > - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 全 16 实装 (V1.21-V1.31)。
 

@@ -81,6 +81,14 @@ repos:
         always_run: true
         stages: [pre-push]
 
+      # 版本号一致性检查:所有声明版本的文件必须与 VERSION 一致
+      - id: version-consistency
+        name: 版本号一致性检查
+        entry: python scripts/check_version_consistency.py
+        language: python
+        pass_filenames: false
+        always_run: true
+
   # ===== Markdown 风格 =====
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.38.0
