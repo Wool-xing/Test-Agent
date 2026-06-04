@@ -1,7 +1,6 @@
 """Tab completion for interactive REPL — slash commands + paths.
 
-Uses prompt_toolkit (same as Hermes Agent CLI).
-Provides: slash command completion, path completion, session command completion.
+Provides slash command completion, path completion, session command completion.
 """
 
 from __future__ import annotations
