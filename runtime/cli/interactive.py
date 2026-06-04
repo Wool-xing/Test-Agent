@@ -1,4 +1,4 @@
-"""Interactive REPL — Claude Code / Hermes Agent / OpenClaw style.
+"""Interactive REPL — terminal-based testing agent.
 
 Bare `tagent` enters interactive session:
   - Natural language → LLM routing → streaming activity feed
@@ -134,7 +134,7 @@ def _print_help() -> None:
 
 
 def _handle_natural_language(text: str) -> None:
-    """Route through LLM with streaming activity output (Claude Code style)."""
+    """Route through LLM with streaming activity output."""
     if not text.strip():
         return
 
