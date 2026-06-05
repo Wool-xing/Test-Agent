@@ -83,7 +83,9 @@ def _run_node(node: DAGNode) -> dict[str, Any]:
     return summary
 
 
-def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers: int = 4) -> dict[str, Any]:
+def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers: int = 4, on_progress: Any = None) -> dict[str, Any]:
+    if on_progress is not None and not callable(on_progress):
+        on_progress = None
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
@@ -115,6 +117,8 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                             except Exception:
                                 results[nid] = {"id": nid, "ok": False, "error": "circuit broken"}
                             pending.discard(nid)
+                            if on_progress and nid in results:
+                                on_progress(results[nid])
                     break
                 # find nodes whose deps are all done
                 ready = [
@@ -147,6 +151,8 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                                     log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                                 circuit_broken = True
                     pending.discard(next_id)
+                    if on_progress and r:
+                        on_progress(r)
                     continue
                 for nid in done_now:
                     try:
@@ -166,6 +172,8 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                                     log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                                 circuit_broken = True
                     pending.discard(nid)
+                    if on_progress and r:
+                        on_progress(r)
     finally:
         if pool is not None:
             pool.shutdown(wait=True)

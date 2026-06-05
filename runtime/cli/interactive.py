@@ -82,11 +82,27 @@ def _current_model() -> str:
 
 def _print_banner() -> None:
     import runtime
-    console.print(_SHEEP.format(
+    from rich.live import Live
+    from rich.text import Text
+
+    banner = _SHEEP.format(
         version=runtime.__version__,
         experts=_count_md_files("agents"),
         skills=_count_md_files("skills"),
-    ))
+    )
+
+    # Animated typewriter reveal
+    try:
+        accumulated = Text("")
+        with Live(accumulated, console=console, refresh_per_second=120, transient=False) as live:
+            for ch in banner:
+                accumulated.append_text(Text(ch, style="bold white"))
+                live.update(accumulated)
+                time.sleep(0.0005)
+    except Exception:
+        # Fallback: plain print if terminal doesn't support Live
+        console.print(banner)
+
     console.print()
 
 
@@ -111,6 +127,11 @@ def _print_help() -> None:
             ("/clear", "Reset conversation memory"),
             ("/setup [--preset]", "Generate config files"),
             ("/check [--e2e]", "Framework self-test"),
+        ]),
+        ("Memory", [
+            ("/remember <fact>", "Save fact to MEMORY.md"),
+            ("/forget <keyword>", "Remove facts by keyword"),
+            ("/memory", "Show MEMORY.md contents"),
         ]),
         ("Session", [
             ("/cost", "Token usage and cost estimate"),
@@ -188,16 +209,18 @@ def _handle_natural_language(text: str) -> None:
     has_history = len(mem.messages) > 0
     context_input = mem.build_context(text)
     mem.add("user", text)  # add AFTER build_context to avoid duplicating current input
-    summary = text[:80] + ("..." if len(text) > 80 else "")
+    _label = text[:80] + ("..." if len(text) > 80 else "")
 
     if has_history:
-        console.print(f"[dim]Turn {len(mem.messages)//2 + 1} · \"{summary}\"[/]")
+        console.print(f"[dim]Turn {len(mem.messages)//2 + 1} · \"{_label}\"[/]")
     else:
-        console.print(f"[dim]\"{summary}\"[/]")
+        console.print(f"[dim]\"{_label}\"[/]")
 
     t0 = time.time()
     try:
         from runtime.cli._shared import _kernel, build_artifact
+        from rich.live import Live
+        from rich.table import Table
 
         with console.status("[bold green]Routing...", spinner="dots"):
             art = build_artifact(context_input, "")
@@ -206,7 +229,33 @@ def _handle_natural_language(text: str) -> None:
         print_dag = __import__("runtime.cli._shared", fromlist=["print_dag"]).print_dag
         print_dag(decision)
 
-        summary = _kernel.execute_sync(run_id, decision)
+        # ── streaming progress table ──
+        progress_table = Table(show_header=True, box=None)
+        progress_table.add_column("#", style="dim", width=3)
+        progress_table.add_column("Node", style="cyan")
+        progress_table.add_column("Status", width=8)
+        progress_table.add_column("Duration", style="dim", width=8)
+
+        completed = []
+
+        def _on_node(result: dict) -> None:
+            nid = result.get("id", "?")
+            name = result.get("name", nid)[:30]
+            ok = result.get("ok", False)
+            dur = result.get("duration_ms", 0)
+            status = "[green]✓[/]" if ok else "[red]✗[/]"
+            dur_str = f"{dur:.0f}ms" if dur else ""
+            completed.append(result)
+            progress_table.add_row(
+                str(len(completed)),
+                name,
+                status,
+                dur_str,
+            )
+
+        with Live(progress_table, console=console, refresh_per_second=8, transient=False):
+            summary = _kernel.execute_sync(run_id, decision, on_progress=_on_node)
+
         elapsed = (time.time() - t0) * 1000
         total = summary["total"]
         succ = summary["succeeded"]
@@ -555,8 +604,58 @@ def _cmd_compact(args: str) -> None:
     )
 
     mem._messages = kept[:2] + [summary_msg] + kept[2:]
+    mem._truncate()  # re-enforce budget after manual message manipulation
     console.print(f"[green]Compacted {removed} turns → summary.[/]")
     console.print(f"[dim]Turns: {len(mem.messages)} · Chars: {sum(len(m.content) for m in mem.messages)}[/]")
+
+
+# ── /remember /forget — persistent cross-session memory ────────────
+
+
+def _cmd_remember(args: str) -> None:
+    """Save a fact to MEMORY.md for cross-session persistence."""
+    fact = args.strip()
+    if not fact:
+        console.print("[red]Usage: /remember <fact>[/]")
+        console.print("[dim]Example: /remember This project uses PostgreSQL[/]")
+        return
+    from runtime.cli.conversation import save_memory_fact, load_memory_md
+    save_memory_fact(fact)
+    console.print(f"[green]Remembered:[/] {fact}")
+    # Show current memory size
+    mem = load_memory_md()
+    lines = mem.count("\n") + 1 if mem else 0
+    console.print(f"[dim]{lines} fact(s) in MEMORY.md[/]")
+
+
+def _cmd_forget(args: str) -> None:
+    """Remove facts from MEMORY.md matching a keyword."""
+    keyword = args.strip()
+    if not keyword:
+        console.print("[red]Usage: /forget <keyword>[/]")
+        console.print("[dim]Example: /forget PostgreSQL[/]")
+        return
+    from runtime.cli.conversation import forget_memory_fact, load_memory_md
+    removed = forget_memory_fact(keyword)
+    if removed > 0:
+        console.print(f"[green]Forgot {removed} fact(s) matching '{keyword}'[/]")
+    else:
+        console.print(f"[dim]No facts matching '{keyword}'[/]")
+    mem = load_memory_md()
+    lines = mem.count("\n") + 1 if mem else 0
+    console.print(f"[dim]{lines} fact(s) remaining[/]")
+
+
+def _cmd_memory(args: str) -> None:
+    """Display current MEMORY.md contents."""
+    from runtime.cli.conversation import load_memory_md
+    mem = load_memory_md()
+    if not mem:
+        console.print("[dim]MEMORY.md is empty. Use /remember <fact> to save knowledge.[/]")
+        return
+    from rich.panel import Panel
+    lines = mem.count("\n") + 1
+    console.print(Panel(mem, title=f"MEMORY.md ({lines} facts)", title_align="left"))
 
 
 # ── Slash Dispatch (after all cmd fns) ────────────────────────────
@@ -573,6 +672,7 @@ _BUILTIN_MAP = {
     "compact": _cmd_compact,
     "context": _cmd_context, "clear": _cmd_clear,
     "session": _cmd_status,
+    "remember": _cmd_remember, "forget": _cmd_forget, "memory": _cmd_memory,
 }
 
 
@@ -586,6 +686,15 @@ def _handle_slash(text: str) -> None:
             _BUILTIN_MAP[name](args)
         except SystemExit:
             raise
+        except Exception as _exc:
+            _hint = _diagnose_error(_exc)
+            if _hint:
+                console.print(f"[red]✗ {type(_exc).__name__}[/]")
+                console.print(f"[yellow]💡 {_hint}[/]")
+            else:
+                _err_msg = str(_exc)[:200]
+                console.print(f"[red]✗ {type(_exc).__name__}: {_err_msg}[/]")
+                console.print("[dim]/help for commands, /doctor for health check.[/]")
         return
 
     cmd = resolve_command(name)
@@ -607,8 +716,15 @@ def _handle_slash(text: str) -> None:
             console.print(f"[red]Command failed (exit {e.code})[/]")
     except KeyboardInterrupt:
         console.print("\n[yellow]Cancelled.[/]")
-    except Exception:
-        console.print("[red]Command failed[/]")
+    except Exception as _exc:
+        _hint = _diagnose_error(_exc)
+        if _hint:
+            console.print(f"[red]✗ {type(_exc).__name__}[/]")
+            console.print(f"[yellow]💡 {_hint}[/]")
+        else:
+            _err_msg = str(_exc)[:200]
+            console.print(f"[red]✗ {type(_exc).__name__}: {_err_msg}[/]")
+            console.print("[dim]/help for commands, /doctor for health check.[/]")
 
 
 # ── Persistence ───────────────────────────────────────────────────
@@ -683,6 +799,13 @@ def start() -> None:
 
     _print_banner()
     _check_first_run()
+
+    # Show cross-session memory status
+    from runtime.cli.conversation import load_memory_md
+    mem_md = load_memory_md()
+    if mem_md:
+        facts = mem_md.count("\n") + 1
+        console.print(f"[dim]🧠 {facts} fact(s) loaded from MEMORY.md[/]\n")
 
     mem = _get_memory()
     if mem.messages:

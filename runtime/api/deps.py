@@ -58,10 +58,10 @@ class Kernel:
             run_id = _ephemeral_run_id()
         return run_id, decision
 
-    def execute_sync(self, run_id: str, decision: RoutingDecision) -> dict[str, Any]:
+    def execute_sync(self, run_id: str, decision: RoutingDecision, on_progress: Any = None) -> dict[str, Any]:
         try:
             self._safe_set_status(run_id, RunStatus.running)
-            summary = _run_decision(decision.model_dump(), run_id)
+            summary = _run_decision(decision.model_dump(), run_id, on_progress=on_progress)
             ok = summary["failed"] == 0
             self._safe_set_status(run_id, RunStatus.succeeded if ok else RunStatus.failed)
             return summary
@@ -88,12 +88,12 @@ def _ephemeral_run_id() -> str:
     return "ephem-" + uuid.uuid4().hex[:16]
 
 
-def _run_decision(decision_dict: dict, run_id: str) -> dict:
+def _run_decision(decision_dict: dict, run_id: str, on_progress: Any = None) -> dict:
     """Use Prefect flow if available, else direct executor."""
     try:
         from runtime.orchestrator.flows import run_decision_flow
 
-        return run_decision_flow(decision_dict, run_id)
+        return run_decision_flow(decision_dict, run_id, on_progress=on_progress)
     except (ImportError, Exception) as e:
         if not isinstance(e, ImportError):
             logger.debug("prefect flow failed ({}); using direct executor", e)
@@ -101,4 +101,4 @@ def _run_decision(decision_dict: dict, run_id: str) -> dict:
             logger.debug("prefect unavailable ({}); using direct executor", e)
         from runtime.orchestrator.direct import run_decision_direct
 
-        return run_decision_direct(decision_dict, run_id)
+        return run_decision_direct(decision_dict, run_id, on_progress=on_progress)

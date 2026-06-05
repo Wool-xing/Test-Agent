@@ -218,3 +218,69 @@ class TestExport:
         mem = _get_memory()
         mem.add("user", "hello")
         _cmd_export("")  # should create export file
+
+
+class TestMemoryCommands:
+    def test_remember_no_args(self):
+        from runtime.cli.interactive import _cmd_remember
+        _cmd_remember("")  # should not crash
+
+    def test_remember_and_forget(self):
+        from runtime.cli.interactive import _cmd_remember, _cmd_forget
+        from runtime.cli.conversation import load_memory_md
+        _cmd_remember("Test fact: project uses Python")
+        mem = load_memory_md()
+        assert "Test fact: project uses Python" in mem
+        _cmd_forget("Test fact")
+        mem = load_memory_md()
+        assert "Test fact: project uses Python" not in mem
+
+    def test_forget_no_args(self):
+        from runtime.cli.interactive import _cmd_forget
+        _cmd_forget("")  # should not crash
+
+    def test_forget_nonexistent(self):
+        from runtime.cli.interactive import _cmd_forget
+        _cmd_forget("xyznonexistent123")  # should not crash
+
+    def test_memory_display(self):
+        from runtime.cli.interactive import _cmd_memory
+        _cmd_memory("")  # should not crash even when empty
+
+    def test_memory_builtin_registered(self):
+        from runtime.cli.interactive import _BUILTIN_MAP
+        assert "remember" in _BUILTIN_MAP
+        assert "forget" in _BUILTIN_MAP
+        assert "memory" in _BUILTIN_MAP
+
+    def test_banner_imports_and_runs(self):
+        from runtime.cli.interactive import _print_banner
+        _print_banner()  # should not crash (animated or plain)
+
+    def test_error_diagnosis_imports(self):
+        from runtime.cli.interactive import _diagnose_error
+        # Test with a generic exception
+        hint = _diagnose_error(Exception("Connection refused"))
+        assert hint is not None  # should match connection pattern
+        assert "Cannot reach" in hint
+
+    def test_error_diagnosis_unknown(self):
+        from runtime.cli.interactive import _diagnose_error
+        hint = _diagnose_error(Exception("some random error"))
+        assert hint is None  # no specific advice
+
+    def test_error_diagnosis_api_key(self):
+        from runtime.cli.interactive import _diagnose_error
+        hint = _diagnose_error(Exception("Invalid API key provided"))
+        assert hint is not None
+        assert "API key" in hint
+
+    def test_error_diagnosis_module_not_found(self):
+        hint = None
+        try:
+            import nonexistent_module_for_test_12345  # noqa: F401
+        except Exception as e:
+            from runtime.cli.interactive import _diagnose_error
+            hint = _diagnose_error(e)
+        assert hint is not None
+        assert "Missing" in hint

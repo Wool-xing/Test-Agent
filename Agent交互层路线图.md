@@ -26,11 +26,11 @@
 
 | # | 功能 | 状态 |
 |---|------|:--:|
-| 5 | 流式输出（execute_sync → generator yield） | [ ] |
-| 6 | MEMORY.md 持久化（跨会话记忆） | [ ] |
-| 7 | Tab 补全增强（agent/skill 名） | [ ] |
-| 8 | 错误交互全覆盖（所有 /command 友好提示） | [ ] |
-| 9 | 启动欢迎动画 | [ ] |
+| 5 | 流式输出（execute_sync + on_progress → Live table） | [✓] |
+| 6 | MEMORY.md 持久化（跨会话记忆：/remember /forget /memory） | [✓] |
+| 7 | Tab 补全增强（agent/skill/provider 名） | [✓] |
+| 8 | 错误交互全覆盖（所有 /command 友好提示 + _diagnose_error） | [✓] |
+| 9 | 启动欢迎动画（Rich Live typewriter reveal） | [✓] |
 
 ---
 

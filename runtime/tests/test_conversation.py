@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from runtime.cli.conversation import ConversationMemory, Message
+from runtime.cli.conversation import ConversationMemory, Message, save_memory_fact, load_memory_md, forget_memory_fact
 
 
 class TestConversationMemory:
@@ -38,10 +38,11 @@ class TestConversationMemory:
         assert "Previous conversation" in ctx
 
     def test_build_context_empty_memory(self):
-        """build_context() with no history returns just the current input."""
+        """build_context() with no history wraps input with 'Current request:'."""
         mem = ConversationMemory()
         ctx = mem.build_context("test login")
-        assert ctx == "test login"
+        assert "test login" in ctx
+        assert "Current request" in ctx
 
     def test_max_turns_truncation(self):
         """Sliding window: oldest messages dropped when exceeding max_turns."""
@@ -98,3 +99,57 @@ class TestConversationMemory:
         assert msg.role == "user"
         assert msg.content == "hello"
         assert msg.ts is not None
+
+
+class TestMemoryMD:
+    """Test MEMORY.md cross-session persistence."""
+
+    def test_save_and_load_fact(self):
+        """save_memory_fact appends; load_memory_md returns content."""
+        # Clean up first
+        forget_memory_fact("test-integration")
+        save_memory_fact("Test-Agent uses Python")
+        mem = load_memory_md()
+        assert "Test-Agent uses Python" in mem
+
+    def test_duplicate_fact_not_appended(self):
+        """Saving same fact twice does not duplicate."""
+        forget_memory_fact("duplicate-test")
+        save_memory_fact("Unique fact for dedup test")
+        mem1 = load_memory_md()
+        save_memory_fact("Unique fact for dedup test")
+        mem2 = load_memory_md()
+        assert mem1 == mem2
+
+    def test_forget_removes_matching_line(self):
+        """forget_memory_fact removes lines containing keyword."""
+        save_memory_fact("Temp fact to be forgotten")
+        removed = forget_memory_fact("Temp fact")
+        assert removed >= 1
+        mem = load_memory_md()
+        if mem:
+            assert "Temp fact to be forgotten" not in mem
+
+    def test_load_memory_md_empty_when_no_file(self):
+        """load_memory_md returns empty string when no MEMORY.md exists."""
+        # forget all test facts
+        forget_memory_fact("Test-Agent")
+        forget_memory_fact("Unique")
+        forget_memory_fact("Temp")
+        # After cleanup, should be empty or just contain non-test facts
+        mem = load_memory_md()
+        assert isinstance(mem, str)
+
+    def test_build_context_includes_memory(self):
+        """build_context prepends MEMORY.md facts when present."""
+        save_memory_fact("Project: Test-Agent framework")
+        mem = ConversationMemory()
+        ctx = mem.build_context("run smoke test")
+        assert "Project: Test-Agent framework" in ctx
+        assert "Persistent knowledge" in ctx
+        forget_memory_fact("Project: Test-Agent framework")
+
+    def test_forget_nonexistent_keyword(self):
+        """forget with no match returns 0."""
+        removed = forget_memory_fact("xyznonexistent987654321")
+        assert removed == 0

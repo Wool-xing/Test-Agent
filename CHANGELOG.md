@@ -14,10 +14,27 @@
 ### Added
 - agent-introspection-debugging skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/agent_introspection_debugging.py`) — 5 维自省 (decision_replay / tool_calls / token_consumption / context / state_machine) + findings + recommendations
 - build-your-own-x-explorer skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/build_your_own_x_explorer.py`) — 场景识别 + byox 13 类 KB 推荐 + 时间预算警告
+- **P1 体感层 — Agent 交互层 5 项全部实装:**
+  - 流式输出：DAG 执行进度实时展示（`on_progress` callback → Rich Live table），支持 direct executor 和 Prefect flow 双路径
+  - MEMORY.md 跨会话持久化：`/remember` `/forget` `/memory` 命令，自动注入 LLM 上下文，线程安全 + 换行注入防护 + 2000 char 预算
+  - Tab 补全增强：agent/skill 名补全（48 个候选，延迟加载）、provider 名补全（`/model` 上下文感知）、命令去重
+  - 错误交互全覆盖：所有 `/command` 路径挂 `_diagnose_error()` 友好提示，不再泛抛 "Command failed"
+  - 启动欢迎动画：Rich Live typewriter reveal 替换静态 banner
 
 ### Changed
 - CLI `tagent run`: `--mode`/`--lang` 改为可选（默认读 `$TAGENT_MODE`/`$TAGENT_LANG` 环境变量，fallback `exec`/`zh`）；裸 `tagent` 显示简洁常用命令摘要
 - 2 vision skill 升 production: `agent-introspection-debugging` + `build-your-own-x-explorer` (frontmatter `SKILL_IMPL_STATUS: vision` → `production`)
+- `ConversationMemory.build_context()`: 无历史时也包裹 "Current request:" 前缀 + MEMORY.md 层，保持输出格式一致
+- `_cmd_compact`: 追加 `_truncate()` 调用，不再绕过字符预算
+- `SlashCompleter`: 去重 COMMAND_REGISTRY 和 _BUILTINS 的重复命令名
+- `run_decision_direct` / `run_decision_flow`: 新增 `on_progress` 回调参数（含 callable 守卫），circuit-breaker drain 路径也触发
+
+### Fixed
+- MEMORY.md 换行注入：`save_memory_fact` 过滤 `\n` `\r`，截断 200 char
+- MEMORY.md prompt injection：`build_context` 用 ``` ```memory``` 分隔符包裹，2000 char 预算
+- MEMORY.md TOCTOU 竞态：加 `threading.Lock`
+- `/forget` 关键词太短导致误删：最小 3 字符
+- `load_memory_md` 异常静默吞噬：改为 `logger.warning`
 - skill rollout 总数: 16 → 18 (中央 `runtime/tests/test_skill_runners.py` `ALL_SKILL_RUNNERS` 同步加 2 行)
 - skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
 - runtime/orchestrator/skills/__init__.py: 聚合 import 新增 agent_introspection_debugging + build_your_own_x_explorer
