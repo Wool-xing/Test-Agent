@@ -24,16 +24,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install runtime
-        run: pip install -e runtime/
+      - name: Install runtime deps
+        run: |
+          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect defusedxml prompt-toolkit httpx
 
       - name: Run demo (smoke)
-        run: tagent demo -y
+        run: python -m runtime.cli.main demo -y
         env:
           TAGENT_LLM_PROVIDER: stub
 
       - name: Run selftest
-        run: tagent selftest --e2e
+        run: python -m runtime.cli.main selftest --e2e
         env:
           TAGENT_LLM_PROVIDER: stub
 
