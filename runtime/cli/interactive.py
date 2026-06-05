@@ -22,7 +22,8 @@ from prompt_toolkit.styles import Style
 from runtime.cli._shared import console
 from runtime.cli.completer import SlashCompleter
 from runtime.cli.conversation import ConversationMemory
-from runtime.cli.slash_commands import COMMAND_REGISTRY, resolve as resolve_command
+from runtime.cli.slash_commands import COMMAND_REGISTRY
+from runtime.cli.slash_commands import resolve as resolve_command
 
 _SHEEP = r"""
     ✧  ▗▛ 🐏 ▜▖  ✧
@@ -106,7 +107,7 @@ def _print_help() -> None:
             ("/ready", "Release readiness score"),
         ]),
         ("Control", [
-            ("/model [name]", "Switch LLM provider (Tab to complete)"),
+            ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
             ("/clear", "Reset conversation memory"),
             ("/setup [--preset]", "Generate config files"),
             ("/check [--e2e]", "Framework self-test"),
@@ -130,11 +131,56 @@ def _print_help() -> None:
     console.print()
 
 
+# ── Error Diagnosis ─────────────────────────────────────────────────
+
+
+def _diagnose_error(exc: Exception) -> str | None:
+    """Return a friendly Chinese/English hint for common errors. None if no specific advice."""
+    _msg = str(exc).lower()
+    _t = type(exc).__name__
+
+    # API key / auth errors
+    if any(k in _msg for k in ("api_key", "api key", "apikey", "unauthorized", "401", "credential", "authentication")):
+        provider = _current_provider()
+        return (
+            f"LLM ({provider}) needs an API key. "
+            f"Set [cyan]TAGENT_LLM_API_KEY[/] in [cyan].env[/] or environment. "
+            f"Run [cyan]tagent setup --preset minimal[/] to generate a template."
+        )
+
+    # Missing module / import errors
+    if _t in ("ModuleNotFoundError", "ImportError"):
+        mod = _msg.split("'")[1] if "'" in _msg else "?"
+        return (
+            f"Missing Python package: [cyan]{mod}[/]. "
+            f"Run [cyan]pip install -e runtime/[/] or [cyan]pip install {mod}[/]."
+        )
+
+    # Connection / network errors
+    if any(k in _msg for k in ("connection", "timeout", "refused", "unreachable", "ssl", "dns", "resolve")):
+        return (
+            "Cannot reach the LLM service. Check your network, proxy settings, "
+            "or [cyan]TAGENT_LLM_API_BASE[/] in [cyan].env[/]."
+        )
+
+    # Rate limit
+    if any(k in _msg for k in ("rate limit", "429", "too many")):
+        return "Rate limited by the LLM provider. Wait a moment and try again."
+
+    # Invalid request / bad gateway from LLM
+    if any(k in _msg for k in ("500", "502", "503", "internal", "bad gateway")):
+        provider = _current_provider()
+        return f"{provider} service returned a server error. The provider may be down — try again or switch with [cyan]/model[/]."
+
+    # General: give the error message itself as info, with next steps
+    return None
+
+
 # ── Streaming Activity Feed ────────────────────────────────────────
 
 
 def _handle_natural_language(text: str) -> None:
-    """Route through LLM with streaming activity output."""
+    """Route through routing kernel with streaming activity output."""
     if not text.strip():
         return
 
@@ -150,37 +196,42 @@ def _handle_natural_language(text: str) -> None:
         console.print(f"[dim]\"{summary}\"[/]")
 
     t0 = time.time()
-    _old_argv = None
     try:
-        import sys as _sys, contextlib, io
-
-        _old_argv = _sys.argv[:]
-        _sys.argv = ["tagent", "run", context_input]
+        from runtime.cli._shared import _kernel, build_artifact
 
         with console.status("[bold green]Routing...", spinner="dots"):
-            from runtime.cli.commands.run import run as _run
-            _capture = io.StringIO()
-            with contextlib.redirect_stdout(_capture):
-                _run()
+            art = build_artifact(context_input, "")
+            run_id, decision = _kernel.submit(art, persist=False)
 
+        print_dag = __import__("runtime.cli._shared", fromlist=["print_dag"]).print_dag
+        print_dag(decision)
+
+        summary = _kernel.execute_sync(run_id, decision)
         elapsed = (time.time() - t0) * 1000
-        output = _capture.getvalue().strip()
-        if output:
-            console.print(output)
-        console.print(f"  [dim]Completed in {elapsed:.0f}ms[/]")
-        mem.add("assistant", output[:500] if output else f"[Run: {text[:100]}]")
-    except SystemExit:
-        pass
+        total = summary["total"]
+        succ = summary["succeeded"]
+        rate = succ / total if total else 0.0
+        console.print(f"  [green]✓ {succ}/{total} ok ({rate:.0%})[/]  [dim]({elapsed:.0f}ms)[/]")
+        mem.add("assistant", f"DAG: {succ}/{total} ok, {summary.get('failed', 0)} failed")
     except KeyboardInterrupt:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
-    except Exception:
-        console.print(f"  [red]Error[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
-        mem.add("assistant", "[Error: command failed]")
-    finally:
-        if _old_argv is not None:
-            import sys as _sys
-            _sys.argv = _old_argv
+    except Exception as _exc:
+        _err_msg = str(_exc)[:300]
+        elapsed = (time.time() - t0) * 1000
+        console.print(f"  [red]✗ {type(_exc).__name__}[/]  [dim]({elapsed:.0f}ms)[/]")
+
+        # ── friendly guidance based on error type ──
+        _hint = _diagnose_error(_exc)
+        if _hint:
+            console.print(f"  [yellow]💡 {_hint}[/]")
+        elif _err_msg:
+            console.print(f"  [dim]{_err_msg}[/]")
+            console.print("  [dim]Run [cyan]/help[/] for commands, [cyan]/doctor[/] for health check.[/]")
+        else:
+            console.print("  [dim]Run [cyan]/doctor[/] to check environment, [cyan]/help[/] for commands.[/]")
+
+        mem.add("assistant", f"[Error: {type(_exc).__name__}]")
 
 
 # ── Fuzzy matching (thefuck-style) ─────────────────────────────────
@@ -264,23 +315,49 @@ def _cmd_status(args: str) -> None:
 
 
 def _cmd_model(args: str) -> None:
-    name = args.strip().lower()
+    parts = args.strip().split()
+    name = parts[0].lower() if parts else ""
+    model_override = parts[1] if len(parts) > 1 else None
     current = _current_provider()
 
     if not name:
         console.print(f"Current: [cyan]{current}[/] → {_current_model()}\n")
         console.print("Available:")
         for p in _PROVIDERS:
-            console.print(f"  {p}{' [bold green]← current[/]' if p == current else ''}")
-        console.print("\n[dim]Usage: /model <name>   Tab to see options[/]")
+            models = {
+                "claude": "sonnet-4-6 / opus-4-8 / haiku-4-5",
+                "openai": "gpt-4o / gpt-4.1 / o4-mini",
+                "gemini": "gemini-1.5-pro / gemini-2.5-flash",
+                "deepseek": "deepseek-chat / deepseek-reasoner",
+                "qwen": "qwen-plus / qwen-max / qwen-turbo",
+                "ollama": "any local model (e.g. qwen2.5:7b)",
+            }
+            marker = " [bold green]← current[/]" if p == current else ""
+            detail = models.get(p, "")
+            console.print(f"  [cyan]{p}[/]{marker}  [dim]{detail}[/]")
+        console.print("\n[dim]Usage: /model <provider> [model]   e.g. /model deepseek deepseek-chat[/]")
         return
 
+    # Check if user typed a model name instead of provider
     if name not in _PROVIDERS:
-        console.print(f"[red]Unknown: {name}[/]  Available: {', '.join(_PROVIDERS)}")
+        # Try fuzzy match against known models → providers
+        for p in _PROVIDERS:
+            if name.startswith(p) or p.startswith(name):
+                console.print(f"[yellow]'{name}' is a model name. Did you mean [cyan]/model {p}[/]?[/]")
+                break
+        else:
+            console.print(f"[red]Unknown provider: {name}[/]")
+            console.print(f"[dim]Available: {', '.join(_PROVIDERS)}[/]")
+            console.print("[dim]Tip: provider first, then model — e.g. [cyan]/model deepseek deepseek-chat[/][/]")
         return
 
     os.environ["TAGENT_LLM_PROVIDER"] = name
-    console.print(f"[green]Switched to {name}[/] → {_current_model()}")
+    if model_override:
+        os.environ["TAGENT_LLM_MODEL"] = model_override
+    else:
+        os.environ.pop("TAGENT_LLM_MODEL", None)  # use default
+
+    console.print(f"[green]Switched[/] → provider: [cyan]{name}[/]  model: [cyan]{_current_model()}[/]")
 
 
 # ── /tools — dynamic agent/skill list ──────────────────────────────
@@ -385,6 +462,7 @@ def _cmd_cost(args: str) -> None:
 
 def _cmd_sessions(args: str) -> None:
     from datetime import datetime
+
     from rich.table import Table
 
     if not _SESSION_DIR.is_dir():
@@ -573,11 +651,38 @@ def _read_input(session: PromptSession | None) -> str | None:
         return None
 
 
+def _check_first_run() -> None:
+    """Detect unconfigured state and show a friendly onboarding guide."""
+    provider = _current_provider()
+    if provider in ("ollama", "stub"):
+        return  # local/stub — no API key needed
+
+    api_key = os.environ.get("TAGENT_LLM_API_KEY", "")
+    has_env_file = (_Path(__file__).resolve().parents[2] / ".env").exists()
+
+    if not api_key and not has_env_file:
+        console.print(
+            "\n[yellow]👋 欢迎！看起来这是你第一次使用 Test-Agent。[/]\n"
+            "[bold]快速上手 (3 步):[/]\n"
+            "  1. [cyan]tagent setup --preset minimal[/]  → 生成 .env 模板\n"
+            "  2. 编辑 [cyan].env[/] → 填入你的 LLM API key\n"
+            "  3. [cyan]tagent demo -y[/]  → 一键验证 (0 费用, stub 模式)\n"
+            "\n[dim]现在可以先跑 demo 看看效果: /check --e2e[/]\n"
+        )
+    elif not api_key:
+        console.print(
+            f"\n[yellow]⚠️  当前 provider [cyan]{provider}[/] 未配置 API key。[/]\n"
+            f"  [dim]设置: set TAGENT_LLM_API_KEY=你的key[/]\n"
+            f"  [dim]或在 .env 文件中添加: TAGENT_LLM_API_KEY=你的key[/]\n"
+        )
+
+
 def start() -> None:
     global _start_time
     _start_time = time.time()
 
     _print_banner()
+    _check_first_run()
 
     mem = _get_memory()
     if mem.messages:
