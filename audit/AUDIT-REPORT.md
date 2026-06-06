@@ -248,3 +248,21 @@ pip-audit工具在Python 3.14环境受限，手动验证依赖均可正常导入
 | 8 | API端点 | ✅ | /health /catalog /run 全通 |
 | 9 | Electron编译启动 | ✅ | TS编译+后端启动验证 |
 | 10 | 版本号三线一致 | ✅ | VERSION→semver→check脚本 |
+
+## 补充审查: runtime/tutor + scheduler + marketplace + init + plugins
+
+| 文件 | 发现 |
+|------|------|
+| tutor/explainer.py | ✅ 反幻觉L1+L2设计良好 |
+| tutor/i18n.py | ✅ 0 bare except |
+| tutor/verbosity.py | ✅ 模式切换简洁 |
+| tutor/theory_kb.py | ✅ KB查询+lazy loading |
+| scheduler/scheduler.py | ✅ 跨平台文件锁(fcntl/msvcrt) |
+| init/matrix.py | ✅ 8640组合矩阵清晰 |
+| init/renderer.py | ✅ 模板渲染正确 |
+| marketplace/catalog.py | ✅ catalog查询逻辑正确 |
+| marketplace/discovery.py | ✅ 插件发现容错 |
+| plugins/__init__.py | ✅ 插件加载错误隔离 |
+| self_healing/locator_store.py | ✅ 多属性定位器设计 |
+
+**runtime/ 全部子模块审查完成: 0个新问题**
