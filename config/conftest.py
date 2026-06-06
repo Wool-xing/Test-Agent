@@ -46,7 +46,7 @@ for _utils_dir in _UTILS_CANDIDATES:
 
 # ===== 输出路径：按项目归类（委托 utils/paths.py）=====
 
-from utils.paths import get_project_name, get_output_dir, current_run_id
+from paths import get_project_name, get_output_dir, current_run_id
 
 
 # ===== 环境配置 =====
