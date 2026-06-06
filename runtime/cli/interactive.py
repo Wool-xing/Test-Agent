@@ -242,6 +242,7 @@ def _print_help() -> None:
         ("Session", [
             ("/cost", "Token usage and cost estimate"),
             ("/sessions", "List saved sessions"),
+            ("/resume <id>", "Load a saved session"),
             ("/export", "Export conversation to markdown"),
             ("/compact", "Summarize and compress context"),
             ("/context", "Full conversation history"),
@@ -709,6 +710,37 @@ def _cmd_sessions(args: str) -> None:
         table.add_row(sid, str(turns), mtime + marker)
 
     console.print(table)
+
+
+# ── /resume — load a saved session ──────────────────────────────────
+
+
+def _cmd_resume(args: str) -> None:
+    """Load a previously saved session by filename or session_id prefix."""
+    global _memory
+
+    sid = args.strip()
+    if not sid:
+        console.print("[dim]Usage: /resume <session_id_or_filename>[/]")
+        return
+
+    match = None
+    for f in sorted(_SESSION_DIR.glob("*.json"), key=lambda x: x.stat().st_mtime, reverse=True):
+        if f.name == sid or f.name == f"{sid}.json" or f.stem.startswith(sid):
+            match = f
+            break
+
+    if match is None:
+        console.print(f"[dim]No session matching '{sid}' found. Use /sessions to list.[/]")
+        return
+
+    loaded = ConversationMemory.load(match)
+    if not loaded.messages:
+        console.print("[dim]Session empty or corrupt.[/]")
+        return
+
+    _memory = loaded
+    console.print(f"[green]Resumed:[/] {match.stem} ({len(loaded.messages)} messages)")
 
 
 # ── /export — export conversation to markdown ──────────────────────
@@ -1218,6 +1250,7 @@ _BUILTIN_MAP = {
     "tools": _cmd_tools,
     "cost": _cmd_cost, "usage": _cmd_cost,
     "sessions": _cmd_sessions,
+    "resume": _cmd_resume,
     "export": _cmd_export,
     "compact": _cmd_compact,
     "context": _cmd_context, "clear": _cmd_clear,
