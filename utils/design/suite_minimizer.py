@@ -82,7 +82,7 @@ def parse_coverage_xml(coverage_xml: str) -> Dict[str, Set[int]]:
     return result
 
 
-def minimize_by_coverage(test_coverage_map: Dict[str, Set[Tuple[str, int]]]) -> List[str]:
+def minimize_by_coverage(test_coverage_map: Dict[str, Set[Tuple[str, int]]]) -> Dict[str, Any]:
     """
     贪心算法：选最少的测试用例覆盖最多的代码行。
     test_coverage_map: {test_id: {(file, line), ...}}

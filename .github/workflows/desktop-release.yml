@@ -13,13 +13,13 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
@@ -29,9 +29,7 @@ jobs:
           pip install pyinstaller
 
       - name: Build Python backend
-        run: |
-          echo "=== DEBUG ===" && ls desktop/entrypoint.py && ls desktop/pyinstaller/*.spec
-          pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
+        run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
 
       - name: Build Web UI
         working-directory: runtime/web
@@ -46,7 +44,7 @@ jobs:
           npx tsc -p electron/tsconfig.json
           npx electron-builder --win --config electron-builder.yml
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         with:
           name: Test-Agent-Windows
           path: dist-electron/*.exe
@@ -54,13 +52,13 @@ jobs:
   build-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
@@ -70,9 +68,7 @@ jobs:
           pip install pyinstaller
 
       - name: Build Python backend
-        run: |
-          echo "=== DEBUG ===" && ls desktop/entrypoint.py && ls desktop/pyinstaller/*.spec
-          pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
+        run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
 
       - name: Build Web UI
         working-directory: runtime/web
@@ -87,7 +83,7 @@ jobs:
           npx tsc -p electron/tsconfig.json
           npx electron-builder --mac --config electron-builder.yml
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         with:
           name: Test-Agent-macOS
           path: dist-electron/Test-Agent-*.dmg
@@ -99,7 +95,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@v4
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3

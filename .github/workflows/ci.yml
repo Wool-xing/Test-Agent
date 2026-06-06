@@ -18,7 +18,7 @@ jobs:
     name: 版本号一致性检查
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Check version consistency
         run: python scripts/check_version_consistency.py
 
@@ -27,9 +27,9 @@ jobs:
     name: utils/ Ruff + 类型检查
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
@@ -50,11 +50,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -72,7 +72,7 @@ jobs:
 
       - name: 上传契约产物
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: contracts
           path: workspace/contracts/
@@ -83,8 +83,8 @@ jobs:
     name: 依赖 CVE 扫描
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -108,7 +108,7 @@ jobs:
     name: install.py 语法
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Python 语法检查 (install.py)
         run: python -m py_compile install.py
@@ -118,9 +118,9 @@ jobs:
     name: install.py macOS 端到端 (实跑)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -168,7 +168,7 @@ jobs:
 
       - name: 上传 install.log (失败时排错用)
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: macos-install-log
           path: /tmp/install.log
@@ -178,8 +178,8 @@ jobs:
     name: 配置文件语法
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -215,8 +215,8 @@ jobs:
     name: utils 模块可导入
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
@@ -256,7 +256,7 @@ jobs:
     name: Markdown 内部链接有效性
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: 检查内部链接
         run: |
@@ -292,7 +292,7 @@ jobs:
     name: Agents/Skills/Utils 数量 + 私有 MD 防护
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: 统计核对
         run: |
@@ -330,8 +330,8 @@ jobs:
     name: L2 self-test · mock LLM e2e
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
@@ -360,8 +360,8 @@ jobs:
     name: runtime/tests pytest 单元
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip

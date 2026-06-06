@@ -157,8 +157,6 @@ desktop/out/
 desktop/node_modules/
 dist-python/
 dist-electron/
-*.exe
-*.dmg
 
 # ===== 私源文档 (不上 Git) =====
 mobile/PUBLISH.md

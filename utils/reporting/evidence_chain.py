@@ -151,7 +151,7 @@ def collect_dora_metrics(deployments: list[dict[str, Any]],
                          git_dir: str = ".") -> dict[str, Any]:
     """Collect DORA 4 metrics snapshot from deployment/incident data."""
     try:
-        from dora_metrics import dora_summary  # type: ignore[import-untyped]
+        from utils.reporting.dora_metrics import dora_summary  # type: ignore[import-untyped]
         return dora_summary(deployments, incidents, git_dir)
     except ImportError:
         logger.warning("dora_metrics module not available")

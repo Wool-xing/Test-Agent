@@ -12,6 +12,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Callable
 
 from loguru import logger
 
@@ -108,7 +109,7 @@ BRIDGE_MAP: dict[str, str] = {
     "test-suite-minimization": "suite_minimizer.py",
 }
 
-ADAPTER_MAP: dict[str, callable] = {
+ADAPTER_MAP: dict[str, Callable] = {
     "mutation_runner.py": run_mutation_test,
     "chaos_helper.py": run_chaos_experiment,
     "fuzzer.py": run_fuzz_http,

@@ -38,7 +38,7 @@ import argparse
 
 # Windows 中文终端默认 GBK，Unicode 输出（✓ ✅ → ⚠）直接炸。
 # 强制 UTF-8 输出，避免 UnicodeEncodeError。
-if sys.stdout.encoding.upper() != "UTF-8":
+if sys.stdout.encoding is not None and sys.stdout.encoding.upper() != "UTF-8":
     sys.stdout.reconfigure(encoding="utf-8")
 
 
@@ -517,7 +517,7 @@ def setup_venv(python_bin, project_root):
             lines = f.readlines()
         filtered = [l for l in lines if not l.startswith(("scikit-image", "scikit-learn", "opencv-python", "opencv-contrib-python"))]
         fd, tmp = tempfile.mkstemp(suffix=".txt", prefix="tagent-req-")
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
+        with open(fd, "w", encoding="utf-8") as f:
             f.writelines(filtered)
         subprocess.run([pip_cmd, "install", "-r", tmp], env=pip_env, check=True)
         os.unlink(tmp)
@@ -644,7 +644,7 @@ def _update_deps(project_root):
             lines = f.readlines()
         filtered = [l for l in lines if not l.startswith(("scikit-image", "scikit-learn", "opencv-python", "opencv-contrib-python"))]
         fd, tmp = tempfile.mkstemp(suffix=".txt", prefix="tagent-update-req-")
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
+        with open(fd, "w", encoding="utf-8") as f:
             f.writelines(filtered)
         subprocess.run([pip_cmd, "install", "-r", tmp], env=pip_env, check=True)
         os.unlink(tmp)

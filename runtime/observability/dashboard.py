@@ -138,10 +138,6 @@ def build_dashboard(workspace_dir: Path) -> dict[str, Any]:
     actions = build_action_items(runs, diagnostic["expert_heatmap"])
 
     total = len(runs)
-    [
-        (r.get("succeeded", r.get("passed", 0)) / max(r.get("total", 1), 1))
-        for r in runs
-    ]
     avg_confidence = round(sum(r.get("avg_confidence", r.get("confidence", 0)) for r in runs) / max(total, 1), 1)
 
     return {

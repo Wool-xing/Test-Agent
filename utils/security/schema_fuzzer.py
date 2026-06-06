@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import random
 import string
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -305,7 +306,7 @@ if __name__ == "__main__":
     elif args.cmd == "fuzz":
         if not HAS_REQUESTS:
             print('{"error": "requests library required: pip install requests"}')
-            exit(1)
+            sys.exit(1)
         cases = generate_from_schema(schema)
         results = []
         passed = 0
