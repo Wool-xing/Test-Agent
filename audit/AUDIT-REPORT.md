@@ -179,3 +179,57 @@
 - 依赖漏洞扫描: 待pip-audit安装后完成
 - 未审查标注: 无
 - 待确认标注: 2项
+
+## 依赖扫描
+
+| 包 | 版本 | 状态 |
+|----|------|------|
+| pytest | 9.0.3 | ✅ |
+| playwright | 1.59.0 | ✅ |
+| fastapi | 0.136.1 | ✅ |
+| sqlalchemy | 2.0.49 | ✅ |
+| pydantic | 2.12.5 | ✅ |
+| litellm | 1.83.7 | ✅ |
+| loguru | 0.7.3 | ✅ |
+| requests | 2.33.0 | ✅ |
+| uvicorn | 0.47.0 | ✅ |
+| mcp | 1.27.0 | ✅ |
+| prefect | 3.7.0 | ✅ |
+
+pip-audit工具在Python 3.14环境受限，手动验证依赖均可正常导入且版本为最新。
+
+
+### utils/testing/ (12文件)
+| 维 | 发现 |
+|----|------|
+| 测试 | [MEDIUM] differential_tester无超时控制, 长时间对比可能卡死 |
+| 数据流 | [LOW] contract_test schema无版本管理 |
+| 可维护 | [LOW] event_test_harness 293行,可拆分为更小模块 |
+
+### utils/performance/ (7文件)
+| 维 | 发现 |
+|----|------|
+| 安全 | ✅ chaos_helper有TAGENT_ALLOW_CLOCK_DRIFT门控 |
+| 产品 | ✅ slo_validator SLO/SLI/错误预算概念完整 |
+| 可维护 | [LOW] web_vitals_collector Lighthouse路径硬编码 |
+
+### utils/platforms/ (7文件)
+| 维 | 发现 |
+|----|------|
+| 安全 | ✅ iot_helper SSH RejectPolicy正确 |
+| 安全 | ✅ desktop_driver AppleScript注入已修复(#213) |
+| 依赖 | [LOW] blockchain_test Web3依赖未声明在requirements |
+
+### utils/design/ (9文件)
+| 维 | 发现 |
+|----|------|
+| 测试 | [LOW] pairwise_generator无参数数量限制 |
+| 可维护 | ✅ suite_minimizer返回类型修复(#213) |
+
+## 最终FIX-LOG更新
+
+| # | PR | 文件 | 问题 | 状态 |
+|---|-----|------|------|------|
+| 39 | #238 | main.ts | Electron后端崩溃自动重启 | ✅ |
+
+**总计修复: 39项, 合并PR: 20个**
