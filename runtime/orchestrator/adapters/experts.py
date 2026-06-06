@@ -186,6 +186,7 @@ class StepOutcome:
     stdout: str
     stderr: str
     duration_ms: int
+    integrity: str = "real"  # real|degraded|mock — anti-fabrication marker
 
     @property
     def ok(self) -> bool:
@@ -290,6 +291,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                     returncode=0 if res.ok else 1,
                     stdout=stdout,
                     stderr=res.error,
+                    integrity="degraded" if res.degraded else "real",
                     duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
                 )
         except Exception as e:  # noqa: BLE001
@@ -335,6 +337,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                     returncode=0 if res.ok else 1,
                     stdout=stdout,
                     stderr=res.error,
+                    integrity="degraded" if res.degraded else "real",
                     duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
                 )
         except Exception as e:  # noqa: BLE001
@@ -351,6 +354,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
             stdout=f"[no-op] {kind} '{name}' has no canonical script; documented step recorded.",
             stderr="",
             duration_ms=0,
+            integrity="degraded",
         )
     available = set(list_available_scripts())
     if script not in available:
@@ -362,6 +366,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
             stdout="",
             stderr=f"script '{script}' not found under utils/",
             duration_ms=0,
+            integrity="degraded",
         )
     defaults = SCRIPT_DEFAULT_ARGS.get(script, {})
     # When upstream agent outputs exist, build real summary for report generation
@@ -401,4 +406,5 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
         stdout=res.stdout,
         stderr=res.stderr,
         duration_ms=res.duration_ms,
+        integrity="degraded" if res.returncode != 0 else "real",
     )
