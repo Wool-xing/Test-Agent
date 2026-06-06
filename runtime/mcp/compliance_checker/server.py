@@ -115,7 +115,7 @@ def build_server():
     except ImportError as e:
         raise RuntimeError("mcp SDK not installed") from e
 
-    server = make_server("compliance-checker", version="0.1.0")
+    server = make_server("compliance-checker")
 
     TOOLS = [
         Tool(

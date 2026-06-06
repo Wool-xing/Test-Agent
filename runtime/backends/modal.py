@@ -7,6 +7,7 @@ Modal client SDK must be installed and authenticated:
 
 from __future__ import annotations
 
+import shlex
 import time
 from pathlib import Path
 
@@ -46,7 +47,9 @@ class ModalBackend(BaseExecutionEnv):
         if self._sandbox is None:
             return ExecResult(ok=False, stdout="", stderr="not connected", returncode=None, elapsed_ms=0)
         try:
-            full = cmd if not cwd else f"cd {cwd} && {cmd}"
+            full = shlex.quote(cmd)
+            if cwd:
+                full = f"cd {shlex.quote(cwd)} && {full}"
             proc = self._sandbox.exec("sh", "-lc", full)
             stdout = proc.stdout.read()
             stderr = proc.stderr.read()

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from runtime.gateway.base import DeliveryResult, Message, Platform, register
+from runtime.gateway.base import DeliveryResult, Message, Platform, is_safe_webhook_url, register
 
 
 @register("discord")
@@ -21,7 +21,7 @@ class DiscordPlatform(Platform):
         except ImportError:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="httpx missing")
         # Only use target if it looks like a URL (Discord webhook URL override)
-        url = target if target and target.startswith("https://") else None
+        url = target if target and target.startswith("https://") and is_safe_webhook_url(target) else None
         if not url:
             if not self.webhook:
                 await self.configure()

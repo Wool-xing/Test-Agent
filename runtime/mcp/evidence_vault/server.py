@@ -187,7 +187,7 @@ def build_server():
     except ImportError as e:
         raise RuntimeError("mcp SDK not installed") from e
 
-    server = make_server("evidence-vault", version="0.1.0")
+    server = make_server("evidence-vault")
 
     TOOLS = [
         Tool(

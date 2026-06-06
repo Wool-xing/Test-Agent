@@ -141,7 +141,7 @@ def build_server():
     except ImportError as e:
         raise RuntimeError("mcp SDK not installed") from e
 
-    server = make_server("test-orchestrator", version="0.1.0")
+    server = make_server("test-orchestrator")
 
     TOOLS = [
         Tool(

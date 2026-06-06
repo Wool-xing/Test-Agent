@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import shlex
 import time
 from pathlib import Path
 
@@ -34,10 +35,11 @@ class SingularityBackend(BaseExecutionEnv):
 
     async def exec(self, cmd: str, *, timeout: float = 60.0, cwd: str | None = None, env: dict | None = None) -> ExecResult:
         start = time.monotonic()
+        full = shlex.quote(cmd) if not cwd else f"cd {shlex.quote(cwd)} && {shlex.quote(cmd)}"
         argv = ["singularity", "exec"]
         for b in self.binds:
             argv += ["--bind", b]
-        argv += [self.image, "sh", "-lc", cmd]
+        argv += [self.image, "sh", "-lc", full]
         rc, out, err = await self._run(argv, timeout=timeout)
         return ExecResult(ok=rc == 0, stdout=out, stderr=err, returncode=rc, elapsed_ms=int((time.monotonic() - start) * 1000))
 

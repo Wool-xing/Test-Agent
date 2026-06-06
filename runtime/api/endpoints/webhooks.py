@@ -429,8 +429,8 @@ async def _process_async_wechat(text: str, platform: str, userid: str,
             await platform_obj.send(
                 Message(text=f"❌ 处理失败: {exc}"), target=userid,
             )
-        except Exception:
-            pass
+        except Exception as e2:
+            logger.warning("WeChat error reply send failed: {}", e2)
 
 
 # ── 钉钉 (DingTalk) ─────────────────────────────────────────────────

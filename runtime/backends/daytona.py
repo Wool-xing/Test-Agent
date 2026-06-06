@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shlex
 import time
 from pathlib import Path
 
@@ -40,7 +41,9 @@ class DaytonaBackend(BaseExecutionEnv):
 
     async def exec(self, cmd: str, *, timeout: float = 60.0, cwd: str | None = None, env: dict | None = None) -> ExecResult:
         start = time.monotonic()
-        full = cmd if not cwd else f"cd {cwd} && {cmd}"
+        full = shlex.quote(cmd)
+        if cwd:
+            full = f"cd {shlex.quote(cwd)} && {full}"
         rc, out, err = await self._cli(["ssh", self.workspace, "--", "sh", "-lc", full], timeout=timeout)
         return ExecResult(ok=rc == 0, stdout=out, stderr=err, returncode=rc, elapsed_ms=int((time.monotonic() - start) * 1000))
 
@@ -55,7 +58,7 @@ class DaytonaBackend(BaseExecutionEnv):
         import base64
 
         b64 = base64.b64encode(data).decode("ascii")
-        await self._cli(["ssh", self.workspace, "--", "sh", "-lc", f"echo {b64} | base64 -d > {path}"])
+        await self._cli(["ssh", self.workspace, "--", "sh", "-lc", f"echo {b64} | base64 -d > {shlex.quote(path)}"])
 
     async def sync_in(self, local: Path, remote: str) -> None:
         await self._cli(["cp", str(local), f"{self.workspace}:{remote}"])

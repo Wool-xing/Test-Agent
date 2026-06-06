@@ -13,7 +13,9 @@ from __future__ import annotations
 import os
 import time
 
-from runtime.gateway.base import DeliveryResult, Message, Platform, register
+from loguru import logger
+
+from runtime.gateway.base import DeliveryResult, Message, Platform, is_safe_webhook_url, register
 
 _ACCESS_TOKEN: str | None = None
 _ACCESS_TOKEN_EXPIRY: float = 0
@@ -39,8 +41,8 @@ def _get_access_token(app_key: str, app_secret: str) -> str | None:
             _ACCESS_TOKEN = token
             _ACCESS_TOKEN_EXPIRY = time.time() + data.get("expires_in", 7200)
             return token
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("DingTalk access_token fetch failed: {}", e)
     return None
 
 
@@ -131,7 +133,7 @@ class DingTalkPlatform(Platform):
             import httpx
         except ImportError:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="httpx missing")
-        url = target if target and target.startswith("https://") else None
+        url = target if target and target.startswith("https://") and is_safe_webhook_url(target) else None
         if not url:
             if not self.webhook:
                 await self.configure()
