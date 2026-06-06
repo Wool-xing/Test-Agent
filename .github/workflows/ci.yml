@@ -25,6 +25,15 @@ jobs:
       - name: Check version consistency
         run: python scripts/check_version_consistency.py
 
+  # ===== 0b. 命令注册表一致性 (防dispatch/help不同步) =====
+  command-consistency:
+    name: 命令注册表一致性
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check command registration
+        run: python scripts/check_command_consistency.py
+
   # ===== 1. utils/ 代码质量 =====
   lint-utils:
     name: utils/ Ruff + 类型检查

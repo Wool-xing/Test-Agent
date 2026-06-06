@@ -40,6 +40,7 @@ _HISTORY_FILE = _SESSION_DIR / "history.txt"
 
 _memory: ConversationMemory | None = None
 _last_trace: tuple | None = None  # (user_text, decision_dict) for /distill
+_last_fix: str | None = None  # last suggested command correction
 _start_time: float = 0.0
 
 _PROMPT_STYLE = Style.from_dict({
@@ -227,6 +228,7 @@ def _print_help() -> None:
         ("Control", [
             ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
             ("/lang [zh|en|zh-en]", "Switch UI language"),
+            ("/fc", "Fix last typo (like thefuck)"),
             ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
             ("/undo", "Remove last exchange from memory"),
@@ -589,6 +591,21 @@ def _cmd_cache(args: str) -> None:
     console.print(f"[bold]LLM Cache:[/] {stats['entries']} entries, {stats['size_kb']} KB, TTL={stats['ttl_hours']}h")
     if stats["entries"] > 0:
         console.print("[dim]Use /cache clear to flush.[/]")
+
+
+# ── /fc — fix last command typo (thefuck-style) ────────────────────
+
+
+def _cmd_fc(args: str) -> None:
+    """Re-execute the last suggested command correction. Like 'thefuck' for slash commands."""
+    global _last_fix
+    if _last_fix is None:
+        console.print("[dim]Nothing to fix. Type a command to get suggestions.[/]")
+        return
+    suggestion = _last_fix
+    _last_fix = None
+    console.print(f"[green]Running: /{suggestion}[/]")
+    _BUILTIN_MAP.get(suggestion, lambda a: None)("")
 
 
 # ── /lang — switch UI language ──────────────────────────────────────
@@ -1507,6 +1524,7 @@ _BUILTIN_MAP = {
     "plugins": _cmd_plugins_list,
     "distill": _cmd_distill,
     "cache": _cmd_cache,
+    "fc": _cmd_fc, "fuck": _cmd_fc,
     "doctor": _cmd_doctor,
     "insights": _cmd_insights,
     "gateway": _cmd_gateway,
@@ -1543,11 +1561,13 @@ def _handle_slash(text: str) -> None:
 
     cmd = resolve_command(name)
     if cmd is None:
+        global _last_fix
         suggestion = _closest_command(name)
         if suggestion:
+            _last_fix = suggestion
             console.print(
                 f"[red]Unknown: /{name}[/]  "
-                f"[dim]Did you mean [/][cyan]/{suggestion}[/][dim]?[/]"
+                f"[dim]Did you mean [/][cyan]/{suggestion}[/][dim]? Run [/][cyan]/fc[/][cyan][/][dim] to fix.[/]"
             )
         else:
             console.print(f"[red]Unknown: /{name}[/]  [dim](/help for commands)[/]")
