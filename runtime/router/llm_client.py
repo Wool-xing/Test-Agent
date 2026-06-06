@@ -65,7 +65,7 @@ class LLMClient:
         try:
             from runtime.router.model_router import select_model
             model = select_model(user, provider)
-        except Exception:
+        except ImportError:
             model = PROVIDER_MODEL_MAP.get(provider, provider)
         kwargs: dict[str, Any] = {
             "model": model,
