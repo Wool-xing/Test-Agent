@@ -3,6 +3,7 @@
 PRD 多格式加载器 - 统一入口，支持 md/txt/pdf/word/excel/zip/img/url
 被引用方：02-需求分析 agent / test-coordinator skill / test-lead 自动路由
 """
+import atexit
 import io
 import json
 import logging
@@ -181,6 +182,7 @@ def _load_xlsx(p: Path) -> Dict:
 def _load_zip(p: Path) -> Dict:
     """zip 解包到临时目录，递归加载每个子文件，合并文本"""
     extract_dir = Path(tempfile.mkdtemp(prefix="prd_zip_"))
+    atexit.register(shutil.rmtree, str(extract_dir), ignore_errors=True)
     with zipfile.ZipFile(p, "r") as zf:
         zf.extractall(extract_dir)
 

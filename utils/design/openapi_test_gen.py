@@ -5,20 +5,40 @@ OpenAPI / Swagger 自动用例生成（Schemathesis 风格）
 
 依赖：pip install schemathesis（生产用）；本文件提供轻量替代
 """
+import ipaddress
 import json
 import logging
-import yaml
+import socket
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 import requests
+import yaml
 
 logger = logging.getLogger(__name__)
+
+
+def _is_safe_url(url: str) -> bool:
+    """Block requests to private/internal network addresses (SSRF prevention)."""
+    try:
+        host = urlparse(url).hostname
+        if not host:
+            return False
+        addr = ipaddress.ip_address(host)
+    except ValueError:
+        try:
+            addr = ipaddress.ip_address(socket.gethostbyname(host))
+        except (OSError, ValueError):
+            return False
+    return not (addr.is_loopback or addr.is_link_local or addr.is_unspecified or addr.is_private)
 
 
 def load_openapi_spec(path_or_url: str) -> Dict:
     """从文件 / URL 加载 OpenAPI / Swagger 规范"""
     if path_or_url.startswith(("http://", "https://")):
+        if not _is_safe_url(path_or_url):
+            raise ValueError(f"URL blocked (private/internal): {path_or_url}")
         r = requests.get(path_or_url, timeout=10)
         r.raise_for_status()
         text = r.text

@@ -3,8 +3,34 @@
 from __future__ import annotations
 
 import abc
+import ipaddress
+import socket
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import urlparse
+
+
+def is_safe_webhook_url(url: str) -> bool:
+    """Check that a URL does not point to private/internal network.
+
+    Blocks: loopback, link-local, private (RFC 1918), and 0.0.0.0.
+    Returns True if safe, False if the host resolves to a blocked IP.
+    """
+    try:
+        host = urlparse(url).hostname
+        if not host:
+            return False
+        addr = ipaddress.ip_address(host)
+    except ValueError:
+        # hostname — resolve it
+        try:
+            addr = ipaddress.ip_address(socket.gethostbyname(host))
+        except (OSError, ValueError):
+            return False  # can't resolve → block
+
+    if addr.is_loopback or addr.is_link_local or addr.is_unspecified or addr.is_private:
+        return False
+    return True
 
 
 @dataclass(slots=True)

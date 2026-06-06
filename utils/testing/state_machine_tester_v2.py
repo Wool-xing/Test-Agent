@@ -38,7 +38,11 @@ class Transition:
                        "abs": abs, "min": min, "max": max, "len": len,
                        "int": int, "float": float, "str": str, "bool": bool,
                        "isinstance": isinstance, "round": round, "sum": sum}
-    _DANGEROUS_RE = re.compile(r"__|import\b|\bdel\b|getattr|setattr|eval\b|exec\b|compile\b|open\b|__import__")
+    _DANGEROUS_RE = re.compile(
+        r"__|import\b|\bdel\b|getattr|setattr|eval\b|exec\b|compile\b|open\b|__import__"
+        r"|__class__|__bases__|__subclasses__|__globals__|__mro__|__dict__|__code__"
+        r"|__builtins__|__subclasshook__|__init_subclass__|breakpoint\b|input\b"
+    )
 
     @classmethod
     def _validate_code(cls, code: str, label: str) -> None:

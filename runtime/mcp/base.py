@@ -13,6 +13,19 @@ import json
 import os
 import uuid
 from collections.abc import Awaitable, Callable
+from pathlib import Path
+
+
+def _get_project_version() -> str:
+    """Read VERSION file, strip V prefix for semver compatibility."""
+    try:
+        vfile = Path(__file__).resolve().parent.parent.parent / "VERSION"
+        if not vfile.exists():
+            vfile = Path(os.getcwd()) / "VERSION"
+        ver = vfile.read_text(encoding="utf-8").strip()
+        return ver.lstrip("Vv")
+    except (OSError, UnicodeDecodeError):
+        return "0.1.0"
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -91,7 +104,9 @@ def tool_decision_logged(tool_name: str) -> Callable:
     return deco
 
 
-def make_server(name: str, version: str = "0.1.0"):
+def make_server(name: str, version: str | None = None):
+    if version is None:
+        version = _get_project_version()
     """Return a low-level MCP Server instance."""
     try:
         from mcp.server import Server
@@ -114,7 +129,7 @@ async def run_stdio(server) -> None:
             write,
             InitializationOptions(
                 server_name=server.name,
-                server_version="0.1.0",
+                server_version=_get_project_version(),
                 capabilities=server.get_capabilities(
                     notification_options=NotificationOptions(),
                     experimental_capabilities={},

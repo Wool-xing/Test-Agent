@@ -45,7 +45,7 @@ def build_server():
     except ImportError as e:
         raise RuntimeError("mcp SDK not installed") from e
 
-    server = make_server("protocol-adapter", version="0.1.0")
+    server = make_server("protocol-adapter")
 
     TOOLS = [
         Tool(
