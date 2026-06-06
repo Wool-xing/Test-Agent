@@ -198,6 +198,8 @@ archive/
 # ===== runtime 运行时产物（用户数据，不入仓）=====
 runtime/workspace/
 runtime/web/tsconfig.tsbuildinfo
+workspace/cron/
+workspace/gateway/
 
 # ===== Claude Code 插件缓存 =====
 .claude-crap/
