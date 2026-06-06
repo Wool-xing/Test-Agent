@@ -226,6 +226,8 @@ def _print_help() -> None:
         ("Control", [
             ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
             ("/clear", "Reset conversation memory"),
+            ("/undo", "Remove last exchange from memory"),
+            ("/retry", "Re-run last prompt after undo"),
             ("/setup [--preset]", "Generate config files"),
             ("/check [--e2e]", "Framework self-test"),
         ]),
@@ -233,6 +235,9 @@ def _print_help() -> None:
             ("/remember <fact>", "Save fact to MEMORY.md"),
             ("/forget <keyword>", "Remove facts by keyword"),
             ("/memory", "Show MEMORY.md contents"),
+        ]),
+        ("Gateway", [
+            ("/gateway", "IM platform connection status"),
         ]),
         ("Session", [
             ("/cost", "Token usage and cost estimate"),
@@ -596,6 +601,31 @@ def _cmd_context(args: str) -> None:
 def _cmd_clear(args: str) -> None:
     _get_memory().clear()
     console.print("[dim]Cleared.[/]")
+
+
+# ── /undo /retry — conversation control ────────────────────────────
+
+
+def _cmd_undo(args: str) -> None:
+    mem = _get_memory()
+    user_text, assistant_text = mem.undo_last_exchange()
+    if user_text is None:
+        console.print("[dim]Nothing to undo.[/]")
+        return
+    console.print(f"[dim]Undone: [yellow]{user_text[:80]}{'...' if len(user_text) > 80 else ''}[/][/]")
+
+
+def _cmd_retry(args: str) -> None:
+    """Undo last assistant response, then re-submit last user prompt."""
+    mem = _get_memory()
+    if mem._messages and mem._messages[-1].role == "assistant":
+        mem._messages.pop()
+    last_user = mem.last_user_message()
+    if last_user is None:
+        console.print("[dim]Nothing to retry.[/]")
+        return
+    console.print(f"[dim]Retrying: [yellow]{last_user[:80]}{'...' if len(last_user) > 80 else ''}[/][/]")
+    _handle_natural_language(last_user)
 
 
 # ── /cost — token usage and cost estimate ─────────────────────────
@@ -1143,6 +1173,41 @@ def _cmd_plugins_list(args: str) -> None:
     console.print(table)
 
 
+# ── /gateway — IM message gateway status/start ──────────────────────
+
+
+def _cmd_gateway(args: str) -> None:
+    """Show gateway platform status."""
+    import os as _os
+    from rich.table import Table
+
+    platforms = [
+        ("Telegram", "TELEGRAM_BOT_TOKEN"),
+        ("Discord", "DISCORD_WEBHOOK_URL"),
+        ("Slack", "SLACK_WEBHOOK_URL"),
+        ("飞书", "FEISHU_WEBHOOK_URL"),
+        ("企微", "WECHAT_WEBHOOK_URL"),
+        ("钉钉", "DINGTALK_WEBHOOK_URL"),
+        ("QQ Bot", "QQBOT_APP_ID"),
+        ("Email", "SMTP_HOST"),
+        ("Webhook", "GENERIC_WEBHOOK_URL"),
+    ]
+
+    table = Table(title="Gateway Platforms", show_header=True)
+    table.add_column("Platform")
+    table.add_column("Status")
+
+    active = 0
+    for name, env_var in platforms:
+        configured = bool(_os.getenv(env_var))
+        if configured:
+            active += 1
+        table.add_row(name, "[green]✓ configured[/]" if configured else "[dim]—[/]")
+
+    console.print(table)
+    console.print(f"\n[dim]{active}/9 configured. Start with [cyan]tagent serve[/] (daemon) or [cyan]tagent gateway[/] (messaging only).[/]")
+
+
 # ── Slash Dispatch (after all cmd fns) ────────────────────────────
 
 
@@ -1156,6 +1221,7 @@ _BUILTIN_MAP = {
     "export": _cmd_export,
     "compact": _cmd_compact,
     "context": _cmd_context, "clear": _cmd_clear,
+    "undo": _cmd_undo, "retry": _cmd_retry,
     "session": _cmd_status,
     "remember": _cmd_remember, "forget": _cmd_forget, "memory": _cmd_memory,
     "mcp": _cmd_mcp_tools, "mcp-call": _cmd_mcp_call,
@@ -1165,6 +1231,7 @@ _BUILTIN_MAP = {
     "skill-score": _cmd_skill_score,
     "speak": _cmd_speak,
     "plugins": _cmd_plugins_list,
+    "gateway": _cmd_gateway,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
 
