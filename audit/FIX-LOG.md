@@ -44,3 +44,7 @@
 | 38 | #227 | runtime/cli/config.py | MEDIUM | OLLAMA_HOST env覆盖 | 语法OK |
 
 - CRITICAL: 8 · HIGH: 9 · MEDIUM: 17 · LOW: 4
+| 39 | #238 | main.ts | MEDIUM | Electron后端崩溃自动重启 | CI绿 |
+| 40 | #240 | VERSION等 | MEDIUM | 版本号统一V1.0.0 | CI绿 |
+| 41 | #241 | check_version_consistency.py | MEDIUM | V前缀兼容npm semver | CI绿 |
+| 42 | #242 | agents/02/08/09 | LOW | 示例版本→占位符 | CI绿 |
