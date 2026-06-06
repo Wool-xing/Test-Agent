@@ -653,3 +653,47 @@ Python 3.11+ · TypeScript · Electron · FastAPI · Prefect · LiteLLM · SQLAl
 |------|------|
 | 测试 | fanout超时默认600s,无进度通知 |
 | 安全 | [MEDIUM] SubagentResult异常时payload=None,无错误分类 |
+
+### runtime/intelligence/flaky_analyzer.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | [MEDIUM] except Exception静默吞日志解析错误 |
+| 产品 | log_dir默认"workspace/logs"硬编码 |
+| 数据流 | [-500:]行数限制硬编码,可能丢失上下文 |
+
+### runtime/intelligence/test_prioritizer.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | history_path默认"workspace/test_history.json"硬编码 |
+| 数据流 | 无历史数据schema验证 |
+
+### runtime/observability/audit.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | _DEFAULT_DIR路径含硬编码PROJECT_NAME='default' |
+| 数据流 | audit文件无限增长,无轮转策略 |
+
+### runtime/observability/prometheus_metrics.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | _MAX_HISTOGRAM_SAMPLES=1000硬编码 |
+| 产品 | 无自定义histogram bucket支持 |
+
+### runtime/backends/local.py
+| 视角 | 发现 |
+|------|------|
+| 安全 | [MEDIUM] create_subprocess_shell使用,命令注入风险 |
+| 测试 | exec timeout无法中断阻塞操作 |
+
+### runtime/backends/docker.py
+| 视角 | 发现 |
+|------|------|
+| 安全 | docker exec默认使用root用户 |
+| 测试 | 容器启动无健康检查等待 |
+
+### runtime/learning_loop/user_model.py
+| 视角 | 发现 |
+|------|------|
+| 安全 | [MEDIUM] 用户数据存储路径拼接触及路径遍历风险 |
+| 数据流 | 用户偏好无版本管理,格式变更会丢失 |
+
