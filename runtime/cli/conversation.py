@@ -162,6 +162,23 @@ class ConversationMemory:
         """Reset memory, keep session_id."""
         self._messages.clear()
 
+    def undo_last_exchange(self) -> tuple[str | None, str | None]:
+        """Remove last user+assistant exchange. Returns (user_text, assistant_text)."""
+        assistant = None
+        user = None
+        if self._messages and self._messages[-1].role == "assistant":
+            assistant = self._messages.pop().content
+        if self._messages and self._messages[-1].role == "user":
+            user = self._messages.pop().content
+        return user, assistant
+
+    def last_user_message(self) -> str | None:
+        """Return the last user message content, or None."""
+        for m in reversed(self._messages):
+            if m.role == "user":
+                return m.content
+        return None
+
     def dump(self, path: Path) -> None:
         """Persist to JSON file. Also indexes in FTS5 for full-text search."""
         path.parent.mkdir(parents=True, exist_ok=True)
