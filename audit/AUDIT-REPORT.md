@@ -633,3 +633,23 @@ Python 3.11+ · TypeScript · Electron · FastAPI · Prefect · LiteLLM · SQLAl
 - subagent: fanout超时无进度
 - 全局: 50+裸except Exception
 
+
+### runtime/api/endpoints/webhooks.py
+| 视角 | 发现 |
+|------|------|
+| 安全 | [HIGH] Discord签名验证在无DISCORD_PUBLIC_KEY时静默跳过 |
+| 安全 | [MEDIUM] 所有webhook端点无速率限制 |
+| 产品 | 消息忽略时响应不说明原因 |
+| 数据流 | BackgroundTasks无完成回调,无法追踪处理结果 |
+
+### runtime/storage/db.py
+| 视角 | 发现 |
+|------|------|
+| 安全 | [MEDIUM] future=True已弃用(SQLAlchemy 2.0). ✅已修复 |
+| 数据流 | session_scope rollback无日志 |
+
+### runtime/subagent/spawn.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | fanout超时默认600s,无进度通知 |
+| 安全 | [MEDIUM] SubagentResult异常时payload=None,无错误分类 |
