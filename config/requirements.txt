@@ -152,7 +152,7 @@ defusedxml==0.7.1                  # [稳定层] XXE/亿笑/decompression bomb �
 # ============================================================
 
 # ===== [可选 · runtime 核心] =====
-mcp>=1.0.0                       # V1.2.0 MCP SDK(6 件套 server + P2 #12 client: test-orchestrator/protocol-adapter/evidence-vault/defect-tracker/knowledge-base/compliance-checker)
+mcp>=1.0.0                       # V1.2.0 MCP SDK(6 件套 server + P2 #12 client): test-orchestrator/protocol-adapter/evidence-vault/defect-tracker/knowledge-base/compliance-checker
 # litellm>=1.55.0                  # 多厂商 LLM 路由(Claude/OpenAI/Gemini/Qwen/DeepSeek/Ollama)
 # prefect>=2.20.0,<3.0             # 编排引擎(可选,Direct 执行器在 prefect 缺席时自动接管)
 # fastapi>=0.115.0                 # HTTP 入口
