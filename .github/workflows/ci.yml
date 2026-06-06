@@ -34,6 +34,15 @@ jobs:
       - name: Check command registration
         run: python scripts/check_command_consistency.py
 
+  # ===== 0c. 硬编码检测 (防写死版本/端口/计数/密钥) =====
+  hardcoded-check:
+    name: 硬编码检测
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for hardcoded values
+        run: python scripts/check_hardcoded_values.py
+
   # ===== 1. utils/ 代码质量 =====
   lint-utils:
     name: utils/ Ruff + 类型检查
