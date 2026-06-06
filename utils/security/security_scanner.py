@@ -4,16 +4,51 @@
 被引用方：15-安全测试 agent / security-test skill
 依赖（按需）：bandit / safety / requests / OWASP ZAP API
 """
+import ipaddress
 import json
 import logging
 import os
+import socket
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional
+from urllib.parse import urlparse
 
 import requests
 
 logger = logging.getLogger(__name__)
+
+# SSRF block: internal/private IP ranges that must not be targeted
+_BLOCKED_NETWORKS = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+]
+
+
+def _block_private_url(url: str) -> None:
+    """Resolve host and reject private/internal IPs to prevent SSRF."""
+    hostname = urlparse(url).hostname
+    if not hostname:
+        raise ValueError(f"Invalid URL (no hostname): {url!r}")
+    try:
+        ip = ipaddress.ip_address(hostname)
+    except ValueError:
+        # Not an IP literal — resolve it
+        try:
+            ip = ipaddress.ip_address(socket.gethostbyname(hostname))
+        except (socket.gaierror, ValueError) as e:
+            raise ValueError(f"DNS resolution failed for {hostname!r}: {e}")
+    for net in _BLOCKED_NETWORKS:
+        if ip in net:
+            raise ValueError(
+                f"SSRF blocked: {hostname!r} resolves to {ip} "
+                f"(in {net}), which is a private/internal network."
+            )
 
 
 # ===== SAST：Bandit（Python 代码静态扫描）=====
@@ -68,6 +103,7 @@ REQUIRED_SECURITY_HEADERS = [
 
 def check_security_headers(url: str, timeout: int = 10) -> Dict:
     """检查目标 URL 的安全响应头"""
+    _block_private_url(url)
     r = requests.get(url, timeout=timeout, allow_redirects=True)
     missing = [h for h in REQUIRED_SECURITY_HEADERS if h not in r.headers]
     return {
@@ -123,14 +159,14 @@ def burp_active_scan(target_url: str,
     base = (burp_api or os.getenv("BURP_API_URL", "http://127.0.0.1:1337")).rstrip("/")
     key = api_key or os.getenv("BURP_API_KEY", "")
 
-    # API key 在 URL path 中（Burp 协议）
-    base_with_key = f"{base}/{key}" if key else base
+    # API key via X-Burp-Api-Key header (never in URL path, which leaks to logs/proxies/referrers)
+    headers = {"X-Burp-Api-Key": key} if key else {}
 
     # 1. 启动扫描
-    r = requests.post(f"{base_with_key}/v0.1/scan", json={
+    r = requests.post(f"{base}/v0.1/scan", json={
         "urls": [target_url],
         "scan_configurations": [{"name": "Crawl and Audit - Lightweight", "type": "NamedConfiguration"}],
-    }, timeout=30)
+    }, headers=headers, timeout=30)
     r.raise_for_status()
     # Location 头可能反射含 API key 的完整 URL — 只取末段 task_id，绝不记录原始头
     location = r.headers.get("Location", "")
@@ -144,7 +180,7 @@ def burp_active_scan(target_url: str,
     end = time.time() + timeout
     last_status = None
     while time.time() < end:
-        s = requests.get(f"{base_with_key}/v0.1/scan/{task_id}", timeout=10).json()
+        s = requests.get(f"{base}/v0.1/scan/{task_id}", headers=headers, timeout=10).json()
         status = s.get("scan_status")
         last_status = s
         if status == "succeeded":
