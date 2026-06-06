@@ -214,6 +214,7 @@ def _print_help() -> None:
 
     groups = [
         ("Run", [
+            ("/task add|list|done|start", "Manage task list with criteria"),
             ("/test  <target>", "Full 11-step test pipeline"),
             ("/run   <target>", "Plan + execute (quick)"),
             ("/plan  <target>", "Plan only, no execution"),
@@ -1379,6 +1380,106 @@ def _cmd_gateway(args: str) -> None:
     console.print(f"\n[dim]{active}/9 configured. Start with [cyan]tagent serve[/] (daemon) or [cyan]tagent gateway[/] (messaging only).[/]")
 
 
+# ── /task — structured task management ──────────────────────────────
+
+
+def _cmd_task(args: str) -> None:
+    """Manage tasks: add, list, done, cancel. Usage: /task <action> [args]."""
+    from runtime.cli.tasks import add_task, list_tasks, update_task, delete_task, stats
+    from rich.table import Table
+
+    parts = args.strip().split(maxsplit=1)
+    action = parts[0].lower() if parts else ""
+    rest = parts[1] if len(parts) > 1 else ""
+
+    if action == "add":
+        # Format: /task add <title> [--criteria <cond1>,<cond2>]
+        title = rest
+        criteria: list[str] = []
+        if " --criteria " in title or title.endswith(" --criteria"):
+            if " --criteria " in title:
+                title, crit_str = title.split(" --criteria ", 1)
+            else:
+                title = title.replace(" --criteria", "")
+                crit_str = ""
+            criteria = [c.strip() for c in crit_str.split(",") if c.strip()]
+        if not title.strip():
+            console.print("[dim]Usage: /task add <title> [--criteria <cond1>,<cond2>][/]")
+            console.print("[dim]Example: /task add Run API smoke tests --criteria all P0 pass,coverage 80%[/]")
+            return
+        task = add_task(title, criteria=criteria)
+        console.print(f"[green]Task #{task.id}:[/] {task.title}")
+        if task.criteria:
+            for c in task.criteria:
+                console.print(f"  [dim]✓ criteria: {c}[/]")
+
+    elif action == "list" or not action:
+        status_filter = rest if rest else None
+        tasks = list_tasks(status_filter)
+        if not tasks:
+            console.print("[dim]No tasks. Use /task add <title> to create one.[/]")
+            return
+        st = stats()
+        console.print(f"[bold]Tasks:[/] {st['total']} total ({st['pending']} pending, {st['in_progress']} active, {st['done']} done)")
+        table = Table(show_header=True)
+        table.add_column("ID", style="dim")
+        table.add_column("Status")
+        table.add_column("Title")
+        icons = {"pending": "○", "in_progress": "◉", "done": "✓", "cancelled": "✗"}
+        for t in tasks[:10]:
+            icon = icons.get(t.status, "?")
+            color = {"done": "green", "in_progress": "cyan", "cancelled": "dim"}.get(t.status, "")
+            table.add_row(t.id, f"[{color}]{icon} {t.status}[/]", t.title[:80])
+        console.print(table)
+
+    elif action == "done":
+        tid = rest.strip()
+        if not tid:
+            console.print("[dim]Usage: /task done <id>[/]")
+            return
+        t = update_task(tid, status="done")
+        if t:
+            console.print(f"[green]Task #{tid} marked done:[/] {t.title}")
+        else:
+            console.print(f"[red]Task #{tid} not found.[/]")
+
+    elif action == "start":
+        tid = rest.strip()
+        if not tid:
+            console.print("[dim]Usage: /task start <id>[/]")
+            return
+        t = update_task(tid, status="in_progress")
+        if t:
+            console.print(f"[cyan]Task #{tid} started:[/] {t.title}")
+        else:
+            console.print(f"[red]Task #{tid} not found.[/]")
+
+    elif action == "cancel":
+        tid = rest.strip()
+        if not tid:
+            console.print("[dim]Usage: /task cancel <id>[/]")
+            return
+        t = update_task(tid, status="cancelled")
+        if t:
+            console.print(f"[dim]Task #{tid} cancelled.[/]")
+        else:
+            console.print(f"[red]Task #{tid} not found.[/]")
+
+    elif action == "delete":
+        tid = rest.strip()
+        if not tid:
+            console.print("[dim]Usage: /task delete <id>[/]")
+            return
+        if delete_task(tid):
+            console.print(f"[dim]Task #{tid} deleted.[/]")
+        else:
+            console.print(f"[red]Task #{tid} not found.[/]")
+
+    else:
+        console.print(f"[red]Unknown action: {action}[/]")
+        console.print("[dim]Use: add, list, done, start, cancel, delete[/]")
+
+
 # ── /insights — cross-session analytics ─────────────────────────────
 
 
@@ -1527,6 +1628,7 @@ _BUILTIN_MAP = {
     "fc": _cmd_fc, "fuck": _cmd_fc,
     "doctor": _cmd_doctor,
     "insights": _cmd_insights,
+    "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
