@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from runtime.gateway.base import DeliveryResult, Message, Platform, register
+from runtime.gateway.base import DeliveryResult, Message, Platform, is_safe_webhook_url, register
 
 
 @register("slack")
@@ -20,7 +20,7 @@ class SlackPlatform(Platform):
             import httpx
         except ImportError:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="httpx missing")
-        url = target if target and target.startswith("https://") else None
+        url = target if target and target.startswith("https://") and is_safe_webhook_url(target) else None
         if not url:
             if not self.webhook:
                 await self.configure()

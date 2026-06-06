@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import threading
 import time
 from typing import Any
 
@@ -41,15 +42,18 @@ class RunStream:
 
 
 _streams: dict[str, RunStream] = {}
+_streams_lock = threading.Lock()
 
 
 def get_or_create_stream(run_id: str) -> RunStream:
-    return _streams.setdefault(run_id, RunStream(run_id))
+    with _streams_lock:
+        return _streams.setdefault(run_id, RunStream(run_id))
 
 
 def push_node_event(run_id: str, node_id: str, status: str, output: dict | None = None) -> None:
     """Push a node execution event to the stream. Non-blocking fire-and-forget."""
-    stream = _streams.get(run_id)
+    with _streams_lock:
+        stream = _streams.get(run_id)
     if stream is None:
         return
     with contextlib.suppress(RuntimeError):
@@ -63,7 +67,8 @@ def push_node_event(run_id: str, node_id: str, status: str, output: dict | None 
 
 def push_run_complete(run_id: str, ok: bool, summary: dict | None = None) -> None:
     """Push run completion event."""
-    stream = _streams.get(run_id)
+    with _streams_lock:
+        stream = _streams.get(run_id)
     if stream is None:
         return
     with contextlib.suppress(RuntimeError):
@@ -75,7 +80,8 @@ def push_run_complete(run_id: str, ok: bool, summary: dict | None = None) -> Non
 
 
 def cleanup_stream(run_id: str) -> None:
-    _streams.pop(run_id, None)
+    with _streams_lock:
+        _streams.pop(run_id, None)
 
 
 @router.websocket("/run/{run_id}/stream")
