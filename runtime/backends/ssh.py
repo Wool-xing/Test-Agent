@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shlex
 import time
 from pathlib import Path
@@ -26,8 +27,9 @@ class SSHBackend(BaseExecutionEnv):
             import asyncssh  # type: ignore
         except ImportError as e:
             raise RuntimeError("asyncssh not installed; pip install asyncssh") from e
+        known_hosts = () if os.getenv("SSH_KNOWN_HOSTS_DISABLE") == "1" else None
         self._conn = await asyncssh.connect(
-            self.host, port=self.port, username=self.user, client_keys=[self.key] if self.key else None, password=self.password, known_hosts=None
+            self.host, port=self.port, username=self.user, client_keys=[self.key] if self.key else None, password=self.password, known_hosts=known_hosts
         )
         logger.info("SSH connected: {}@{}:{}", self.user, self.host, self.port)
 

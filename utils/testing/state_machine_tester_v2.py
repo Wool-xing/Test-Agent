@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
@@ -37,10 +38,18 @@ class Transition:
                        "abs": abs, "min": min, "max": max, "len": len,
                        "int": int, "float": float, "str": str, "bool": bool,
                        "isinstance": isinstance, "round": round, "sum": sum}
+    _DANGEROUS_RE = re.compile(r"__|import\b|\bdel\b|getattr|setattr|eval\b|exec\b|compile\b|open\b|__import__")
+
+    @classmethod
+    def _validate_code(cls, code: str, label: str) -> None:
+        """Reject dangerous patterns to harden restricted eval/exec sandbox."""
+        if cls._DANGEROUS_RE.search(code):
+            raise ValueError(f"Dangerous pattern in {label}: {code!r}")
 
     def evaluate_guard(self, ctx: dict) -> bool:
         if not self.guard:
             return True
+        Transition._validate_code(self.guard, "guard")
         try:
             # Restricted eval with whitelisted builtins
             return bool(eval(self.guard, {"__builtins__": self._SAFE_BUILTINS}, ctx))
@@ -49,6 +58,7 @@ class Transition:
 
     def execute_action(self, ctx: dict) -> None:
         if self.action:
+            Transition._validate_code(self.action, "action")
             try:
                 # exec not allowed for actions — only safe assignment via ctx dict
                 _locals = {}
@@ -70,8 +80,11 @@ class State:
         violations = []
         for inv in self.invariants:
             try:
+                Transition._validate_code(inv, "invariant")
                 if not eval(inv, {"__builtins__": {}}, ctx):
                     violations.append(inv)
+            except ValueError:
+                violations.append(f"{inv} (dangerous pattern)")
             except Exception:
                 violations.append(f"{inv} (eval error)")
         return violations
