@@ -1,4 +1,4 @@
-"""Platform adapters · 8 起步,可扩."""
+"""Platform adapters · 9 起步,可扩."""
 
 # trigger registration
 from runtime.gateway.platforms import (  # noqa: F401
@@ -6,6 +6,7 @@ from runtime.gateway.platforms import (  # noqa: F401
     discord,
     email,
     feishu,
+    qqbot,
     slack,
     telegram,
     webhook,
