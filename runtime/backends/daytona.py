@@ -37,7 +37,8 @@ class DaytonaBackend(BaseExecutionEnv):
         except asyncio.TimeoutError:
             proc.kill()
             return -1, "", "timeout"
-        return proc.returncode or 0, out.decode("utf-8", "replace"), err.decode("utf-8", "replace")
+        rc = proc.returncode if proc.returncode is not None else -1
+        return rc, out.decode("utf-8", "replace"), err.decode("utf-8", "replace")
 
     async def exec(self, cmd: str, *, timeout: float = 60.0, cwd: str | None = None, env: dict | None = None) -> ExecResult:
         start = time.monotonic()
