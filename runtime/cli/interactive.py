@@ -39,6 +39,7 @@ _SESSION_FILE = _SESSION_DIR / "active_session.json"
 _HISTORY_FILE = _SESSION_DIR / "history.txt"
 
 _memory: ConversationMemory | None = None
+_last_trace: tuple | None = None  # (user_text, decision_dict) for /distill
 _start_time: float = 0.0
 
 _PROMPT_STYLE = Style.from_dict({
@@ -231,6 +232,9 @@ def _print_help() -> None:
             ("/setup [--preset]", "Generate config files"),
             ("/check [--e2e]", "Framework self-test"),
         ]),
+        ("Learning", [
+            ("/distill", "Save last execution as reusable skill"),
+        ]),
         ("Memory", [
             ("/remember <fact>", "Save fact to MEMORY.md"),
             ("/forget <keyword>", "Remove facts by keyword"),
@@ -338,6 +342,7 @@ def _execute_with_progress(run_id: str, decision) -> dict:
 
 def _handle_natural_language(text: str) -> None:
     """Route through routing kernel with streaming activity output."""
+    global _last_trace
     if not text.strip():
         return
 
@@ -398,6 +403,15 @@ def _handle_natural_language(text: str) -> None:
             announce_result(summary)
         except Exception:
             pass
+
+        # Skill distillation hint (≥3 nodes, multi-agent)
+        if total >= 3 and rate >= 0.8:
+            ds = decision.model_dump() if hasattr(decision, "model_dump") else {}
+            nodes = ds.get("dag", ds.get("nodes", []))
+            if len(set(n.get("kind", "") for n in nodes)) >= 2:
+                # Stash trace for /distill command
+                _last_trace = (text, ds)
+                console.print("  [dim]💡 Multi-agent pattern detected. Run [cyan]/distill[/] to save as reusable skill.[/]")
     except KeyboardInterrupt:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
@@ -1179,6 +1193,30 @@ def _cmd_speak(args: str) -> None:
         console.print(f"[red]Voice error: {e}[/]")
 
 
+# ── /distill — create reusable skill from last execution ────────────
+
+
+def _cmd_distill(args: str) -> None:
+    """Distill the last execution into a reusable skill."""
+    global _last_trace
+    if _last_trace is None:
+        console.print("[dim]No execution to distill. Run a test first.[/]")
+        return
+
+    user_text, decision_dict = _last_trace
+    from runtime.learning_loop.skill_distiller import capture_trace, distill_skill, suggest_skill_name
+
+    trace = capture_trace(user_text, decision_dict)
+    if not trace.is_distillable:
+        console.print("[dim]Last execution too simple to distill (need ≥3 nodes, ≥2 agent types).[/]")
+        return
+
+    name = args.strip() or suggest_skill_name(trace)
+    path = distill_skill(trace, name)
+    console.print(f"[green]Skill created:[/] {path}")
+    _last_trace = None  # consume once
+
+
 # ── /plugins — list loaded plugins (P3 #22) ────────────────────────
 
 
@@ -1264,6 +1302,7 @@ _BUILTIN_MAP = {
     "skill-score": _cmd_skill_score,
     "speak": _cmd_speak,
     "plugins": _cmd_plugins_list,
+    "distill": _cmd_distill,
     "gateway": _cmd_gateway,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
