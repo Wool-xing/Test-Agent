@@ -12,13 +12,14 @@ from rich.table import Table
 from runtime.api.deps import Kernel
 from runtime.api.parsers import parse_path, parse_text, parse_url
 
-# Fix Unicode and SSL on Windows
+# Fix Unicode on Windows; SSL warning suppression gated behind env opt-in
 if sys.platform == "win32":
     os.environ.setdefault("PYTHONIOENCODING", "utf-8")
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
-    import urllib3
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    if os.environ.get("TAGENT_SUPPRESS_SSL_WARNINGS", "").strip() == "1":
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 _no_color = os.environ.get("NO_COLOR", "").strip() != ""
 console = Console(force_terminal=True, color_system=None if _no_color else "auto")

@@ -11,12 +11,15 @@ Engine evaluates each check against the project and produces a compliance report
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -121,8 +124,8 @@ def _check_no_hardcoded_secrets(scan_dir: str = ".") -> CheckResult:
             for pattern, label in secret_patterns:
                 if re.search(pattern, content):
                     findings.append(f"{py_file}: {label}")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("secret scan skip {}: {}", py_file, e)
 
     if findings:
         return CheckResult("no-hardcoded-secrets", "No hardcoded secrets",

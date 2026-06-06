@@ -21,6 +21,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import time
@@ -29,6 +30,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 from urllib.parse import urljoin
 
 try:
@@ -275,8 +278,8 @@ def jwt_attack_matrix(token: str, base_url: str, test_endpoint: str = "/health")
         if resp.status_code == 200:
             findings.append({"test": "alg:none", "severity": "CRITICAL",
                              "finding": "Server accepts JWT with alg=none"})
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("JWT alg:none test failed: {}", e)
 
     # Test 2: Key confusion (HMAC with public key)
     if header.get("alg", "").startswith("RS"):
@@ -287,8 +290,8 @@ def jwt_attack_matrix(token: str, base_url: str, test_endpoint: str = "/health")
             if resp.status_code == 200:
                 findings.append({"test": "alg:HS256 confusion", "severity": "HIGH",
                                  "finding": "Server may accept HMAC with RSA public key"})
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("JWT HS256 confusion test failed: {}", e)
 
     # Test 3: kid injection (path traversal)
     kid_payloads = [
@@ -316,8 +319,8 @@ def jwt_attack_matrix(token: str, base_url: str, test_endpoint: str = "/health")
         if resp.status_code == 200:
             findings.append({"test": "expiry bypass", "severity": "HIGH",
                              "finding": "Server accepts expired JWT"})
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("JWT expiry bypass test failed: {}", e)
 
     if not findings:
         findings.append({"test": "JWT matrix", "severity": "INFO",
