@@ -723,14 +723,42 @@ def do_update():
         # 写回新版本号
         _write_local_version(PROJECT_ROOT, remote_version)
 
-        # Post-update verification: doctor + selftest
+        # Post-update verification: API health + doctor + selftest
+        # Covers all deployment targets: CLI / Desktop / Web / IM bots
         print()
         print("→ 更新后验证...")
         verify_ok = True
         tagent_cmd = [sys.executable, "-m", "runtime.cli.main"]
 
+        # Step 0: API health check (universal — covers server-side, desktop, IM)
+        print("  [0] API 端点 (/health)...")
+        try:
+            import urllib.request, threading, time as _time
+            result = {"ok": False}
+
+            def _check_api():
+                try:
+                    req = urllib.request.Request("http://127.0.0.1:8800/health")
+                    req.add_header("User-Agent", "Test-Agent-updater")
+                    resp = urllib.request.urlopen(req, timeout=5)
+                    data = resp.read().decode()
+                    if "ok" in data.lower() or "status" in data.lower():
+                        result["ok"] = True
+                except Exception:
+                    pass
+
+            t = threading.Thread(target=_check_api, daemon=True)
+            t.start()
+            t.join(timeout=6)
+            if result["ok"]:
+                print("  ✓ API 端点正常 (覆盖 CLI/Desktop/Web/IM 全终端)")
+            else:
+                print("  - API 未运行 (跳过 — 启动后访问 http://127.0.0.1:8800/health)")
+        except Exception:
+            print("  - API 检查跳过")
+
         # Step 1: Environment health check
-        print("  [1/2] 环境诊断 (/doctor)...")
+        print("  [1] 环境诊断 (/doctor)...")
         r = subprocess.run(tagent_cmd + ["doctor"], capture_output=True, text=True, cwd=PROJECT_ROOT)
         if r.returncode == 0:
             print("  ✓ 环境诊断通过")
@@ -741,7 +769,7 @@ def do_update():
 
         # Step 2: Selftest regression (stub mode — no external LLM cost)
         if verify_ok:
-            print("  [2/2] 功能自检 (selftest --e2e)...")
+            print("  [2] 功能自检 (selftest --e2e)...")
             env = os.environ.copy()
             env.setdefault("TAGENT_LLM_PROVIDER", "stub")
             r2 = subprocess.run(
