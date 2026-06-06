@@ -226,6 +226,7 @@ def _print_help() -> None:
         ]),
         ("Control", [
             ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
+            ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
             ("/undo", "Remove last exchange from memory"),
             ("/retry", "Re-run last prompt after undo"),
@@ -493,11 +494,14 @@ def _cmd_status(args: str) -> None:
     uptime_s = int(time.time() - _start_time)
     uptime = f"{uptime_s // 60}m {uptime_s % 60}s" if uptime_s > 0 else "just started"
 
+    from runtime.cli.conversation import get_personality
+    persona = get_personality()
     info = [
-        f"Model:    [cyan]{_current_model()}[/]",
-        f"Provider: [cyan]{_current_provider()}[/]",
-        f"Session:  [cyan]{mem.session_id}[/] · {turns} turns · {chars}/{mem.max_chars} chars",
-        f"Uptime:   {uptime}",
+        f"Model:       [cyan]{_current_model()}[/]",
+        f"Provider:    [cyan]{_current_provider()}[/]",
+        f"Personality: [cyan]{persona or 'default'}[/]",
+        f"Session:     [cyan]{mem.session_id}[/] · {turns} turns · {chars}/{mem.max_chars} chars",
+        f"Uptime:      {uptime}",
     ]
     console.print(Panel("\n".join(info), title="Status", title_align="left"))
 
@@ -566,6 +570,31 @@ def _cmd_model(args: str) -> None:
         pass
 
     console.print(f"[green]Switched[/] → provider: [cyan]{name}[/]  model: [cyan]{_current_model()}[/]")
+
+
+# ── /personality — set agent persona ────────────────────────────────
+
+
+def _cmd_personality(args: str) -> None:
+    """Switch active personality (loads agent .md as system prompt)."""
+    from runtime.cli.conversation import list_personalities, set_personality, get_personality
+
+    name = args.strip().lower()
+    if not name:
+        current = get_personality()
+        personalities = list_personalities()
+        console.print(f"[bold]Available personalities ({len(personalities)}):[/]")
+        for p in personalities:
+            marker = " [green]← active[/]" if p["name"] == current else ""
+            console.print(f"  [cyan]{p['name']}{marker}[/] — {p['description']}")
+        if not current:
+            console.print("\n[dim]Usage: /personality <name>[/]")
+        return
+
+    if set_personality(name):
+        console.print(f"[green]Personality:[/] [cyan]{name}[/] (injected into context)")
+    else:
+        console.print(f"[dim]Unknown personality '{name}'. Use /personality to list.[/]")
 
 
 # ── /tools — dynamic agent/skill list ──────────────────────────────
@@ -1318,6 +1347,7 @@ _BUILTIN_MAP = {
     "help": lambda a: _print_help(), "h": lambda a: _print_help(), "?": lambda a: _print_help(),
     "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
     "status": _cmd_status, "model": _cmd_model,
+    "personality": _cmd_personality,
     "tools": _cmd_tools,
     "cost": _cmd_cost, "usage": _cmd_cost,
     "sessions": _cmd_sessions,

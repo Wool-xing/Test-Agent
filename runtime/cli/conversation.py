@@ -25,6 +25,7 @@ _MEMORY_MAX_CHARS = 2000  # cap injected memory to prevent prompt injection / co
 # Project context files — auto-discovered from cwd upward
 _PROJECT_CONTEXT_FILES = ["CLAUDE.md", "AGENTS.md", ".claude/CLAUDE.md"]
 _PROJECT_CONTEXT_CACHE: str | None = None
+_personality: str = ""  # active personality (agent name or empty for default)
 
 
 def _discover_project_context() -> str | None:
@@ -161,6 +162,16 @@ class ConversationMemory:
         All sourced from delimited blocks to prevent prompt injection.
         """
         parts: list[str] = []
+
+        # Layer -1: Active personality (agent profile)
+        if _personality:
+            profile = load_personality(_personality)
+            if profile:
+                parts.append(f"You are acting as the '{_personality}' expert. Your behavior:")
+                parts.append("```personality")
+                parts.append(profile[:2000])
+                parts.append("```")
+                parts.append("")
 
         # Layer 0: Project context (CLAUDE.md / AGENTS.md auto-discovered)
         proj_ctx = _discover_project_context()
@@ -307,3 +318,57 @@ class ConversationMemory:
 
     def _total_chars(self) -> int:
         return sum(len(m.content) for m in self._messages)
+
+
+# ── Personality system — loadable agent profiles ────────────────────
+
+
+def list_personalities() -> list[dict[str, str]]:
+    """List available personalities from agents/ directory."""
+    agents_dir = Path(__file__).resolve().parents[2] / "agents"
+    result: list[dict[str, str]] = []
+    for f in sorted(agents_dir.glob("*.md")):
+        if f.name.upper() in ("README.MD", "INDEX.MD"):
+            continue
+        text = f.read_text(encoding="utf-8", errors="replace")
+        # Extract frontmatter name + description
+        name = ""
+        desc = ""
+        if text.startswith("---"):
+            parts = text.split("---", 2)
+            if len(parts) >= 3:
+                for line in parts[1].splitlines():
+                    line = line.strip()
+                    if line.startswith("name:"):
+                        name = line.split(":", 1)[1].strip()
+                    elif line.startswith("description:"):
+                        desc = line.split(":", 1)[1].strip()[:80]
+        if name:
+            result.append({"name": name, "description": desc, "file": str(f)})
+    return result
+
+
+def load_personality(name: str) -> str | None:
+    """Load the body (after frontmatter) of an agent .md as personality prompt."""
+    agents_dir = Path(__file__).resolve().parents[2] / "agents"
+    for f in sorted(agents_dir.glob("*.md")):
+        text = f.read_text(encoding="utf-8", errors="replace")
+        if text.startswith("---"):
+            parts = text.split("---", 2)
+            if len(parts) >= 3 and f"name: {name}" in parts[1]:
+                return parts[2].strip()[:3000]
+    return None
+
+
+def set_personality(name: str) -> bool:
+    """Set active personality. Returns True if found."""
+    global _personality
+    if load_personality(name):
+        _personality = name
+        return True
+    return False
+
+
+def get_personality() -> str:
+    """Get current active personality name (empty = default)."""
+    return _personality
