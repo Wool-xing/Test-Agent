@@ -344,9 +344,9 @@ def full_scan(page, url: str) -> A11yReport:
 # ═══════════════════════════════════════════════════════════════
 
 def scan_with_lighthouse(url: str, output_dir: str = None) -> dict:
+    """Run Lighthouse a11y audit. Requires: npm install -g lighthouse"""
     if output_dir is None:
         output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/a11y"
-    """Run Lighthouse a11y audit. Requires: npm install -g lighthouse"""
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     out_json = out_dir / "lighthouse_a11y.json"
