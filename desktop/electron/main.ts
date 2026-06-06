@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, shell } from "electron";
 import { ChildProcess, spawn } from "child_process";
 import * as path from "path";
 import * as http from "http";
+import { registerIpcHandlers } from "./ipc_handlers";
 
 let backendProcess: ChildProcess | null = null;
 let mainWindow: BrowserWindow | null = null;
@@ -148,6 +149,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(async () => {
+  registerIpcHandlers();
   try {
     await startBackend();
   } catch (err: any) {

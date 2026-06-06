@@ -22,11 +22,11 @@ def _is_abort_exception(exc: Exception) -> bool:
     return isinstance(exc, RuntimeError) and "aborted" in str(exc)
 
 
-def _run_node_with_retry(node: DAGNode, pool: ThreadPoolExecutor, results: dict, log) -> None:
+def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
     """Execute a node with retries, respecting on_failure=abort."""
     nid = node.id
     try:
-        results[nid] = pool.submit(_run_node, node).result()
+        results[nid] = _run_node(node)
     except Exception as exc:
         log.warning("node {} attempt failed: {}", nid, exc)
         if node.on_failure == "abort" or _is_abort_exception(exc):
@@ -36,7 +36,7 @@ def _run_node_with_retry(node: DAGNode, pool: ThreadPoolExecutor, results: dict,
         for attempt in range(2):
             time.sleep(2 ** attempt)
             try:
-                results[nid] = pool.submit(_run_node, node).result()
+                results[nid] = _run_node(node)
                 return
             except Exception as retry_exc:
                 log.warning("node {} retry {}/2 failed", nid, attempt + 1)
@@ -142,7 +142,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                         results[next_id] = futures[next_id].result()
                     except Exception as exc:
                         log.warning("node {} attempt failed: {}", next_id, exc)
-                        _run_node_with_retry(by_id[next_id], pool, results, log)
+                        _run_node_with_retry(by_id[next_id], results, log)
                     r = results.get(next_id)
                     if r:
                         if r.get("skipped"):

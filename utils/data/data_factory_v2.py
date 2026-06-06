@@ -24,6 +24,7 @@ import os
 import random
 import time
 import uuid
+from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -54,8 +55,6 @@ class EntityRegistry:
     def random_ref(self, entity: str) -> str | None:
         ids = self.ids.get(entity, [])
         return random.choice(ids) if ids else None
-
-from collections import defaultdict
 
 
 class DataFactoryV2:

@@ -140,13 +140,19 @@ def open_macos_app(app_name: Optional[str] = None) -> str:
     return name
 
 
+def _escape_as_string(s: str) -> str:
+    """Escape a string for safe embedding in double-quoted AppleScript literal."""
+    return s.replace("\\", "\\\\").replace('"', '\\"')
+
+
 def macos_menu(app_name: str, menu: str, item: str):
     """通过 AppleScript 点击 macOS 菜单。
 
     安全：
       - 需 TAGENT_DESKTOP_AUTHORIZED=1 + platform=darwin。
-      - app_name / menu / item 三者均经 AppleScript identifier 白名单校验,
-        防 AppleScript 注入 (历史上 f-string 拼接可逃逸引号执行 do shell script)。
+      - app_name / menu / item 三者均经 AppleScript identifier 白名单校验
+        + 双引号/反斜杠转义，防 AppleScript 注入
+        (历史上 f-string 拼接可逃逸引号执行 do shell script)。
     """
     _require_authorized("macos_menu")
     _require_macos("macos_menu")
@@ -155,8 +161,8 @@ def macos_menu(app_name: str, menu: str, item: str):
     _validate_as_identifier(item, "menu item")
     script = f'''
         tell application "System Events"
-            tell process "{app_name}"
-                click menu item "{item}" of menu "{menu}" of menu bar 1
+            tell process "{_escape_as_string(app_name)}"
+                click menu item "{_escape_as_string(item)}" of menu "{_escape_as_string(menu)}" of menu bar 1
             end tell
         end tell
     '''

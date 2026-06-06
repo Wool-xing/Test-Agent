@@ -265,7 +265,6 @@ class TestCoordinatorPipeline:
                 name=name,
                 kind=kind,
                 inputs={"target": target, "pipeline_step": name},
-                run_id=f"tc-{int(t0)}",
             )
             stdout = getattr(outcome, "stdout", "")
             result = {

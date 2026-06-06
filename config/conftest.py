@@ -142,12 +142,12 @@ def test_data(env_config: EnvConfig, tmp_path: Path) -> dict:
         data = {
             "normal_user": {
                 "username": os.getenv("TEST_USER", "testuser@example.com"),
-                "password": os.getenv("TEST_PASS", "Test@123456"),
+                "password": os.getenv("TEST_PASS", ""),
                 "display_name": "测试用户",
             },
             "admin_user": {
                 "username": os.getenv("ADMIN_USER", "admin@example.com"),
-                "password": os.getenv("ADMIN_PASS", "Admin@123456"),
+                "password": os.getenv("ADMIN_PASS", ""),
                 "display_name": "管理员",
             },
         }

@@ -229,6 +229,7 @@ def test_postgres_backup_restore(host: str, db: str, user: str, password: str,
 
     # 2. 恢复到临时库（identifier 白名单校验后拼接安全）
     test_db = f"{db}_restore_test"
+    _validate_identifier(test_db, "restore test database name")
     subprocess.run(["psql", "-h", host, "-U", user, "-c", f"CREATE DATABASE {test_db}"],
                    env=env, capture_output=True)
     try:
