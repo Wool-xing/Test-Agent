@@ -12,8 +12,39 @@
 ## [Unreleased]
 
 ### Added
-- agent-introspection-debugging skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/agent_introspection_debugging.py`) — 5 维自省 (decision_replay / tool_calls / token_consumption / context / state_machine) + findings + recommendations
-- build-your-own-x-explorer skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/build_your_own_x_explorer.py`) — 场景识别 + byox 13 类 KB 推荐 + 时间预算警告
+- OpenAI Responses API 支持 (`TAGENT_LLM_RESPONSES_API=1`)
+- Server酱微信通知渠道 (`SERVERCHAN_SENDKEY`)
+- Ollama URL 环境变量覆盖 (`OLLAMA_HOST`)
+- Electron后端崩溃自动重启 (最多3次)
+- 报告生成器聚合真实Agent上游输出
+
+### Changed
+- VERSION 统一为 `V1.0.0` (大写V)
+- 版本号从环境变量读取: `PROJECT_VERSION`, `PROJECT_NAME`
+- 模型名可覆盖: `TAGENT_LLM_MODEL`
+- docker-compose 密码→环境变量
+- check_version_consistency.py 兼容V前缀
+- Electron tsconfig 适配 TypeScript 7+
+
+### Fixed
+- CI workflow action版本修复 (checkout@v6→v4, setup-python@v6→v5等)
+- 6项CRITICAL安全漏洞 (SSH known_hosts/eval注入/Burp API key/SQL注入/AppleScript/SSRF)
+- Desktop IPC handlers注册
+- 报告生成器死代码list comprehension
+- SOAP xml_escape双重转义
+- install.py os.fdopen()→open() (Python 3.13)
+- suite_minimizer.py 返回类型+缺失Any导入
+- BugTracker适配器双导入issubclass失败
+- mq_helper.py guest:guest硬编码凭据
+- SQLAlchemy future=True弃用
+- 硬编码默认密码 (conftest.py)
+- db_name/db_user默认凭证
+- schema_fuzzer.py exit()→sys.exit()
+- fairness_auditor.py docstring位置
+- evidence_chain.py 导入路径
+- data_factory_v2.py defaultdict顺序
+- 文档数据一致性 (67→79)
+- .gitignore 运行时文件
 - **P1 体感层 — Agent 交互层 5 项全部实装:**
   - 流式输出：DAG 执行进度实时展示（`on_progress` callback → Rich Live table），支持 direct executor 和 Prefect flow 双路径
   - MEMORY.md 跨会话持久化：`/remember` `/forget` `/memory` 命令，自动注入 LLM 上下文，线程安全 + 换行注入防护 + 2000 char 预算
