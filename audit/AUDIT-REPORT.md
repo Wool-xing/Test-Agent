@@ -266,3 +266,10 @@ pip-audit工具在Python 3.14环境受限，手动验证依赖均可正常导入
 | self_healing/locator_store.py | ✅ 多属性定位器设计 |
 
 **runtime/ 全部子模块审查完成: 0个新问题**
+
+## 补充发现
+
+| 发现 | 级别 | 描述 |
+|------|------|------|
+| release/v1.0.0落后main 54 commits | MEDIUM | release分支未包含最新修复,发布时需同步 |
+| CHANGELOG [Unreleased]为空 | LOW | 本次27个PR未记录到CHANGELOG |
