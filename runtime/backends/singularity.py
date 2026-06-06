@@ -45,18 +45,37 @@ class SingularityBackend(BaseExecutionEnv):
         return ExecResult(ok=rc == 0, stdout=out, stderr=err, returncode=rc, elapsed_ms=int((time.monotonic() - start) * 1000))
 
     async def read(self, path: str) -> bytes:
-        return Path(path).read_bytes()
+        """Read file from inside the container (like docker exec cat)."""
+        argv = ["singularity", "exec"]
+        for b in self.binds:
+            argv += ["--bind", b]
+        argv += [self.image, "cat", path]
+        rc, out, err = await self._run(argv)
+        if rc != 0:
+            raise FileNotFoundError(f"container:{path} ({err[:200]})")
+        return out.encode("utf-8")
 
     async def write(self, path: str, data: bytes) -> None:
-        Path(path).write_bytes(data)
+        """Write file into the container via base64 pipe (no docker cp equivalent)."""
+        import base64
+        b64 = base64.b64encode(data).decode("ascii")
+        argv = ["singularity", "exec"]
+        for b in self.binds:
+            argv += ["--bind", b]
+        argv += [self.image, "sh", "-lc", f"echo {b64} | base64 -d > {shlex.quote(path)}"]
+        rc, _, err = await self._run(argv)
+        if rc != 0:
+            raise OSError(f"container write failed: {path} ({err[:200]})")
 
     async def sync_in(self, local: Path, remote: str) -> None:
-        # Singularity binds local FS read-only by default; user supplies binds
-        pass
+        """Copy local host file into the container."""
+        await self.write(remote, local.read_bytes())
 
     async def sync_out(self, remote: str, local: Path) -> None:
+        """Copy file from container to local host."""
+        data = await self.read(remote)
         local.parent.mkdir(parents=True, exist_ok=True)
-        Path(local).write_bytes(Path(remote).read_bytes())
+        local.write_bytes(data)
 
     async def close(self) -> None:
         pass
