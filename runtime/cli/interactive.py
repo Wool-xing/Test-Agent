@@ -20,7 +20,7 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
 
 from runtime.cli._shared import console
-from runtime.cli.completer import SlashCompleter
+from runtime.cli.completer import SlashCompleter, _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
 from runtime.cli.slash_commands import COMMAND_REGISTRY
 from runtime.cli.slash_commands import resolve as resolve_command
@@ -41,13 +41,112 @@ _HISTORY_FILE = _SESSION_DIR / "history.txt"
 _memory: ConversationMemory | None = None
 _start_time: float = 0.0
 
-_PROVIDERS = ["claude", "openai", "gemini", "deepseek", "qwen", "ollama"]
 _PROMPT_STYLE = Style.from_dict({
     "prompt": "bold cyan",
 })
 
-# Key bindings: Ctrl+D exits, Ctrl+C handled by KeyboardInterrupt
+# Key bindings: Ctrl+D exits, Alt+Enter inserts newline for multi-line input
 _kb = KeyBindings()
+
+
+@_kb.add("escape", "enter")
+def _insert_newline(event):
+    """Alt+Enter: insert newline in multi-line input."""
+    event.app.current_buffer.insert_text("\n")
+
+
+@_kb.add("c-d")
+def _ctrl_d_exit(event):
+    """Ctrl+D: exit REPL."""
+    event.app.exit(result=None)
+
+
+_ML_START_MARKERS = ('"""', "'''", "```")  # triggers for auto multi-line mode
+
+
+def _read_multiline(session: PromptSession | None) -> str:
+    """Read multi-line input with continuation prompts.
+
+    Submit with empty line. Code blocks (```) auto-continue until closed.
+    Falls back to single-line if prompt_toolkit unavailable.
+    """
+    if session is None:
+        return _fallback_multiline()
+
+    lines = []
+    try:
+        first = session.prompt(
+            message=[("class:prompt", "> "), ("class:prompt.dim", "[…] ")],
+        )
+        if first is None:
+            return ""
+        first = first.rstrip()
+        if not first:
+            return ""
+        lines.append(first)
+
+        # Auto-continue for code blocks
+        in_block = any(first.strip().startswith(m) for m in _ML_START_MARKERS)
+
+        while True:
+            marker = "… " if in_block else "· "
+            try:
+                line = session.prompt(message=[("class:prompt.dim", marker)])
+            except (EOFError, KeyboardInterrupt):
+                break
+            if line is None:
+                break
+            line = line.rstrip()
+            # Empty line submits (unless inside code block)
+            if not line and not in_block:
+                break
+            # Closing code block marker
+            if in_block and any(line.strip().startswith(m) for m in _ML_START_MARKERS):
+                lines.append(line)
+                break
+            lines.append(line)
+            if not in_block:
+                break  # single continuation only for non-block
+    except (EOFError, KeyboardInterrupt):
+        pass
+
+    return "\n".join(lines)
+
+
+def _fallback_multiline() -> str:
+    """Read multi-line input without prompt_toolkit (Git Bash fallback)."""
+    lines = []
+    try:
+        first = console.input("[bold cyan]> [/]").strip()
+        if not first:
+            return ""
+        lines.append(first)
+        in_block = any(first.startswith(m) for m in _ML_START_MARKERS)
+        while True:
+            line = console.input("… " if in_block else "· ").strip()
+            if not line and not in_block:
+                break
+            if in_block and any(line.startswith(m) for m in _ML_START_MARKERS):
+                lines.append(line)
+                break
+            lines.append(line)
+            if not in_block:
+                break
+    except (EOFError, KeyboardInterrupt):
+        pass
+    return "\n".join(lines)
+
+
+def _is_multiline_candidate(text: str) -> bool:
+    """Check if text should trigger multi-line input mode."""
+    text = text.strip()
+    if not text:
+        return False
+    if any(text.startswith(m) for m in _ML_START_MARKERS):
+        return True
+    if "\n" in text:
+        return True
+    return False
 
 
 def _get_memory() -> ConversationMemory:
@@ -64,17 +163,19 @@ def _count_md_files(dirname: str) -> int:
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
 
 
+_PROVIDER_MODELS = {
+    "claude": "claude-sonnet-4-6", "openai": "gpt-4o",
+    "gemini": "gemini-1.5-pro", "deepseek": "deepseek-chat",
+    "qwen": "qwen-plus", "ollama": "qwen2.5:7b",
+}
+
+
 def _current_provider() -> str:
     return os.environ.get("TAGENT_LLM_PROVIDER", "claude")
 
 
 def _current_model() -> str:
-    models = {
-        "claude": "claude-sonnet-4-6", "openai": "gpt-4o",
-        "gemini": "gemini-1.5-pro", "deepseek": "deepseek-chat",
-        "qwen": "qwen-plus", "ollama": "qwen2.5:7b",
-    }
-    return os.environ.get("TAGENT_LLM_MODEL", models.get(_current_provider(), "unknown"))
+    return os.environ.get("TAGENT_LLM_MODEL", _PROVIDER_MODELS.get(_current_provider(), "unknown"))
 
 
 # ── Banner & Help ─────────────────────────────────────────────────
@@ -82,11 +183,27 @@ def _current_model() -> str:
 
 def _print_banner() -> None:
     import runtime
-    console.print(_SHEEP.format(
+    from rich.live import Live
+    from rich.text import Text
+
+    banner = _SHEEP.format(
         version=runtime.__version__,
         experts=_count_md_files("agents"),
         skills=_count_md_files("skills"),
-    ))
+    )
+
+    # Animated typewriter reveal
+    try:
+        accumulated = Text("")
+        with Live(accumulated, console=console, refresh_per_second=120, transient=False) as live:
+            for ch in banner:
+                accumulated.append_text(Text(ch, style="bold white"))
+                live.update(accumulated)
+                time.sleep(0.0005)
+    except Exception:
+        # Fallback: plain print if terminal doesn't support Live
+        console.print(banner)
+
     console.print()
 
 
@@ -111,6 +228,11 @@ def _print_help() -> None:
             ("/clear", "Reset conversation memory"),
             ("/setup [--preset]", "Generate config files"),
             ("/check [--e2e]", "Framework self-test"),
+        ]),
+        ("Memory", [
+            ("/remember <fact>", "Save fact to MEMORY.md"),
+            ("/forget <keyword>", "Remove facts by keyword"),
+            ("/memory", "Show MEMORY.md contents"),
         ]),
         ("Session", [
             ("/cost", "Token usage and cost estimate"),
@@ -179,6 +301,35 @@ def _diagnose_error(exc: Exception) -> str | None:
 # ── Streaming Activity Feed ────────────────────────────────────────
 
 
+def _execute_with_progress(run_id: str, decision) -> dict:
+    """Run decision with Rich Live progress table. Returns summary dict."""
+    from rich.live import Live
+    from rich.table import Table
+
+    from runtime.cli._shared import _kernel
+
+    progress_table = Table(show_header=True, box=None)
+    progress_table.add_column("#", style="dim", width=3)
+    progress_table.add_column("Node", style="cyan")
+    progress_table.add_column("Status", width=8)
+    progress_table.add_column("Duration", style="dim", width=8)
+
+    completed: list[dict] = []
+
+    def _on_node(result: dict) -> None:
+        nid = result.get("id", "?")
+        name = result.get("name", nid)[:30]
+        ok = result.get("ok", False)
+        dur = result.get("duration_ms", 0)
+        status = "[green]✓[/]" if ok else "[red]✗[/]"
+        dur_str = f"{dur:.0f}ms" if dur else ""
+        completed.append(result)
+        progress_table.add_row(str(len(completed)), name, status, dur_str)
+
+    with Live(progress_table, console=console, refresh_per_second=8, transient=False):
+        return _kernel.execute_sync(run_id, decision, on_progress=_on_node)
+
+
 def _handle_natural_language(text: str) -> None:
     """Route through routing kernel with streaming activity output."""
     if not text.strip():
@@ -188,25 +339,37 @@ def _handle_natural_language(text: str) -> None:
     has_history = len(mem.messages) > 0
     context_input = mem.build_context(text)
     mem.add("user", text)  # add AFTER build_context to avoid duplicating current input
-    summary = text[:80] + ("..." if len(text) > 80 else "")
+    _label = text[:80] + ("..." if len(text) > 80 else "")
 
     if has_history:
-        console.print(f"[dim]Turn {len(mem.messages)//2 + 1} · \"{summary}\"[/]")
+        console.print(f"[dim]Turn {len(mem.messages)//2 + 1} · \"{_label}\"[/]")
     else:
-        console.print(f"[dim]\"{summary}\"[/]")
+        console.print(f"[dim]\"{_label}\"[/]")
 
     t0 = time.time()
     try:
         from runtime.cli._shared import _kernel, build_artifact
 
-        with console.status("[bold green]Routing...", spinner="dots"):
-            art = build_artifact(context_input, "")
-            run_id, decision = _kernel.submit(art, persist=False)
+        # ── fast-path: direct agent/skill invocation ──
+        from runtime.router.intent import try_fast_path
+        decision = try_fast_path(text)
+
+        if decision is not None:
+            console.print(f"[dim]⚡ Direct: {', '.join(n.name for n in decision.dag)}[/]")
+            run_id = f"direct-{decision.dag[0].id}" if decision.dag else "direct"
+            # Submit for persistence but skip LLM routing
+            art = build_artifact(text, "")
+            run_id, _ = _kernel.submit(art, persist=False)
+        else:
+            with console.status("[bold green]Routing...", spinner="dots"):
+                art = build_artifact(context_input, "")
+                run_id, decision = _kernel.submit(art, persist=False)
 
         print_dag = __import__("runtime.cli._shared", fromlist=["print_dag"]).print_dag
         print_dag(decision)
 
-        summary = _kernel.execute_sync(run_id, decision)
+        summary = _execute_with_progress(run_id, decision)
+
         elapsed = (time.time() - t0) * 1000
         total = summary["total"]
         succ = summary["succeeded"]
@@ -555,8 +718,405 @@ def _cmd_compact(args: str) -> None:
     )
 
     mem._messages = kept[:2] + [summary_msg] + kept[2:]
+    mem._truncate()  # re-enforce budget after manual message manipulation
     console.print(f"[green]Compacted {removed} turns → summary.[/]")
     console.print(f"[dim]Turns: {len(mem.messages)} · Chars: {sum(len(m.content) for m in mem.messages)}[/]")
+
+
+# ── /remember /forget — persistent cross-session memory ────────────
+
+
+def _cmd_remember(args: str) -> None:
+    """Save a fact to MEMORY.md for cross-session persistence."""
+    fact = args.strip()
+    if not fact:
+        console.print("[red]Usage: /remember <fact>[/]")
+        console.print("[dim]Example: /remember This project uses PostgreSQL[/]")
+        return
+    from runtime.cli.conversation import save_memory_fact, load_memory_md
+    save_memory_fact(fact)
+    console.print(f"[green]Remembered:[/] {fact}")
+    # Show current memory size
+    mem = load_memory_md()
+    lines = mem.count("\n") + 1 if mem else 0
+    console.print(f"[dim]{lines} fact(s) in MEMORY.md[/]")
+
+
+def _cmd_forget(args: str) -> None:
+    """Remove facts from MEMORY.md matching a keyword."""
+    keyword = args.strip()
+    if not keyword:
+        console.print("[red]Usage: /forget <keyword>[/]")
+        console.print("[dim]Example: /forget PostgreSQL[/]")
+        return
+    from runtime.cli.conversation import forget_memory_fact, load_memory_md
+    removed = forget_memory_fact(keyword)
+    if removed > 0:
+        console.print(f"[green]Forgot {removed} fact(s) matching '{keyword}'[/]")
+    else:
+        console.print(f"[dim]No facts matching '{keyword}'[/]")
+    mem = load_memory_md()
+    lines = mem.count("\n") + 1 if mem else 0
+    console.print(f"[dim]{lines} fact(s) remaining[/]")
+
+
+def _cmd_memory(args: str) -> None:
+    """Display current MEMORY.md contents."""
+    from runtime.cli.conversation import load_memory_md
+    mem = load_memory_md()
+    if not mem:
+        console.print("[dim]MEMORY.md is empty. Use /remember <fact> to save knowledge.[/]")
+        return
+    from rich.panel import Panel
+    lines = mem.count("\n") + 1
+    console.print(Panel(mem, title=f"MEMORY.md ({lines} facts)", title_align="left"))
+
+
+# ── /mcp — list and call MCP tools ────────────────────────────────
+
+
+def _cmd_mcp_tools(args: str) -> None:
+    """List MCP tools across all configured servers."""
+    import asyncio
+
+    from rich.table import Table
+
+    from runtime.mcp.client import get_client
+
+    client = get_client()
+
+    async def _list() -> list:
+        return await client.list_all_tools()
+
+    try:
+        tools = asyncio.run(_list())
+    except Exception as exc:
+        console.print(f"[red]Failed to discover MCP tools: {exc}[/]")
+        return
+
+    if not tools:
+        console.print("[dim]No MCP tools discovered. Check config/.mcp.json[/]")
+        return
+
+    table = Table(title=f"MCP Tools · {len(tools)} across {len(client.servers)} servers", show_header=True)
+    table.add_column("Server", style="dim")
+    table.add_column("Tool", style="cyan")
+    table.add_column("Description")
+
+    for t in sorted(tools, key=lambda x: (x.server_name, x.tool_name)):
+        table.add_row(t.server_name, t.tool_name, t.description[:80])
+
+    console.print(table)
+    console.print("[dim]Call a tool: /mcp-call <server> <tool> [json_args][/]")
+
+
+def _cmd_mcp_call(args: str) -> None:
+    """Call an MCP tool: /mcp-call <server> <tool> [json_args]"""
+    import asyncio
+    import json as _json
+
+    from runtime.mcp.client import get_client
+
+    parts = args.strip().split(maxsplit=2)
+    if len(parts) < 2:
+        console.print("[red]Usage: /mcp-call <server> <tool> [json_args][/]")
+        console.print("[dim]Example: /mcp-call test-orchestrator catalog[/]")
+        return
+
+    server_name, tool_name = parts[0], parts[1]
+    tool_args = {}
+    if len(parts) > 2:
+        try:
+            tool_args = _json.loads(parts[2])
+        except _json.JSONDecodeError:
+            console.print(f"[red]Invalid JSON args: {parts[2]}[/]")
+            return
+
+    client = get_client()
+
+    async def _call():
+        return await client.call_tool(server_name, tool_name, tool_args)
+
+    with console.status(f"[bold green]Calling {server_name}/{tool_name}..."):
+        try:
+            result = asyncio.run(_call())
+        except Exception as exc:
+            console.print(f"[red]MCP call failed: {exc}[/]")
+            return
+
+    if result.ok:
+        preview = result.content[:500] + ("..." if len(result.content) > 500 else "")
+        console.print(f"[green]✓ {server_name}/{tool_name}[/] ({len(result.content)} chars)")
+        console.print(preview)
+    else:
+        console.print(f"[red]✗ {server_name}/{tool_name}: {result.error}[/]")
+
+
+# ── /cron — scheduled task management ─────────────────────────────
+
+
+def _cmd_cron(args: str) -> None:
+    """Manage scheduled tasks: /cron list | add | remove | run.
+
+    /cron list                     — show all scheduled jobs
+    /cron add <cron> <prompt>      — schedule a test (e.g. "0 9 * * *" smoke test)
+    /cron remove <job_id>          — delete a scheduled job
+    /cron run                      — run all due jobs now
+    """
+    parts = args.strip().split(maxsplit=1)
+    sub = parts[0].lower() if parts else "list"
+    rest = parts[1] if len(parts) > 1 else ""
+
+    if sub == "list":
+        from rich.table import Table
+        from runtime.scheduler.jobs import list_jobs
+
+        jobs = list_jobs()
+        if not jobs:
+            console.print("[dim]No scheduled jobs. Use /cron add <cron> <prompt>[/]")
+            console.print("[dim]Example: /cron add '0 9 * * *' smoke test daily[/]")
+            return
+
+        table = Table(title=f"Scheduled Jobs · {len(jobs)}", show_header=True)
+        table.add_column("ID", style="dim", width=16)
+        table.add_column("Cron", style="cyan")
+        table.add_column("Prompt")
+        table.add_column("Next At", style="dim")
+        table.add_column("Status")
+
+        for j in jobs:
+            status = "[green]enabled[/]" if j.get("enabled") else "[dim]disabled[/]"
+            cnt = j.get("run_count", 0)
+            if cnt:
+                status += f" ({cnt} runs)"
+            table.add_row(
+                j["id"][:16],
+                j.get("cron", ""),
+                j.get("prompt", "")[:50],
+                (j.get("next_at") or "")[:19],
+                status,
+            )
+        console.print(table)
+
+    elif sub == "add":
+        # Parse: /cron add "*/30 * * * *" smoke test
+        import shlex
+
+        try:
+            tokens = shlex.split(rest)
+        except ValueError:
+            tokens = rest.split(maxsplit=1)
+
+        if len(tokens) < 2:
+            console.print("[red]Usage: /cron add '<cron_expr>' <prompt>[/]")
+            console.print("[dim]Example: /cron add '0 9 * * *' run full regression[/]")
+            return
+
+        cron_expr = tokens[0]
+        prompt = tokens[1] if len(tokens) > 1 else ""
+
+        try:
+            from runtime.scheduler.jobs import add_job
+
+            job_id = add_job(cron_expr, prompt, delivery=["telegram"])
+            console.print(f"[green]✓ Scheduled[/] {job_id}")
+            console.print(f"[dim]  Cron: {cron_expr}[/]")
+            console.print(f"[dim]  Prompt: {prompt}[/]")
+        except Exception as e:
+            console.print(f"[red]Failed: {e}[/]")
+            console.print("[dim]Ensure croniter is installed: pip install croniter[/]")
+
+    elif sub == "remove":
+        job_id = rest.strip()
+        if not job_id:
+            console.print("[red]Usage: /cron remove <job_id>[/]")
+            return
+        from runtime.scheduler.jobs import remove_job
+
+        if remove_job(job_id):
+            console.print(f"[green]✓ Removed {job_id}[/]")
+        else:
+            console.print(f"[red]Job not found: {job_id}[/]")
+
+    elif sub == "run":
+        from runtime.scheduler.scheduler import tick
+
+        n = tick()
+        console.print(f"[green]✓ Tick complete — {n} job(s) processed[/]")
+
+
+def _cmd_cron_health(args: str) -> None:
+    """Add built-in hourly health check job."""
+    from runtime.scheduler.jobs import add_job, list_jobs
+
+    # Check if health check already exists
+    existing = [j for j in list_jobs() if j.get("metadata", {}).get("kind") == "health-check"]
+    if existing:
+        console.print(f"[dim]Health check already scheduled: {existing[0]['id'][:16]}[/]")
+        return
+
+    job_id = add_job(
+        "0 * * * *",  # every hour
+        "Run framework self-check: verify all 16 experts + 32 skills load correctly",
+        delivery=["telegram"],
+        metadata={"kind": "health-check", "description": "Hourly self-check"},
+    )
+    console.print(f"[green]✓ Health check scheduled hourly[/] {job_id}")
+
+
+# ── /model-router — display auto-routing configuration ─────────────
+
+
+def _cmd_model_router(args: str) -> None:
+    """Show model auto-routing tiers (P2 #14)."""
+    from rich.table import Table
+
+    from runtime.router.model_router import (
+        MODEL_TIERS,
+        TaskTier,
+        classify_task,
+        get_current_provider,
+        get_model_tier,
+    )
+
+    current = get_current_provider()
+    table = Table(title="Model Auto-Router · P2 #14", show_header=True)
+    table.add_column("Provider", style="cyan")
+    table.add_column("Light (routing)", style="dim")
+    table.add_column("Heavy (execution)", style="bold")
+
+    for prov, tier in MODEL_TIERS.items():
+        marker = " ←" if prov == current else ""
+        table.add_row(
+            prov + marker,
+            tier.light_model,
+            tier.heavy_model,
+        )
+
+    # Show relay/proxy config
+    api_base = os.environ.get("TAGENT_LLM_API_BASE")
+    if api_base:
+        console.print(f"[dim]Relay endpoint: {api_base}[/]")
+
+    console.print(table)
+    console.print("[dim]Auto: classify_task(prompt) → LIGHT/HEAVY → model selection[/]")
+    console.print("[dim]Override via /model <provider> [model] or TAGENT_LLM_MODEL env[/]")
+
+
+# ── /search — full-text conversation search (P3 #16) ───────────────
+
+
+def _cmd_search(args: str) -> None:
+    """Search conversation history with FTS5."""
+    query = args.strip()
+    if not query:
+        console.print("[red]Usage: /search <query>[/]")
+        console.print("[dim]Example: /search login page bug[/]")
+        return
+
+    from rich.table import Table
+
+    from runtime.cli.search import search
+
+    results = search(query, limit=15)
+    if not results:
+        console.print(f"[dim]No results for '{query}'[/]")
+        return
+
+    table = Table(title=f"Search: '{query}' · {len(results)} results", show_header=True)
+    table.add_column("Session", style="dim", width=14)
+    table.add_column("Role", width=8)
+    table.add_column("Content")
+    table.add_column("Date", style="dim", width=19)
+
+    for r in results:
+        role = "[cyan]You[/]" if r["role"] == "user" else "[green]Agent[/]"
+        preview = r["content"][:100] + ("..." if len(r["content"]) > 100 else "")
+        ts = r.get("ts", "")[:19]
+        table.add_row(r["session_id"][:12], role, preview, ts)
+
+    console.print(table)
+
+
+# ── /skill-score — auto-rate skills (P3 #18) ──────────────────────
+
+
+def _cmd_skill_score(args: str) -> None:
+    """Score skills based on execution history."""
+    from rich.table import Table
+
+    from runtime.learning_loop.skill_scorer import collect_execution_stats, compute_scores
+
+    with console.status("[bold green]Scanning execution history..."):
+        records = collect_execution_stats()
+        if not records:
+            console.print("[dim]No execution history found. Run some tests first.[/]")
+            return
+        scores = compute_scores(records)
+
+    table = Table(title=f"Skill Scores · {len(scores)} skills · {len(records)} records", show_header=True)
+    table.add_column("Skill", style="cyan")
+    table.add_column("Runs", width=6)
+    table.add_column("OK%", width=6)
+    table.add_column("Avg Dur", width=8)
+    table.add_column("Score", width=6)
+
+    for s in sorted(scores.values(), key=lambda x: x.score, reverse=True)[:20]:
+        ok_str = f"{s.success_rate:.0%}"
+        dur_str = f"{s.avg_duration_ms}ms" if s.avg_duration_ms else "-"
+        score_style = "[green]" if s.score >= 70 else "[yellow]" if s.score >= 40 else "[red]"
+        table.add_row(
+            s.name, str(s.runs),
+            ok_str, dur_str,
+            f"{score_style}{s.score:.0f}[/]",
+        )
+
+    console.print(table)
+    console.print("[dim]Score = success_rate×50 + frequency×30 + speed×20 (max 100)[/]")
+
+
+# ── /speak — voice announce (P3 #23) ──────────────────────────────
+
+
+def _cmd_speak(args: str) -> None:
+    """Read last result or given text aloud."""
+    text = args.strip()
+    if not text:
+        mem = _get_memory()
+        assistant_msgs = [m.content for m in mem.messages if m.role == "assistant"]
+        text = assistant_msgs[-1][:300] if assistant_msgs else "No results to speak."
+    try:
+        from runtime.cli.voice import speak
+        ok = speak(text)
+        console.print(f"[dim]{'Spoke' if ok else 'TTS unavailable'}: {text[:80]}[/]")
+    except Exception as e:
+        console.print(f"[red]Voice error: {e}[/]")
+
+
+# ── /plugins — list loaded plugins (P3 #22) ────────────────────────
+
+
+def _cmd_plugins_list(args: str) -> None:
+    """List loaded plugins from workspace/plugins/."""
+    from runtime.plugins import discover_plugins
+
+    plugins = discover_plugins()
+    if not plugins:
+        console.print("[dim]No plugins found. Drop .py files in workspace/plugins/[/]")
+        return
+
+    from rich.table import Table
+    table = Table(title=f"Plugins · {len(plugins)} loaded", show_header=True)
+    table.add_column("Name", style="cyan")
+    table.add_column("Registered")
+    for name, mod in plugins.items():
+        try:
+            info = mod.register()
+            desc = info.get("description", "-")[:60]
+        except Exception:
+            desc = "[red]error loading[/]"
+        table.add_row(name, desc)
+    console.print(table)
 
 
 # ── Slash Dispatch (after all cmd fns) ────────────────────────────
@@ -573,6 +1133,15 @@ _BUILTIN_MAP = {
     "compact": _cmd_compact,
     "context": _cmd_context, "clear": _cmd_clear,
     "session": _cmd_status,
+    "remember": _cmd_remember, "forget": _cmd_forget, "memory": _cmd_memory,
+    "mcp": _cmd_mcp_tools, "mcp-call": _cmd_mcp_call,
+    "cron": _cmd_cron, "cron-health": _cmd_cron_health,
+    "model-router": _cmd_model_router,
+    "search": _cmd_search,
+    "skill-score": _cmd_skill_score,
+    "speak": _cmd_speak,
+    "plugins": _cmd_plugins_list,
+    "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
 
 
@@ -581,11 +1150,26 @@ def _handle_slash(text: str) -> None:
     name = parts[0].lower()
     args = parts[1] if len(parts) > 1 else ""
 
+    # Trust check — warn on first use of non-builtin commands (P3 #21)
+    from runtime.cli.user_profile import is_trusted, trust_command
+    if not is_trusted(name) and name not in {"quit", "q", "exit", "help", "h", "?", "status"}:
+        console.print(f"[dim]First use of /{name} — trusted for future.[/]")
+        trust_command(name)
+
     if name in _BUILTIN_MAP:
         try:
             _BUILTIN_MAP[name](args)
         except SystemExit:
             raise
+        except Exception as _exc:
+            _hint = _diagnose_error(_exc)
+            if _hint:
+                console.print(f"[red]✗ {type(_exc).__name__}[/]")
+                console.print(f"[yellow]💡 {_hint}[/]")
+            else:
+                _err_msg = str(_exc)[:200]
+                console.print(f"[red]✗ {type(_exc).__name__}: {_err_msg}[/]")
+                console.print("[dim]/help for commands, /doctor for health check.[/]")
         return
 
     cmd = resolve_command(name)
@@ -607,8 +1191,15 @@ def _handle_slash(text: str) -> None:
             console.print(f"[red]Command failed (exit {e.code})[/]")
     except KeyboardInterrupt:
         console.print("\n[yellow]Cancelled.[/]")
-    except Exception:
-        console.print("[red]Command failed[/]")
+    except Exception as _exc:
+        _hint = _diagnose_error(_exc)
+        if _hint:
+            console.print(f"[red]✗ {type(_exc).__name__}[/]")
+            console.print(f"[yellow]💡 {_hint}[/]")
+        else:
+            _err_msg = str(_exc)[:200]
+            console.print(f"[red]✗ {type(_exc).__name__}: {_err_msg}[/]")
+            console.print("[dim]/help for commands, /doctor for health check.[/]")
 
 
 # ── Persistence ───────────────────────────────────────────────────
@@ -684,6 +1275,39 @@ def start() -> None:
     _print_banner()
     _check_first_run()
 
+    # Auto-learn user preferences (P3 #20)
+    try:
+        from runtime.cli.user_profile import learn_from_usage
+        prefs = learn_from_usage()
+        if prefs:
+            console.print(f"[dim]👤 Profile: {', '.join(f'{k}={v}' for k,v in prefs.items())}[/]")
+    except Exception:
+        pass
+
+    # Load plugins (P3 #22)
+    try:
+        from runtime.plugins import discover_plugins
+        plugins = discover_plugins()
+        if plugins:
+            console.print(f"[dim]🔌 {len(plugins)} plugin(s) loaded[/]")
+    except Exception:
+        pass
+
+    # Start background scheduler for cron jobs
+    try:
+        from runtime.scheduler.scheduler import start_background
+        thread, stop = start_background()
+        console.print(f"[dim]⏰ Scheduler started (tick={60}s)[/]")
+    except Exception:
+        pass  # scheduler is optional — croniter may not be installed
+
+    # Show cross-session memory status
+    from runtime.cli.conversation import load_memory_md
+    mem_md = load_memory_md()
+    if mem_md:
+        facts = mem_md.count("\n") + 1
+        console.print(f"[dim]🧠 {facts} fact(s) loaded from MEMORY.md[/]\n")
+
     mem = _get_memory()
     if mem.messages:
         console.print(f"[dim]Resumed {mem.session_id} ({len(mem.messages)} turns)[/]\n")
@@ -710,6 +1334,15 @@ def start() -> None:
 
         if not user_input:
             continue
+
+        # Multi-line detection: code blocks + /ml command
+        if user_input.strip() == "/ml" or user_input.strip() == "/multiline":
+            user_input = _read_multiline(session)
+            if not user_input:
+                continue
+        elif _is_multiline_candidate(user_input):
+            # Already contains newlines from paste — process as-is
+            pass
 
         try:
             if user_input.startswith("/"):

@@ -14,13 +14,46 @@
 ### Added
 - agent-introspection-debugging skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/agent_introspection_debugging.py`) — 5 维自省 (decision_replay / tool_calls / token_consumption / context / state_machine) + findings + recommendations
 - build-your-own-x-explorer skill: LLM-driven minimum viable runner (`runtime/orchestrator/skills/build_your_own_x_explorer.py`) — 场景识别 + byox 13 类 KB 推荐 + 时间预算警告
+- **P1 体感层 — Agent 交互层 5 项全部实装:**
+  - 流式输出：DAG 执行进度实时展示（`on_progress` callback → Rich Live table），支持 direct executor 和 Prefect flow 双路径
+  - MEMORY.md 跨会话持久化：`/remember` `/forget` `/memory` 命令，自动注入 LLM 上下文，线程安全 + 换行注入防护 + 2000 char 预算
+  - Tab 补全增强：agent/skill 名补全（48 个候选，延迟加载）、provider 名补全（`/model` 上下文感知）、命令去重
+  - 错误交互全覆盖：所有 `/command` 路径挂 `_diagnose_error()` 友好提示，不再泛抛 "Command failed"
+  - 启动欢迎动画：Rich Live typewriter reveal 替换静态 banner
 
 ### Changed
 - CLI `tagent run`: `--mode`/`--lang` 改为可选（默认读 `$TAGENT_MODE`/`$TAGENT_LANG` 环境变量，fallback `exec`/`zh`）；裸 `tagent` 显示简洁常用命令摘要
 - 2 vision skill 升 production: `agent-introspection-debugging` + `build-your-own-x-explorer` (frontmatter `SKILL_IMPL_STATUS: vision` → `production`)
+- `ConversationMemory.build_context()`: 无历史时也包裹 "Current request:" 前缀 + MEMORY.md 层，保持输出格式一致
+- `_cmd_compact`: 追加 `_truncate()` 调用，不再绕过字符预算
+- `SlashCompleter`: 去重 COMMAND_REGISTRY 和 _BUILTINS 的重复命令名
+- `run_decision_direct` / `run_decision_flow`: 新增 `on_progress` 回调参数（含 callable 守卫），circuit-breaker drain 路径也触发
+
+### Fixed
+- MEMORY.md 换行注入：`save_memory_fact` 过滤 `\n` `\r`，截断 200 char
+- MEMORY.md prompt injection：`build_context` 用 ``` ```memory``` 分隔符包裹，2000 char 预算
+- MEMORY.md TOCTOU 竞态：加 `threading.Lock`
+- `/forget` 关键词太短导致误删：最小 3 字符
+- `load_memory_md` 异常静默吞噬：改为 `logger.warning`
 - skill rollout 总数: 16 → 18 (中央 `runtime/tests/test_skill_runners.py` `ALL_SKILL_RUNNERS` 同步加 2 行)
 - skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
 - runtime/orchestrator/skills/__init__.py: 聚合 import 新增 agent_introspection_debugging + build_your_own_x_explorer
+
+- **P2 能力层 — Agent 交互层 6 项全部实装:**
+  - IM 多渠道接入（P2 #10）：Telegram / Discord / 飞书 webhook 入站端点 (`runtime/api/endpoints/webhooks.py`) + IM→Agent 桥接 (`runtime/gateway/bridge.py`) + 跨消息对话记忆
+  - Sub-agent 对话触发（P2 #11）：意图检测 (`runtime/router/intent.py`) — @agent / 用 agent / use agent 快速路径，跳过 LLM 路由直接调用
+  - MCP client 完善（P2 #12）：`runtime/mcp/client.py` — stdio 连接 7 个 MCP 服务器，工具发现 + 调用；`/mcp` + `/mcp-call` REPL 命令
+  - 定时主动任务（P2 #13）：scheduler delivery 推送集成 + `/cron` 管理命令 + `/cron-health` 内置自检 + REPL 启动自动后台 daemon
+  - 模型自动路由（P2 #14）：`runtime/router/model_router.py` — LIGHT/HEAVY 任务分级 + 6 provider 双 tier + 中转站支持（TAGENT_LLM_API_BASE）
+  - 多行输入（P2 #15）：代码块自动续行 + 粘贴检测 + `/ml` 命令 + Alt+Enter 换行
+
+### Fixed
+- 6 个 gateway platform 适配器 (discord/feishu/slack/wechat/dingtalk/webhook): `target` 非 URL 时 httpx 崩溃 → URL 前缀校验优雅降级
+- `completer.py` `except Exception` 静默吞噬 → `logger.warning(exc_info=True)`
+- `completer.py` + `interactive.py` `_PROVIDERS` 重复定义 → 统一从 completer 导入
+- `_BUILTINS` 补全 `session` / `exit` / `usage` 别名
+- `direct.py` `on_progress` 回调 3 处重复 → 提取 `_notify()` helper
+- `_BUILTIN_MAP` 测试断言同步新增命令键
 
 _后续累积变更入此节;切版本时移到下方版本节。_
 

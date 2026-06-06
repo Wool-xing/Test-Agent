@@ -47,6 +47,14 @@ from runtime.cli.commands.readiness import register as _reg_readiness  # noqa: E
 from runtime.cli.commands.run import register_run as _reg_run  # noqa: E402
 from runtime.cli.commands.selftest import register as _reg_selftest  # noqa: E402
 from runtime.cli.commands.test_coordinator import register as _reg_test_coordinator  # noqa: E402
+# P3 #19 daemon mode (inline — simple enough)
+@app.command(name="serve", help="Start 7x24 daemon (FastAPI + scheduler)")
+def _serve(
+    host: str = typer.Option("127.0.0.1", "--host", "-h", help="Bind host"),
+    port: int = typer.Option(8800, "--port", "-p", help="Bind port"),
+):
+    from runtime.cli.commands.serve import serve
+    serve(host, port)
 
 _reg_bootstrap(app)
 _reg_catalog(app)

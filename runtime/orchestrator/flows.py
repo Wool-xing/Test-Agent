@@ -15,7 +15,9 @@ from runtime.router.schema import DAGNode, RoutingDecision
 
 
 @flow(name="test-agent-run", task_runner=ConcurrentTaskRunner())
-def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, Any]:
+def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: Any = None) -> dict[str, Any]:
+    if on_progress is not None and not callable(on_progress):
+        on_progress = None
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
@@ -53,6 +55,8 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str) -> dict[str, A
                     log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                     break
             log.info("DAG progress: {}/{} nodes done", i, total)
+            if on_progress and nid in results:
+                on_progress(results[nid])
         else:
             # no break — all futures completed normally
             pass
