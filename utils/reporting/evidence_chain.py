@@ -307,7 +307,7 @@ def build_evidence_chain(
 
     from pathlib import Path as _EPath
     _ev = _EPath(__file__).resolve().parents[2] / "VERSION"
-    _ev_ver = _ev.read_text(encoding="utf-8").strip() if _ev.is_file() else "1.0.0"
+    _ev_ver = _ev.read_text(encoding="utf-8").strip() if _ev.is_file() else "0.0.0"
     pkg = EvidencePackage(
         package_id=f"EP-{now.strftime('%Y%m%d-%H%M%S')}",
         chain=chain,
