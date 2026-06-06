@@ -112,7 +112,7 @@ perf(jmeter): 减少不必要心跳
 ```bash
 ls agents/[0-9]*.md | wc -l   # 16（或 +N）
 ls skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
-ls utils/*.py | wc -l         # 67（或 +N,含 __init__.py）
+ls utils/*.py | wc -l         # 79（或 +N,含 __init__.py）
 grep -c "^    [a-z_]+:" config/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
@@ -137,8 +137,8 @@ pytest --collect-only
 
 ### 自动化保障
 
-- `pre-commit`：18/32/67 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
-- `.github/workflows/ci.yml`：18/32/67 自校 + Markdown 链接有效性 + utils 导入
+- `pre-commit`：16/32/79 文件统计 + .env 防护 + gitleaks 凭据扫描 + ruff
+- `.github/workflows/ci.yml`：16/32/79 自校 + Markdown 链接有效性 + utils 导入
 - `.github/workflows/codeql.yml`：python + GitHub Actions 安全扫描
 
 ### 提交前自检
