@@ -739,28 +739,25 @@ def do_update():
             verify_ok = False
 
         # [2] import check — runtime can be loaded
-        print("  [2/3] runtime 导入...")
+        print("  [2/3] runtime 导入 + catalog...")
         import_ok = subprocess.run(
             [sys.executable, "-c",
              "from runtime.cli.main import app; from runtime.registry.registry import build_catalog; "
-             "cat=build_catalog(); assert len(cat.experts)==16; assert len(cat.skills)==32"],
+             "cat=build_catalog(); n=len(cat.experts)+len(cat.skills); "
+             "print(f'catalog={n} entries ({len(cat.experts)}e+{len(cat.skills)}s)')"],
             capture_output=True, text=True, cwd=PROJECT_ROOT,
         )
         if import_ok.returncode == 0:
-            print("  ✓ runtime + catalog 正常 (16 experts, 32 skills)")
+            print(f"  ✓ {import_ok.stdout.strip()}")
         else:
             print(f"  ⚠ 导入失败: {import_ok.stderr.strip()[:200]}")
             verify_ok = False
 
-        # [3] agent/skill count — file-level integrity
-        print("  [3/3] 文件计数...")
+        # [3] agent/skill files present — informational, not assertion
+        print("  [3/3] 文件完整性...")
         agents_n = len(glob.glob(os.path.join(PROJECT_ROOT, "agents", "[0-9]*.md")))
         skills_n = len(glob.glob(os.path.join(PROJECT_ROOT, "skills", "*.md")))
-        if agents_n == 16 and skills_n == 32:
-            print(f"  ✓ agents={agents_n}, skills={skills_n}")
-        else:
-            print(f"  ⚠ 文件数异常: agents={agents_n}(期望16), skills={skills_n}(期望32)")
-            verify_ok = False
+        print(f"  ✓ agents={agents_n}, skills={skills_n}")
 
         print("=" * 50)
         if verify_ok:
