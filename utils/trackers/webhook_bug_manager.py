@@ -20,7 +20,10 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 
-from bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY  # conftest adds utils/trackers/ to sys.path
+try:
+    from bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY
+except ImportError:
+    from utils.trackers.bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY
 
 load_dotenv()
 logger = logging.getLogger(__name__)
