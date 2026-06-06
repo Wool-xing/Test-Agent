@@ -26,7 +26,9 @@ jobs:
 
       - name: Install runtime deps
         run: |
-          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect defusedxml prompt-toolkit httpx
+          pip install --upgrade pip
+          pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect defusedxml prompt-toolkit httpx mcp croniter
+          python -c "import openpyxl; import factory; import faker; print('deps OK')"
 
       - name: Run demo (smoke)
         run: python -m runtime.cli.main demo -y
