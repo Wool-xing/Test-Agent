@@ -238,6 +238,7 @@ def _print_help() -> None:
         ("Memory", [
             ("/remember <fact>", "Save fact to MEMORY.md"),
             ("/forget <keyword>", "Remove facts by keyword"),
+            ("/nudge", "Scan session for facts worth remembering"),
             ("/memory", "Show MEMORY.md contents"),
         ]),
         ("Gateway", [
@@ -1278,6 +1279,38 @@ def _cmd_gateway(args: str) -> None:
     console.print(f"\n[dim]{active}/9 configured. Start with [cyan]tagent serve[/] (daemon) or [cyan]tagent gateway[/] (messaging only).[/]")
 
 
+# ── /nudge — suggest facts worth remembering ───────────────────────
+
+
+def _cmd_nudge(args: str) -> None:
+    """Scan recent conversation for facts worth persisting to MEMORY.md."""
+    mem = _get_memory()
+    if not mem.messages:
+        console.print("[dim]No conversation to scan.[/]")
+        return
+    from runtime.cli.conversation import load_memory_md
+    existing = load_memory_md()
+    suggestions: list[str] = []
+    seen: set[str] = set()
+    for m in reversed(mem.messages):
+        if m.role != "user":
+            continue
+        for kw in ["config", "setting", "prefer", "always", "never", "remember"]:
+            if kw in m.content.lower() and m.content[:80] not in seen:
+                suggestions.append(m.content[:120])
+                seen.add(m.content[:80])
+                break
+    if not suggestions:
+        console.print("[dim]No notable facts detected. Use /remember <fact> manually.[/]")
+        return
+    console.print("[bold]Suggestions from this session:[/]")
+    for i, s in enumerate(suggestions[:5], 1):
+        preview = s[:100] + ("..." if len(s) > 100 else "")
+        console.print(f"  {i}. {preview}")
+    if existing:
+        console.print(f"\n[dim]MEMORY.md has {len(existing)} chars. /forget <keyword> to clean.[/]")
+
+
 # ── Slash Dispatch (after all cmd fns) ────────────────────────────
 
 
@@ -1295,6 +1328,7 @@ _BUILTIN_MAP = {
     "undo": _cmd_undo, "retry": _cmd_retry,
     "session": _cmd_status,
     "remember": _cmd_remember, "forget": _cmd_forget, "memory": _cmd_memory,
+    "nudge": _cmd_nudge,
     "mcp": _cmd_mcp_tools, "mcp-call": _cmd_mcp_call,
     "cron": _cmd_cron, "cron-health": _cmd_cron_health,
     "model-router": _cmd_model_router,
@@ -1372,6 +1406,10 @@ def _save_session() -> None:
     mem = _get_memory()
     if mem.messages:
         mem.dump(_SESSION_FILE)
+        # Memory nudge: after substantial session, suggest remembering key facts
+        exchanges = len([m for m in mem.messages if m.role == "user"])
+        if exchanges >= 5:
+            console.print(f"\n[dim]💾 Session saved ({exchanges} exchanges). [/][cyan]/remember <fact>[/][dim] to persist key learnings.[/]")
 
 
 # ── REPL Entry ────────────────────────────────────────────────────
