@@ -67,6 +67,9 @@ class LLMClient:
             model = select_model(user, provider)
         except ImportError:
             model = PROVIDER_MODEL_MAP.get(provider, provider)
+        # Allow env var override for any provider (supports any model / 中转站)
+        if os.environ.get("TAGENT_LLM_MODEL"):
+            model = os.environ["TAGENT_LLM_MODEL"]
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": [

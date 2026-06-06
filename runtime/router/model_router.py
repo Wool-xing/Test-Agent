@@ -78,6 +78,15 @@ def get_model_tier(provider: str | None = None) -> ModelTier:
         )
 
     tier = MODEL_TIERS[provider]
+    # TAGENT_LLM_MODEL overrides light/heavy for any provider (supports any model / 中转站)
+    override_model = os.environ.get("TAGENT_LLM_MODEL")
+    if override_model:
+        return ModelTier(
+            provider=tier.provider,
+            light_model=override_model,
+            heavy_model=override_model,
+            api_base=api_base or tier.api_base,
+        )
     if api_base:
         tier = ModelTier(
             provider=tier.provider,
