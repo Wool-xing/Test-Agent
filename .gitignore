@@ -199,5 +199,11 @@ archive/
 runtime/workspace/
 runtime/web/tsconfig.tsbuildinfo
 
+# ===== Claude Code 插件缓存 =====
+.claude-crap/
+
+# ===== 版本检查时间戳（自动生成）=====
+VERSION_last_check
+
 # ===== 安全：可能含敏感数据的文件 =====
 *.har
