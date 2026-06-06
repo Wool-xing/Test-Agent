@@ -17,7 +17,7 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 
-from utils.trackers.bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY
+from bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY  # conftest adds utils/trackers/ to sys.path
 
 load_dotenv()
 logger = logging.getLogger(__name__)
