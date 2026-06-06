@@ -91,7 +91,8 @@ def call_with_retry(
             )
             time.sleep(delay)
 
-    assert last_exception is not None
+    if last_exception is None:
+        raise RuntimeError("retry loop exited without capturing an exception")
     raise last_exception
 
 
@@ -163,7 +164,8 @@ async def async_api_call_with_retry(
                 logger.warning(f"异步请求失败 (尝试 {attempt + 1})，等待 {delay:.0f}s: {e}")
                 await asyncio.sleep(delay)
 
-    assert last_exc is not None
+    if last_exc is None:
+        raise RuntimeError("async retry loop exited without capturing an exception")
     raise last_exc
 
 

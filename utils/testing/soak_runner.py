@@ -118,7 +118,8 @@ def http_scenario(url: str, expected_status: int = 200):
     import requests
     def _scenario():
         r = requests.get(url, timeout=10)
-        assert r.status_code == expected_status, f"status={r.status_code}"
+        if r.status_code != expected_status:
+            raise AssertionError(f"status={r.status_code}, expected={expected_status}")
     return _scenario
 
 

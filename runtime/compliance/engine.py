@@ -121,8 +121,8 @@ def _check_no_hardcoded_secrets(scan_dir: str = ".") -> CheckResult:
             for pattern, label in secret_patterns:
                 if re.search(pattern, content):
                     findings.append(f"{py_file}: {label}")
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("secret scan skip {}: {}", py_file, e)
 
     if findings:
         return CheckResult("no-hardcoded-secrets", "No hardcoded secrets",

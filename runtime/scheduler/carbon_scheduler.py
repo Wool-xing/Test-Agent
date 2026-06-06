@@ -84,8 +84,8 @@ def get_carbon_intensity(region: str = "") -> float:
                 headers={"auth-token": api_key}, timeout=10)
             if resp.status_code == 200:
                 return resp.json().get("carbonIntensity", DEFAULT_INTENSITY)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("carbon intensity API call failed for {}: {}", region, e)
 
     # Fallback
     country = REGION_FALLBACK.get(region, region[:2] if len(region) >= 2 else "")
@@ -124,8 +124,8 @@ def get_optimal_windows(region: str = "", hours_ahead: int = 24,
                         level=level,
                     ))
                 return windows
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("carbon intensity API call failed for {}: {}", region, e)
 
     # Fallback: return current single window
     intensity = get_carbon_intensity(region)
