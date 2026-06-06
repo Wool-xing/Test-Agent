@@ -163,6 +163,13 @@ class ConversationMemory:
         """
         parts: list[str] = []
 
+        # Layer -2: Integrity rules (anti-fabrication, anti-mock)
+        from runtime.tutor.integrity import get_integrity_rules
+        integrity = get_integrity_rules()
+        if integrity:
+            parts.append(integrity)
+            parts.append("")
+
         # Layer -1: Active personality (agent profile)
         if _personality:
             profile = load_personality(_personality)
