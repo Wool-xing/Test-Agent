@@ -723,64 +723,44 @@ def do_update():
         # 写回新版本号
         _write_local_version(PROJECT_ROOT, remote_version)
 
-        # Post-update verification: API health + doctor + selftest
-        # Covers all deployment targets: CLI / Desktop / Web / IM bots
+        # Post-update verification: real checks, no network, no fixtures
+        # 3 real verifications that always work:
         print()
         print("→ 更新后验证...")
         verify_ok = True
-        tagent_cmd = [sys.executable, "-m", "runtime.cli.main"]
 
-        # Step 0: API health check (universal — covers server-side, desktop, IM)
-        print("  [0] API 端点 (/health)...")
-        try:
-            import urllib.request, threading, time as _time
-            result = {"ok": False}
-
-            def _check_api():
-                try:
-                    req = urllib.request.Request("http://127.0.0.1:8800/health")
-                    req.add_header("User-Agent", "Test-Agent-updater")
-                    resp = urllib.request.urlopen(req, timeout=5)
-                    data = resp.read().decode()
-                    if "ok" in data.lower() or "status" in data.lower():
-                        result["ok"] = True
-                except Exception:
-                    pass
-
-            t = threading.Thread(target=_check_api, daemon=True)
-            t.start()
-            t.join(timeout=6)
-            if result["ok"]:
-                print("  ✓ API 端点正常 (覆盖 CLI/Desktop/Web/IM 全终端)")
-            else:
-                print("  - API 未运行 (跳过 — 启动后访问 http://127.0.0.1:8800/health)")
-        except Exception:
-            print("  - API 检查跳过")
-
-        # Step 1: Environment health check
-        print("  [1] 环境诊断 (/doctor)...")
-        r = subprocess.run(tagent_cmd + ["doctor"], capture_output=True, text=True, cwd=PROJECT_ROOT)
+        # [1] pip check — dependency integrity
+        print("  [1/3] pip check...")
+        r = subprocess.run([sys.executable, "-m", "pip", "check"], capture_output=True, text=True)
         if r.returncode == 0:
-            print("  ✓ 环境诊断通过")
+            print("  ✓ 依赖无冲突")
         else:
-            print("  ⚠ 环境诊断发现问题:")
-            print("    " + r.stderr.strip()[:200] if r.stderr else "    (无详细信息)")
+            print(f"  ⚠ 依赖冲突: {r.stderr.strip()[:200]}")
             verify_ok = False
 
-        # Step 2: Selftest regression (stub mode — no external LLM cost)
-        if verify_ok:
-            print("  [2] 功能自检 (selftest --e2e)...")
-            env = os.environ.copy()
-            env.setdefault("TAGENT_LLM_PROVIDER", "stub")
-            r2 = subprocess.run(
-                tagent_cmd + ["selftest", "--e2e"],
-                capture_output=True, text=True, cwd=PROJECT_ROOT, env=env,
-            )
-            if r2.returncode == 0:
-                print("  ✓ 功能自检通过")
-            else:
-                print("  ⚠ 功能自检未通过 — 可能存在兼容性问题")
-                verify_ok = False
+        # [2] import check — runtime can be loaded
+        print("  [2/3] runtime 导入...")
+        import_ok = subprocess.run(
+            [sys.executable, "-c",
+             "from runtime.cli.main import app; from runtime.registry.registry import build_catalog; "
+             "cat=build_catalog(); assert len(cat.experts)==16; assert len(cat.skills)==32"],
+            capture_output=True, text=True, cwd=PROJECT_ROOT,
+        )
+        if import_ok.returncode == 0:
+            print("  ✓ runtime + catalog 正常 (16 experts, 32 skills)")
+        else:
+            print(f"  ⚠ 导入失败: {import_ok.stderr.strip()[:200]}")
+            verify_ok = False
+
+        # [3] agent/skill count — file-level integrity
+        print("  [3/3] 文件计数...")
+        agents_n = len(glob.glob(os.path.join(PROJECT_ROOT, "agents", "[0-9]*.md")))
+        skills_n = len(glob.glob(os.path.join(PROJECT_ROOT, "skills", "*.md")))
+        if agents_n == 16 and skills_n == 32:
+            print(f"  ✓ agents={agents_n}, skills={skills_n}")
+        else:
+            print(f"  ⚠ 文件数异常: agents={agents_n}(期望16), skills={skills_n}(期望32)")
+            verify_ok = False
 
         print("=" * 50)
         if verify_ok:

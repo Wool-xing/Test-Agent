@@ -11,6 +11,7 @@ Bare `tagent` enters interactive session:
 from __future__ import annotations
 
 import os
+import sys
 import time
 from pathlib import Path as _Path
 
@@ -1792,6 +1793,20 @@ def start() -> None:
 
     _print_banner()
     _check_first_run()
+
+    # Version check (non-blocking, 24h rate-limited by check_version.py)
+    try:
+        import subprocess, threading
+        def _check_version():
+            checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+            if checker.is_file():
+                r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
+                if r.stdout.strip():
+                    console.print(r.stdout.strip())
+        t = threading.Thread(target=_check_version, daemon=True)
+        t.start()
+    except Exception:
+        pass
 
     # Auto-learn user preferences (P3 #20)
     try:
