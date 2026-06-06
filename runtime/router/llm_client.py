@@ -85,6 +85,22 @@ class LLMClient:
     def _call(self, provider: str, system: str, user: str, temperature: float, *, max_tokens: int | None = None, json_mode: bool = True) -> str:
         if provider == "stub":
             return _stub_response(system, user) if json_mode else "stub: ok"
+
+        # Check LLM response cache
+        try:
+            from runtime.router.llm_cache import get_cached, set_cached
+        except ImportError:
+            get_cached = set_cached = None  # type: ignore[assignment]
+
+        if get_cached:
+            try:
+                from runtime.router.model_router import select_model
+                model = select_model(user, provider)
+            except ImportError:
+                model = PROVIDER_MODEL_MAP.get(provider, provider)
+            cached = get_cached(provider, model, system, user, temperature)
+            if cached is not None:
+                return cached
         try:
             import litellm  # local import keeps tests cheap
         except ImportError as e:
@@ -130,7 +146,14 @@ class LLMClient:
         if api_key:
             kwargs["api_key"] = api_key
         resp = litellm.completion(**kwargs)
-        return resp["choices"][0]["message"]["content"]
+        result = resp["choices"][0]["message"]["content"]
+        # Store in cache (async-safe: write is fast JSON)
+        if set_cached and provider != "stub":
+            try:
+                set_cached(provider, model, system, user, temperature, result)
+            except Exception:
+                pass
+        return result
 
     @staticmethod
     def _extract_json(raw: str) -> dict[str, Any]:

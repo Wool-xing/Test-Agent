@@ -248,6 +248,7 @@ def _print_help() -> None:
         ]),
         ("Session", [
             ("/cost", "Token usage and cost estimate"),
+            ("/cache [clear]", "LLM response cache stats/clear"),
             ("/insights [days]", "Cross-session usage analytics"),
             ("/sessions", "List saved sessions"),
             ("/resume <id>", "Load a saved session"),
@@ -572,6 +573,22 @@ def _cmd_model(args: str) -> None:
         pass
 
     console.print(f"[green]Switched[/] → provider: [cyan]{name}[/]  model: [cyan]{_current_model()}[/]")
+
+
+# ── /cache — LLM response cache stats/clear ─────────────────────────
+
+
+def _cmd_cache(args: str) -> None:
+    """Show or clear the LLM response cache. Usage: /cache [clear]."""
+    from runtime.router.llm_cache import cache_stats, clear_cache
+    if args.strip() == "clear":
+        n = clear_cache()
+        console.print(f"[green]Cache cleared:[/] {n} entries removed")
+        return
+    stats = cache_stats()
+    console.print(f"[bold]LLM Cache:[/] {stats['entries']} entries, {stats['size_kb']} KB, TTL={stats['ttl_hours']}h")
+    if stats["entries"] > 0:
+        console.print("[dim]Use /cache clear to flush.[/]")
 
 
 # ── /lang — switch UI language ──────────────────────────────────────
@@ -1489,6 +1506,7 @@ _BUILTIN_MAP = {
     "speak": _cmd_speak,
     "plugins": _cmd_plugins_list,
     "distill": _cmd_distill,
+    "cache": _cmd_cache,
     "doctor": _cmd_doctor,
     "insights": _cmd_insights,
     "gateway": _cmd_gateway,
