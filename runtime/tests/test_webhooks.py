@@ -519,7 +519,8 @@ class TestWeChatWebhook:
         msg_len = struct.pack(">I", len(msg_bytes))
         buffer = random_bytes + msg_len + msg_bytes + b"test_corp_id"
 
-        block_size = 32
+        # AES block size = 16 (not 32)
+        block_size = 16
         pad = block_size - len(buffer) % block_size
         buffer += bytes([pad]) * pad
 
@@ -530,6 +531,7 @@ class TestWeChatWebhook:
 
         ts = "1680000000"
         nonce = "test_nonce"
+        # Use the original encrypted string for signature (before URL encoding)
         sig = hashlib.sha1(
             "".join(sorted([token, ts, nonce, encrypted])).encode()
         ).hexdigest()
@@ -540,9 +542,13 @@ class TestWeChatWebhook:
             app = FastAPI()
             app.include_router(router)
             client = TestClient(app)
-            resp = client.get(
-                f"/webhooks/wechat?msg_signature={sig}&timestamp={ts}&nonce={nonce}&echostr={encrypted}"
-            )
+            # Use params= dict so httpx properly URL-encodes base64 chars (+ / =)
+            resp = client.get("/webhooks/wechat", params={
+                "msg_signature": sig,
+                "timestamp": ts,
+                "nonce": nonce,
+                "echostr": encrypted,
+            })
             assert resp.status_code == 200
             assert resp.text == echostr_plain
         finally:

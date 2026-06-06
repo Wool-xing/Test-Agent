@@ -12,6 +12,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   # ===== 0. 版本号一致性（最快，无外部依赖）=====
   version-check:
