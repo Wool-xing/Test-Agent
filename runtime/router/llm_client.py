@@ -35,15 +35,18 @@ def _call_responses_api(provider: str, model: str, system: str, user: str,
     api_base = os.environ.get("TAGENT_LLM_API_BASE") or "https://api.openai.com/v1"
 
     client = openai.OpenAI(api_key=api_key, base_url=api_base)
-    input_msgs = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-    kwargs: dict[str, Any] = {"model": model, "input": input_msgs, "temperature": temperature}
-    if max_tokens is not None:
-        kwargs["max_output_tokens"] = max_tokens
-    if json_mode:
-        input_msgs.append({"role": "system", "content": "Respond with valid JSON only."})
+    try:
+        input_msgs = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        kwargs: dict[str, Any] = {"model": model, "input": input_msgs, "temperature": temperature}
+        if max_tokens is not None:
+            kwargs["max_output_tokens"] = max_tokens
+        if json_mode:
+            input_msgs.append({"role": "system", "content": "Respond with valid JSON only."})
 
-    resp = client.responses.create(**kwargs)
-    return resp.output_text
+        resp = client.responses.create(**kwargs)
+        return resp.output_text
+    finally:
+        client.close()
 
 
 class LLMError(RuntimeError):

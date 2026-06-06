@@ -371,9 +371,14 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
         summary = _build_report_summary_from_upstream(_upstream_outputs, _upstream_meta)
         if summary:
             _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8")
-            _json.dump(summary, _tf, ensure_ascii=False)
-            _tf.close()
-            defaults = {"data": _tf.name}
+            try:
+                _json.dump(summary, _tf, ensure_ascii=False)
+                _tf.close()
+                defaults = {"data": _tf.name}
+            except Exception:
+                _tf.close()
+                os.unlink(_tf.name)
+                raise
     merged = {**defaults, **inputs}  # explicit inputs win
     for k, v in defaults.items():
         if k not in inputs:  # only materialize fixture for auto-injected defaults
@@ -382,6 +387,12 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
     _CLI_EXCLUDE = {"artifact_text", "lang", "mode"}
     args = [f"--{k}={v}" for k, v in merged.items() if k not in _CLI_EXCLUDE]
     res: ScriptResult = run_script(script, args=args, timeout=timeout)
+    # Clean up temp data file after script execution
+    if defaults.get("data") and "data" in defaults:
+        try:
+            os.unlink(defaults["data"])
+        except OSError:
+            pass
     return StepOutcome(
         name=name,
         kind=kind,
