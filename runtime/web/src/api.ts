@@ -1,8 +1,15 @@
-/** API client for runtime/api/main.py. */
+/** API client for runtime/api/main.py.
+ *
+ * In Electron: prefers IPC via window.tagendAPI (zero network overhead).
+ * In browser: falls back to direct HTTP against BASE.
+ */
 
 export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8800";
 
 const BASE = API_BASE;
+
+// tagendAPI is injected by preload_extended.ts in Electron
+const _ipc = (window as any).tagendAPI;
 
 export interface RunCreated {
   run_id: string;
@@ -46,6 +53,7 @@ async function jsonOrThrow<T>(res: Response): Promise<T> {
 }
 
 export async function postRunText(text: string, extra: Record<string, string> = {}): Promise<RunCreated> {
+  if (_ipc?.runTest) return _ipc.runTest({ text, ...extra });
   const res = await fetch(`${BASE}/run/text`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -70,16 +78,19 @@ export async function postRunUrl(url: string): Promise<RunCreated> {
 }
 
 export async function getStatus(runId: string): Promise<RunStatus> {
+  if (_ipc?.getStatus) return _ipc.getStatus(runId);
   const res = await fetch(`${BASE}/status/${encodeURIComponent(runId)}`);
   return jsonOrThrow<RunStatus>(res);
 }
 
 export async function getReport(runId: string): Promise<Record<string, unknown>> {
+  if (_ipc?.getReport) return _ipc.getReport(runId);
   const res = await fetch(`${BASE}/report/${encodeURIComponent(runId)}`);
   return jsonOrThrow<Record<string, unknown>>(res);
 }
 
 export async function getCatalog(): Promise<CatalogResponse> {
+  if (_ipc?.getCatalog) return _ipc.getCatalog();
   const res = await fetch(`${BASE}/catalog`);
   return jsonOrThrow<CatalogResponse>(res);
 }
