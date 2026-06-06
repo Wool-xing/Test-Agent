@@ -723,8 +723,43 @@ def do_update():
         # 写回新版本号
         _write_local_version(PROJECT_ROOT, remote_version)
 
+        # Post-update verification: doctor + selftest
+        print()
+        print("→ 更新后验证...")
+        verify_ok = True
+        tagent_cmd = [sys.executable, "-m", "runtime.cli.main"]
+
+        # Step 1: Environment health check
+        print("  [1/2] 环境诊断 (/doctor)...")
+        r = subprocess.run(tagent_cmd + ["doctor"], capture_output=True, text=True, cwd=PROJECT_ROOT)
+        if r.returncode == 0:
+            print("  ✓ 环境诊断通过")
+        else:
+            print("  ⚠ 环境诊断发现问题:")
+            print("    " + r.stderr.strip()[:200] if r.stderr else "    (无详细信息)")
+            verify_ok = False
+
+        # Step 2: Selftest regression (stub mode — no external LLM cost)
+        if verify_ok:
+            print("  [2/2] 功能自检 (selftest --e2e)...")
+            env = os.environ.copy()
+            env.setdefault("TAGENT_LLM_PROVIDER", "stub")
+            r2 = subprocess.run(
+                tagent_cmd + ["selftest", "--e2e"],
+                capture_output=True, text=True, cwd=PROJECT_ROOT, env=env,
+            )
+            if r2.returncode == 0:
+                print("  ✓ 功能自检通过")
+            else:
+                print("  ⚠ 功能自检未通过 — 可能存在兼容性问题")
+                verify_ok = False
+
         print("=" * 50)
-        print(f" ✅ 已更新到 {remote_version}")
+        if verify_ok:
+            print(f" ✅ 已更新到 {remote_version} (验证通过)")
+        else:
+            print(f" ⚠ 已更新到 {remote_version} (验证未通过)")
+            print("   回滚: 从 workspace/backup/ 恢复, 或 git checkout <旧版本>")
         print("=" * 50)
 
     finally:
