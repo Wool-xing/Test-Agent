@@ -118,7 +118,7 @@
 #### desktop/electron/main.ts (182行)
 | 维 | 发现 |
 |----|------|
-| 产品 | [HIGH] 后端崩溃无自动重启 |
+| 产品 | ✅ 后端崩溃自动重启已修复(#待PR) |
 | 安全 | [MEDIUM] shell.openExternal允许任意HTTP/HTTPS URL |
 | 可维护 | [LOW] startBackend轮询30s硬编码 |
 | 依赖 | [LOW] Electron版本^42.1.0,caret范围较宽 |

@@ -67,9 +67,16 @@ function startBackend(): Promise<void> {
         reject(err);
       });
 
+      let restartCount = 0;
+      const maxRestarts = 3;
       backendProcess.on("exit", (code: number | null) => {
         console.log(`Backend exited with code ${code}`);
         backendProcess = null;
+        if (code !== 0 && restartCount < maxRestarts) {
+          restartCount++;
+          console.log(`Restarting backend (attempt ${restartCount}/${maxRestarts})...`);
+          startBackend().catch((err) => console.error("Backend restart failed:", err));
+        }
       });
 
       // Poll /health until backend is ready
