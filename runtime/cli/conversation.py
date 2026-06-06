@@ -181,7 +181,10 @@ class ConversationMemory:
                 for m in self._messages
             ],
         }
-        path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        try:
+            path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        except OSError as e:
+            logger.warning("conversation dump failed for {}: {}", path, e)
 
     @classmethod
     def load(cls, path: Path) -> ConversationMemory:
