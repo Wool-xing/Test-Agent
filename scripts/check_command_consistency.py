@@ -84,9 +84,33 @@ def _check() -> int:
     if errors:
         print(f"\n{errors} ERROR(S) found. Fix before merging.")
         return 1
+    # Check: agent paired_skills reference valid skills from catalog
+    from pathlib import Path
+    agents_dir = Path(__file__).resolve().parents[1] / "agents"
+    skills_set: set[str] = set()
+    for sf in sorted((Path(__file__).resolve().parents[1] / "skills").glob("*.md")):
+        stext = sf.read_text(encoding="utf-8")
+        sm = re.search(r"name:\s*(\S+)", stext)
+        if sm:
+            skills_set.add(sm.group(1))
+    for af in sorted(agents_dir.glob("[0-9]*.md")):
+        atext = af.read_text(encoding="utf-8")
+        # Parse paired_skills from frontmatter
+        pm = re.search(r"paired_skills:\s*\[([^\]]*)\]", atext)
+        if not pm:
+            continue
+        agent_name = re.search(r"name:\s*(\S+)", atext)
+        aname = agent_name.group(1) if agent_name else af.stem
+        skills_raw = pm.group(1)
+        if skills_raw.strip():
+            for skill in re.findall(r"[\w-]+", skills_raw):
+                if skill not in skills_set:
+                    print(f"WARNING: {aname}: paired_skill '{skill}' not in catalog")
+                    warnings += 1
+
     if warnings:
         print(f"\n{warnings} warning(s) (cosmetic, ok to merge)")
-    print(f"OK: {len(map_keys)} dispatch keys, {len(help_entries)} help entries")
+    print(f"OK: {len(map_keys)} dispatch, {len(help_entries)} help, {len(skills_set)} catalog skills")
     return 0
 
 
