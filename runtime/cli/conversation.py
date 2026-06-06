@@ -22,6 +22,33 @@ _MEMORY_FILE = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "
 _MEMORY_LOCK = threading.Lock()
 _MEMORY_MAX_CHARS = 2000  # cap injected memory to prevent prompt injection / context bloat
 
+# Project context files — auto-discovered from cwd upward
+_PROJECT_CONTEXT_FILES = ["CLAUDE.md", "AGENTS.md", ".claude/CLAUDE.md"]
+_PROJECT_CONTEXT_CACHE: str | None = None
+
+
+def _discover_project_context() -> str | None:
+    """Walk cwd upward looking for context files. Cached after first call."""
+    global _PROJECT_CONTEXT_CACHE
+    if _PROJECT_CONTEXT_CACHE is not None:
+        return _PROJECT_CONTEXT_CACHE or None
+    cwd = Path.cwd()
+    for d in [cwd, *cwd.parents]:
+        for name in _PROJECT_CONTEXT_FILES:
+            cf = d / name
+            if cf.is_file():
+                try:
+                    content = cf.read_text(encoding="utf-8", errors="replace")
+                    _PROJECT_CONTEXT_CACHE = content[:4000]  # cap
+                    logger.info("project context loaded: {}", cf)
+                    return _PROJECT_CONTEXT_CACHE
+                except OSError:
+                    continue
+        if (d / ".git").is_dir():
+            break  # stop at repo root
+    _PROJECT_CONTEXT_CACHE = ""
+    return None
+
 
 @dataclass
 class Message:
@@ -130,10 +157,19 @@ class ConversationMemory:
     def build_context(self, current_input: str) -> str:
         """Build context string for LLM prompt.
 
-        Prepends MEMORY.md facts (cross-session knowledge), then conversation
-        history, then current input — all with clear markers.
+        Layers (in order): project context → MEMORY.md → conversation history → current input.
+        All sourced from delimited blocks to prevent prompt injection.
         """
         parts: list[str] = []
+
+        # Layer 0: Project context (CLAUDE.md / AGENTS.md auto-discovered)
+        proj_ctx = _discover_project_context()
+        if proj_ctx:
+            parts.append("Project context (from workspace):")
+            parts.append("```project")
+            parts.append(proj_ctx)
+            parts.append("```")
+            parts.append("")
 
         # Layer 1: Cross-session persistent memory (delimited to prevent prompt injection)
         mem_md = load_memory_md()
