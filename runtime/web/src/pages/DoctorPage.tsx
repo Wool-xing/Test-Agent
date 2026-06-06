@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Stethoscope, Check, X, Loader2 } from "lucide-react";
 
-const BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8800";
+import { API_BASE } from "../api";
+
+const BASE = API_BASE;
 
 interface CheckItem {
   name: string;
