@@ -27,6 +27,7 @@ jobs:
         run: |
           pip install -e runtime
           pip install pyinstaller
+          pip install pyyaml python-docx openpyxl factory-boy faker beautifulsoup4 pdfplumber httpx websocket-client python-multipart typer mcp croniter
 
       - name: Build Python backend
         run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
@@ -34,13 +35,13 @@ jobs:
       - name: Build Web UI
         working-directory: runtime/web
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Build Electron
         working-directory: desktop
         run: |
-          npm install
+          npm ci
           npx tsc -p electron/tsconfig.json
           npx electron-builder --win --config electron-builder.yml
 
@@ -66,6 +67,7 @@ jobs:
         run: |
           pip install -e runtime
           pip install pyinstaller
+          pip install pyyaml python-docx openpyxl factory-boy faker beautifulsoup4 pdfplumber httpx websocket-client python-multipart typer mcp croniter
 
       - name: Build Python backend
         run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
@@ -73,13 +75,13 @@ jobs:
       - name: Build Web UI
         working-directory: runtime/web
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Build Electron
         working-directory: desktop
         run: |
-          npm install
+          npm ci
           npx tsc -p electron/tsconfig.json
           npx electron-builder --mac --config electron-builder.yml
 
