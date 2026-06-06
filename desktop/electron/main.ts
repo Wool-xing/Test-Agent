@@ -3,11 +3,11 @@ import { ChildProcess, spawn } from "child_process";
 import * as path from "path";
 import * as http from "http";
 import { registerIpcHandlers } from "./ipc_handlers";
+import { BACKEND_PORT } from "./version";
 
 let backendProcess: ChildProcess | null = null;
 let mainWindow: BrowserWindow | null = null;
 
-const BACKEND_PORT = 8800;
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 
 function getBackendPath(): string {

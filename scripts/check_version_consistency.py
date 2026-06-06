@@ -74,6 +74,7 @@ def _scan_tsx_ts(expected: str) -> list[str]:
     """Scan TypeScript/TSX files for getAppVersion() or vX.Y.Z display strings."""
     errors: list[str] = []
     patterns = [
+        (r'export const APP_VERSION\s*=\s*"([^"]+)"', "APP_VERSION constant"),
         (r'getAppVersion\s*:\s*\(\)\s*=>\s*"([^"]+)"', "getAppVersion"),
         (r"Test-Agent\s+(?:Desktop\s+)?v(\d+\.\d+\.\d+)", "display"),
     ]

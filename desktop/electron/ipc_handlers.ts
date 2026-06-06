@@ -7,8 +7,8 @@ import { ipcMain, dialog, shell } from "electron";
 import { spawn } from "child_process";
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
+import { BACKEND_PORT } from "./version";
 
-const BACKEND_PORT = 8800;
 const BASE_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 
 export function registerIpcHandlers(): void {

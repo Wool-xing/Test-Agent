@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { APP_VERSION, BACKEND_PORT } from "./version";
 
 contextBridge.exposeInMainWorld("electronAPI", {
-  getBackendPort: () => 8800,
-  getAppVersion: () => "1.0.0",
+  getBackendPort: () => BACKEND_PORT,
+  getAppVersion: () => APP_VERSION,
   platform: process.platform,
   isElectron: true,
 });

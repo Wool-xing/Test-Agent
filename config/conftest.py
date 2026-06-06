@@ -58,8 +58,8 @@ class EnvConfig:
     api_base_url: str
     db_host: str
     db_port: int = 5432
-    db_name: str = "testdb"
-    db_user: str = "testuser"
+    db_name: str = ""
+    db_user: str = ""
     db_password: str = ""
     redis_host: str = "localhost"
     redis_port: int = 6379
@@ -80,8 +80,8 @@ def get_current_env() -> EnvConfig:
             api_base_url=os.getenv("TEST_API_URL", "http://test-api.example.com"),
             db_host=os.getenv("TEST_DB_HOST", "localhost"),
             db_port=int(os.getenv("TEST_DB_PORT", "5432")),
-            db_name=os.getenv("TEST_DB_NAME", "testdb"),
-            db_user=os.getenv("TEST_DB_USER", "testuser"),
+            db_name=os.getenv("TEST_DB_NAME", ""),
+            db_user=os.getenv("TEST_DB_USER", ""),
             db_password=os.getenv("TEST_DB_PASSWORD", ""),
             redis_host=os.getenv("TEST_REDIS_HOST", "localhost"),
             redis_port=int(os.getenv("TEST_REDIS_PORT", "6379")),
@@ -95,8 +95,8 @@ def get_current_env() -> EnvConfig:
             api_base_url=os.getenv("STAGING_API_URL", "http://staging-api.example.com"),
             db_host=os.getenv("STAGING_DB_HOST", "localhost"),
             db_port=int(os.getenv("STAGING_DB_PORT", "5432")),
-            db_name=os.getenv("STAGING_DB_NAME", "stagingdb"),
-            db_user=os.getenv("STAGING_DB_USER", "staginguser"),
+            db_name=os.getenv("STAGING_DB_NAME", ""),
+            db_user=os.getenv("STAGING_DB_USER", ""),
             db_password=os.getenv("STAGING_DB_PASSWORD", ""),
             redis_host=os.getenv("STAGING_REDIS_HOST", "localhost"),
             redis_port=int(os.getenv("STAGING_REDIS_PORT", "6379")),
