@@ -16,7 +16,7 @@
     "dist:mac": "npm run build:all && electron-builder --mac"
   },
   "devDependencies": {
-    "electron": "^38.8.6",
+    "electron": "^39.8.5",
     "electron-builder": "^26.0.0",
     "typescript": "~5.7.0"
   },
