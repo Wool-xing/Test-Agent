@@ -371,6 +371,7 @@ jobs:
           python -m pip install --upgrade pip
           # runtime/ 依赖 (与 selftest-mock 一致)
           pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect fastapi python-multipart httpx numpy defusedxml tenacity python-dotenv requests prompt-toolkit
+          pip install mcp croniter  # P3 #16 FTS5 + #12 MCP client + #13 scheduler
           # pytest core (排除 pytest-bdd / pytest-playwright 等用户场景 plugin)
           pip install pytest pytest-asyncio pytest-cov
 
