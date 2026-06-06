@@ -376,6 +376,22 @@ def _handle_natural_language(text: str) -> None:
         rate = succ / total if total else 0.0
         console.print(f"  [green]✓ {succ}/{total} ok ({rate:.0%})[/]  [dim]({elapsed:.0f}ms)[/]")
         mem.add("assistant", f"DAG: {succ}/{total} ok, {summary.get('failed', 0)} failed")
+
+        # P3 #18: auto-learn skill scores
+        try:
+            from runtime.learning_loop.skill_scorer import auto_learn_and_recommend
+            rec = auto_learn_and_recommend()
+            if rec:
+                console.print(f"  [dim]📊 {rec}[/]")
+        except Exception:
+            pass
+
+        # P3 #23: voice announce
+        try:
+            from runtime.cli.voice import announce_result
+            announce_result(summary)
+        except Exception:
+            pass
     except KeyboardInterrupt:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
@@ -519,6 +535,14 @@ def _cmd_model(args: str) -> None:
         os.environ["TAGENT_LLM_MODEL"] = model_override
     else:
         os.environ.pop("TAGENT_LLM_MODEL", None)  # use default
+
+    # P3 #20: auto-learn provider preference
+    try:
+        from runtime.cli.user_profile import set_preference
+        set_preference("provider", name)
+        set_preference("model", _current_model())
+    except Exception:
+        pass
 
     console.print(f"[green]Switched[/] → provider: [cyan]{name}[/]  model: [cyan]{_current_model()}[/]")
 
@@ -1289,6 +1313,16 @@ def start() -> None:
         from runtime.plugins import discover_plugins
         plugins = discover_plugins()
         if plugins:
+            for pname, pmod in plugins.items():
+                try:
+                    info = pmod.register()
+                    run_fn = info.get("run")
+                    if callable(run_fn):
+                        _BUILTIN_MAP[pname] = lambda a, fn=run_fn: (
+                            console.print(f"[green]Plugin {pname}:[/] {fn(a)}")
+                        )
+                except Exception:
+                    pass
             console.print(f"[dim]🔌 {len(plugins)} plugin(s) loaded[/]")
     except Exception:
         pass
