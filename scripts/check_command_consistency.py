@@ -108,26 +108,7 @@ def _check() -> int:
                     print(f"WARNING: {aname}: paired_skill '{skill}' not in catalog")
                     warnings += 1
 
-    # Check: no hardcoded agent/skill counts in maintenance files
-    # Patterns like assert len(cat.experts)==16 or agents_n == 16
-    hc_patterns = [
-        (r"assert\s+len\(.*?\)\s*==\s*\d+", "hardcoded count assertion"),
-        (r"(agents_n|skills_n|experts|skills)\s*(==|!=)\s*\d+", "hardcoded agent/skill count comparison"),
-    ]
-    hc_files = [
-        INTERACTIVE_PY.parents[2] / "install.py",
-        Path(__file__).resolve().parents[1] / ".github" / "workflows" / "ci.yml",
-    ]
-    for hf in hc_files:
-        if not hf.is_file():
-            continue
-        htext = hf.read_text(encoding="utf-8")
-        for pat, desc in hc_patterns:
-            for m in re.finditer(pat, htext):
-                line = htext[:m.start()].count("\n") + 1
-                if "16" in m.group() or "32" in m.group():
-                    print(f"ERROR: {hf.name}:{line}: {desc} → {m.group().strip()[:60]}")
-                    errors += 1
+    # Note: hardcoded value check is in separate script check_hardcoded_values.py
 
     if warnings:
         print(f"\n{warnings} warning(s) (cosmetic, ok to merge)")
