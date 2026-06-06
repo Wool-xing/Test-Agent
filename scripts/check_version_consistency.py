@@ -34,20 +34,26 @@ def _read_version() -> str:
     return vf.read_text(encoding="utf-8").strip()
 
 
+def _semver(expected: str) -> str:
+    """Strip V/v prefix for comparison with package managers (npm/pip use semver)."""
+    return expected[1:] if expected and expected[0] in ("V", "v") else expected
+
+
 # ── Layer 1: Dynamic scan ──────────────────────────────────────────
 
 def _scan_package_json(expected: str) -> list[str]:
     """Scan ALL package.json files (recursive) for version field."""
     errors: list[str] = []
+    semver = _semver(expected)
     for f in PROJECT_ROOT.rglob("package.json"):
         if any(skip in f.parts for skip in SKIP_DIRS):
             continue
         try:
             content = f.read_text(encoding="utf-8", errors="ignore")
             m = re.search(r'"version"\s*:\s*"([^"]+)"', content)
-            if m and m.group(1) != expected:
+            if m and m.group(1) != semver:
                 rel = f.relative_to(PROJECT_ROOT)
-                errors.append(f"  {rel}: {m.group(1)} (expected {expected})")
+                errors.append(f"  {rel}: {m.group(1)} (expected {semver})")
         except Exception:
             pass
     return errors
@@ -56,13 +62,14 @@ def _scan_package_json(expected: str) -> list[str]:
 def _scan_pyproject_toml(expected: str) -> list[str]:
     """Scan ALL pyproject.toml files for project version."""
     errors: list[str] = []
+    semver = _semver(expected)
     for f in PROJECT_ROOT.rglob("pyproject.toml"):
         if any(skip in f.parts for skip in SKIP_DIRS):
             continue
         try:
             content = f.read_text(encoding="utf-8", errors="ignore")
             m = re.search(r'\nversion\s*=\s*"([^"]+)"', content)
-            if m and m.group(1) != expected:
+            if m and m.group(1) != semver:
                 rel = f.relative_to(PROJECT_ROOT)
                 errors.append(f"  {rel}: {m.group(1)} (expected {expected})")
         except Exception:
@@ -73,6 +80,7 @@ def _scan_pyproject_toml(expected: str) -> list[str]:
 def _scan_tsx_ts(expected: str) -> list[str]:
     """Scan TypeScript/TSX files for getAppVersion() or vX.Y.Z display strings."""
     errors: list[str] = []
+    semver = _semver(expected)
     patterns = [
         (r'export const APP_VERSION\s*=\s*"([^"]+)"', "APP_VERSION constant"),
         (r'getAppVersion\s*:\s*\(\)\s*=>\s*"([^"]+)"', "getAppVersion"),
@@ -92,9 +100,9 @@ def _scan_tsx_ts(expected: str) -> list[str]:
                 content = f.read_text(encoding="utf-8", errors="ignore")
                 for pat, label in patterns:
                     for m in re.finditer(pat, content):
-                        if m.group(1) != expected:
+                        if m.group(1) != semver:
                             rel = f.relative_to(PROJECT_ROOT)
-                            errors.append(f"  {rel}: v{m.group(1)} [{label}] (expected v{expected})")
+                            errors.append(f"  {rel}: {m.group(1)} [{label}] (expected {semver})")
             except Exception:
                 pass
     return errors
@@ -105,6 +113,7 @@ def _scan_tsx_ts(expected: str) -> list[str]:
 def _check_doc_versions(expected: str) -> list[str]:
     """Check active documentation files for version references."""
     errors: list[str] = []
+    semver = _semver(expected)
     checks = [
         ("FULL_GUIDE.md", r'\*\*版本\*\*：V(\d+\.\d+\.\d+)'),
         ("ROADMAP.md", r'当前状态:V(\d+\.\d+\.\d+)'),
@@ -120,8 +129,8 @@ def _check_doc_versions(expected: str) -> list[str]:
             continue
         content = f.read_text(encoding="utf-8", errors="ignore")
         m = re.search(pattern, content)
-        if m and m.group(1) != expected:
-            errors.append(f"  {path}: V{m.group(1)} (expected V{expected})")
+        if m and m.group(1) != semver:
+            errors.append(f"  {path}: V{m.group(1)} (expected V{semver})")
     return errors
 
 
