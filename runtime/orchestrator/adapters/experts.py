@@ -135,8 +135,8 @@ def _build_report_summary_from_upstream(
     Returns None if no usable data found (report-generator falls back to fixture).
     """
     summary: dict = {
-        "project_name": os.getenv("PROJECT_NAME", "default"),
-        "version": "1.0.0",
+        "project_name": os.getenv("PROJECT_NAME", ""),
+        "version": os.getenv("PROJECT_VERSION", ""),
         "environment": os.getenv("TEST_ENV", "test"),
         "verdict": "通过",
         "results": {"total": 0, "passed": 0, "failed": 0, "pass_rate": 0.0},
