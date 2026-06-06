@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 NodeKind = Literal["expert", "skill", "script"]
 
@@ -16,7 +16,7 @@ class DAGNode(BaseModel):
     depends_on: list[str] = Field(default_factory=list)
     inputs: dict[str, object] = Field(default_factory=dict)
     on_failure: Literal["retry", "skip", "abort"] = "retry"
-    timeout_seconds: int = 1800
+    timeout_seconds: int = Field(default=1800, ge=1, description="node timeout in seconds")
 
     # Charter §23 教学层字段(可选;LLM 在 learn mode 应填,exec mode 仅 one_liner)
     one_liner_zh: str = Field(default="", description="≤30 字 why,执行模式输出此字段")
@@ -50,6 +50,14 @@ class RoutingDecision(BaseModel):
         default_factory=list,
         description="inputs the user did not provide; UI should prompt",
     )
+
+    @model_validator(mode="after")
+    def _check_duplicate_ids(self):
+        ids=[n.id for n in self.dag]
+        dups={i for i in ids if ids.count(i)>1}
+        if dups:
+            raise ValueError(f"Duplicate DAG node IDs: {dups}")
+        return self
 
     def topological(self) -> list[DAGNode]:
         """Kahn's algorithm. Raises on cycle."""
