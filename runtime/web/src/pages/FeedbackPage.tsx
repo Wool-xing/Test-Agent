@@ -63,16 +63,16 @@ export default function FeedbackPage() {
 
     saveFeedback(entry);
 
-    // Also try to submit to GitHub Issues if in desktop app
-    if ((window as any).electronAPI?.isElectron) {
-      try {
-        const body = `## ${type}: ${title}\n\n**Module**: ${module}\n**Email**: ${email || "N/A"}\n\n### Description\n${desc}\n\n---\n*Submitted via Test-Agent Desktop v1.0.0*`;
-        fetch(`${API_BASE}/feedback`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, module, title, body }),
-        }).catch(() => {});
-      } catch {}
+    // Submit to backend (IPC in Electron, HTTP fallback)
+    const tagendAPI = (window as any).tagendAPI;
+    if (tagendAPI?.sendFeedback) {
+      tagendAPI.sendFeedback({ runId: "", rating: 3, comment: desc }).catch(() => {});
+    } else {
+      fetch(`${API_BASE}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, module, title, desc, email }),
+      }).catch(() => {});
     }
 
     setSent(true);
