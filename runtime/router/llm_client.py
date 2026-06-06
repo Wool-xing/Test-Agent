@@ -20,6 +20,32 @@ PROVIDER_MODEL_MAP: dict[str, str] = {
 }
 
 
+def _call_responses_api(provider: str, model: str, system: str, user: str,
+                         temperature: float, max_tokens: int | None,
+                         json_mode: bool) -> str:
+    """OpenAI Responses API (opt-in via TAGENT_LLM_RESPONSES_API=1).
+    Uses native openai SDK. Falls back to litellm Chat Completions on failure.
+    """
+    try:
+        import openai
+    except ImportError:
+        raise LLMError("openai SDK not installed; pip install openai")
+
+    api_key = os.environ.get("TAGENT_LLM_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
+    api_base = os.environ.get("TAGENT_LLM_API_BASE") or "https://api.openai.com/v1"
+
+    client = openai.OpenAI(api_key=api_key, base_url=api_base)
+    input_msgs = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+    kwargs: dict[str, Any] = {"model": model, "input": input_msgs, "temperature": temperature}
+    if max_tokens is not None:
+        kwargs["max_output_tokens"] = max_tokens
+    if json_mode:
+        input_msgs.append({"role": "system", "content": "Respond with valid JSON only."})
+
+    resp = client.responses.create(**kwargs)
+    return resp.output_text
+
+
 class LLMError(RuntimeError):
     pass
 
@@ -70,6 +96,14 @@ class LLMClient:
         # Allow env var override for any provider (supports any model / 中转站)
         if os.environ.get("TAGENT_LLM_MODEL"):
             model = os.environ["TAGENT_LLM_MODEL"]
+        # OpenAI Responses API (opt-in via TAGENT_LLM_RESPONSES_API=1)
+        if os.environ.get("TAGENT_LLM_RESPONSES_API") == "1":
+            try:
+                return _call_responses_api(provider, model, system, user,
+                                           temperature, max_tokens, json_mode)
+            except Exception:
+                logger.debug("Responses API failed, falling back to Chat Completions")
+
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": [

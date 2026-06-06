@@ -252,7 +252,25 @@ TAGENT_REAL_LLM=1 TAGENT_LLM_PROVIDER=<provider> <KEY_ENV>=<value> \
 
 ---
 
-## 8 · 故障排查
+## 8 · OpenAI Responses API（实验性）
+
+OpenAI 2025年新API，内置工具调用/网络搜索。opt-in 启用：
+
+```bash
+export TAGENT_LLM_RESPONSES_API=1
+export TAGENT_LLM_PROVIDER=openai
+export OPENAI_API_KEY=sk-xxx
+```
+
+启用后 `llm_client` 使用原生 `openai` SDK 调 `responses.create()`。
+失败自动回退 litellm Chat Completions。
+其他 provider (Claude/Gemini/DeepSeek等) 不受影响。
+
+> 需 `pip install openai`。litellm 暂不支持此API，故走原生SDK。
+
+---
+
+## 9 · 故障排查
 
 | 症状 | 原因 | 修法 |
 |---|---|---|
@@ -264,7 +282,7 @@ TAGENT_REAL_LLM=1 TAGENT_LLM_PROVIDER=<provider> <KEY_ENV>=<value> \
 
 ---
 
-## 9 · 相关文档
+## 10 · 相关文档
 
 - 配置清单全字段: `docs/getting-started/配置清单.md`
 - LLM 客户端实现: `runtime/router/llm_client.py`
