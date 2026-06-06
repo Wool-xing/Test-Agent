@@ -5,7 +5,7 @@
 
 ## 定位
 
-把 16 专家定义 + 32 业务 Skill + 3 元 Skill + 67 脚本 从"文档+工具箱"升级为"可执行运行时"。
+把 16 专家定义 + 32 业务 Skill + 3 元 Skill + 79 脚本 从"文档+工具箱"升级为"可执行运行时"。
 本层 **不动** `agents/` `skills/` `utils/` 已有内容,仅作调度。
 
 ## 模块清单
@@ -48,7 +48,7 @@ runtime/orchestrator            ← 新增,Prefect 编排
    │
    ├─► agents/*.md         ← 已有,文档→Claude Code 加载
    ├─► skills/*.md         ← 已有,文档→Skill 调用
-   └─► utils/*.py         ← 已有,67 脚本(adapter 包装)
+   └─► utils/*.py         ← 已有,79 脚本(adapter 包装)
    │
    ▼
 runtime/storage 飞轮            ← 新增,数据沉淀
