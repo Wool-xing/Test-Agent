@@ -226,6 +226,7 @@ def _print_help() -> None:
         ]),
         ("Control", [
             ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
+            ("/lang [zh|en|zh-en]", "Switch UI language"),
             ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
             ("/undo", "Remove last exchange from memory"),
@@ -247,6 +248,7 @@ def _print_help() -> None:
         ]),
         ("Session", [
             ("/cost", "Token usage and cost estimate"),
+            ("/insights [days]", "Cross-session usage analytics"),
             ("/sessions", "List saved sessions"),
             ("/resume <id>", "Load a saved session"),
             ("/export", "Export conversation to markdown"),
@@ -572,6 +574,23 @@ def _cmd_model(args: str) -> None:
     console.print(f"[green]Switched[/] → provider: [cyan]{name}[/]  model: [cyan]{_current_model()}[/]")
 
 
+# ── /lang — switch UI language ──────────────────────────────────────
+
+
+def _cmd_lang(args: str) -> None:
+    """Switch UI language. Supports: zh, en, zh-en (bilingual)."""
+    from runtime.tutor.i18n import set_lang, get_lang
+    name = args.strip().lower()
+    if name not in ("zh", "en", "zh-en"):
+        current = get_lang()
+        console.print(f"Current: [cyan]{current}[/]")
+        console.print("[dim]Usage: /lang zh | en | zh-en[/]")
+        return
+    set_lang(name)
+    labels = {"zh": "中文", "en": "English", "zh-en": "中文/English"}
+    console.print(f"[green]{labels.get(name, name)}[/]")
+
+
 # ── /personality — set agent persona ────────────────────────────────
 
 
@@ -652,6 +671,11 @@ def _cmd_clear(args: str) -> None:
 
 
 def _cmd_undo(args: str) -> None:
+    """Remove last user+assistant exchange from conversation memory.
+
+    Can be called repeatedly to unwind multiple turns.
+    Run /retry after undo to re-submit the undone prompt.
+    """
     mem = _get_memory()
     user_text, assistant_text = mem.undo_last_exchange()
     if user_text is None:
@@ -661,7 +685,11 @@ def _cmd_undo(args: str) -> None:
 
 
 def _cmd_retry(args: str) -> None:
-    """Undo last assistant response, then re-submit last user prompt."""
+    """Undo last assistant response and re-submit the last user prompt.
+
+    Equivalent to /undo (assistant only) + re-running the prompt.
+    Use when the agent gave a wrong or incomplete answer.
+    """
     mem = _get_memory()
     if mem._messages and mem._messages[-1].role == "assistant":
         mem._messages.pop()
@@ -1227,7 +1255,12 @@ def _cmd_speak(args: str) -> None:
 
 
 def _cmd_distill(args: str) -> None:
-    """Distill the last execution into a reusable skill."""
+    """Distill the last execution into a reusable skill document.
+
+    Requires a complex execution (3+ nodes, 2+ agent types).
+    Usage: /distill [name] — name is auto-generated if omitted.
+    The generated skill is saved to skills/<name>.md.
+    """
     global _last_trace
     if _last_trace is None:
         console.print("[dim]No execution to distill. Run a test first.[/]")
@@ -1277,7 +1310,11 @@ def _cmd_plugins_list(args: str) -> None:
 
 
 def _cmd_gateway(args: str) -> None:
-    """Show gateway platform status."""
+    """Show IM messaging gateway platform configuration status.
+
+    Displays which of the 9 supported platforms are configured
+    (env vars set). Start with: tagent gateway start or tagent serve.
+    """
     import os as _os
     from rich.table import Table
 
@@ -1308,11 +1345,66 @@ def _cmd_gateway(args: str) -> None:
     console.print(f"\n[dim]{active}/9 configured. Start with [cyan]tagent serve[/] (daemon) or [cyan]tagent gateway[/] (messaging only).[/]")
 
 
+# ── /insights — cross-session analytics ─────────────────────────────
+
+
+def _cmd_insights(args: str) -> None:
+    """Show usage analytics across saved sessions.
+
+    Scans workspace/gateway/*.json for session data.
+    Usage: /insights [days] — default 30 days.
+    Shows: session count, avg turns, top agents, daily activity chart.
+    """
+    from runtime.cli.insights import collect_stats, compute_insights
+    from rich.table import Table
+
+    days = 30
+    try:
+        if args.strip():
+            days = int(args.strip())
+    except ValueError:
+        pass
+
+    with console.status("[bold]Analyzing sessions...", spinner="dots"):
+        stats = collect_stats(days=days)
+        insights = compute_insights(stats)
+
+    if "error" in insights:
+        console.print(f"[dim]{insights['error']}[/]")
+        return
+
+    table = Table(title=f"Insights · Last {days} days", show_header=False)
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value")
+    table.add_row("Sessions", str(insights["sessions"]))
+    table.add_row("Total messages", str(insights["total_messages"]))
+    table.add_row("Avg turns/session", str(insights["avg_turns_per_session"]))
+    table.add_row("Avg duration", f"{insights['avg_duration_s']:.0f}s")
+    table.add_row("Data range", f"{insights['oldest_session_days']} days")
+    console.print(table)
+
+    if insights["top_agents"]:
+        console.print("\n[bold]Top agents:[/]")
+        for agent, count in insights["top_agents"]:
+            console.print(f"  [cyan]{agent}[/]: {count}")
+
+    if insights["daily_activity"]:
+        console.print("\n[bold]Daily activity:[/]")
+        max_count = max(c for _, c in insights["daily_activity"])
+        for day, count in insights["daily_activity"]:
+            bar = "█" * max(1, int(count / max(max_count, 1) * 20))
+            console.print(f"  {day}  {bar} {count}")
+
+
 # ── /doctor — comprehensive environment health check ────────────────
 
 
 def _cmd_doctor(args: str) -> None:
-    """Run comprehensive diagnostics."""
+    """Run comprehensive environment health check.
+
+    7 categories: Environment, Catalog, Config, Dependencies,
+    LLM, Workspace, MCP. Use --agents to probe individual experts.
+    """
     from runtime.cli.doctor import run_doctor
     from rich.table import Table
 
@@ -1337,7 +1429,11 @@ def _cmd_doctor(args: str) -> None:
 
 
 def _cmd_nudge(args: str) -> None:
-    """Scan recent conversation for facts worth persisting to MEMORY.md."""
+    """Scan recent conversation for facts worth persisting to MEMORY.md.
+
+    Detects patterns: config changes, preferences, decisions.
+    Use /remember <fact> to save suggestions, /memory to review.
+    """
     mem = _get_memory()
     if not mem.messages:
         console.print("[dim]No conversation to scan.[/]")
@@ -1372,6 +1468,7 @@ _BUILTIN_MAP = {
     "help": lambda a: _print_help(), "h": lambda a: _print_help(), "?": lambda a: _print_help(),
     "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
     "status": _cmd_status, "model": _cmd_model,
+    "lang": _cmd_lang,
     "personality": _cmd_personality,
     "tools": _cmd_tools,
     "cost": _cmd_cost, "usage": _cmd_cost,
@@ -1393,6 +1490,7 @@ _BUILTIN_MAP = {
     "plugins": _cmd_plugins_list,
     "distill": _cmd_distill,
     "doctor": _cmd_doctor,
+    "insights": _cmd_insights,
     "gateway": _cmd_gateway,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
