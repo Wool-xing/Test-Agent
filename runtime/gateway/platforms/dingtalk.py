@@ -58,6 +58,7 @@ class DingTalkPlatform(Platform):
         self.webhook: str | None = None
         self.app_key: str | None = None
         self.app_secret: str | None = None
+        self.agent_id: str | None = None
 
     async def configure(
         self,
@@ -65,11 +66,13 @@ class DingTalkPlatform(Platform):
         webhook_url: str | None = None,
         app_key: str | None = None,
         app_secret: str | None = None,
+        agent_id: str | None = None,
         **_kwargs,
     ) -> None:
         self.webhook = webhook_url or os.getenv("DINGTALK_WEBHOOK_URL")
         self.app_key = app_key or os.getenv("DINGTALK_APP_KEY")
         self.app_secret = app_secret or os.getenv("DINGTALK_APP_SECRET")
+        self.agent_id = agent_id or os.getenv("DINGTALK_AGENT_ID")
 
     async def send(self, msg: Message, *, target: str | None = None) -> DeliveryResult:
         """Send message. Uses API mode when target is a userid, webhook otherwise."""
@@ -102,7 +105,7 @@ class DingTalkPlatform(Platform):
 
         body = {
             "touser": userid,
-            "agent_id": os.getenv("DINGTALK_AGENT_ID", ""),
+            "agent_id": self.agent_id or "",
             "msg": {"msgtype": "text", "text": {"content": msg.text}},
         }
         async with httpx.AsyncClient(timeout=15.0) as c:

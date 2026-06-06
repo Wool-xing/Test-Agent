@@ -80,7 +80,10 @@ class QQBotPlatform(Platform):
                 error="QQBOT_APP_ID/QQBOT_CLIENT_SECRET not set",
             )
 
-        token = await _get_access_token_async()
+        import asyncio
+        token = await asyncio.to_thread(
+            _get_access_token, self.app_id, self.client_secret,
+        )
         if not token:
             return DeliveryResult(
                 ok=False, platform=self.name, msg_id=None,
@@ -109,16 +112,6 @@ class QQBotPlatform(Platform):
                 ok=False, platform=self.name, msg_id=None,
                 error=f"{r.status_code}: {r.text[:120]}",
             )
-
-
-async def _get_access_token_async() -> str | None:
-    """Async wrapper around sync token fetch."""
-    import asyncio
-    return await asyncio.to_thread(
-        _get_access_token,
-        os.getenv("QQBOT_APP_ID", ""),
-        os.getenv("QQBOT_CLIENT_SECRET", ""),
-    )
 
 
 def _build_qqbot_request(target: str, text: str) -> tuple[str, dict]:
