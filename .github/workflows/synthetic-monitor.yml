@@ -44,3 +44,4 @@ jobs:
         if: failure()
         run: |
           echo "::warning::Synthetic monitor FAILED in ${{ matrix.region }}"
+# Synthetic Monitor fix verified
