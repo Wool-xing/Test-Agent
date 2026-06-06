@@ -58,3 +58,11 @@ contextBridge.exposeInMainWorld("tagendAPI", {
   platform: process.platform,
   isElectron: true,
 });
+
+// Backward compat: pages that check window.electronAPI still work
+contextBridge.exposeInMainWorld("electronAPI", {
+  getBackendPort: () => BACKEND_PORT,
+  getAppVersion: () => APP_VERSION,
+  platform: process.platform,
+  isElectron: true,
+});
