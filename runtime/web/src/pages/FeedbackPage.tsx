@@ -1,5 +1,6 @@
 import { useState, FormEvent } from "react";
 import { MessageSquare, Send, Check, AlertCircle } from "lucide-react";
+import { API_BASE } from "../api";
 
 const MODULES = [
   "Upload / Run",
@@ -66,7 +67,7 @@ export default function FeedbackPage() {
     if ((window as any).electronAPI?.isElectron) {
       try {
         const body = `## ${type}: ${title}\n\n**Module**: ${module}\n**Email**: ${email || "N/A"}\n\n### Description\n${desc}\n\n---\n*Submitted via Test-Agent Desktop v1.0.0*`;
-        fetch("http://localhost:8800/feedback", {
+        fetch(`${API_BASE}/feedback`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ type, module, title, body }),

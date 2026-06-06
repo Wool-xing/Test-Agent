@@ -351,7 +351,7 @@ async def wechat_webhook(request: Request, bg: BackgroundTasks):
         try:
             plain = _wechat_decrypt(echostr, aes_key)
         except Exception:
-            # Edge case: URL decoder turned base64 + into space; retry
+            # Edge case: URL decoder turned base64 + into space; retry once
             if " " in echostr:
                 try:
                     plain = _wechat_decrypt(echostr.replace(" ", "+"), aes_key)
@@ -360,9 +360,6 @@ async def wechat_webhook(request: Request, bg: BackgroundTasks):
                     raise HTTPException(status_code=400, detail="decrypt failed")
             else:
                 raise HTTPException(status_code=400, detail="decrypt failed")
-        except Exception as e:
-            logger.warning("WeChat echostr decrypt failed: {}", e)
-            raise HTTPException(status_code=400, detail="decrypt failed")
         return PlainTextResponse(content=plain)
 
     # POST: message callback

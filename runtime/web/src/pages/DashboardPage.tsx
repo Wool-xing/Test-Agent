@@ -21,7 +21,9 @@ interface DashboardData {
   top_failures: { expert: string; fail_count: number }[];
 }
 
-const BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8800";
+import { API_BASE } from "../api";
+
+const BASE = API_BASE;
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);

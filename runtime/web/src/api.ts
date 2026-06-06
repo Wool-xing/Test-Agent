@@ -1,6 +1,8 @@
 /** API client for runtime/api/main.py. */
 
-const BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8800";
+export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8800";
+
+const BASE = API_BASE;
 
 export interface RunCreated {
   run_id: string;
