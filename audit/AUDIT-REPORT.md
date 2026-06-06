@@ -697,3 +697,57 @@ Python 3.11+ · TypeScript · Electron · FastAPI · Prefect · LiteLLM · SQLAl
 | 安全 | [MEDIUM] 用户数据存储路径拼接触及路径遍历风险 |
 | 数据流 | 用户偏好无版本管理,格式变更会丢失 |
 
+
+### runtime/scheduler/scheduler.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | cron表达式解析无验证,错误静默跳过 |
+| 产品 | job执行失败无告警通知 |
+
+### runtime/self_healing/retry.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | ✅ 设计良好,RETRYABLE类型明确,无bare except |
+| 产品 | 指数退避base=2.0硬编码,无可配置性 |
+
+### runtime/marketplace/installer.py
+| 视角 | 发现 |
+|------|------|
+| 安全 | ✅ 4关安全门设计合理(签名/注入扫描/沙箱/darwin) |
+| 测试 | 无离线安装支持,完全依赖网络 |
+
+### runtime/healthcheck/agent_smoke.py
+| 视角 | 发现 |
+|------|------|
+| 测试 | L1 frontmatter lint合理,检测agent/skill缺失字段 |
+| 产品 | 健康检查结果无结构化JSON输出 |
+
+### runtime/init/wizard.py
+| 视角 | 发现 |
+|------|------|
+| 产品 | ✅ tagent init交互设计优秀,8×6×5×6×6=8640组合 |
+| 测试 | 模板变量替换无escaping,特殊字符可能破坏配置 |
+
+---
+
+## 阶段1完成: 全部runtime/模块已审查
+
+**审查覆盖**: runtime/ 全部14子模块, ~130文件
+**使用视角**: 测试专家/产品设计/安全审计/数据流
+**发现问题**: 已修复38项, 新增可修复12项
+
+### 剩余模块审计状态
+
+| 模块 | 状态 |
+|------|------|
+| utils/design/ | ⏳ 部分 |
+| utils/security/ | ⏳ 部分 |
+| utils/testing/ | ⏳ 部分 |
+| utils/data/ | ⏳ 部分 |
+| utils/performance/ | ⏳ 部分 |
+| utils/platforms/ | ⏳ 部分 |
+| utils/reporting/ | ⏳ 部分 |
+| utils/protocols/ | ⏳ 部分 |
+| utils/trackers/ | ✅ 已完成 |
+| utils/a11y_i18n/ | ✅ 已完成 |
+
