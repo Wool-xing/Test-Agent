@@ -6,10 +6,13 @@ Use: tagent serve [--port PORT] [--host HOST]
 
 from __future__ import annotations
 
+import logging
 import signal
 import sys
 import threading
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 def _signal_handler(stop_event: threading.Event):
