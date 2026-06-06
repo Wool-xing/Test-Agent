@@ -101,7 +101,11 @@ def _entry_from_file(path: Path, kind: EntryKind) -> CatalogEntry | None:
     name = meta.get("name")
     description = meta.get("description", "")
     if not name:
-        logger.debug("skip {} (no name frontmatter)", path)
+        has_fm = text.startswith("---")
+        if has_fm:
+            logger.warning("skip {} — frontmatter missing 'name' field (YAML may be broken)", path)
+        else:
+            logger.debug("skip {} (no frontmatter)", path)
         return None
     tools_raw = meta.get("tools", "")
     if isinstance(tools_raw, list):
