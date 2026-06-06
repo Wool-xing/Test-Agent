@@ -51,6 +51,15 @@ class AgentRunner(abc.ABC):
     def system_prompt(self) -> str:
         """从 agents/*.md 提炼的角色 prompt."""
 
+    def _system_prompt_with_integrity(self) -> str:
+        """Return system_prompt() with integrity rules prepended."""
+        from runtime.tutor.integrity import get_integrity_rules
+        prompt = self.system_prompt()
+        rules = get_integrity_rules()
+        if rules:
+            return rules + "\n\n" + prompt
+        return prompt
+
     @abc.abstractmethod
     def user_prompt(self, ctx: RunnerContext) -> str:
         """拼上游产物 + PRD 为单个 user message."""
@@ -94,7 +103,7 @@ class AgentRunner(abc.ABC):
                 from runtime.config.settings import get_settings
 
                 raw = client.complete(
-                    self.system_prompt(),
+                    self._system_prompt_with_integrity(),
                     self.user_prompt(ctx),
                     temperature=0.1,
                     max_tokens=get_settings().agent_max_tokens,
