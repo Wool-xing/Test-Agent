@@ -122,3 +122,46 @@ def compute_scores(records: list[dict] | None = None) -> dict[str, SkillScore]:
         )
 
     return scores
+
+
+def auto_learn_and_recommend() -> str | None:
+    """Run after test execution: score skills + surface recommendations.
+
+    Returns a recommendation string if interesting patterns found, else None.
+    """
+    records = collect_execution_stats(limit=100)
+    if not records:
+        return None
+
+    scores = compute_scores(records)
+    if not scores:
+        return None
+
+    parts: list[str] = []
+
+    # Find underperformers (low success rate, enough runs)
+    under = [(n, s) for n, s in scores.items() if s.runs >= 3 and s.success_rate < 0.5]
+    if under:
+        worst = sorted(under, key=lambda x: x[1].success_rate)[:3]
+        parts.append("Underperforming: " + ", ".join(
+            f"{n} ({s.success_rate:.0%})" for n, s in worst
+        ))
+
+    # Find unused but available skills (never run)
+    try:
+        from runtime.registry.registry import get_catalog
+        cat = get_catalog()
+        all_skills = set(cat.skills.keys())
+        scored_names = set(scores.keys())
+        unused = all_skills - scored_names
+        if unused:
+            sample = list(unused)[:5]
+            parts.append("Unused: " + ", ".join(sample))
+    except Exception:
+        pass
+
+    # Top performers
+    top = sorted(scores.values(), key=lambda x: x.score, reverse=True)[:3]
+    parts.append("Top: " + ", ".join(f"{s.name} ({s.score:.0f})" for s in top))
+
+    return " | ".join(parts) if parts else None
