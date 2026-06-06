@@ -41,8 +41,8 @@ def discover_plugins() -> dict[str, list[EntryPoint]]:
             for ep in all_eps:
                 if ep.group == PLUGIN_GROUP and ep.name in discovered:
                     discovered[ep.name].append(ep)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("marketplace entry_points scan failed: %s", e)
     return discovered
 
 

@@ -27,7 +27,6 @@ def _get_project_version() -> str:
     except (OSError, UnicodeDecodeError):
         return "0.1.0"
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from loguru import logger

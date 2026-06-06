@@ -157,8 +157,8 @@ def auto_learn_and_recommend() -> str | None:
         if unused:
             sample = list(unused)[:5]
             parts.append("Unused: " + ", ".join(sample))
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("skill scorer auto_learn catalog fetch failed: %s", e)
 
     # Top performers
     top = sorted(scores.values(), key=lambda x: x.score, reverse=True)[:3]

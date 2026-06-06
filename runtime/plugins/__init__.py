@@ -7,9 +7,12 @@ Each plugin exports: register() -> dict {name, description, run(text) -> str}
 from __future__ import annotations
 
 import importlib.util
+import logging
 import sys
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 def discover_plugins(plugins_dir: Path | None = None) -> dict[str, Any]:
@@ -33,6 +36,6 @@ def discover_plugins(plugins_dir: Path | None = None) -> dict[str, Any]:
                 spec.loader.exec_module(mod)
                 if hasattr(mod, "register"):
                     loaded[name] = mod
-        except Exception:
-            pass  # skip broken plugins
+        except Exception as e:
+            logger.warning("plugin %s failed to load: %s", f.name, e)
     return loaded
