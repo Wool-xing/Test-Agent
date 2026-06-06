@@ -40,7 +40,9 @@ def load_prd(source: Union[str, Path]) -> Dict:
 
     p = Path(s)
     if not p.exists():
-        raise FileNotFoundError(f"PRD 文件不存在: {s}")
+        return {"format": "error", "source": s, "text": "",
+                "error": f"文件不存在: {s}", "attachments": [], "images": [],
+                "metadata": {"name": p.name}}
 
     suffix = p.suffix.lower()
     if suffix in (".md", ".markdown", ".txt"):
