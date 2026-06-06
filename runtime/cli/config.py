@@ -12,6 +12,7 @@ env file priority: CWD/.env -> repo-root/.env. Always backup to .env.bak before 
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import typer
@@ -47,7 +48,7 @@ BUILTIN_PROVIDERS: dict[str, dict[str, str | None]] = {
     "ollama": {
         "env_key": None,
         "model": "ollama/qwen2.5:7b",
-        "url": "http://localhost:11434",
+        "url": os.environ.get("OLLAMA_HOST", "http://localhost:11434"),
     },
 }
 
