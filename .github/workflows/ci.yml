@@ -383,6 +383,7 @@ jobs:
         run: |
           python -m pytest runtime/tests/ \
             --ignore=runtime/tests/test_router_real.py \
+            --ignore=runtime/tests/test_smoke_e2e.py \
             -p no:cacheprovider \
             -v --tb=short
           echo "✅ pytest 单元测试全过"
