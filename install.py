@@ -723,8 +723,51 @@ def do_update():
         # 写回新版本号
         _write_local_version(PROJECT_ROOT, remote_version)
 
+        # Post-update verification: real checks, no network, no fixtures
+        # 3 real verifications that always work:
+        print()
+        print("→ 更新后验证...")
+        verify_ok = True
+
+        # [1] pip check — dependency integrity
+        print("  [1/3] pip check...")
+        r = subprocess.run([sys.executable, "-m", "pip", "check"], capture_output=True, text=True)
+        if r.returncode == 0:
+            print("  ✓ 依赖无冲突")
+        else:
+            print(f"  ⚠ 依赖冲突: {r.stderr.strip()[:200]}")
+            verify_ok = False
+
+        # [2] import check — runtime can be loaded
+        print("  [2/3] runtime 导入...")
+        import_ok = subprocess.run(
+            [sys.executable, "-c",
+             "from runtime.cli.main import app; from runtime.registry.registry import build_catalog; "
+             "cat=build_catalog(); assert len(cat.experts)==16; assert len(cat.skills)==32"],
+            capture_output=True, text=True, cwd=PROJECT_ROOT,
+        )
+        if import_ok.returncode == 0:
+            print("  ✓ runtime + catalog 正常 (16 experts, 32 skills)")
+        else:
+            print(f"  ⚠ 导入失败: {import_ok.stderr.strip()[:200]}")
+            verify_ok = False
+
+        # [3] agent/skill count — file-level integrity
+        print("  [3/3] 文件计数...")
+        agents_n = len(glob.glob(os.path.join(PROJECT_ROOT, "agents", "[0-9]*.md")))
+        skills_n = len(glob.glob(os.path.join(PROJECT_ROOT, "skills", "*.md")))
+        if agents_n == 16 and skills_n == 32:
+            print(f"  ✓ agents={agents_n}, skills={skills_n}")
+        else:
+            print(f"  ⚠ 文件数异常: agents={agents_n}(期望16), skills={skills_n}(期望32)")
+            verify_ok = False
+
         print("=" * 50)
-        print(f" ✅ 已更新到 {remote_version}")
+        if verify_ok:
+            print(f" ✅ 已更新到 {remote_version} (验证通过)")
+        else:
+            print(f" ⚠ 已更新到 {remote_version} (验证未通过)")
+            print("   回滚: 从 workspace/backup/ 恢复, 或 git checkout <旧版本>")
         print("=" * 50)
 
     finally:

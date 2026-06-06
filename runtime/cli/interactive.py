@@ -11,6 +11,7 @@ Bare `tagent` enters interactive session:
 from __future__ import annotations
 
 import os
+import sys
 import time
 from pathlib import Path as _Path
 
@@ -20,7 +21,7 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
 
 from runtime.cli._shared import console
-from runtime.cli.completer import SlashCompleter, _PROVIDERS
+from runtime.cli.completer import _PROVIDERS, SlashCompleter
 from runtime.cli.conversation import ConversationMemory
 from runtime.cli.slash_commands import COMMAND_REGISTRY
 from runtime.cli.slash_commands import resolve as resolve_command
@@ -184,9 +185,10 @@ def _current_model() -> str:
 
 
 def _print_banner() -> None:
-    import runtime
     from rich.live import Live
     from rich.text import Text
+
+    import runtime
 
     banner = _SHEEP.format(
         version=runtime.__version__,
@@ -220,6 +222,7 @@ def _print_help() -> None:
             ("/plan  <target>", "Plan only, no execution"),
         ]),
         ("Info", [
+            ("/update", "Check for newer version"),
             ("/status", "Session, model, conversation stats"),
             ("/tools", "List agents + skills with status"),
             ("/ls", "Quick list experts + skills"),
@@ -609,12 +612,30 @@ def _cmd_fc(args: str) -> None:
     _BUILTIN_MAP.get(suggestion, lambda a: None)("")
 
 
+# ── /update — check for new version ──────────────────────────────────
+
+
+def _cmd_update(args: str) -> None:
+    """Check GitHub for newer version. Thin wrapper around config/check_version.py."""
+    import subprocess
+    import sys
+    checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+    if not checker.is_file():
+        console.print("[dim]Version checker not found.[/]")
+        return
+    r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True)
+    if r.stdout.strip():
+        console.print(r.stdout.strip())
+    else:
+        console.print("[green]Already up to date.[/]")
+
+
 # ── /lang — switch UI language ──────────────────────────────────────
 
 
 def _cmd_lang(args: str) -> None:
     """Switch UI language. Supports: zh, en, zh-en (bilingual)."""
-    from runtime.tutor.i18n import set_lang, get_lang
+    from runtime.tutor.i18n import get_lang, set_lang
     name = args.strip().lower()
     if name not in ("zh", "en", "zh-en"):
         current = get_lang()
@@ -631,7 +652,7 @@ def _cmd_lang(args: str) -> None:
 
 def _cmd_personality(args: str) -> None:
     """Switch active personality (loads agent .md as system prompt)."""
-    from runtime.cli.conversation import list_personalities, set_personality, get_personality
+    from runtime.cli.conversation import get_personality, list_personalities, set_personality
 
     name = args.strip().lower()
     if not name:
@@ -926,7 +947,7 @@ def _cmd_remember(args: str) -> None:
         console.print("[red]Usage: /remember <fact>[/]")
         console.print("[dim]Example: /remember This project uses PostgreSQL[/]")
         return
-    from runtime.cli.conversation import save_memory_fact, load_memory_md
+    from runtime.cli.conversation import load_memory_md, save_memory_fact
     save_memory_fact(fact)
     console.print(f"[green]Remembered:[/] {fact}")
     # Show current memory size
@@ -1062,6 +1083,7 @@ def _cmd_cron(args: str) -> None:
 
     if sub == "list":
         from rich.table import Table
+
         from runtime.scheduler.jobs import list_jobs
 
         jobs = list_jobs()
@@ -1166,10 +1188,7 @@ def _cmd_model_router(args: str) -> None:
 
     from runtime.router.model_router import (
         MODEL_TIERS,
-        TaskTier,
-        classify_task,
         get_current_provider,
-        get_model_tier,
     )
 
     current = get_current_provider()
@@ -1351,6 +1370,7 @@ def _cmd_gateway(args: str) -> None:
     (env vars set). Start with: tagent gateway start or tagent serve.
     """
     import os as _os
+
     from rich.table import Table
 
     platforms = [
@@ -1385,8 +1405,9 @@ def _cmd_gateway(args: str) -> None:
 
 def _cmd_task(args: str) -> None:
     """Manage tasks: add, list, done, cancel. Usage: /task <action> [args]."""
-    from runtime.cli.tasks import add_task, list_tasks, update_task, delete_task, stats
     from rich.table import Table
+
+    from runtime.cli.tasks import add_task, delete_task, list_tasks, stats, update_task
 
     parts = args.strip().split(maxsplit=1)
     action = parts[0].lower() if parts else ""
@@ -1490,8 +1511,9 @@ def _cmd_insights(args: str) -> None:
     Usage: /insights [days] — default 30 days.
     Shows: session count, avg turns, top agents, daily activity chart.
     """
-    from runtime.cli.insights import collect_stats, compute_insights
     from rich.table import Table
+
+    from runtime.cli.insights import collect_stats, compute_insights
 
     days = 30
     try:
@@ -1540,8 +1562,9 @@ def _cmd_doctor(args: str) -> None:
     7 categories: Environment, Catalog, Config, Dependencies,
     LLM, Workspace, MCP. Use --agents to probe individual experts.
     """
-    from runtime.cli.doctor import run_doctor
     from rich.table import Table
+
+    from runtime.cli.doctor import run_doctor
 
     with console.status("[bold green]Running diagnostics...", spinner="dots"):
         results, ok_count, _ = run_doctor()
@@ -1604,6 +1627,7 @@ _BUILTIN_MAP = {
     "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
     "status": _cmd_status, "model": _cmd_model,
     "lang": _cmd_lang,
+    "update": _cmd_update,
     "personality": _cmd_personality,
     "tools": _cmd_tools,
     "cost": _cmd_cost, "usage": _cmd_cost,
@@ -1769,6 +1793,20 @@ def start() -> None:
 
     _print_banner()
     _check_first_run()
+
+    # Version check (non-blocking, 24h rate-limited by check_version.py)
+    try:
+        import subprocess, threading
+        def _check_version():
+            checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+            if checker.is_file():
+                r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
+                if r.stdout.strip():
+                    console.print(r.stdout.strip())
+        t = threading.Thread(target=_check_version, daemon=True)
+        t.start()
+    except Exception:
+        pass
 
     # Auto-learn user preferences (P3 #20)
     try:
