@@ -61,7 +61,12 @@ class LLMClient:
         except ImportError as e:
             raise LLMError("litellm not installed; pip install litellm") from e
 
-        model = PROVIDER_MODEL_MAP.get(provider, provider)
+        # Auto-route model based on task complexity (P2 #14)
+        try:
+            from runtime.router.model_router import select_model
+            model = select_model(user, provider)
+        except Exception:
+            model = PROVIDER_MODEL_MAP.get(provider, provider)
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": [
