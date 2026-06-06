@@ -65,13 +65,14 @@ export default function FeedbackPage() {
 
     // Submit to backend (IPC in Electron, HTTP fallback)
     const tagendAPI = (window as any).tagendAPI;
+    const body = `## ${type}: ${title}\n\n**Module**: ${module}\n**Email**: ${email || "N/A"}\n\n### Description\n${desc}`;
     if (tagendAPI?.sendFeedback) {
-      tagendAPI.sendFeedback({ runId: "", rating: 3, comment: desc }).catch(() => {});
+      tagendAPI.sendFeedback({ runId: "", rating: 3, comment: body }).catch(() => {});
     } else {
       fetch(`${API_BASE}/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, module, title, desc, email }),
+        body: JSON.stringify({ type, module, title, body }),
       }).catch(() => {});
     }
 
