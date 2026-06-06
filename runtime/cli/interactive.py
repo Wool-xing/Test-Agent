@@ -1466,6 +1466,15 @@ def start() -> None:
     except Exception:
         pass
 
+    # Load project context (CLAUDE.md / AGENTS.md auto-discovered)
+    try:
+        from runtime.cli.conversation import _discover_project_context
+        proj_ctx = _discover_project_context()
+        if proj_ctx:
+            console.print("[dim]📋 Project context loaded[/]")
+    except Exception:
+        pass
+
     # Start background scheduler for cron jobs
     try:
         from runtime.scheduler.scheduler import start_background
