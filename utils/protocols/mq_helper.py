@@ -79,7 +79,7 @@ class RabbitMQClient:
             import pika
         except ImportError:
             raise RuntimeError("pika 未安装")
-        u = url or os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
+        u = url or os.getenv("RABBITMQ_URL", "amqp://localhost:5672/")
         self.connection = pika.BlockingConnection(pika.URLParameters(u))
         self.channel = self.connection.channel()
 
