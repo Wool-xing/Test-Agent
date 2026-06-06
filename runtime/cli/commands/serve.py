@@ -34,7 +34,7 @@ def serve(host: str = "127.0.0.1", port: int = 8800) -> None:
     try:
         from runtime.scheduler.scheduler import start_background
         thread, sched_stop = start_background()
-        console.print(f"[dim]Scheduler started (tick=60s)[/]")
+        console.print("[dim]Scheduler started (tick=60s)[/]")
     except Exception:
         sched_stop = None
         console.print("[dim]Scheduler unavailable (croniter not installed)[/]")
