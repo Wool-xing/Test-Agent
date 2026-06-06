@@ -264,12 +264,47 @@ def send_dingtalk_report(summary: Dict, webhook: Optional[str] = None) -> bool:
 
 
 def send_all_notifications(summary: Dict):
-    """同时发送企业微信/飞书/钉钉（按 .env 配置自动跳过未配置项）"""
+    """同时发送企业微信/飞书/钉钉/Server酱（按 .env 配置自动跳过未配置项）"""
     return {
         "wechat": send_wechat_report(summary),
         "feishu": send_feishu_report(summary),
         "dingtalk": send_dingtalk_report(summary),
+        "serverchan": send_serverchan_report(summary),
     }
+
+
+def send_serverchan_report(summary: Dict, sendkey: Optional[str] = None) -> bool:
+    """Server酱(https://sct.ftqq.com/) 微信推送通知。
+    SendKey 从 .env SERVERCHAN_SENDKEY 读取。
+    """
+    sendkey = sendkey or os.getenv("SERVERCHAN_SENDKEY", "")
+    if not sendkey:
+        logger.warning("未配置 SERVERCHAN_SENDKEY，跳过 Server酱通知")
+        return False
+    try:
+        title = f"{summary.get('verdict','?')} {summary.get('project','')} {summary.get('pass_rate',0)*100:.0f}%"
+        desp = (
+            f"## {summary.get('project','')} 测试报告\n\n"
+            f"> 结论：**{summary.get('verdict','?')}**\n"
+            f"> 用例：{summary.get('total',0)} 通过 {summary.get('passed',0)}（{summary.get('pass_rate',0)*100:.1f}%）\n"
+            f"> Bug：P0({summary.get('p0_bugs',0)}) P1({summary.get('p1_bugs',0)})\n"
+            f"> 覆盖率：{summary.get('coverage',0)*100:.0f}%\n"
+        )
+        if summary.get('perf_tps'):
+            desp += f"> 性能：TPS={summary['perf_tps']} P95={summary.get('perf_p95','?')}ms\n"
+        if summary.get('report_url'):
+            desp += f"\n[查看完整报告]({summary['report_url']})"
+        r = requests.post(
+            f"https://sctapi.ftqq.com/{sendkey}.send",
+            data={"title": title, "desp": desp},
+            timeout=10,
+        )
+        ok = r.json().get("code") == 0
+        logger.info(f"Server酱通知: {'成功' if ok else '失败'}")
+        return ok
+    except Exception as e:
+        logger.error(f"Server酱通知失败: {e}")
+        return False
 
 
 # ===== PDF 报告（reportlab） =====
