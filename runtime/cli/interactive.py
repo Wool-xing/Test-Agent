@@ -1308,6 +1308,31 @@ def _cmd_gateway(args: str) -> None:
     console.print(f"\n[dim]{active}/9 configured. Start with [cyan]tagent serve[/] (daemon) or [cyan]tagent gateway[/] (messaging only).[/]")
 
 
+# ── /doctor — comprehensive environment health check ────────────────
+
+
+def _cmd_doctor(args: str) -> None:
+    """Run comprehensive diagnostics."""
+    from runtime.cli.doctor import run_doctor
+    from rich.table import Table
+
+    with console.status("[bold green]Running diagnostics...", spinner="dots"):
+        results, ok_count, _ = run_doctor()
+
+    table = Table(title="Doctor · Health Check", show_header=True)
+    table.add_column("Section")
+    table.add_column("Status")
+
+    for section in results:
+        for check in section["checks"]:
+            icon = "[green]✓[/]" if check["ok"] else "[red]✗[/]"
+            label = f"{icon} {check['label']}"
+            table.add_row(label, check.get("detail", ""))
+
+    console.print(table)
+    console.print(f"\n[bold]{ok_count} checks passed[/]   [dim]Run /help for next steps.[/]")
+
+
 # ── /nudge — suggest facts worth remembering ───────────────────────
 
 
@@ -1367,6 +1392,7 @@ _BUILTIN_MAP = {
     "speak": _cmd_speak,
     "plugins": _cmd_plugins_list,
     "distill": _cmd_distill,
+    "doctor": _cmd_doctor,
     "gateway": _cmd_gateway,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
