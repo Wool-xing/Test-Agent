@@ -27,6 +27,7 @@ on:
         options: [ci_quick, full]
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   PYTHON_VERSION: '3.11'
   JMETER_VERSION: '5.6.3'
   TEST_ENV: ${{ github.event.inputs.environment || 'test' }}
