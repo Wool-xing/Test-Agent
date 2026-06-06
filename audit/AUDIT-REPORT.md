@@ -831,3 +831,15 @@ Python 3.11+ · TypeScript · Electron · FastAPI · Prefect · LiteLLM · SQLAl
 
 ### 全部模块审计覆盖
 ✅ runtime/ (14子模块) ✅ utils/trackers/ ✅ utils/a11y_i18n/ ✅ utils/security/ ✅ utils/testing/ ✅ utils/data/ ✅ utils/performance/ ✅ utils/platforms/ ✅ utils/reporting/ ✅ utils/protocols/ ✅ utils/design/
+
+## 审计纠正
+
+以下原始发现经过代码复查确认为误报或已妥善处理：
+
+| 原发现 | 纠正 |
+|--------|------|
+| local.py: create_subprocess_shell命令注入 | ✅ 已用shlex.split+create_subprocess_exec,安全 |
+| user_model.py: 路径遍历 | ✅ _path()已过滤user_id为alphanumeric+`-_.` |
+| ai_adversarial.py: 缺授权控制 | ✅ TAGENT_PENTEST_AUTHORIZED gate已实现 |
+
+**修正后剩余待修复: 4 MEDIUM + 8 LOW = 12项**
