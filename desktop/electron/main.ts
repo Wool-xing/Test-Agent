@@ -117,7 +117,7 @@ function createWindow(): void {
     minHeight: 600,
     title: "Test-Agent",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload_extended.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
