@@ -751,3 +751,83 @@ Python 3.11+ · TypeScript · Electron · FastAPI · Prefect · LiteLLM · SQLAl
 | utils/trackers/ | ✅ 已完成 |
 | utils/a11y_i18n/ | ✅ 已完成 |
 
+
+---
+
+## utils/ 模块审计
+
+### utils/security/
+| 文件 | 发现 |
+|------|------|
+| ai_adversarial.py | ✅ 安全gate设计良好(TAGENT_PENTEST_AUTHORIZED) |
+| api_security_scanner_v2.py | [MEDIUM] 攻击工具缺独立授权变量 |
+| security_scanner.py | [MEDIUM] burp_active_scan轮询间隔30s硬编码 |
+
+### utils/testing/
+| 文件 | 发现 |
+|------|------|
+| mutation_runner.py | 77行, 简洁设计 |
+| property_tester.py | 332行, Hypothesis集成良好 |
+| state_machine_tester_v2.py | ✅ eval/exec注入已修复(#213) |
+| bdd_runner.py | [LOW] BDD step定义无参数类型验证 |
+| soak_runner.py | [MEDIUM] SOAK_HOURS=24硬编码 |
+| contract_test.py | [LOW] contract schema无版本管理 |
+
+### utils/data/
+| 文件 | 发现 |
+|------|------|
+| data_factory.py | ✅ 设计良好, 预设LOGIN_TEST_DATA合理 |
+| data_masking.py | ✅ 4类PII脱敏(phone/email/id_card/bank_card) |
+| data_factory_v2.py | ✅ defaultdict导入已修复(#213) |
+| db_test_helper.py | ✅ SQL注入防护已修复(#213) |
+| data_synthesizer.py | [LOW] 合成数据无多样性指标 |
+
+### utils/performance/
+| 文件 | 发现 |
+|------|------|
+| chaos_helper.py | [MEDIUM] clock_drift需TAGENT_ALLOW_CLOCK_DRIFT门控(已实现) |
+| jmeter_result_parser.py | [MEDIUM] DEFAULT_GATES双模式,阈值硬编码 |
+| slo_validator.py | ✅ SLO/SLI/错误预算概念完整 |
+| web_vitals_collector.py | [LOW] Lighthouse二进制路径硬编码 |
+| jmeter_csv_exporter.py | [LOW] CSV列名硬编码,无schema定义 |
+
+### utils/platforms/
+| 文件 | 发现 |
+|------|------|
+| desktop_driver.py | ✅ AppleScript注入已修复(#213) |
+| network_throttle.py | [MEDIUM] tc_apply需要sudo,无权限检查 |
+| mobile_driver.py | [LOW] adb命令路径硬编码 |
+| miniprogram_runner.py | [LOW] 微信开发者工具CLI路径硬编码 |
+| iot_helper.py | ✅ SSH host key RejectPolicy正确 |
+
+### utils/reporting/
+| 文件 | 发现 |
+|------|------|
+| generate_report.py | ✅ Server酱集成(#223), 通知系统完整 |
+| excel_generator.py | [LOW] 示例数据含testuser/Test@123456(#213) |
+| evidence_chain.py | ✅ 导入路径已修复(#213) |
+| dora_metrics.py | [LOW] DORA指标无趋势对比 |
+
+### utils/protocols/
+| 文件 | 发现 |
+|------|------|
+| protocol_helper.py | ✅ SOAP注入已修复(#213) |
+| mq_helper.py | ✅ guest:guest凭据已移除(#217) |
+| api_retry_util.py | ✅ 指数退避设计良好 |
+| websocket_helper.py | [LOW] WS重连无最大次数限制 |
+| visual_helper.py | [LOW] SSIM阈值硬编码0.95 |
+
+---
+
+## 审计最终汇总
+
+| 级别 | 总计 | 已修复 | 待修复 |
+|------|------|--------|--------|
+| CRITICAL | 8 | 8 | 0 |
+| HIGH | 9 | 9 | 0 |
+| MEDIUM | 22 | 17 | 5 |
+| LOW | 15 | 4 | 11 |
+| **合计** | **54** | **38** | **16** |
+
+### 全部模块审计覆盖
+✅ runtime/ (14子模块) ✅ utils/trackers/ ✅ utils/a11y_i18n/ ✅ utils/security/ ✅ utils/testing/ ✅ utils/data/ ✅ utils/performance/ ✅ utils/platforms/ ✅ utils/reporting/ ✅ utils/protocols/ ✅ utils/design/
