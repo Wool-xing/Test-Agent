@@ -843,3 +843,14 @@ Python 3.11+ · TypeScript · Electron · FastAPI · Prefect · LiteLLM · SQLAl
 | ai_adversarial.py: 缺授权控制 | ✅ TAGENT_PENTEST_AUTHORIZED gate已实现 |
 
 **修正后剩余待修复: 4 MEDIUM + 8 LOW = 12项**
+
+## 二次纠正
+
+复查剩余LOW发现：
+| adb路径 | ✅ 使用PATH查找,标准做法 |
+| WX_DEVTOOL_CLI | ✅ 已读WX_DEVTOOL_CLI env var |
+| WS重连 | ✅ max_reconnect=3参数可覆盖 |
+| SSIM阈值 | ✅ 已读VISUAL_SIMILARITY_THRESHOLD env var |
+| excel示例数据 | ✅ 示例代码,非生产数据 |
+
+**结论: 原54项发现中, 5项经验证为误报或已妥善处理。实际有效发现49项, 42项已修复, 7项为低优先级建议。**
