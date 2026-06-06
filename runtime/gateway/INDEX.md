@@ -6,16 +6,19 @@
 
 | 平台 | 文件 | 触发 |
 |------|------|------|
-| Telegram | `platforms/telegram.py` | Bot API |
-| Discord | `platforms/discord.py` | Bot API |
-| Slack | `platforms/slack.py` | Webhook/Bot |
-| 微信 | `platforms/wechat.py` | Webhook |
-| 飞书 | `platforms/feishu.py` | Webhook+Bot |
-| 钉钉 | `platforms/dingtalk.py` | Webhook |
-| Email | `platforms/email.py` | SMTP+IMAP |
-| 通用 Webhook | `platforms/webhook.py` | HTTP POST |
+| Telegram | `platforms/telegram.py` | Bot API ↔ |
+| Discord | `platforms/discord.py` | Bot API ↔ |
+| Slack | `platforms/slack.py` | Webhook → |
+| 微信 | `platforms/wechat.py` | Webhook→ + API ↔ |
+| 飞书 | `platforms/feishu.py` | Webhook+Bot ↔ |
+| 钉钉 | `platforms/dingtalk.py` | Webhook→ + API ↔ |
+| QQ Bot | `platforms/qqbot.py` | Bot API ↔ |
+| Email | `platforms/email.py` | SMTP → |
+| 通用 Webhook | `platforms/webhook.py` | HTTP POST → |
 
-未来扩(留扩展位):企微 / WhatsApp / Signal / SMS / QQ / iMessage(bluebubbles)/ Matrix / Mattermost / HomeAssistant / Yuanbao / 元宝
+> ↔ = 双向(收发) · → = 单向(仅发) · 收消息走 `runtime/api/endpoints/webhooks.py`
+
+未来扩(留扩展位):WhatsApp / Signal / SMS / iMessage(bluebubbles)/ Matrix / Mattermost / HomeAssistant / Yuanbao / 元宝
 
 ## 桥接层 (P2 #10)
 
@@ -23,7 +26,7 @@
 |------|------|------|
 | IM→Agent 桥 | `bridge.py` | 入站消息 → Kernel 路由 → 格式化 → 平台回复 |
 
-Webhook 端点: `runtime/api/endpoints/webhooks.py` (Telegram / Discord / 飞书)
+Webhook 端点: `runtime/api/endpoints/webhooks.py` (Telegram / Discord / 飞书 / 企微 / 钉钉 / QQ Bot)
 
 ## 规则
 

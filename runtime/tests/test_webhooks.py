@@ -264,3 +264,392 @@ class TestBridgeFormatting:
         summary = {"total": 0, "succeeded": 0, "failed": 0, "results": {}}
         text = _format_dag_summary(summary)
         assert "0/0 ok" in text
+
+
+# ── WeChat Work crypto ────────────────────────────────────────────────
+
+
+class TestWeChatCrypto:
+    """Test WeChat Work AES decryption, signature verification, XML parsing."""
+
+    def test_signature_verification(self):
+        from runtime.api.endpoints.webhooks import _wechat_verify_signature
+
+        token = "test_token"
+        ts = "1234567890"
+        nonce = "test_nonce"
+        encrypt = "encrypted_msg_content"
+        # SHA1(sort(token, ts, nonce, encrypt))
+        import hashlib
+        expected = hashlib.sha1(
+            "".join(sorted([token, ts, nonce, encrypt])).encode()
+        ).hexdigest()
+        assert _wechat_verify_signature(token, ts, nonce, encrypt, expected) is True
+
+    def test_signature_mismatch(self):
+        from runtime.api.endpoints.webhooks import _wechat_verify_signature
+        assert _wechat_verify_signature("a", "1", "2", "3", "bad_signature") is False
+
+    def test_decrypt_roundtrip(self):
+        """Encrypt a known message, then decrypt it — verify roundtrip."""
+        from runtime.api.endpoints.webhooks import _wechat_decrypt
+        import base64, os, struct
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+        aes_key = os.urandom(32)
+        # EncodingAESKey is 43-char base64 of aes_key
+        encoding_aes_key = base64.b64encode(aes_key).decode()[:43]
+
+        plain_xml = "<xml><ToUserName><![CDATA[corp123]]></ToUserName><FromUserName><![CDATA[user456]]></FromUserName><CreateTime>1234567890</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[hello test]]></Content><MsgId>1</MsgId><AgentID>1000002</AgentID></xml>"
+        plain_bytes = plain_xml.encode("utf-8")
+
+        # Build buffer: random(16) + msg_len(4 big-endian) + msg + corpid
+        random_bytes = os.urandom(16)
+        msg_len = struct.pack(">I", len(plain_bytes))
+        buffer = random_bytes + msg_len + plain_bytes + b"corp123"
+
+        # PKCS#7 padding
+        block_size = 32
+        pad = block_size - len(buffer) % block_size
+        buffer += bytes([pad]) * pad
+
+        # AES-256-CBC encrypt
+        iv = aes_key[:16]
+        cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv))
+        encryptor = cipher.encryptor()
+        encrypted = encryptor.update(buffer) + encryptor.finalize()
+        encrypted_b64 = base64.b64encode(encrypted).decode()
+
+        # Decrypt
+        result = _wechat_decrypt(encrypted_b64, encoding_aes_key)
+        assert result == plain_xml
+
+    def test_parse_wechat_xml_text(self):
+        from runtime.api.endpoints.webhooks import _parse_wechat_xml
+
+        xml = """<xml>
+<ToUserName><![CDATA[corp123]]></ToUserName>
+<FromUserName><![CDATA[zhangsan]]></FromUserName>
+<CreateTime>1234567890</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[run smoke test]]></Content>
+<MsgId>100</MsgId>
+<AgentID>1000002</AgentID>
+</xml>"""
+        parsed = _parse_wechat_xml(xml)
+        assert parsed["from_user"] == "zhangsan"
+        assert parsed["msg_type"] == "text"
+        assert parsed["content"] == "run smoke test"
+        assert parsed["agent_id"] == "1000002"
+
+
+# ── DingTalk ──────────────────────────────────────────────────────────
+
+
+class TestDingTalkCrypto:
+    """Test DingTalk HMAC-SHA256 signature verification."""
+
+    def test_valid_signature(self):
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
+        import base64, hmac, hashlib, os
+
+        secret = "test_app_secret_123"
+        os.environ["DINGTALK_APP_SECRET"] = secret
+        ts = "1680000000000"
+        message = ts + "\n" + secret
+        expected = base64.b64encode(
+            hmac.new(secret.encode(), message.encode(), hashlib.sha256).digest()
+        ).decode()
+        try:
+            assert _verify_dingtalk_signature(ts, expected) is True
+        finally:
+            os.environ.pop("DINGTALK_APP_SECRET", None)
+
+    def test_invalid_signature(self):
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
+        import os
+
+        os.environ["DINGTALK_APP_SECRET"] = "secret"
+        try:
+            assert _verify_dingtalk_signature("123", "wrong_signature") is False
+        finally:
+            os.environ.pop("DINGTALK_APP_SECRET", None)
+
+    def test_no_secret_allows_dev(self):
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
+        import os
+
+        old = os.environ.pop("DINGTALK_APP_SECRET", None)
+        try:
+            assert _verify_dingtalk_signature("123", "any") is True
+        finally:
+            if old:
+                os.environ["DINGTALK_APP_SECRET"] = old
+
+
+# ── QQ Bot ────────────────────────────────────────────────────────────
+
+
+class TestQQBotCrypto:
+    """Test QQ Bot Ed25519 signature verification."""
+
+    def test_no_public_key_allows_in_dev(self):
+        from runtime.api.endpoints.webhooks import _verify_qqbot_signature
+        import os
+
+        old = os.environ.pop("QQBOT_PUBLIC_KEY", None)
+        try:
+            assert _verify_qqbot_signature(b"{}", "bad_sig", "123") is True
+        finally:
+            if old:
+                os.environ["QQBOT_PUBLIC_KEY"] = old
+
+    def test_invalid_signature_rejected(self):
+        from runtime.api.endpoints.webhooks import _verify_qqbot_signature
+        import os
+
+        test_pubkey = "00" * 32  # 32 bytes hex
+        os.environ["QQBOT_PUBLIC_KEY"] = test_pubkey
+        try:
+            result = _verify_qqbot_signature(b'{"op":0}', "00" * 64, "1234567890")
+            assert result is False
+        finally:
+            os.environ.pop("QQBOT_PUBLIC_KEY", None)
+
+
+# ── Payload extraction (new platforms) ────────────────────────────────
+
+
+class TestPayloadExtractionNew:
+    """Test _extract_text_from_payload for 钉钉 and QQ Bot."""
+
+    def test_dingtalk_text(self):
+        from runtime.api.endpoints.webhooks import _extract_text_from_payload
+
+        payload = {
+            "msg": {"text": {"content": "run regression test"}},
+            "senderId": "user001",
+        }
+        assert _extract_text_from_payload("dingtalk", payload) == "run regression test"
+
+    def test_dingtalk_empty(self):
+        from runtime.api.endpoints.webhooks import _extract_text_from_payload
+
+        payload = {"msg": {}, "senderId": "user001"}
+        assert _extract_text_from_payload("dingtalk", payload) is None
+
+    def test_qqbot_c2c_text(self):
+        from runtime.api.endpoints.webhooks import _extract_text_from_payload
+
+        payload = {
+            "op": 0,
+            "t": "C2C_MESSAGE_CREATE",
+            "d": {
+                "content": "test the login flow",
+                "author": {"id": "openid_abc"},
+            },
+        }
+        assert _extract_text_from_payload("qqbot", payload) == "test the login flow"
+
+    def test_qqbot_no_content(self):
+        from runtime.api.endpoints.webhooks import _extract_text_from_payload
+
+        payload = {"op": 0, "t": "MESSAGE_CREATE", "d": {}}
+        assert _extract_text_from_payload("qqbot", payload) is None
+
+    def test_qqbot_attachment_content(self):
+        from runtime.api.endpoints.webhooks import _extract_text_from_payload
+
+        payload = {
+            "op": 0,
+            "t": "AT_MESSAGE_CREATE",
+            "d": {
+                "content": "",
+                "attachments": [{"content": "check the API"}],
+            },
+        }
+        assert _extract_text_from_payload("qqbot", payload) == "check the API"
+
+
+# ── Webhook endpoint integration tests ────────────────────────────────
+
+
+class TestWeChatWebhook:
+    """Test 企微 webhook endpoint — GET/POST contract."""
+
+    def test_get_missing_params_400(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.get("/webhooks/wechat")
+        assert resp.status_code == 400
+
+    def test_post_missing_config_400(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post("/webhooks/wechat", content="<xml></xml>")
+        assert resp.status_code == 400
+
+    def test_get_valid_echostr_returns_plaintext(self):
+        """Full URL verification flow with known keys."""
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+        import base64, hashlib, os, struct
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+        # Setup test keys
+        token = "test_wx_token"
+        aes_key = os.urandom(32)
+        encoding_aes_key = base64.b64encode(aes_key).decode()[:43]
+        echostr_plain = "verify_ok_123"
+
+        # Encrypt echostr same way WeChat does
+        random_bytes = os.urandom(16)
+        msg_bytes = echostr_plain.encode("utf-8")
+        msg_len = struct.pack(">I", len(msg_bytes))
+        buffer = random_bytes + msg_len + msg_bytes + b"test_corp_id"
+
+        # AES block size = 16 (not 32)
+        block_size = 16
+        pad = block_size - len(buffer) % block_size
+        buffer += bytes([pad]) * pad
+
+        iv = aes_key[:16]
+        cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv))
+        encryptor = cipher.encryptor()
+        encrypted = base64.b64encode(encryptor.update(buffer) + encryptor.finalize()).decode()
+
+        ts = "1680000000"
+        nonce = "test_nonce"
+        # Use the original encrypted string for signature (before URL encoding)
+        sig = hashlib.sha1(
+            "".join(sorted([token, ts, nonce, encrypted])).encode()
+        ).hexdigest()
+
+        os.environ["WECHAT_TOKEN"] = token
+        os.environ["WECHAT_ENCODING_AES_KEY"] = encoding_aes_key
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            # Use params= dict so httpx properly URL-encodes base64 chars (+ / =)
+            resp = client.get("/webhooks/wechat", params={
+                "msg_signature": sig,
+                "timestamp": ts,
+                "nonce": nonce,
+                "echostr": encrypted,
+            })
+            assert resp.status_code == 200
+            assert resp.text == echostr_plain
+        finally:
+            os.environ.pop("WECHAT_TOKEN", None)
+            os.environ.pop("WECHAT_ENCODING_AES_KEY", None)
+
+
+class TestDingTalkWebhook:
+    """Test 钉钉 webhook endpoint."""
+
+    def test_no_text_returns_ignored(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post("/webhooks/dingtalk", json={"msg": {}})
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "ignored"
+
+    def test_text_accepted(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post(
+            "/webhooks/dingtalk",
+            json={
+                "msg": {"text": {"content": "run smoke test"}},
+                "senderId": "user001",
+            },
+        )
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "accepted"
+
+
+class TestQQBotWebhook:
+    """Test QQ Bot webhook endpoint."""
+
+    def test_heartbeat_ack(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post("/webhooks/qqbot", json={"op": 10})
+        assert resp.status_code == 200
+        assert resp.json()["op"] == 11
+
+    def test_hello_ack(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post("/webhooks/qqbot", json={"op": 1})
+        assert resp.status_code == 200
+        assert resp.json()["op"] == 1
+
+    def test_non_message_event_ignored(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post(
+            "/webhooks/qqbot",
+            json={"op": 0, "t": "GUILD_CREATE", "d": {}},
+        )
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "ignored"
+
+    def test_c2c_message_accepted(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from runtime.api.endpoints.webhooks import router
+
+        app = FastAPI()
+        app.include_router(router)
+        client = TestClient(app)
+        resp = client.post(
+            "/webhooks/qqbot",
+            json={
+                "op": 0,
+                "t": "C2C_MESSAGE_CREATE",
+                "d": {
+                    "content": "test login",
+                    "author": {"id": "openid_abc"},
+                },
+            },
+        )
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "accepted"
