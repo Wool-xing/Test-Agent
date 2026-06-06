@@ -39,6 +39,22 @@
 - skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
 - runtime/orchestrator/skills/__init__.py: 聚合 import 新增 agent_introspection_debugging + build_your_own_x_explorer
 
+- **P2 能力层 — Agent 交互层 6 项全部实装:**
+  - IM 多渠道接入（P2 #10）：Telegram / Discord / 飞书 webhook 入站端点 (`runtime/api/endpoints/webhooks.py`) + IM→Agent 桥接 (`runtime/gateway/bridge.py`) + 跨消息对话记忆
+  - Sub-agent 对话触发（P2 #11）：意图检测 (`runtime/router/intent.py`) — @agent / 用 agent / use agent 快速路径，跳过 LLM 路由直接调用
+  - MCP client 完善（P2 #12）：`runtime/mcp/client.py` — stdio 连接 7 个 MCP 服务器，工具发现 + 调用；`/mcp` + `/mcp-call` REPL 命令
+  - 定时主动任务（P2 #13）：scheduler delivery 推送集成 + `/cron` 管理命令 + `/cron-health` 内置自检 + REPL 启动自动后台 daemon
+  - 模型自动路由（P2 #14）：`runtime/router/model_router.py` — LIGHT/HEAVY 任务分级 + 6 provider 双 tier + 中转站支持（TAGENT_LLM_API_BASE）
+  - 多行输入（P2 #15）：代码块自动续行 + 粘贴检测 + `/ml` 命令 + Alt+Enter 换行
+
+### Fixed
+- 6 个 gateway platform 适配器 (discord/feishu/slack/wechat/dingtalk/webhook): `target` 非 URL 时 httpx 崩溃 → URL 前缀校验优雅降级
+- `completer.py` `except Exception` 静默吞噬 → `logger.warning(exc_info=True)`
+- `completer.py` + `interactive.py` `_PROVIDERS` 重复定义 → 统一从 completer 导入
+- `_BUILTINS` 补全 `session` / `exit` / `usage` 别名
+- `direct.py` `on_progress` 回调 3 处重复 → 提取 `_notify()` helper
+- `_BUILTIN_MAP` 测试断言同步新增命令键
+
 _后续累积变更入此节;切版本时移到下方版本节。_
 
 ---

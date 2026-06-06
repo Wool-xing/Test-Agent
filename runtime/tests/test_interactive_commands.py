@@ -120,7 +120,9 @@ class TestSlashDispatch:
         from runtime.cli.interactive import _BUILTIN_MAP
         expected = {"help", "h", "?", "quit", "q", "exit", "status",
                      "model", "tools", "cost", "usage", "sessions",
-                     "export", "compact", "context", "clear", "session"}
+                     "export", "compact", "context", "clear", "session",
+                     "remember", "forget", "memory",
+                     "mcp", "mcp-call", "cron", "cron-health", "model-router"}
         for key in expected:
             assert key in _BUILTIN_MAP, f"Missing builtin: {key}"
 

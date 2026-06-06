@@ -20,9 +20,11 @@ class DiscordPlatform(Platform):
             import httpx
         except ImportError:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="httpx missing")
-        url = target or self.webhook
+        # Only use target if it looks like a URL (Discord webhook URL override)
+        url = target if target and target.startswith("https://") else None
         if not url:
-            await self.configure()
+            if not self.webhook:
+                await self.configure()
             url = self.webhook
         if not url:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="DISCORD_WEBHOOK_URL not set")

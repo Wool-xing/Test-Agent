@@ -17,9 +17,17 @@
 
 未来扩(留扩展位):企微 / WhatsApp / Signal / SMS / QQ / iMessage(bluebubbles)/ Matrix / Mattermost / HomeAssistant / Yuanbao / 元宝
 
+## 桥接层 (P2 #10)
+
+| 模块 | 文件 | 用途 |
+|------|------|------|
+| IM→Agent 桥 | `bridge.py` | 入站消息 → Kernel 路由 → 格式化 → 平台回复 |
+
+Webhook 端点: `runtime/api/endpoints/webhooks.py` (Telegram / Discord / 飞书)
+
 ## 规则
 
 - **单 session 跨平台**:用户在 Telegram 开话题,Slack 续话不丢上下文
-- **统一 base 抽象**:`Platform` 接口,所有平台实现 `send/recv/configure`
+- **统一 base 抽象**:`Platform` 接口,所有平台实现 `send` / `configure`
 - **运行时 prompt 注入扫**(继承 scheduler 同模块)
 - **delivery 走 scheduler**:cron 任务输出 → 推送对应平台

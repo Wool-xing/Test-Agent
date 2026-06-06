@@ -22,9 +22,10 @@ class WebhookPlatform(Platform):
             import httpx
         except ImportError:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="httpx missing")
-        url = target or self.url
+        url = target if target and target.startswith("https://") else None
         if not url:
-            await self.configure()
+            if not self.url:
+                await self.configure()
             url = self.url
         if not url:
             return DeliveryResult(ok=False, platform=self.name, msg_id=None, error="no url")

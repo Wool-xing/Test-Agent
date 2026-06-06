@@ -1,46 +1,40 @@
 {
-  "_comment": "MCP 服务配置。V1.2.0 起 M2 实现 6 件套(主宪章 §16)。filesystem 始终启用。其他 6 件 server 注释段保留,需启用时取消注释。",
+  "_comment": "MCP 服务配置 — V1.2.0 6 件套 (主宪章 §16)。P2 #12 MCP client 完善后全部启用。",
   "mcpServers": {
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "${PROJECT_ROOT:-./workspace}"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${PROJECT_ROOT:-./workspace}"],
       "description": "文件系统访问 - 读写 workspace 目录中的测试文件"
     },
     "test-orchestrator": {
       "command": "python",
       "args": ["-m", "runtime.mcp.test_orchestrator.server"],
-      "description": "主调度 - 包装 runtime/router + orchestrator,工具:catalog/plan/run/status/report"
-    }
-  },
-  "_pending_servers_v1_2_0_alpha": {
+      "description": "主调度 - 包装 runtime/router + orchestrator, 5 工具: catalog/plan/run/status/report"
+    },
     "protocol-adapter": {
       "command": "python",
       "args": ["-m", "runtime.mcp.protocol_adapter.server"],
-      "description": "协议层统一抽象 - HTTP/gRPC/WS/MQTT/Kafka 5 协议起步(M2-2 待实现)"
+      "description": "协议层统一抽象 - HTTP/gRPC/WS/MQTT/Kafka 5 协议"
     },
     "evidence-vault": {
       "command": "python",
       "args": ["-m", "runtime.mcp.evidence_vault.server"],
-      "description": "证据/录屏/日志归档 - MinIO+Postgres(M2-3 待实现)"
+      "description": "证据/录屏/日志归档 - MinIO+Postgres"
     },
     "defect-tracker": {
       "command": "python",
       "args": ["-m", "runtime.mcp.defect_tracker.server"],
-      "description": "工单桥 - 5 adapter zentao/jira/github/linear/webhook(M2-4 待实现)"
+      "description": "工单桥 - 5 adapter zentao/jira/github/linear/webhook"
     },
     "knowledge-base": {
       "command": "python",
       "args": ["-m", "runtime.mcp.knowledge_base.server"],
-      "description": "历史用例+缺陷向量检索 - pgvector(M2-5 待实现)"
+      "description": "历史用例+缺陷向量检索 - pgvector+LiteLLM"
     },
     "compliance-checker": {
       "command": "python",
       "args": ["-m", "runtime.mcp.compliance_checker.server"],
-      "description": "行业合规规则库 - SOC2/PCI/HIPAA/IEC 62304 等(M2-6 待实现)"
+      "description": "行业合规规则库 - SOC2/PCI/HIPAA/IEC 62304 等"
     }
   }
 }

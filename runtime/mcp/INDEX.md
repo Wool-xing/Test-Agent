@@ -42,3 +42,10 @@ python -m runtime.mcp.test_orchestrator.server --http 8801  # http mode
 - `make_server(name, version)`:统一 Server 实例化
 - `tool_decision_logged(name)`:工具装饰器,自动落 `decisions/{date}_mcp_{tool}.json`(宪章 §18-12)
 - `with_run_id(handler)`:run_id 全链路注入(§21 横切可复现性)
+
+## MCP 客户端 (P2 #12)
+
+`client.py` 提供:
+- `McpClient`: 连接本地 MCP 服务器(stdio), 发现工具, 调用工具
+- `get_client()`: 单例全局实例
+- 自动读取 `config/.mcp.json` 获取服务器配置

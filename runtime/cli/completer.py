@@ -6,15 +6,20 @@ and context-aware completion for /model provider names.
 
 from __future__ import annotations
 
+import logging
+
 from prompt_toolkit.completion import Completer, Completion, PathCompleter
 from prompt_toolkit.document import Document
 
 from runtime.cli.slash_commands import COMMAND_REGISTRY
 
+logger = logging.getLogger(__name__)
+
 # Built-in REPL commands not in the global registry
 _BUILTINS = [
     ("help", "Show help"),
     ("status", "Session stats + model info"),
+    ("session", "Alias for /status"),
     ("model", "Switch LLM provider"),
     ("tools", "List agents + skills"),
     ("memory", "Show MEMORY.md contents"),
@@ -27,6 +32,19 @@ _BUILTINS = [
     ("clear", "Reset conversation memory"),
     ("compact", "Summarize and compress context"),
     ("quit", "Save and exit"),
+    ("exit", "Alias for /quit"),
+    ("usage", "Alias for /cost"),
+    ("mcp", "List MCP tools across all servers"),
+    ("mcp-call", "Call an MCP tool"),
+    ("cron", "Manage scheduled tasks"),
+    ("cron-health", "Schedule hourly health check"),
+    ("model-router", "Show model auto-routing config"),
+    ("ml", "Enter multi-line input mode"),
+    ("multiline", "Enter multi-line input mode"),
+    ("search", "Full-text search conversation history"),
+    ("skill-score", "Score skills based on execution history"),
+    ("speak", "Read test results aloud"),
+    ("plugins", "List loaded plugins"),
 ]
 
 _PROVIDERS = ["claude", "openai", "gemini", "deepseek", "qwen", "ollama"]
@@ -51,6 +69,7 @@ class SlashCompleter(Completer):
                     names.append((e.name, f"{kind} {e.description[:50]}"))
                 self._catalog_names = names
             except Exception:
+                logger.warning("Failed to load catalog names for completer", exc_info=True)
                 self._catalog_names = []
         return self._catalog_names
 

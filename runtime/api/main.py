@@ -18,6 +18,7 @@ from runtime.api.correlation import CorrelationMiddleware
 from runtime.api.deps import Kernel
 from runtime.api.endpoints.cancel import router as cancel_router
 from runtime.api.endpoints.stream import router as stream_router
+from runtime.api.endpoints.webhooks import router as webhooks_router
 from runtime.api.models import CatalogResponse, RunCreated, RunCreateText
 from runtime.api.models import RunStatus as RunStatusModel
 from runtime.api.parsers import parse_path, parse_text, parse_url
@@ -44,6 +45,7 @@ if _metrics_router is not None:
     app.include_router(_metrics_router)
 app.include_router(cancel_router)
 app.include_router(stream_router)
+app.include_router(webhooks_router)
 
 # Bearer token auth middleware — enforced only when TAGENT_API_AUTH_TOKEN is set
 @app.middleware("http")

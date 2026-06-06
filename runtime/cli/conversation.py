@@ -163,8 +163,15 @@ class ConversationMemory:
         self._messages.clear()
 
     def dump(self, path: Path) -> None:
-        """Persist to JSON file."""
+        """Persist to JSON file. Also indexes in FTS5 for full-text search."""
         path.parent.mkdir(parents=True, exist_ok=True)
+        # Index messages for full-text search (P3 #16)
+        try:
+            from runtime.cli.search import index_message
+            for m in self._messages:
+                index_message(self.session_id, m.role, m.content, str(m.ts))
+        except Exception:
+            pass  # search indexing is best-effort
         data = {
             "session_id": self.session_id,
             "max_turns": self.max_turns,
@@ -203,11 +210,44 @@ class ConversationMemory:
             return cls()
 
     def _truncate(self) -> None:
-        """Enforce max_turns and max_chars."""
-        while len(self._messages) > self.max_turns:
-            self._messages.pop(0)
-        while self._total_chars() > self.max_chars and len(self._messages) > 1:
-            self._messages.pop(0)
+        """Enforce max_turns and max_chars. Auto-compacts before dropping."""
+        # Auto-compact turn budget overflow
+        overflow = len(self._messages) - self.max_turns
+        if overflow > 0:
+            self._auto_compact(overflow)
+
+        # Compact char budget overflow (with safety limit to prevent infinite loop)
+        for _ in range(10):  # max 10 iterations
+            if self._total_chars() <= self.max_chars or len(self._messages) <= 1:
+                break
+            # Pop oldest messages until under budget
+            dropped: list[Message] = []
+            while self._total_chars() > self.max_chars and len(self._messages) > 1:
+                dropped.append(self._messages.pop(0))
+            # Insert summary (capped to avoid re-exceeding budget)
+            if dropped:
+                summary = self._build_summary(dropped)[:500]
+                self._messages.insert(0, Message(role="assistant", content=summary))
+
+    def _auto_compact(self, overflow: int) -> None:
+        """Compress oldest turns to stay within max_turns budget."""
+        if overflow <= 0 or not self._messages:
+            return
+        count = min(overflow, len(self._messages))
+        dropped = [self._messages.pop(0) for _ in range(count)]
+        if dropped:
+            summary = self._build_summary(dropped)[:500]
+            self._messages.insert(0, Message(role="assistant", content=summary))
+
+    @staticmethod
+    def _build_summary(messages: list[Message]) -> str:
+        """Build a concise summary of dropped conversation turns."""
+        parts: list[str] = []
+        for m in messages[:20]:
+            role = "Q" if m.role == "user" else "A"
+            text = m.content[:80] + "..." if len(m.content) > 80 else m.content
+            parts.append(f"[{role}] {text}")
+        return f"[Compacted {len(messages)} turns]\n" + "\n".join(parts[:15])
 
     def _total_chars(self) -> int:
         return sum(len(m.content) for m in self._messages)

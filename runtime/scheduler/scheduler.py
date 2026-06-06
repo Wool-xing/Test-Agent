@@ -61,6 +61,43 @@ def _release_lock(f) -> None:
             f.close()
 
 
+def _deliver_results(job: dict, result: dict) -> None:
+    """Push job results to configured gateway platforms (async)."""
+    delivery = job.get("delivery") or []
+    if not delivery:
+        return
+
+    import asyncio
+
+    async def _send():
+        from runtime.gateway.base import Message, get_platform
+
+        ok_str = "✅ OK" if result.get("ok") else "❌ Failed"
+        text = (
+            f"⏰ Scheduled task: {job.get('prompt', '')[:80]}\n"
+            f"{ok_str}\n"
+            f"Job: {job['id']}"
+        )
+        if result.get("output_path"):
+            text += f"\nOutput: {result['output_path']}"
+
+        for platform_name in delivery:
+            try:
+                p = get_platform(platform_name)
+                await p.configure()
+                msg = Message(text=text, user="test-agent")
+                r = await p.send(msg)
+                if not r.ok:
+                    logger.warning("Job delivery failed via {}: {}", platform_name, r.error)
+            except Exception as exc:
+                logger.warning("Job delivery error for {}: {}", platform_name, exc)
+
+    try:
+        asyncio.run(_send())
+    except Exception as exc:
+        logger.warning("Job delivery async failed: {}", exc)
+
+
 def run_job(job: dict, *, runner: Callable[[str], dict] | None = None) -> dict:
     """Execute a single job. `runner` defaults to runtime/api/deps.Kernel pipeline.
 
@@ -90,12 +127,16 @@ def run_job(job: dict, *, runner: Callable[[str], dict] | None = None) -> dict:
             encoding="utf-8",
         )
         advance_job(job_id, outcome="ok", output_path=str(out_file))
-        return {"ok": True, "run_id": result.get("run_id") if isinstance(result, dict) else None, "blocked": False, "output_path": str(out_file)}
+        ret = {"ok": True, "run_id": result.get("run_id") if isinstance(result, dict) else None, "blocked": False, "output_path": str(out_file)}
+        _deliver_results(job, ret)
+        return ret
     except Exception as e:
         out_file.write_text(f"# Job {job_id} failed\n\nerror: {e}\nprompt:\n{prompt}\n", encoding="utf-8")
         advance_job(job_id, outcome="failed", output_path=str(out_file))
+        ret = {"ok": False, "run_id": None, "blocked": False, "output_path": str(out_file)}
+        _deliver_results(job, ret)
         logger.exception("job {} failed", job_id)
-        return {"ok": False, "run_id": None, "blocked": False, "output_path": str(out_file)}
+        return ret
 
 
 def _default_runner(prompt: str) -> dict:
