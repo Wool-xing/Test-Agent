@@ -121,7 +121,8 @@ def build_graph() -> Graph:
             # strip frontmatter for body scan
             parts = text.split("---", 2)
             body = parts[2] if len(parts) >= 3 else text
-        except Exception:
+        except Exception as e:
+            logger.debug("knowledge graph card read skip %s: %s", card, e)
             body = ""
         for e in _extract_edges_from_card(card, body):
             g.add(e)

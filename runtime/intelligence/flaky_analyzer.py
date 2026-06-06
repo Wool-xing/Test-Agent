@@ -12,10 +12,13 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
 import re
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -55,7 +58,8 @@ def collect_logs(log_dir: str = "workspace/logs",
                 entry = _parse_log_line(line, source)
                 if entry:
                     entries.append(entry)
-        except Exception:
+        except Exception as e:
+            logger.debug("flaky analyzer log read skip %s: %s", log_file, e)
             continue
 
     entries.sort(key=lambda e: e.timestamp)

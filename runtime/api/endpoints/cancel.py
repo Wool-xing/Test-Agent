@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import threading
+
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(tags=["runs"])
 
 # Shared cancel registry — populated by main.py at startup
 _cancel_registry: dict[str, bool] = {}
+_cancel_lock = threading.Lock()
 
 
 def get_cancel_registry() -> dict[str, bool]:
@@ -16,22 +19,26 @@ def get_cancel_registry() -> dict[str, bool]:
 
 def request_cancel(run_id: str) -> bool:
     """Set cancel flag for a run. Returns True if run was found."""
-    if run_id in _cancel_registry:
-        _cancel_registry[run_id] = True
-        return True
+    with _cancel_lock:
+        if run_id in _cancel_registry:
+            _cancel_registry[run_id] = True
+            return True
     return False
 
 
 def is_cancelled(run_id: str) -> bool:
-    return _cancel_registry.get(run_id, False)
+    with _cancel_lock:
+        return _cancel_registry.get(run_id, False)
 
 
 def register_run(run_id: str) -> None:
-    _cancel_registry[run_id] = False
+    with _cancel_lock:
+        _cancel_registry[run_id] = False
 
 
 def unregister_run(run_id: str) -> None:
-    _cancel_registry.pop(run_id, None)
+    with _cancel_lock:
+        _cancel_registry.pop(run_id, None)
 
 
 @router.post("/run/{run_id}/cancel")

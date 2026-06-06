@@ -293,7 +293,9 @@ class TestWeChatCrypto:
     def test_decrypt_roundtrip(self):
         """Encrypt a known message, then decrypt it — verify roundtrip."""
         from runtime.api.endpoints.webhooks import _wechat_decrypt
-        import base64, os, struct
+        import base64
+        import os
+        import struct
         from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
         aes_key = os.urandom(32)
@@ -351,7 +353,10 @@ class TestDingTalkCrypto:
 
     def test_valid_signature(self):
         from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
-        import base64, hmac, hashlib, os
+        import base64
+        import hmac
+        import hashlib
+        import os
 
         secret = "test_app_secret_123"
         os.environ["DINGTALK_APP_SECRET"] = secret
@@ -504,7 +509,10 @@ class TestWeChatWebhook:
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
         from runtime.api.endpoints.webhooks import router
-        import base64, hashlib, os, struct
+        import base64
+        import hashlib
+        import os
+        import struct
         from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
         # Setup test keys

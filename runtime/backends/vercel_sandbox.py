@@ -34,6 +34,10 @@ class VercelSandboxBackend(BaseExecutionEnv):
         token = os.getenv("VERCEL_TOKEN")
         if not token:
             raise RuntimeError("VERCEL_TOKEN env not set")
+        # Close previous client to avoid connection pool leak on reconnect
+        if self._client is not None:
+            with contextlib.suppress(Exception):
+                await self._client.aclose()
         self._client = httpx.AsyncClient(
             base_url="https://api.vercel.com",
             headers={"Authorization": f"Bearer {token}"},

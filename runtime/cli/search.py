@@ -33,6 +33,7 @@ def index_message(session_id: str, role: str, content: str, ts: str | None = Non
     if not content.strip():
         return
     ts = ts or datetime.now(timezone.utc).isoformat()
+    conn = None
     try:
         with _lock:
             conn = _ensure_db()
@@ -41,9 +42,14 @@ def index_message(session_id: str, role: str, content: str, ts: str | None = Non
                 (session_id, role, content[:2000], ts),
             )
             conn.commit()
-            conn.close()
     except Exception as exc:
         logger.warning("FTS index failed: {}", exc)
+    finally:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def index_session(session_id: str, messages: list[dict]) -> int:
