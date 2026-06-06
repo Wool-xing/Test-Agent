@@ -116,7 +116,7 @@ class TestCoordinatorPipeline:
                 console.print(
                     f"[green]OK[/] ({step.duration_ms:.0f}ms)"
                     if step.status == "ok"
-                    else f"[red]FAILED[/]"
+                    else "[red]FAILED[/]"
                 )
 
                 # Gate checks between phases

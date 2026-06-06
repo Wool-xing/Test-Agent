@@ -366,7 +366,8 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
     defaults = SCRIPT_DEFAULT_ARGS.get(script, {})
     # When upstream agent outputs exist, build real summary for report generation
     if script == "generate_report.py" and _upstream_outputs:
-        import tempfile as _tmp, json as _json
+        import tempfile as _tmp
+        import json as _json
         summary = _build_report_summary_from_upstream(_upstream_outputs, _upstream_meta)
         if summary:
             _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8")
