@@ -19,6 +19,9 @@ class HTTPAdapter(ProtocolAdapter):
             import httpx
         except ImportError as e:
             raise RuntimeError("httpx not installed") from e
+        # Close previous client to avoid connection pool leak on reconnect
+        if self._client is not None:
+            await self._client.aclose()
         self._client = httpx.AsyncClient(timeout=kwargs.get("timeout", 30.0))
         self._target = target
 

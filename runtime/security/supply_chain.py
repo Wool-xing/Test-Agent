@@ -10,11 +10,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -67,8 +70,8 @@ def generate_sbom(output_path: str = "workspace/sbom.cdx.json") -> SbomReport:
                         if metadata_path.exists():
                             content = metadata_path.read_bytes()
                             pkg.hashes["sha256"] = hashlib.sha256(content).hexdigest()
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug("SBOM hash skip %s: %s", dist.metadata.get("Name", "?"), e)
 
             report.packages.append(pkg)
     except ImportError:
