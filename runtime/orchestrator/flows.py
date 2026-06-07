@@ -27,7 +27,12 @@ from runtime.orchestrator.tasks import execute_dag_node
 from runtime.router.schema import DAGNode, RoutingDecision
 
 
-@flow(name="test-agent-run", task_runner=ConcurrentTaskRunner())
+_flow_kwargs: dict[str, Any] = {"name": "test-agent-run"}
+if ConcurrentTaskRunner is not None:
+    _flow_kwargs["task_runner"] = ConcurrentTaskRunner()
+
+
+@flow(**_flow_kwargs)
 def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: Any = None) -> dict[str, Any]:
     if on_progress is not None and not callable(on_progress):
         on_progress = None
