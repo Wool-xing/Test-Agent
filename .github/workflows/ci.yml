@@ -115,14 +115,14 @@ jobs:
       - name: pip-audit 扫描
         run: |
           pip install pip-audit
-          pip-audit -r config/requirements.txt --format columns || true
+          pip-audit -r deploy/config/requirements.txt --format columns || true
         # 使用 || true 确保扫描完整运行，但 job 会因非零退出码显示为失败
         # 可通过 branch protection 设置决定是否阻断合并
 
       - name: safety 扫描
         run: |
           pip install safety
-          safety check -r config/requirements.txt --short-report || true
+          safety check -r deploy/config/requirements.txt --short-report || true
 
   # ===== 3. install.py 脚本检查 =====
   install-syntax:
@@ -246,7 +246,7 @@ jobs:
         run: |
           set -o pipefail
           python -m pip install --upgrade pip
-          pip install -r config/requirements.txt 2>&1 | tail -20 || \
+          pip install -r deploy/config/requirements.txt 2>&1 | tail -20 || \
             pip install pytest faker factory-boy requests websocket-client pdfplumber python-docx openpyxl PyYAML python-dotenv tenacity loguru beautifulsoup4 jsonschema
 
       - name: 核心 utils 导入测试
@@ -360,7 +360,7 @@ jobs:
       - name: 安装运行时依赖
         run: |
           python -m pip install --upgrade pip
-          pip install -r config/requirements.txt 2>&1 | tail -10 || true
+          pip install -r deploy/config/requirements.txt 2>&1 | tail -10 || true
           # 兜底:确保关键运行时模块在
           pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect defusedxml prompt-toolkit
 
