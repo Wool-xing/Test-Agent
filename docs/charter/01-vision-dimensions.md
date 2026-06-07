@@ -167,7 +167,7 @@
 
 **探索 + 元工具 4 个**：`build-your-own-x-explorer` + `karpathy-guidelines` + `darwin-skill` + `nuwa-skill`
 
-> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [skills/README.md](../../skills/README.md)。
+> 完整 32 业务 Skill + 3 元 Skill 清单见 [ROADMAP.md](../../ROADMAP.md) 与 [skills/README.md](../../ai/skills/README.md)。
 
 ### 工程级质量门禁（分层）
 

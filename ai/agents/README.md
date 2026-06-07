@@ -1,8 +1,8 @@
 # agents 索引
 
-**16 个 Agent**,按域分三类:核心通用流程 9 (含 test-lead 协调者) + 平台专项扩展 5 + 垂直领域 2。test-lead 自身不计入被协调专家清单时核心为 8 位。按实装状态:**11 production + 5 script + 0 rollout**(详见根目录 [ROADMAP.md](../ROADMAP.md))。
+**16 个 Agent**,按域分三类:核心通用流程 9 (含 test-lead 协调者) + 平台专项扩展 5 + 垂直领域 2。test-lead 自身不计入被协调专家清单时核心为 8 位。按实装状态:**11 production + 5 script + 0 rollout**(详见根目录 [ROADMAP.md](../../ROADMAP.md))。
 
-顶层导航见 [00-项目导航.md](../00-项目导航.md)。
+顶层导航见 [00-项目导航.md](../../00-项目导航.md)。
 
 ---
 
@@ -51,7 +51,7 @@ bug-manager → report-generator → test-lead 决策
 | 15 | `15-渗透测试.md` | **pentest-tester** | 渗透 / 安全测试 / SQL 注入 / XSS / SSRF / 漏洞扫描 / OWASP / 攻击面 |
 | 16 | `16-车载测试.md` | **automotive-tester** | 车载 / 汽车 / CAN-bus / SOME-IP / DoIP / UDS / ASIL / ISO-26262 / HIL / OTA |
 
-⚠️ **运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../SECURITY.md) 武器化代码使用边界)。16 expert 全部 active (11 production + 5 script)，0 处于 rollout。runtime/router + orchestrator 防 mock 已落地，不会输出 mock 数据。详见 [ROADMAP.md](../ROADMAP.md)。
+⚠️ **运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../../SECURITY.md) 武器化代码使用边界)。16 expert 全部 active (11 production + 5 script)，0 处于 rollout。runtime/router + orchestrator 防 mock 已落地，不会输出 mock 数据。详见 [ROADMAP.md](../../ROADMAP.md)。
 
 ### 路由识别（自动）
 
@@ -87,4 +87,4 @@ tools: Read, Write, Bash, Grep, Glob   # 按需添加 Edit
 
 ## 添加新 Agent
 
-详见根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md) "添加新 Agent" 章节。
+详见根目录 [`CONTRIBUTING.md`](../../CONTRIBUTING.md) "添加新 Agent" 章节。

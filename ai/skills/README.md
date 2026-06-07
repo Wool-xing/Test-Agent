@@ -5,7 +5,7 @@
 业务 skill 按领域分:通用流程 8 + 平台专项 5 + 渗透安全 7 + 车载 5 + ECC 测试加固 6 + 探索学习 1 = 32。
 元 skill 3 个子目录:`darwin-skill/` `karpathy-guidelines/` `nuwa-skill/` — 用法见各子目录 SKILL.md。
 
-顶层导航见根目录 [00-项目导航.md](../00-项目导航.md);路线图见 [ROADMAP.md](../ROADMAP.md)。
+顶层导航见根目录 [00-项目导航.md](../../00-项目导航.md);路线图见 [ROADMAP.md](../../ROADMAP.md)。
 
 ---
 
@@ -101,4 +101,4 @@
 
 ## 添加新 Skill
 
-详见根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md) "添加新 Skill" 章节。
+详见根目录 [`CONTRIBUTING.md`](../../CONTRIBUTING.md) "添加新 Skill" 章节。
