@@ -11,6 +11,7 @@ Bare `tagent` enters interactive session:
 from __future__ import annotations
 
 import os
+import re
 import sys
 import time
 from pathlib import Path as _Path
@@ -1114,7 +1115,7 @@ def _cmd_cron(args: str) -> None:
         console.print(table)
 
     elif sub == "add":
-        # Parse: /cron add "*/30 * * * *" smoke test
+        # Parse: /cron add "0 9 * * *" "smoke test"  OR  /cron add "every morning" "smoke test"
         import shlex
 
         try:
@@ -1123,12 +1124,26 @@ def _cmd_cron(args: str) -> None:
             tokens = rest.split(maxsplit=1)
 
         if len(tokens) < 2:
-            console.print("[red]Usage: /cron add '<cron_expr>' <prompt>[/]")
-            console.print("[dim]Example: /cron add '0 9 * * *' run full regression[/]")
+            console.print("[red]Usage: /cron add <schedule> <prompt>[/]")
+            console.print("[dim]Cron: /cron add '0 9 * * *' run full regression[/]")
+            console.print("[dim]Natural: /cron add 'every morning' run smoke tests[/]")
+            console.print("[dim]Try: every morning / every day at 18 / every monday / hourly[/]")
             return
 
         cron_expr = tokens[0]
         prompt = tokens[1] if len(tokens) > 1 else ""
+
+        # Auto-detect natural language → convert to cron expression
+        if not re.match(r"^[\d*/,\-]+\s+[\d*/,\-]+\s+[\d*/,\-]+\s+[\d*/,\-]+\s+[\d*/,\-]+$", cron_expr):
+            from runtime.scheduler.nl_cron import parse as nl_parse
+            parsed = nl_parse(cron_expr)
+            if parsed:
+                console.print(f"[dim]Parsed '{cron_expr}' → [cyan]{parsed}[/][/]")
+                cron_expr = parsed
+            else:
+                console.print(f"[red]Cannot parse schedule: '{cron_expr}'[/]")
+                console.print("[dim]Use cron format (5 fields) or natural language (e.g. 'every morning')[/]")
+                return
 
         try:
             from runtime.scheduler.jobs import add_job
@@ -1796,7 +1811,8 @@ def start() -> None:
 
     # Version check (non-blocking, 24h rate-limited by check_version.py)
     try:
-        import subprocess, threading
+        import subprocess
+        import threading
         def _check_version():
             checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
             if checker.is_file():
