@@ -5,6 +5,7 @@ on:
     branches: [main, develop, 'release/**']
   pull_request:
     branches: [main, develop, 'release/**']
+  workflow_dispatch:
   schedule:
     - cron: "30 2 * * 1"   # 每周一 02:30 UTC（北京时间 10:30）
 
