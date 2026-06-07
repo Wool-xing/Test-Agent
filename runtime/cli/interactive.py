@@ -222,6 +222,17 @@ def _print_help() -> None:
             ("/run   <target>", "Plan + execute (quick)"),
             ("/plan  <target>", "Plan only, no execution"),
         ]),
+        ("Data & API", [
+            ("/data users|related <N>", "Generate test data"),
+            ("/api gen|test", "OpenAPI contract testing"),
+            ("/cross env <e1> <e2>", "Cross-environment test run"),
+        ]),
+        ("Quality", [
+            ("/regression", "Regression detection vs baseline"),
+            ("/flaky list|quarantine", "Flaky test management"),
+            ("/prioritize", "Prioritize by git changes"),
+            ("/clean", "Clean temp data (preserves deliverables)"),
+        ]),
         ("Info", [
             ("/update", "Check for newer version"),
             ("/progress", "Test coverage matrix"),
@@ -237,6 +248,7 @@ def _print_help() -> None:
             ("/skin [name]", "Switch CLI theme (4 skins)"),
             ("/fc", "Fix last typo (like thefuck)"),
             ("/! /1..9", "Command history / re-run"),
+            ("/alias add|list", "Command shortcuts"),
             ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
             ("/undo", "Remove last exchange from memory"),
@@ -1610,62 +1622,6 @@ def _cmd_plugins_list(args: str) -> None:
     console.print(table)
 
 
-# ── /env — environment presets ─────────────────────────────────────
-
-
-def _cmd_env(args: str) -> None:
-    """Manage environment presets: /env save|load|list|delete."""
-    from runtime.cli.env_presets import list_presets, save_preset, load_preset, delete_preset, CAPTURE_PREFIXES
-    from rich.table import Table
-
-    parts = args.strip().split(maxsplit=1)
-    action = parts[0].lower() if parts else "list"
-    rest = parts[1] if len(parts) > 1 else ""
-
-    if action == "list" or not action:
-        presets = list_presets()
-        if not presets:
-            console.print("[dim]No presets. Use /env save <name> to snapshot current env[/]")
-            return
-        table = Table(title=f"Env Presets · {len(presets)}", show_header=True)
-        table.add_column("Name", style="cyan")
-        table.add_column("Vars")
-        table.add_column("Description")
-        for p in presets:
-            table.add_row(p.name, str(len(p.env_vars)), p.description[:40])
-        console.print(table)
-
-    elif action == "save":
-        name = rest.strip()
-        if not name:
-            console.print("[dim]Usage: /env save <name> [description][/]")
-            console.print("[dim]Example: /env save staging 'staging config'[/]")
-            return
-        p = save_preset(name)
-        console.print(f"[green]Saved:[/] {p.name} ({len(p.env_vars)} vars)")
-
-    elif action == "load":
-        name = rest.strip()
-        if not name:
-            console.print("[dim]Usage: /env load <name>[/]")
-            return
-        p = load_preset(name)
-        if p:
-            console.print(f"[green]Loaded:[/] {p.name} ({len(p.env_vars)} env vars applied)")
-        else:
-            console.print(f"[red]Preset '{name}' not found[/]")
-
-    elif action == "delete":
-        name = rest.strip()
-        if not name:
-            console.print("[dim]Usage: /env delete <name>[/]")
-            return
-        if delete_preset(name):
-            console.print(f"[green]Deleted: {name}[/]")
-        else:
-            console.print(f"[red]Not found: {name}[/]")
-
-
 # ── /alias — command shortcuts ─────────────────────────────────────
 
 
@@ -2373,7 +2329,6 @@ _BUILTIN_MAP = {
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
     "alias": _cmd_alias,
-    "env": _cmd_env,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
 
