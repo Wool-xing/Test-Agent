@@ -117,6 +117,140 @@ SKINS: dict[str, dict[str, Any]] = {
             "info": ">>>",
         },
     },
+    "matrix": {
+        "name": "matrix",
+        "description": "Hacker green-on-black, pentest/security vibe",
+        "banner": r"""
+    ╔══════════════════════════════════════╗
+    ║  >> TEST-AGENT_v{version}           ║
+    ║  >> {experts}_agents :: {skills}_skills         ║
+    ║  >> trace active :: /help           ║
+    ╚══════════════════════════════════════╝
+      >>>>  follow the white rabbit.  >>>>""",
+        "prompt_style": {
+            "prompt": "bold green",
+            "prompt.dim": "dim green",
+        },
+        "colors": {
+            "primary": "green",
+            "success": "bright_green",
+            "error": "red",
+            "warning": "yellow",
+            "dim": "dim green",
+        },
+        "icons": {
+            "ok": "OK",
+            "fail": "ERR",
+            "warn": "WARN",
+            "info": ">>>",
+        },
+    },
+    "dracula": {
+        "name": "dracula",
+        "description": "Popular dark theme with purple accents",
+        "banner": r"""
+    █ █▄ █ · Test-Agent v{version}
+    █ █ ▀█ · {experts} agents / {skills} skills
+    ▀ ▀  ▀ · /help for commands""",
+        "prompt_style": {
+            "prompt": "bold magenta",
+            "prompt.dim": "dim",
+        },
+        "colors": {
+            "primary": "magenta",
+            "success": "bright_green",
+            "error": "bright_red",
+            "warning": "bright_yellow",
+            "dim": "bright_black",
+        },
+        "icons": {
+            "ok": "✓",
+            "fail": "✗",
+            "warn": "⚠",
+            "info": "💡",
+        },
+    },
+    "monokai": {
+        "name": "monokai",
+        "description": "Code editor theme — warm syntax colors",
+        "banner": r"""
+  ███╗   ███╗ Test-Agent v{version}
+  ████╗ ████║ {experts} experts · {skills} skills
+  ██╔████╔██║ /help for commands
+  ██║╚██╔╝██║
+  ╚═╝ ╚═╝ ╚═╝""",
+        "prompt_style": {
+            "prompt": "bold yellow",
+            "prompt.dim": "dim",
+        },
+        "colors": {
+            "primary": "yellow",
+            "success": "bright_green",
+            "error": "bright_red",
+            "warning": "yellow",
+            "dim": "bright_black",
+        },
+        "icons": {
+            "ok": "✓",
+            "fail": "✗",
+            "warn": "⚠",
+            "info": "💡",
+        },
+    },
+    "nord": {
+        "name": "nord",
+        "description": "Arctic bluish-gray, calm and focused",
+        "banner": r"""
+        ╭─────────────────────────╮
+        │  Test-Agent v{version}      │
+        │  {experts} experts · {skills} skills  │
+        │  /help for commands     │
+        ╰─────────────────────────╯""",
+        "prompt_style": {
+            "prompt": "bold bright_cyan",
+            "prompt.dim": "dim",
+        },
+        "colors": {
+            "primary": "bright_cyan",
+            "success": "bright_green",
+            "error": "bright_red",
+            "warning": "bright_yellow",
+            "dim": "bright_black",
+        },
+        "icons": {
+            "ok": "✓",
+            "fail": "✗",
+            "warn": "⚠",
+            "info": "💡",
+        },
+    },
+    "terminal": {
+        "name": "terminal",
+        "description": "Classic green phosphor terminal, testing engineer standard",
+        "banner": r"""
+$ test-agent --version
+Test-Agent v{version} | {experts} agents | {skills} skills
+$ echo 'Type /help for commands'
+Type /help for commands
+$ _""",
+        "prompt_style": {
+            "prompt": "bold bright_green",
+            "prompt.dim": "dim green",
+        },
+        "colors": {
+            "primary": "bright_green",
+            "success": "green",
+            "error": "red",
+            "warning": "yellow",
+            "dim": "dim green",
+        },
+        "icons": {
+            "ok": "[  OK  ]",
+            "fail": "[ FAIL ]",
+            "warn": "[ WARN ]",
+            "info": "[ INFO ]",
+        },
+    },
 }
 
 
