@@ -5,6 +5,7 @@ on:
     branches: [main, develop, 'release/**']
   pull_request:
     branches: [main, develop, 'release/**']
+  workflow_dispatch:
   schedule:
     - cron: "30 2 * * 1"   # 每周一 02:30 UTC（北京时间 10:30）
 
@@ -42,6 +43,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Scan for hardcoded values
         run: python scripts/check_hardcoded_values.py
+
+  # ===== 0d. 架构合规检测 (路径硬编码/目录纯净/构建产物) =====
+  arch-compliance:
+    name: 架构合规检测
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 架构合规 + 路径硬编码 + 构建产物
+        run: python scripts/check_arch_compliance.py
 
   # ===== 1. utils/ 代码质量 =====
   lint-utils:
