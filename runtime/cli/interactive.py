@@ -1949,6 +1949,49 @@ def _cmd_clean(args: str) -> None:
     console.print("[dim]Run /clean run to delete. Delivery artifacts never touched.[/]")
 
 
+# ── /data — test data generation ────────────────────────────────────
+
+
+def _cmd_data(args: str) -> None:
+    """Generate test data: /data users <N> | related <N> | product | order | address."""
+    from pathlib import Path
+
+    parts = args.strip().split()
+    entity = parts[0].lower() if parts else ""
+    count = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 10
+
+    try:
+        from utils.data.data_factory_v2 import DataFactoryV2
+        factory = DataFactoryV2()
+
+        if entity == "related":
+            data = factory.generate_related(count)
+            out = Path(f"workspace/测试数据/related_{count}.json")
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(factory.to_json(list(data.values())[0] if data else []), encoding="utf-8")
+            console.print(f"[green]Generated:[/] {', '.join(f'{k}={len(v)}' for k, v in data.items())} [dim]→ {out}[/]")
+
+        elif entity == "users":
+            data = [factory.user() for _ in range(count)]
+            out = Path(f"workspace/测试数据/users_{count}.json")
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(factory.to_json(data), encoding="utf-8")
+            console.print(f"[green]Generated:[/] {count} users [dim]→ {out}[/]")
+
+        elif entity == "products":
+            data = [factory.product() for _ in range(count)]
+            out = Path(f"workspace/测试数据/products_{count}.json")
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(factory.to_json(data), encoding="utf-8")
+            console.print(f"[green]Generated:[/] {count} products [dim]→ {out}[/]")
+
+        else:
+            console.print("[dim]Usage: /data users|products|related <count>[/]")
+            console.print("[dim]Example: /data users 100[/]")
+    except ImportError:
+        console.print("[red]DataFactoryV2 not available. Install: pip install faker[/]")
+
+
 # ── /prioritize — test priority by changed code ─────────────────────
 
 
@@ -2273,6 +2316,7 @@ _BUILTIN_MAP = {
     "prioritize": _cmd_prioritize,
     "clean": _cmd_clean,
     "cross": _cmd_cross,
+    "data": _cmd_data,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
