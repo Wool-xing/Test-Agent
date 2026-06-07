@@ -4,8 +4,21 @@ from __future__ import annotations
 
 from typing import Any
 
-from prefect import flow
-from prefect.task_runners import ConcurrentTaskRunner
+try:
+    from prefect import flow
+    from prefect.task_runners import ConcurrentTaskRunner
+except ImportError:
+    from functools import wraps
+    def flow(name=None, task_runner=None):
+        def decorator(fn):
+            @wraps(fn)
+            def wrapper(*args, **kwargs):
+                import logging
+                logging.getLogger(__name__).warning("prefect unavailable; running %s in direct mode", fn.__name__)
+                return fn(*args, **kwargs)
+            return wrapper
+        return decorator
+    ConcurrentTaskRunner = None  # type: ignore[name-defined]
 
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
