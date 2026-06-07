@@ -32,12 +32,21 @@ def _is_hard(node: DAGNode) -> bool:
 
 
 def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
-    """Execute a node with retries, respecting on_failure=abort."""
+    """Execute a node with retries, respecting on_failure policy.
+
+    on_failure modes:
+      - retry (default): retry 2x with exp backoff, mark failed after
+      - skip: mark skipped on first failure, don't retry, don't block
+      - abort: stop entire DAG immediately
+    """
     nid = node.id
     try:
         results[nid] = _run_node(node)
     except Exception as exc:
         log.warning("node {} attempt failed: {}", nid, exc)
+        if node.on_failure == "skip":
+            results[nid] = {"id": nid, "ok": False, "skipped": True, "error": str(exc)}
+            return
         if node.on_failure == "abort" or _is_abort_exception(exc):
             results[nid] = {"id": nid, "ok": False, "error": str(exc), "aborted": True}
             return
