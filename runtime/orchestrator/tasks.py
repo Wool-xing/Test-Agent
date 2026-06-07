@@ -3,8 +3,20 @@
 from __future__ import annotations
 
 from loguru import logger
-from prefect import task
-from prefect.tasks import exponential_backoff
+try:
+    from prefect import task
+    from prefect.tasks import exponential_backoff
+except ImportError:
+    from functools import wraps
+    def task(fn=None, **kwargs):
+        if fn is None:
+            return lambda f: task(f, **kwargs)
+        @wraps(fn)
+        def wrapper(*args, **kw):
+            return fn(*args, **kw)
+        return wrapper
+    def exponential_backoff(*args, **kwargs):
+        return [1]
 
 from runtime.observability.otel import span
 from runtime.orchestrator.adapters.experts import StepOutcome, execute_node
