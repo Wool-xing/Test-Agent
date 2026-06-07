@@ -78,7 +78,8 @@ class TestCLIVersionCheck:
     """Update/version checks."""
 
     def test_check_version_script(self):
-        checker = Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+        from runtime.config.settings import get_settings
+        checker = get_settings().config_dir / "check_version.py"
         r = subprocess.run(
             [sys.executable, "-X", "utf8", str(checker)],
             capture_output=True, text=True, timeout=15,
@@ -199,7 +200,7 @@ class TestAgentSkillPairing:
 
     def test_all_agents_have_pairing(self):
         import re
-        agents_dir = Path(__file__).resolve().parents[2] / "agents"
+        agents_dir = Path(__file__).resolve().parents[2] / "ai" / "agents"
         for f in sorted(agents_dir.glob("[0-9]*.md")):
             text = f.read_text(encoding="utf-8")
             assert "paired_skills:" in text, f"{f.name}: missing paired_skills"

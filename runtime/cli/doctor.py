@@ -44,11 +44,12 @@ def check_catalog() -> Checks:
 def check_config() -> Checks:
     """Check .env and VERSION files."""
     results: Checks = []
+    from runtime.config.settings import get_settings
     env_file = Path.cwd() / ".env"
     if env_file.is_file():
         results.append(_ok(".env file", "found"))
     else:
-        example = Path.cwd() / "config" / ".env.example"
+        example = get_settings().config_dir / ".env.example"
         results.append(_warn(".env file", f"not found; copy from {example}"))
     version_file = Path.cwd() / "VERSION"
     if version_file.is_file():

@@ -13,7 +13,7 @@ from runtime.init.wizard import InitAnswers
 def _templates_dir() -> Path:
     from runtime.config.settings import get_settings
 
-    return get_settings().project_root / "config" / "templates"
+    return get_settings().templates_dir
 
 
 def _read_version() -> str:

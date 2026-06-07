@@ -60,7 +60,7 @@ class Matrix:
 def _matrix_path() -> Path:
     from runtime.config.settings import get_settings
 
-    return get_settings().project_root / "config" / "templates" / "matrix.yaml"
+    return get_settings().templates_dir / "matrix.yaml"
 
 
 def load_matrix(path: Path | None = None) -> Matrix:

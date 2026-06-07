@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test-Agent 工作流一键部署脚本（跨平台：Windows / macOS / Linux）
+"""Test-Agent 一键部署脚本（跨平台：Windows / macOS / Linux）
 
 前置条件：
     Python 3.x — 脚本运行前提，需手动安装：
@@ -45,7 +45,7 @@ if sys.stdout.encoding is not None and sys.stdout.encoding.upper() != "UTF-8":
 def _parse_args():
     """解析命令行参数。"""
     parser = argparse.ArgumentParser(
-        description="Test-Agent 工作流一键部署脚本",
+        description="Test-Agent 一键部署脚本",
         epilog="安全提示：不要 pipe-to-python。先下载再审查后执行。",
     )
     parser.add_argument(
@@ -62,13 +62,26 @@ def _parse_args():
 
 _ARGS = _parse_args()
 UPDATE_MODE = _ARGS.update
+IS_WINDOWS = platform.system() == "Windows"
+
+# 部署后的目录名（settings.py 默认值针对源码，部署后 .env 覆盖为这些值）
+DEPLOY_EXPERTS_DIR = "agents"
+DEPLOY_SKILLS_DIR = "skills"
 
 if _ARGS.path:
     PROJECT_ROOT = _ARGS.path
 elif UPDATE_MODE:
     PROJECT_ROOT = os.getcwd()
 else:
-    PROJECT_ROOT = os.path.join(os.getcwd(), "Test-Agent")
+    PROJECT_ROOT = "D:\\Test-Agent" if IS_WINDOWS else os.path.join(os.getcwd(), "Test-Agent")
+
+# 验证目标路径的驱动器是否存在
+if IS_WINDOWS and len(PROJECT_ROOT) >= 2 and PROJECT_ROOT[1] == ":":
+    drive = PROJECT_ROOT[:3]
+    if not os.path.exists(drive):
+        print(f"❌ 目标驱动器不存在: {drive}")
+        print(f"   请指定有效路径: python install.py <路径>")
+        sys.exit(1)
 REPO_URL = os.environ.get("TEST_AGENT_REPO_URL", "https://github.com/Wool-xing/Test-Agent.git")
 REPO_BRANCH = os.environ.get("TEST_AGENT_REPO_BRANCH", "main")
 
@@ -80,13 +93,11 @@ PRESERVE_FILES = [
     "workspace/regression_modules.yaml",
 ]
 
-IS_WINDOWS = platform.system() == "Windows"
-
 
 def banner():
     mode = "轻量更新" if UPDATE_MODE else "一键部署"
     print("=" * 50)
-    print(f" Test-Agent 工作流{mode}")
+    print(f" Test-Agent {mode}")
     print(f" 仓库:     {REPO_URL} ({REPO_BRANCH})")
     print(f" 项目目录: {PROJECT_ROOT}")
     print("=" * 50)
@@ -282,10 +293,10 @@ def create_dirs(project_root):
     """创建项目目录结构。"""
     print("→ 创建目录...")
     dirs = [
-        "agents",                          # runtime 直读（registry / catalog）
-        "skills",                          # runtime 直读
-        os.path.join(".claude", "agents"), # Claude Code 自动发现
-        os.path.join(".claude", "skills"), # Claude Code 自动发现
+        DEPLOY_EXPERTS_DIR,                          # runtime 直读（registry / catalog）
+        DEPLOY_SKILLS_DIR,                          # runtime 直读
+        os.path.join(".claude", DEPLOY_EXPERTS_DIR), # Claude Code 自动发现
+        os.path.join(".claude", DEPLOY_SKILLS_DIR), # Claude Code 自动发现
         os.path.join(".github", "workflows"),
         "utils",
         "src",
@@ -308,12 +319,15 @@ def create_dirs(project_root):
 def copy_agents(template_dir, project_root):
     """拷贝 Agent 定义到 agents/（runtime 用）和 .claude/agents/（Claude Code 用）。"""
     print("→ 拷贝 Agent 定义...")
-    agents_dir = os.path.join(template_dir, "agents")
+    # 兼容新旧仓库结构：新(ai/agents) 优先，旧(agents) 兜底
+    agents_dir = os.path.join(template_dir, "ai", "agents")
+    if not os.path.isdir(agents_dir):
+        agents_dir = os.path.join(template_dir, "agents")
     # runtime 路径
-    runtime_dest = os.path.join(project_root, "agents")
+    runtime_dest = os.path.join(project_root, DEPLOY_EXPERTS_DIR)
     os.makedirs(runtime_dest, exist_ok=True)
     # Claude Code 路径
-    claude_dest = os.path.join(project_root, ".claude", "agents")
+    claude_dest = os.path.join(project_root, ".claude", DEPLOY_EXPERTS_DIR)
     os.makedirs(claude_dest, exist_ok=True)
     count = 0
     for f in glob.glob(os.path.join(agents_dir, "[0-9]*.md")):
@@ -326,10 +340,13 @@ def copy_agents(template_dir, project_root):
 def copy_skills(template_dir, project_root):
     """拷贝 Skill 定义到 skills/（runtime 用）和 .claude/skills/（Claude Code 用）。"""
     print("→ 拷贝 Skill 定义...")
-    skills_dir = os.path.join(template_dir, "skills")
-    runtime_dest = os.path.join(project_root, "skills")
+    # 兼容新旧仓库结构：新(ai/skills) 优先，旧(skills) 兜底
+    skills_dir = os.path.join(template_dir, "ai", "skills")
+    if not os.path.isdir(skills_dir):
+        skills_dir = os.path.join(template_dir, "skills")
+    runtime_dest = os.path.join(project_root, DEPLOY_SKILLS_DIR)
     os.makedirs(runtime_dest, exist_ok=True)
-    claude_dest = os.path.join(project_root, ".claude", "skills")
+    claude_dest = os.path.join(project_root, ".claude", DEPLOY_SKILLS_DIR)
     os.makedirs(claude_dest, exist_ok=True)
 
     md_count = 0
@@ -359,10 +376,30 @@ def copy_skills(template_dir, project_root):
     print(f"  已部署 {md_count} 个业务 Skill + {dir_count} 个元 Skill 子目录（skills/ + .claude/skills/）")
 
 
+def _ensure_env_overrides(env_path: str) -> None:
+    """确保 .env 中包含部署后路径覆盖。"""
+    overrides = {
+        "TAGENT_EXPERTS_DIR": DEPLOY_EXPERTS_DIR,
+        "TAGENT_SKILLS_DIR": DEPLOY_SKILLS_DIR,
+    }
+    if os.path.isfile(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        missing = [k for k, v in overrides.items() if k not in content]
+        if missing:
+            with open(env_path, "a", encoding="utf-8") as f:
+                f.write("\n# 部署后路径覆盖（AI模式/CLI模式共用 agents/ skills/ 非 ai/ 子目录）\n")
+                for k in missing:
+                    f.write(f"{k}={overrides[k]}\n")
+
+
 def copy_config(template_dir, project_root):
     """拷贝配置文件。"""
     print("→ 拷贝配置文件...")
-    config_dir = os.path.join(template_dir, "config")
+    # 兼容新旧仓库结构：新(deploy/config) 优先，旧(config) 兜底
+    config_dir = os.path.join(template_dir, "deploy", "config")
+    if not os.path.isdir(config_dir):
+        config_dir = os.path.join(template_dir, "config")
     files = [
         "conftest.py", "pytest.ini", ".mcp.json", "requirements.txt",
         "check_version.py", "quality_gates.yaml",
@@ -386,6 +423,9 @@ def copy_config(template_dir, project_root):
         env_src = os.path.join(config_dir, ".env.example")
         if os.path.isfile(env_src):
             shutil.copy2(env_src, env_dst)
+
+    # 确保部署后路径覆盖存在（settings.py 默认值针对源码，部署后需覆盖）
+    _ensure_env_overrides(env_dst)
 
     # .claude/settings.json — 部署版本检查 hook，仅在不存在时创建
     claude_dir = os.path.join(project_root, ".claude")
@@ -545,12 +585,12 @@ def _create_wrappers(project_root):
     if IS_WINDOWS:
         venv_python = os.path.join(project_root, ".venv", "Scripts", "python.exe")
         bat_path = os.path.join(project_root, "tagent.bat")
-        with open(bat_path, "w", encoding="ascii") as f:
-            f.write(f'@echo off\n"{venv_python}" -m runtime.cli.main %*\nif "%1"=="" pause\n')
+        with open(bat_path, "w", encoding="utf-8") as f:
+            f.write(f'@echo off\nchcp 65001 > nul\n"{venv_python}" -m runtime.cli.main %*\nif "%1"=="" pause\n')
     else:
         venv_python = os.path.join(project_root, ".venv", "bin", "python")
         sh_path = os.path.join(project_root, "tagent")
-        with open(sh_path, "w", encoding="ascii") as f:
+        with open(sh_path, "w", encoding="utf-8") as f:
             f.write(f'#!/bin/sh\n"{venv_python}" -m runtime.cli.main "$@"\n')
         os.chmod(sh_path, 0o755)
 
@@ -673,7 +713,7 @@ def do_update():
     print(f"→ 当前版本: {local_version}")
 
     template_dir_parent = tempfile.mkdtemp()
-    template_dir = os.path.join(template_dir_parent, "Test-Agent工作流搭建")
+    template_dir = os.path.join(template_dir_parent, "Test-Agent")
 
     try:
         local_src = os.environ.get("TEST_AGENT_LOCAL_SRC")
@@ -755,8 +795,8 @@ def do_update():
 
         # [3] agent/skill files present — informational, not assertion
         print("  [3/3] 文件完整性...")
-        agents_n = len(glob.glob(os.path.join(PROJECT_ROOT, "agents", "[0-9]*.md")))
-        skills_n = len(glob.glob(os.path.join(PROJECT_ROOT, "skills", "*.md")))
+        agents_n = len(glob.glob(os.path.join(PROJECT_ROOT, DEPLOY_EXPERTS_DIR, "[0-9]*.md")))
+        skills_n = len(glob.glob(os.path.join(PROJECT_ROOT, DEPLOY_SKILLS_DIR, "*.md")))
         print(f"  ✓ agents={agents_n}, skills={skills_n}")
 
         print("=" * 50)
@@ -790,7 +830,7 @@ def main():
     backed = backup_user_data(PROJECT_ROOT)
 
     template_dir_parent = tempfile.mkdtemp()
-    template_dir = os.path.join(template_dir_parent, "Test-Agent工作流搭建")
+    template_dir = os.path.join(template_dir_parent, "Test-Agent")
 
     try:
         # 3. 获取模板
@@ -799,11 +839,23 @@ def main():
             print(f"→ [dev mode] 复制本地源代码: {local_src} → {template_dir}")
             shutil.copytree(local_src, template_dir)
         else:
-            print("→ 克隆模板...")
-            subprocess.run(
-                ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
-                check=True,
-            )
+            print(f"→ 从 GitHub 克隆模板...")
+            print(f"   {REPO_URL} ({REPO_BRANCH})")
+            try:
+                subprocess.run(
+                    ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
+                    check=True, timeout=120,
+                )
+            except subprocess.TimeoutExpired:
+                print("❌ Git 克隆超时（>120 秒），请检查网络或使用本地模式：")
+                print(f"   set TEST_AGENT_LOCAL_SRC={os.getcwd()}")
+                print(f"   python install.py <目标目录>")
+                sys.exit(1)
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Git 克隆失败: {e}")
+                print(f"   仓库: {REPO_URL}")
+                print(f"   可以尝试本地模式：set TEST_AGENT_LOCAL_SRC={os.getcwd()}")
+                sys.exit(1)
 
         # 4. 安装 Claude Code
         if shutil.which("claude") is None:
@@ -838,6 +890,11 @@ def main():
 
         finish(PROJECT_ROOT)
 
+    except Exception as e:
+        print(f"\n❌ 部署失败: {e}")
+        import traceback
+        traceback.print_exc()
+
     finally:
         # 清理临时目录
         if os.path.isdir(template_dir_parent):
@@ -845,6 +902,10 @@ def main():
         tmp = backed.pop("__tmp__", None)
         if tmp and os.path.isdir(tmp):
             shutil.rmtree(tmp, onerror=_rmtree_onerror)
+
+    # 保持窗口打开，成功或失败用户都能看到结果
+    if IS_WINDOWS and not UPDATE_MODE:
+        input("\n按 Enter 键退出...")
 
 
 if __name__ == "__main__":

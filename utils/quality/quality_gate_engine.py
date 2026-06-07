@@ -4,7 +4,7 @@
 Replaces hardcoded GATES dict in ci_quality_gate.py with YAML-configurable
 thresholds. Users edit the YAML, not the code.
 
-默认查找: ./quality_gates.yaml (部署) → ./config/quality_gates.yaml (源码)
+默认查找: ./quality_gates.yaml (部署) → ./deploy/config/quality_gates.yaml (源码)
 可通过 QUALITY_GATE_CONFIG 环境变量覆盖路径。
 """
 
@@ -27,7 +27,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 _cfg_deployed = Path(__file__).resolve().parent.parent.parent / "quality_gates.yaml"
-_cfg_source = Path(__file__).resolve().parent.parent.parent / "config" / "quality_gates.yaml"
+_cfg_source = Path(__file__).resolve().parent.parent.parent / "deploy" / "config" / "quality_gates.yaml"
 DEFAULT_CONFIG = _cfg_deployed if _cfg_deployed.exists() else _cfg_source
 
 

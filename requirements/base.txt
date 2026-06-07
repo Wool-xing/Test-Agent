@@ -43,7 +43,7 @@ tenacity==8.2.3
 loguru==0.7.3
 
 # 契约测试
-jsonschema==4.21.0
+jsonschema>=4.23.0
 
 # 报告
 reportlab==4.5.1

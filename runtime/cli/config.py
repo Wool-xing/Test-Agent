@@ -122,7 +122,7 @@ def cmd_list() -> None:
     for name, info in COMPAT_EXAMPLES.items():
         typer.echo(f"  {name:18s} {info}")
     typer.echo("")
-    typer.echo("📖 Full cookbook: config/llm-providers.md")
+    typer.echo("📖 Full cookbook: deploy/config/llm-providers.md")
 
 
 @config_app.command("show")

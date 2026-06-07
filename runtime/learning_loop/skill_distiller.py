@@ -66,7 +66,8 @@ def distill_skill(trace: ExecutionTrace, skill_name: str | None = None) -> str:
     Returns the file path of the generated skill.
     """
     name = skill_name or suggest_skill_name(trace)
-    skill_dir = Path(__file__).resolve().parents[2] / "skills"
+    from runtime.config.settings import get_settings
+    skill_dir = get_settings().skills_dir
     skill_dir.mkdir(parents=True, exist_ok=True)
     skill_path = skill_dir / f"{name}.md"
 

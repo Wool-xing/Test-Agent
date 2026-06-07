@@ -30,10 +30,12 @@ class Settings(BaseSettings):
     )
 
     project_root: Path = Field(default_factory=_get_project_root)
-    experts_dir: Path = Field(default=Path("agents"))
-    skills_dir: Path = Field(default=Path("skills"))
+    experts_dir: Path = Field(default=Path("ai/agents"))
+    skills_dir: Path = Field(default=Path("ai/skills"))
     scripts_dir: Path = Field(default=Path("utils"))
     workspace_dir: Path = Field(default=Path("workspace"))
+    config_dir: Path = Field(default=Path("deploy/config"))
+    templates_dir: Path = Field(default=Path("deploy/config/templates"))
 
     llm_provider: str = Field(default="claude")
     llm_provider_fallback: str = Field(default="ollama")

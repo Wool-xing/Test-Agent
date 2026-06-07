@@ -33,7 +33,7 @@ jobs:
           pip install pyyaml python-docx openpyxl factory-boy faker beautifulsoup4 pdfplumber httpx websocket-client python-multipart typer mcp croniter
 
       - name: Build Python backend
-        run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
+        run: pyinstaller --clean --noconfirm apps/desktop/pyinstaller/tagent_backend.spec
 
       - name: Build Web UI
         working-directory: runtime/web
@@ -42,7 +42,7 @@ jobs:
           npm run build
 
       - name: Build Electron
-        working-directory: desktop
+        apps/desktop
         run: |
           npm ci
           npx tsc -p electron/tsconfig.json
@@ -73,7 +73,7 @@ jobs:
           pip install pyyaml python-docx openpyxl factory-boy faker beautifulsoup4 pdfplumber httpx websocket-client python-multipart typer mcp croniter
 
       - name: Build Python backend
-        run: pyinstaller --clean --noconfirm desktop/pyinstaller/tagent_backend.spec
+        run: pyinstaller --clean --noconfirm apps/desktop/pyinstaller/tagent_backend.spec
 
       - name: Build Web UI
         working-directory: runtime/web
@@ -82,7 +82,7 @@ jobs:
           npm run build
 
       - name: Build Electron
-        working-directory: desktop
+        apps/desktop
         run: |
           npm ci
           npx tsc -p electron/tsconfig.json

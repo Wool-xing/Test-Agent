@@ -34,9 +34,9 @@ SOURCE_TO_TEST: list[tuple[str, str]] = [
     (r"utils/trackers/", "Bug trackers"),
     (r"desktop/", "Desktop app"),
     (r"runtime/web/", "Web UI"),
-    (r"agents/", "Agent definitions"),
-    (r"skills/", "Skill definitions"),
-    (r"config/", "Configuration"),
+    (r"ai/agents/", "Agent definitions"),
+    (r"ai/skills/", "Skill definitions"),
+    (r"deploy/config/", "Configuration"),
     (r"install.py", "Installation"),
 ]
 

@@ -162,7 +162,8 @@ def _get_memory() -> ConversationMemory:
 
 
 def _count_md_files(dirname: str) -> int:
-    d = _Path(__file__).resolve().parents[2] / dirname
+    from runtime.config.settings import get_settings
+    d = get_settings().project_root / dirname
     if not d.is_dir():
         return 0
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
@@ -721,10 +722,11 @@ def _cmd_ready(args: str) -> None:
 
 
 def _cmd_update(args: str) -> None:
-    """Check GitHub for newer version. Thin wrapper around config/check_version.py."""
+    """Check GitHub for newer version. Thin wrapper around deploy/config/check_version.py."""
     import subprocess
     import sys
-    checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+    from runtime.config.settings import get_settings
+    checker = get_settings().config_dir / "check_version.py"
     if not checker.is_file():
         console.print("[dim]Version checker not found.[/]")
         return
@@ -2474,7 +2476,8 @@ def start() -> None:
         import subprocess
         import threading
         def _check_version():
-            checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+            from runtime.config.settings import get_settings
+    checker = get_settings().config_dir / "check_version.py"
             if checker.is_file():
                 r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
                 if r.stdout.strip():

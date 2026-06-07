@@ -38,8 +38,9 @@ class McpToolResult:
 
 def _find_config() -> Path | None:
     """Locate the .mcp.json config file."""
+    from runtime.config.settings import get_settings
     candidates = [
-        Path(__file__).resolve().parents[2] / "config" / ".mcp.json",
+        get_settings().config_dir / ".mcp.json",
     ]
     for p in candidates:
         if p.is_file():

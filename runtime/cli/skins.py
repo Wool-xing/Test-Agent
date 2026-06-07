@@ -290,6 +290,6 @@ def apply_skin_to_banner(skin_name: str | None = None) -> str:
     skin = get_skin(skin_name)
     return skin["banner"].format(
         version=runtime.__version__,
-        experts=_count_md_files("agents"),
-        skills=_count_md_files("skills"),
+        experts=_count_md_files("ai/agents"),
+        skills=_count_md_files("ai/skills"),
     )

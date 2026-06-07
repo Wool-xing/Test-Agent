@@ -2,6 +2,20 @@
 
 欢迎扩展本项目。所有新增 agent / skill / utils 流程统一在此文档。
 
+## 项目架构速览
+
+| 目录 | 用途 | 放什么 | 不放什么 |
+|------|------|--------|---------|
+| `ai/` | AI模式界面层 | Agent .md, Skill .md | Python代码 |
+| `apps/` | 分发应用 | desktop/, mobile/ 等 | 共享业务逻辑 |
+| `deploy/` | 部署物料 | 配置模板, 市场, 合规 | 源码 |
+| `runtime/` | CLI引擎 | 业务逻辑.py | .md定义 |
+| `utils/` | 共享工具 | 工具函数.py | 编排逻辑 |
+| `docs/` | 文档 | 知识库, 教程 | 历史快照 |
+| `workspace/` | 运行时产出 | 测试报告(全部gitignored) | 源码 |
+
+**核心规则：新增文件前先问——这属于哪一层？** 找不到答案就在issue里问。
+
 ---
 
 ## 添加新 Agent
@@ -11,7 +25,7 @@
 3. 顶部 YAML frontmatter（必含 `name` / `description` / `tools`；可选 `requires_layer: [base, <layer>]` 标注依赖层，值见 `docs/charter/05-install-deploy.md` 六层定义）
 4. 编写：职责 / 工具栈 / Page Object 或调用模板 / 协作输出
 5. **同步**：
-   - `agents/README.md` 加一行
+   - `ai/agents/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `01-测试主管.md` 路由表（如平台扩展）
    - `utils/prd_loader.PLATFORM_KEYWORDS` 加关键词（如平台扩展）
@@ -33,7 +47,7 @@
    - 质量门禁
    - 输出文件
 5. **同步**：
-   - `skills/README.md` 加一行
+   - `ai/skills/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `docs/getting-started/使用手册.md` skill 详解段加描述
    - `01-测试主管.md` 快速命令清单加一行
@@ -51,10 +65,10 @@
 5. **同步**：
    - `utils/README.md` 表格加一行
    - `00-项目导航.md` 对应分类加一行
-   - `config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
-   - `config/.env.example` 加配置字段
-   - `config/conftest.py` `pytest_configure` 加产出目录
-   - `config/pytest.ini` markers 加新标记
+   - `deploy/config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
+   - `deploy/config/.env.example` 加配置字段
+   - `deploy/config/conftest.py` `pytest_configure` 加产出目录
+   - `deploy/config/pytest.ini` markers 加新标记
    - `install.py` utils 数组 + 数字
    - `docs/getting-started/部署说明.md` 拷贝清单 + 数字
 
@@ -71,9 +85,9 @@
 
 ## 添加新 .env 字段
 
-1. `config/.env.example` 加（带注释）
+1. `deploy/config/.env.example` 加（带注释）
 2. `docs/getting-started/配置清单.md` 字段说明加一行
-3. `config/conftest.py` `EnvConfig` 加字段（如功能必需）
+3. `deploy/config/conftest.py` `EnvConfig` 加字段（如功能必需）
 4. CI yml / Jenkins Credentials 同步（如 CI 需要）
 
 ---
@@ -110,10 +124,10 @@ perf(jmeter): 减少不必要心跳
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
-ls agents/[0-9]*.md | wc -l   # 16（或 +N）
-ls skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
+ls ai/agents/[0-9]*.md | wc -l   # 16（或 +N）
+ls ai/skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
 ls utils/*.py | wc -l         # 79（或 +N,含 __init__.py）
-grep -c "^    [a-z_]+:" config/pytest.ini  # markers 数
+grep -c "^    [a-z_]+:" deploy/config/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
 ```
@@ -128,12 +142,12 @@ pytest --collect-only
 
 | 改动类型 | 必同步至 |
 |---------|---------|
-| 新增/删除 Agent | `agents/README.md` + `00-项目导航.md` + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS`（install.py 用 glob 自动发现，无需手动加文件名） |
-| 新增/删除 Skill | `skills/README.md` + `00-项目导航.md` + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单（install.py 用 glob 自动发现） |
+| 新增/删除 Agent | `ai/agents/README.md` + `00-项目导航.md` + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS`（install.py 用 glob 自动发现，无需手动加文件名） |
+| 新增/删除 Skill | `ai/skills/README.md` + `00-项目导航.md` + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单（install.py 用 glob 自动发现） |
 | 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers（install.py 用 os.walk 自动发现 .py） |
 | 数字变化（18/32+3 子目录/49） | grep 全项目 + 同步顶层 README/FULL_GUIDE/00-项目导航/ROADMAP/使用手册/部署说明/install.py + ci.yml `file-count` job 校验 |
 | URL/repo 名变化 | grep `Wool-xing/Test-Agent` 全替换 + `install.py::REPO_URL` + `dependabot.yml` |
-| 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `agents/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
+| 门禁阈值变化 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `ai/agents/01-测试主管.md::QUALITY_GATES` + 各 skill 门禁段 |
 
 ### 自动化保障
 
@@ -152,7 +166,7 @@ pytest --collect-only
 
 ## RACI 协作矩阵（浓缩版）
 
-> 完整路由逻辑见 `agents/01-测试主管.md` PLATFORM_KEYWORDS 与 `agents/README.md` 流程依赖关系。
+> 完整路由逻辑见 `ai/agents/01-测试主管.md` PLATFORM_KEYWORDS 与 `ai/agents/README.md` 流程依赖关系。
 
 ### 缩写
 
