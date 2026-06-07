@@ -452,6 +452,10 @@ def _handle_natural_language(text: str) -> None:
                     console.print(f"  [{color}]⚠ Regression: {report.summary}[/] [dim](/regression for details)[/]")
                 else:
                     console.print(f"  [dim]📈 {report.summary}[/]")
+
+                # Flaky detection
+                from runtime.cli.flaky_manager import record_run, get_flaky_list
+                record_run(summary.get("results", {}), run_id)
             except Exception:
                 pass
     except KeyboardInterrupt:
@@ -1908,6 +1912,51 @@ def _cmd_progress(args: str) -> None:
     )
 
 
+# ── /flaky — flaky test management ─────────────────────────────────
+
+
+def _cmd_flaky(args: str) -> None:
+    """Show flaky test analysis. /flaky list | quarantine | clear."""
+    from runtime.cli.flaky_manager import get_flaky_list, get_quarantined, clear_tracker
+    from rich.table import Table
+
+    action = args.strip().lower()
+    if action == "clear":
+        clear_tracker()
+        console.print("[green]Flaky tracker cleared.[/]")
+        return
+    if action == "quarantine":
+        q = get_quarantined()
+        if q:
+            console.print(f"[yellow]Quarantined ({len(q)}):[/]")
+            for n in q:
+                console.print(f"  ⊘ {n}")
+        else:
+            console.print("[dim]No quarantined tests.[/]")
+        return
+
+    entries = get_flaky_list()
+    if not entries:
+        console.print("[dim]No flaky data yet. Run tests multiple times to collect.[/]")
+        return
+
+    table = Table(title="Flaky Tests", show_header=True)
+    table.add_column("Name")
+    table.add_column("Score")
+    table.add_column("Runs")
+    table.add_column("Pass Rate")
+    table.add_column("Status")
+    for e in entries[:15]:
+        history = e.run_history
+        runs = len(history)
+        passes = sum(1 for r in history if r["ok"])
+        rate = f"{passes}/{runs}" if runs else "-"
+        status = "[red]quarantined[/]" if e.quarantined else "[dim]tracking[/]"
+        score_color = "red" if e.flaky_score >= 0.5 else "yellow" if e.flaky_score >= 0.2 else "dim"
+        table.add_row(e.node_name[:40], f"[{score_color}]{e.flaky_score:.2f}[/]", str(runs), rate, status)
+    console.print(table)
+
+
 # ── /regression — view regression report ────────────────────────────
 
 
@@ -2113,6 +2162,7 @@ _BUILTIN_MAP = {
     "insights": _cmd_insights,
     "progress": _cmd_progress,
     "regression": _cmd_regression,
+    "flaky": _cmd_flaky,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
