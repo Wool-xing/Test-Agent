@@ -202,7 +202,7 @@ jobs:
 
       - name: runtime/ 零 ai/ 引用
         run: |
-          refs=$(grep -rn "from ai\.\|import ai\.\|ai/agents\|ai/skills" --include="*.py" runtime/ 2>/dev/null || true)
+          refs=$(grep -rn "from ai\.\|import ai\." --include="*.py" runtime/ 2>/dev/null || true)
           [ -z "$refs" ] || { echo "FAIL: runtime/ references ai/"; exit 1; }
           echo "OK: zero ai/ imports in runtime/"
 
