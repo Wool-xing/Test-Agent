@@ -1533,6 +1533,57 @@ def _cmd_distill(args: str) -> None:
     _last_trace = None  # consume once
 
 
+# ── /api — API contract testing ────────────────────────────────────
+
+
+def _cmd_api(args: str) -> None:
+    """API testing: /api gen <spec> <base_url> | test <base_url> [spec]."""
+    from rich.table import Table
+    parts = args.strip().split(maxsplit=1)
+    action = parts[0].lower() if parts else ""
+    rest = parts[1] if len(parts) > 1 else ""
+
+    if action == "gen":
+        sub = rest.split(maxsplit=1)
+        if len(sub) < 2:
+            console.print("[dim]Usage: /api gen <spec_path_or_url> <base_url>[/]")
+            return
+        try:
+            from utils.design.openapi_test_gen import load_openapi_spec, generate_test_cases
+            spec = load_openapi_spec(sub[0])
+            path = generate_test_cases(spec, sub[1])
+            endpoints = len(spec.get("paths", {}))
+            console.print(f"[green]Generated:[/] ~{endpoints * 5} test cases [dim]→ {path}[/]")
+        except Exception as e:
+            console.print(f"[red]{e}[/]")
+
+    elif action == "test":
+        sub = rest.split(maxsplit=1)
+        if not sub:
+            console.print("[dim]Usage: /api test <base_url> [spec_path][/]")
+            return
+        console.print(f"[bold]API Smoke:[/] {sub[0]}")
+        try:
+            from utils.design.openapi_test_gen import load_openapi_spec, smoke_test_all_endpoints
+            spec = load_openapi_spec(sub[1]) if len(sub) > 1 else {"paths": {}}
+            if not spec.get("paths"):
+                console.print("[dim]No OpenAPI spec — use /api gen first[/]")
+                return
+            result = smoke_test_all_endpoints(spec, sub[0])
+            table = Table(title="API Smoke Results")
+            table.add_column("Endpoint")
+            table.add_column("Status")
+            for d in result["details"][:15]:
+                icon = "[green]✓[/]" if d.get("ok") else "[red]✗[/]"
+                table.add_row(f"{d.get('method','GET')} {d.get('path','?')}", icon)
+            console.print(table)
+            console.print(f"[bold]{result['passed']}/{result['total']} ok[/]")
+        except Exception as e:
+            console.print(f"[red]{e}[/]")
+    else:
+        console.print("[dim]Usage: /api gen <spec> <base_url> | test <base_url> [spec][/]")
+
+
 # ── /plugins — list loaded plugins (P3 #22) ────────────────────────
 
 
@@ -2317,6 +2368,7 @@ _BUILTIN_MAP = {
     "clean": _cmd_clean,
     "cross": _cmd_cross,
     "data": _cmd_data,
+    "api": _cmd_api,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
