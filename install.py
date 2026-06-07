@@ -377,32 +377,16 @@ def copy_skills(template_dir, project_root):
 
 
 def copy_ai_support(template_dir, project_root):
-    """拷贝 ai/ 目录中 agents/ skills/ 之外的元文件到部署后 ai/ 目录。
-
-    agents/ 和 skills/ 由 copy_agents / copy_skills 专门处理（含 .claude/ 双份拷贝），
-    此处只拷贝 CLAUDE.md、INDEX.md 及其他非 agents/skills 内容。
-    """
+    """拷贝完整 ai/ 目录到部署项目 — AI 协作模式界面。"""
     ai_src = os.path.join(template_dir, "ai")
     if not os.path.isdir(ai_src):
         return
     ai_dst = os.path.join(project_root, "ai")
-    os.makedirs(ai_dst, exist_ok=True)
-    print("→ 拷贝 ai/ 支持文件...")
-    count = 0
-    for entry in os.listdir(ai_src):
-        if entry in ("agents", "skills"):
-            continue
-        src = os.path.join(ai_src, entry)
-        dst = os.path.join(ai_dst, entry)
-        if os.path.isfile(src):
-            shutil.copy2(src, dst)
-            count += 1
-        elif os.path.isdir(src):
-            if os.path.exists(dst):
-                shutil.rmtree(dst)
-            shutil.copytree(src, dst)
-            count += 1
-    print(f"  已部署 {count} 个 ai/ 支持项")
+    print("→ 拷贝 ai/ 目录...")
+    if os.path.exists(ai_dst):
+        shutil.rmtree(ai_dst)
+    shutil.copytree(ai_src, ai_dst)
+    print("  已部署 ai/ 目录")
 
 
 def _ensure_env_overrides(env_path: str) -> None:
