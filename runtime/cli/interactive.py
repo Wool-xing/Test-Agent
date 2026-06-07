@@ -247,7 +247,7 @@ def _print_help() -> None:
             ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
             ("/lang [zh|en|zh-en]", "Switch UI language"),
             ("/skin [name]", "Switch CLI theme (4 skins)"),
-            ("/fc", "Fix last typo (命令纠错)"),
+            ("/fc", "Fix last typo (like thefuck)"),
             ("/! /1..9", "Command history / re-run"),
             ("/alias add|list", "Command shortcuts"),
             ("/personality [name]", "Set agent persona (loads expert)"),
@@ -492,7 +492,7 @@ def _handle_natural_language(text: str) -> None:
         mem.add("assistant", f"[Error: {type(_exc).__name__}]")
 
 
-# ── Fuzzy matching ─────────────────────────────────
+# ── Fuzzy matching (thefuck-style) ─────────────────────────────────
 
 
 def _closest_command(name: str) -> str | None:
@@ -672,7 +672,7 @@ def _cmd_history(args: str) -> None:
     console.print(f"[dim]Run /1 (most recent) through /{min(9, len(_cmd_history))} to re-execute.[/]")
 
 
-# ── /fc — fix last command typo ────────────────────
+# ── /fc — fix last command typo (thefuck-style) ────────────────────
 
 
 def _cmd_fc(args: str) -> None:

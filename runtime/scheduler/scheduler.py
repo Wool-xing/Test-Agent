@@ -1,4 +1,4 @@
-"""Scheduler tick loop ().
+"""Scheduler tick loop (hermes §1.2).
 
 - 60s tick from a background thread
 - Cross-platform file lock (fcntl/msvcrt) prevents double-run

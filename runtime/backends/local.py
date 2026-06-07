@@ -1,4 +1,4 @@
-"""Local subprocess backend ()."""
+"""Local subprocess backend (hermes §1.4)."""
 
 from __future__ import annotations
 
