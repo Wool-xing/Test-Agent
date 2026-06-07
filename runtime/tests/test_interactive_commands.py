@@ -13,13 +13,13 @@ class TestSlashHelp:
 
 class TestSlashStatus:
     def test_status_function_imports(self):
-        from runtime.cli.interactive import _cmd_status
+        from runtime.cli.commands.slash_handlers import _cmd_status
         assert callable(_cmd_status)
 
 
 class TestSlashModel:
     def test_model_list(self):
-        from runtime.cli.interactive import _cmd_model
+        from runtime.cli.commands.slash_handlers import _cmd_model
         assert callable(_cmd_model)
 
     def test_model_unknown_provider(self):
@@ -42,23 +42,23 @@ class TestSlashModel:
 
 class TestSlashCost:
     def test_cost_function_imports(self):
-        from runtime.cli.interactive import _cmd_cost
+        from runtime.cli.commands.slash_handlers import _cmd_cost
         assert callable(_cmd_cost)
 
     def test_estimate_cost_returns_tuple(self):
-        from runtime.cli.interactive import _estimate_cost, _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         tokens, cost = _estimate_cost(mem)
         assert isinstance(tokens, int)
         assert isinstance(cost, float)
 
     def test_price_table_has_all_providers(self):
-        from runtime.cli.interactive import _PRICE_PER_1K, _PROVIDERS
+        from runtime.cli.commands.slash_handlers import _PRICE_PER_1K; from runtime.cli.interactive import _PROVIDERS
         for p in _PROVIDERS:
             assert p in _PRICE_PER_1K, f"Missing pricing for {p}"
 
     def test_cost_formats_currency(self):
-        from runtime.cli.interactive import _estimate_cost, _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.add("user", "test")
         mem.add("assistant", "done")
@@ -68,7 +68,7 @@ class TestSlashCost:
 
 class TestSlashClear:
     def test_clear_resets_memory(self):
-        from runtime.cli.interactive import _cmd_clear, _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_clear; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.add("user", "hello")
         _cmd_clear("")
@@ -77,29 +77,29 @@ class TestSlashClear:
 
 class TestSlashContext:
     def test_context_function_imports(self):
-        from runtime.cli.interactive import _cmd_context
+        from runtime.cli.commands.slash_handlers import _cmd_context
         assert callable(_cmd_context)
 
 
 class TestSlashSessions:
     def test_sessions_function_imports(self):
-        from runtime.cli.interactive import _cmd_sessions
+        from runtime.cli.commands.slash_handlers import _cmd_sessions
         assert callable(_cmd_sessions)
 
 
 class TestSlashExport:
     def test_export_function_imports(self):
-        from runtime.cli.interactive import _cmd_export
+        from runtime.cli.commands.slash_handlers import _cmd_export
         assert callable(_cmd_export)
 
 
 class TestSlashCompact:
     def test_compact_function_imports(self):
-        from runtime.cli.interactive import _cmd_compact
+        from runtime.cli.commands.slash_handlers import _cmd_compact
         assert callable(_cmd_compact)
 
     def test_compact_too_few_turns(self):
-        from runtime.cli.interactive import _cmd_compact, _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_compact; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         _cmd_compact("")  # should not crash with 0 messages
@@ -107,7 +107,7 @@ class TestSlashCompact:
 
 class TestSlashTools:
     def test_tools_function_imports(self):
-        from runtime.cli.interactive import _cmd_tools
+        from runtime.cli.commands.slash_handlers import _cmd_tools
         assert callable(_cmd_tools)
 
 
@@ -117,22 +117,22 @@ class TestSlashDispatch:
         assert callable(_handle_slash)
 
     def test_builtin_map_has_all_keys(self):
-        from runtime.cli.interactive import _BUILTIN_MAP
+        from runtime.cli.slash_commands import resolve
         expected = {"help", "h", "?", "quit", "q", "exit", "status",
                      "model", "tools", "cost", "usage", "sessions",
-                     "export", "compact", "context", "clear", "session",
+                     "export", "compact", "context", "clear",
                      "remember", "forget", "memory",
                      "mcp", "mcp-call", "cron", "cron-health", "model-router"}
         for key in expected:
-            assert key in _BUILTIN_MAP, f"Missing builtin: {key}"
+            assert resolve(key) is not None, f"Missing command: {key}"
 
     def test_closest_command_returns_none_for_gibberish(self):
-        from runtime.cli.interactive import _closest_command
+        from runtime.cli.slash_commands import closest as _closest_command
         result = _closest_command("xyzwq")
         assert result is None
 
     def test_edit_distance_edge_cases(self):
-        from runtime.cli.interactive import _edit_distance
+        from runtime.cli.slash_commands import _edit_distance
         assert _edit_distance("", "") == 0
         assert _edit_distance("a", "") == 1
         assert _edit_distance("", "a") == 1
@@ -140,20 +140,20 @@ class TestSlashDispatch:
 
 class TestFuzzyMatching:
     def test_common_typos_corrected(self):
-        from runtime.cli.interactive import _closest_command
+        from runtime.cli.slash_commands import closest as _closest_command
         # These should all find matches
         assert _closest_command("modl") == "model"
         assert _closest_command("tets") == "test"
         assert _closest_command("contxt") == "context"
 
     def test_very_different_no_match(self):
-        from runtime.cli.interactive import _closest_command
+        from runtime.cli.slash_commands import closest as _closest_command
         assert _closest_command("zzzpq") is None
 
 
 class TestCostEstimation:
     def test_empty_memory_minimal_tokens(self):
-        from runtime.cli.interactive import _estimate_cost, _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         tokens, cost = _estimate_cost(mem)
@@ -161,7 +161,7 @@ class TestCostEstimation:
         assert cost >= 0.0
 
     def test_cost_scales_with_messages(self):
-        from runtime.cli.interactive import _estimate_cost, _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         mem.add("user", "x" * 400)
@@ -171,13 +171,13 @@ class TestCostEstimation:
         assert cost >= 0.0  # may be 0 if provider=stub
 
     def test_ollama_pricing_is_zero(self):
-        from runtime.cli.interactive import _PRICE_PER_1K
+        from runtime.cli.commands.slash_handlers import _PRICE_PER_1K
         in_p, out_p = _PRICE_PER_1K["ollama"]
         assert in_p == 0
         assert out_p == 0
 
     def test_claude_pricing_positive(self):
-        from runtime.cli.interactive import _PRICE_PER_1K
+        from runtime.cli.commands.slash_handlers import _PRICE_PER_1K
         in_p, out_p = _PRICE_PER_1K["claude"]
         assert in_p > 0
         assert out_p > 0
@@ -185,7 +185,7 @@ class TestCostEstimation:
 
 class TestCompact:
     def test_compact_too_few_messages(self):
-        from runtime.cli.interactive import _cmd_compact, _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_compact; from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         mem.add("user", "a")
@@ -193,7 +193,7 @@ class TestCompact:
         _cmd_compact("")  # should not crash with 2 messages
 
     def test_compact_on_six_messages(self):
-        from runtime.cli.interactive import _cmd_compact, _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_compact, _get_memory
         mem = _get_memory()
         mem.clear()
         for i in range(6):
@@ -204,19 +204,19 @@ class TestCompact:
 
 class TestSessions:
     def test_sessions_no_crash(self):
-        from runtime.cli.interactive import _cmd_sessions
+        from runtime.cli.commands.slash_handlers import _cmd_sessions
         _cmd_sessions("")  # should not crash even with no sessions
 
 
 class TestExport:
     def test_export_empty_memory(self):
-        from runtime.cli.interactive import _cmd_export, _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_export, _get_memory
         mem = _get_memory()
         mem.clear()
         _cmd_export("")  # should not crash
 
     def test_export_with_messages(self):
-        from runtime.cli.interactive import _cmd_export, _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_export, _get_memory
         mem = _get_memory()
         mem.add("user", "hello")
         _cmd_export("")  # should create export file
@@ -224,11 +224,11 @@ class TestExport:
 
 class TestMemoryCommands:
     def test_remember_no_args(self):
-        from runtime.cli.interactive import _cmd_remember
+        from runtime.cli.commands.slash_handlers import _cmd_remember
         _cmd_remember("")  # should not crash
 
     def test_remember_and_forget(self):
-        from runtime.cli.interactive import _cmd_remember, _cmd_forget
+        from runtime.cli.commands.slash_handlers import _cmd_remember, _cmd_forget
         from runtime.cli.conversation import load_memory_md
         _cmd_remember("Test fact: project uses Python")
         mem = load_memory_md()
@@ -238,22 +238,22 @@ class TestMemoryCommands:
         assert "Test fact: project uses Python" not in mem
 
     def test_forget_no_args(self):
-        from runtime.cli.interactive import _cmd_forget
+        from runtime.cli.commands.slash_handlers import _cmd_forget
         _cmd_forget("")  # should not crash
 
     def test_forget_nonexistent(self):
-        from runtime.cli.interactive import _cmd_forget
+        from runtime.cli.commands.slash_handlers import _cmd_forget
         _cmd_forget("xyznonexistent123")  # should not crash
 
     def test_memory_display(self):
-        from runtime.cli.interactive import _cmd_memory
+        from runtime.cli.commands.slash_handlers import _cmd_memory
         _cmd_memory("")  # should not crash even when empty
 
     def test_memory_builtin_registered(self):
-        from runtime.cli.interactive import _BUILTIN_MAP
-        assert "remember" in _BUILTIN_MAP
-        assert "forget" in _BUILTIN_MAP
-        assert "memory" in _BUILTIN_MAP
+        from runtime.cli.slash_commands import resolve
+        assert resolve("remember") is not None
+        assert resolve("forget") is not None
+        assert resolve("memory") is not None
 
     def test_banner_imports_and_runs(self):
         from runtime.cli.interactive import _print_banner

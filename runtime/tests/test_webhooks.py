@@ -1,4 +1,8 @@
-"""TDD: IM webhook endpoints — payload parsing, verification, response formatting."""
+"""TDD: IM webhook endpoints — payload parsing, verification, response formatting.
+
+本文件中所有 secret/签名均为虚构测试数据，不是真实凭据。
+All secrets and signatures are fake test fixtures — not real credentials.
+"""
 
 from __future__ import annotations
 
