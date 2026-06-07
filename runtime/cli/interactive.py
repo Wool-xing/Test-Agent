@@ -1534,6 +1534,52 @@ def _cmd_plugins_list(args: str) -> None:
     console.print(table)
 
 
+# ── /alias — command shortcuts ─────────────────────────────────────
+
+
+def _cmd_alias(args: str) -> None:
+    """Manage command aliases: /alias list | add <name> <cmd> | remove <name>."""
+    from runtime.cli.aliases import list_aliases, add_alias, remove_alias
+    from rich.table import Table
+
+    parts = args.strip().split(maxsplit=1)
+    action = parts[0].lower() if parts else "list"
+    rest = parts[1] if len(parts) > 1 else ""
+
+    if action == "list" or not action:
+        aliases = list_aliases()
+        if not aliases:
+            console.print("[dim]No aliases. /alias add smoke '/test --quick'[/]")
+            return
+        table = Table(title=f"Aliases · {len(aliases)}", show_header=True)
+        table.add_column("Name", style="cyan")
+        table.add_column("Command")
+        for a in aliases:
+            table.add_row(a.name, a.command[:80])
+        console.print(table)
+
+    elif action == "add":
+        sub = rest.strip().split(maxsplit=1)
+        name = sub[0] if sub else ""
+        cmd = sub[1] if len(sub) > 1 else ""
+        if not name or not cmd:
+            console.print("[dim]Usage: /alias add <name> <command>[/]")
+            console.print("[dim]Example: /alias add smoke '/test --quick'[/]")
+            return
+        a = add_alias(name, cmd)
+        console.print(f"[green]Alias:[/] [cyan]{a.name}[/] → {a.command}")
+
+    elif action == "remove":
+        name = rest.strip()
+        if not name:
+            console.print("[dim]Usage: /alias remove <name>[/]")
+            return
+        if remove_alias(name):
+            console.print(f"[green]Removed: {name}[/]")
+        else:
+            console.print(f"[red]Not found: {name}[/]")
+
+
 # ── /ws — workspace management ─────────────────────────────────────
 
 
@@ -1949,6 +1995,7 @@ _BUILTIN_MAP = {
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
+    "alias": _cmd_alias,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
 
@@ -2191,6 +2238,14 @@ def start() -> None:
         elif _is_multiline_candidate(user_input):
             # Already contains newlines from paste — process as-is
             pass
+
+        # Alias expansion: check non-slash input against aliases
+        if not user_input.startswith("/"):
+            from runtime.cli.aliases import expand_alias
+            expanded = expand_alias(user_input)
+            if expanded:
+                console.print(f"[dim]→ {expanded}[/]")
+                user_input = expanded
 
         # Record in command history (non-slash only)
         if not user_input.startswith("/"):
