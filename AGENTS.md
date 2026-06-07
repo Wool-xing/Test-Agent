@@ -9,11 +9,11 @@
 - Do NOT execute test workflows directly — read the Skill doc and follow its agent call sequence.
 
 **Correct flow:**
-1. Read `skills/<task>.md` to understand the workflow
+1. Read `ai/skills/<task>.md` to understand the workflow
 2. Follow the Skill doc's step-by-step agent call sequence
 3. Use Agent tools ONLY when and how the Skill doc says
 
-**If no Skill doc matches the task:** fall back to `skills/test-coordinator.md`.
+**If no Skill doc matches the task:** fall back to `ai/skills/test-coordinator.md`.
 
 ---
 
@@ -42,7 +42,7 @@ cd project-dir
 ```
 
 **Agent 工作流:**
-1. Read `skills/<task>.md` first
+1. Read `ai/skills/<task>.md` first
 2. Follow Skill doc sequence (requirements-analyst → testcase-designer → ...)
 3. Outputs in workspace/
 
@@ -54,10 +54,10 @@ cd project-dir
 Standalone CLI (tagent)              AI Agent Mode
         │                                      │
         ▼                                      ▼
-   runtime/router                    Skill docs (skills/*.md)
+   runtime/router                    Skill docs (ai/skills/*.md)
         │                                      │
         ▼                                      ▼
-   runtime/orchestrator              Agent defs (agents/*.md)
+   runtime/orchestrator              Agent defs (ai/agents/*.md)
         │                                      │
         ▼                                      ▼
    utils/*.py (79 modules)           utils/*.py (79 modules)
@@ -69,11 +69,12 @@ Both paths converge at the utils execution layer.
 
 | What | Where |
 |------|-------|
-| Agent definitions | `agents/` (16 agents) |
-| Skill workflow docs | `skills/` (32 skills + 3 meta-skill packages) |
+| Agent definitions | `ai/agents/` (16 agents) |
+| Skill workflow docs | `ai/skills/` (32 skills + 3 meta-skill packages) |
 | Python utils | `utils/` (79 modules) |
 | Runtime (CLI + orchestrator + MCP) | `runtime/` |
-| Config templates | `config/` (incl. `.env.example`) |
+| Deploy templates | `deploy/config/` (incl. `.env.example`) |
+| Distributable apps | `apps/` (desktop, mobile) |
 | Test outputs | `workspace/` |
 | CI pipelines | `ci/` |
 | Docs | `docs/` |

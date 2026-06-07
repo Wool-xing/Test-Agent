@@ -41,4 +41,4 @@ llm_providers:
 
 - 主宪章 §5 多格式 I/O · §36 多端通知 canon · §37 BugTracker canon
 - 上一级:[`../INDEX.md`](../INDEX.md)
-- 实现:[`../../runtime/init/INDEX.md`](../../runtime/init/INDEX.md)
+- 实现:[`../../runtime/init/INDEX.md`](../../../runtime/init/INDEX.md)

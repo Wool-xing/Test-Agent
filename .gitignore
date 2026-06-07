@@ -8,73 +8,46 @@ __pycache__/
 venv/
 env/
 .python-version
+pip-wheel-metadata/
 
-# ===== 测试产出（不提交）=====
+# ===== Testing =====
 .pytest_cache/
 .allure-results/
 .coverage
+coverage.xml
 htmlcov/
 
-# workspace 测试产出（敏感 + 体积大）
-workspace/测试数据/
-workspace/automotive/
-workspace/测试用例/
-workspace/测试计划/
-workspace/需求分析/
-workspace/执行日志/
-workspace/audit/
-workspace/_outputs/
-workspace/feedback/
-workspace/自动化脚本/
+# ===== Lint =====
+.ruff_cache/
 
-# 测试报告 — 排除产物，保留 baselines/
-# 根级直接文件（临时报告、自检产物等）
-workspace/测试报告/*.md
-workspace/测试报告/*.docx
-workspace/测试报告/*.json
-# 旧式子目录（v1.42 前，无项目名层级）
-workspace/测试报告/allure-results/
-workspace/测试报告/allure-report/
-workspace/测试报告/jmeter-results/
-workspace/测试报告/jmeter-report/
-workspace/测试报告/decisions/
-workspace/测试报告/evidence/
-workspace/测试报告/reports/
-workspace/测试报告/security/
-workspace/测试报告/history/
-workspace/测试报告/quarantine/
-workspace/测试报告/soak/
-workspace/测试报告/ai-*/
-workspace/测试报告/web-vitals/
-workspace/测试报告/silent-failures/
-workspace/测试报告/audit/
-workspace/测试报告/screenshots/
-# 按 run_id 隔离的产出目录（时间戳格式: YYYYMMDD_HHMMSS_xxxxxx）
-workspace/测试报告/*/2*/
-# 项目级产出子目录（{项目名}/ 下）
-workspace/测试报告/*/screenshots/
-workspace/测试报告/*/allure-results/
-workspace/测试报告/*/allure-report/
-workspace/测试报告/*/jmeter-results/
-workspace/测试报告/*/jmeter-report/
-workspace/测试报告/*/decisions/
-workspace/测试报告/*/evidence/
-workspace/测试报告/*/reports/
-workspace/测试报告/*/security/
-workspace/测试报告/*/history/
-workspace/测试报告/*/quarantine/
-workspace/测试报告/*/soak/
-workspace/测试报告/*/ai-*/
-workspace/测试报告/*/web-vitals/
-workspace/测试报告/*/silent-failures/
-workspace/测试报告/*/audit/
+# ===== Node / npm =====
+node_modules/
+npm-debug.log
+package-lock.json
 
-# ===== 敏感配置 =====
-.env
-.env.local
-.env.*.local
+# ===== Build output =====
+build/
+dist/
+dist-python/
+dist-electron/
+*.exe
+*.dmg
+*.app
+out/
+*.tsbuildinfo
 
-# ===== IDE / 编辑器 =====
+# ===== Logs & temp =====
+*.log
+logs/
+*.tmp
+*.bak
+*.cache
+tmp/
+temp/
+*_backup.*
+*_old.*
+
+# ===== IDE / Editor =====
 .vscode/
 .idea/
 *.swp
@@ -82,130 +55,93 @@ workspace/测试报告/*/audit/
 *~
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# ===== Claude Code =====
+# ===== Environment =====
+.env
+.env.local
+.env.*.local
+
+# ===== Claude Code runtime (generated at deploy time) =====
 .claude/agents/
 .claude/skills/
 .claude/cache/
 .claude/sessions/
+.claude/settings.local.json
+.claude-crap/
 
-# ===== Node（npm 安装的 Claude Code 等）=====
-node_modules/
-npm-debug.log
-package-lock.json
+# ===== Workspace runtime output =====
+workspace/测试报告/
+workspace/automotive/
+workspace/测试数据/
+workspace/测试用例/
+workspace/测试计划/
+workspace/需求分析/
+workspace/执行日志/
+workspace/_outputs/
+workspace/audit/
+workspace/feedback/
+workspace/cron/
+workspace/cache/
+workspace/gateway/
+workspace/自动化脚本/
+workspace/**/_smoke_*
 
-# ===== 操作系统 =====
-desktop.ini
-
-# ===== 日志 =====
-*.log
-logs/
-
-# ===== 临时文件 =====
-*.tmp
-*.bak
-*.cache
-tmp/
-temp/
-
-# ===== 移动端构建产物 =====
-*.apk
-*.ipa
-*.aab
-
-# ===== 桌面构建产物 =====
-*.exe
-*.dmg
-*.app
-build/
-dist/
-
-# ===== 视觉测试中间文件 =====
-workspace/自动化脚本/python/visual/screenshots/
-*.airtestlog/
-
-# ===== JMeter 中间文件 =====
-*.jmeter.log
-jmeter.log
-
-# ===== Allure 中间 =====
-allure-history/
-allure-report/
-
-# ===== Java =====
-*.class
-target/
-
-# ===== 备份文件 =====
-*_backup.*
-*_old.*
-
-# ===== Ruff 缓存 =====
-.ruff_cache/
-
-# ===== JMeter 原始结果（敏感+大）=====
-*.jtl
-
-# ===== 证书 / 私钥（防误提交）=====
-*.pem
-*.key
-*.crt
-*.p12
-
-# ===== Desktop build artifacts =====
-desktop/out/
-desktop/node_modules/
-dist-python/
-dist-electron/
-
-# ===== 私源文档 (不上 Git) =====
-mobile/PUBLISH.md
-*.AppImage
-*.pfx
-*.jks
-id_rsa
-id_dsa
-id_ed25519
-
-# ===== 覆盖率显式（除 .coverage）=====
-coverage.xml
-
-# ===== 构建中间产物 =====
-pip-wheel-metadata/
-
-# ===== 私有源文档（个人归属，不公开）=====
+# ===== Private source docs (not for public repo) =====
 Test-Agent.md
 00-协作宪章.md
 灵感笔记.md
-_精髓库_apply_policy.example.yaml
-
-# ===== 私有精髓库（跨项目知识，绝不公开 · 主宪章 §29 + V1.10 §34）=====
-# 正确位置:D:/项目文件/_精髓库/(repo 外)。若误 cp 进 repo,pre-commit hook 二次拦截
 _精髓库/
 **/_精髓库/
 
-# ===== 自检 smoke 临时产物 =====
-workspace/**/_smoke_*
-workspace/测试用例/_smoke_out/
-
-# ===== 内部开发文档（HANDOFF / 内部讨论纪要,不入公开仓）=====
+# ===== Internal dev docs =====
 discussions/internal/
 docs/审查报告/
 docs/参考库/
 docs/decisions/
 archive/
 
-# ===== runtime 运行时产物（用户数据，不入仓）=====
-runtime/workspace/
-runtime/web/tsconfig.tsbuildinfo
-workspace/cron/
-workspace/gateway/
+# ===== Mobile builds =====
+*.apk
+*.ipa
+*.aab
+*.AppImage
+mobile/PUBLISH.md
 
-# ===== Claude Code 插件缓存 =====
-.claude-crap/
+# ===== Desktop apps ====
+# Electron/TS compiled output
+apps/desktop/out/
+apps/desktop/node_modules/
 
-# ===== 版本检查时间戳（自动生成）=====
+# ===== Security =====
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_dsa
+id_ed25519
+*.har
+
+# ===== Java =====
+*.class
+target/
+
+# ===== JMeter =====
+*.jtl
+*.jmeter.log
+
+# ===== Allure =====
+allure-history/
+allure-report/
+
+# ===== Visual testing =====
+*.airtestlog/
+
+# ===== Version state =====
 VERSION_last_check
 
-# ===== 安全：可能含敏感数据的文件 =====
-*.har
+# ===== Runtime artifacts =====
+runtime/workspace/

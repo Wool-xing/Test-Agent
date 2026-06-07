@@ -162,7 +162,8 @@ def _get_memory() -> ConversationMemory:
 
 
 def _count_md_files(dirname: str) -> int:
-    d = _Path(__file__).resolve().parents[2] / dirname
+    from runtime.config.settings import get_settings
+    d = get_settings().project_root / dirname
     if not d.is_dir():
         return 0
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
@@ -222,6 +223,17 @@ def _print_help() -> None:
             ("/run   <target>", "Plan + execute (quick)"),
             ("/plan  <target>", "Plan only, no execution"),
         ]),
+        ("Data & API", [
+            ("/data users|related <N>", "Generate test data"),
+            ("/api gen|test", "OpenAPI contract testing"),
+            ("/cross env <e1> <e2>", "Cross-environment test run"),
+        ]),
+        ("Quality", [
+            ("/regression", "Regression detection vs baseline"),
+            ("/flaky list|quarantine", "Flaky test management"),
+            ("/prioritize", "Prioritize by git changes"),
+            ("/clean", "Clean temp data (preserves deliverables)"),
+        ]),
         ("Info", [
             ("/update", "Check for newer version"),
             ("/progress", "Test coverage matrix"),
@@ -237,6 +249,7 @@ def _print_help() -> None:
             ("/skin [name]", "Switch CLI theme (4 skins)"),
             ("/fc", "Fix last typo (like thefuck)"),
             ("/! /1..9", "Command history / re-run"),
+            ("/alias add|list", "Command shortcuts"),
             ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
             ("/undo", "Remove last exchange from memory"),
@@ -709,10 +722,11 @@ def _cmd_ready(args: str) -> None:
 
 
 def _cmd_update(args: str) -> None:
-    """Check GitHub for newer version. Thin wrapper around config/check_version.py."""
+    """Check GitHub for newer version. Thin wrapper around deploy/config/check_version.py."""
     import subprocess
     import sys
-    checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+    from runtime.config.settings import get_settings
+    checker = get_settings().config_dir / "check_version.py"
     if not checker.is_file():
         console.print("[dim]Version checker not found.[/]")
         return
@@ -1610,62 +1624,6 @@ def _cmd_plugins_list(args: str) -> None:
     console.print(table)
 
 
-# ── /env — environment presets ─────────────────────────────────────
-
-
-def _cmd_env(args: str) -> None:
-    """Manage environment presets: /env save|load|list|delete."""
-    from runtime.cli.env_presets import list_presets, save_preset, load_preset, delete_preset, CAPTURE_PREFIXES
-    from rich.table import Table
-
-    parts = args.strip().split(maxsplit=1)
-    action = parts[0].lower() if parts else "list"
-    rest = parts[1] if len(parts) > 1 else ""
-
-    if action == "list" or not action:
-        presets = list_presets()
-        if not presets:
-            console.print("[dim]No presets. Use /env save <name> to snapshot current env[/]")
-            return
-        table = Table(title=f"Env Presets · {len(presets)}", show_header=True)
-        table.add_column("Name", style="cyan")
-        table.add_column("Vars")
-        table.add_column("Description")
-        for p in presets:
-            table.add_row(p.name, str(len(p.env_vars)), p.description[:40])
-        console.print(table)
-
-    elif action == "save":
-        name = rest.strip()
-        if not name:
-            console.print("[dim]Usage: /env save <name> [description][/]")
-            console.print("[dim]Example: /env save staging 'staging config'[/]")
-            return
-        p = save_preset(name)
-        console.print(f"[green]Saved:[/] {p.name} ({len(p.env_vars)} vars)")
-
-    elif action == "load":
-        name = rest.strip()
-        if not name:
-            console.print("[dim]Usage: /env load <name>[/]")
-            return
-        p = load_preset(name)
-        if p:
-            console.print(f"[green]Loaded:[/] {p.name} ({len(p.env_vars)} env vars applied)")
-        else:
-            console.print(f"[red]Preset '{name}' not found[/]")
-
-    elif action == "delete":
-        name = rest.strip()
-        if not name:
-            console.print("[dim]Usage: /env delete <name>[/]")
-            return
-        if delete_preset(name):
-            console.print(f"[green]Deleted: {name}[/]")
-        else:
-            console.print(f"[red]Not found: {name}[/]")
-
-
 # ── /alias — command shortcuts ─────────────────────────────────────
 
 
@@ -2373,7 +2331,6 @@ _BUILTIN_MAP = {
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
     "alias": _cmd_alias,
-    "env": _cmd_env,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
 
@@ -2519,7 +2476,8 @@ def start() -> None:
         import subprocess
         import threading
         def _check_version():
-            checker = _Path(__file__).resolve().parents[2] / "config" / "check_version.py"
+            from runtime.config.settings import get_settings
+            checker = get_settings().config_dir / "check_version.py"
             if checker.is_file():
                 r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
                 if r.stdout.strip():

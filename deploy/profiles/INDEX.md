@@ -22,6 +22,6 @@
 
 ## 相关
 
-- 上一级:[`../README.md`](../README.md)
+- 上一级:[`../README.md`](../../README.md)
 - 主宪章 §17(九大簇维度边界)+ §25(渗透 & 安全)+ §26(车载 & 自动驾驶)
 - 加载实现:`runtime/config/settings.py` profile 字段

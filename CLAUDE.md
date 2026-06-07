@@ -1,98 +1,113 @@
-# CLAUDE.md
+# CLAUDE.md — Test-Agent Project Entry Point
 
-## AI AGENT — STOP. READ THIS FIRST.
+> **AI 编程助理必须先读 [`ai/CLAUDE.md`](ai/CLAUDE.md)** — 包含强制开发约束（禁止硬编码、文件放置规则、防污染机制等）。
 
-**This is a Test-Agent project. It has a defined execution framework. You MUST follow it.**
+## ⚠️ READ THIS FIRST
 
-- Do NOT call `Agent()` directly.
-- Do NOT spawn sub-agents without reading the relevant Skill doc first.
-- Do NOT skip the Skill workflow layer.
+This project has a **dual-mode architecture**. Two independent paths converge at `utils/`.
+
+### 🔵 AI Mode — `ai/`
+AI agents read skill docs and agent definitions to orchestrate testing.
+
+- `ai/agents/` — 16 agent prompt definitions (.md)
+- `ai/skills/` — 32 skill workflow definitions (.md)
+- These are READ-ONLY for AI agents. Do NOT modify unless explicitly asked.
 
 **Correct flow:**
-1. Read `skills/<task>.md` to understand the workflow
+1. Read `ai/skills/<task>.md` to understand the workflow
 2. Follow the Skill doc's step-by-step agent call sequence
 3. Call `Agent(subagent_type="xxx")` ONLY when and how the Skill doc says
 
-**If no Skill doc matches the task:** fall back to `skills/test-coordinator.md` (通用编排).
+**If no Skill doc matches the task:** fall back to `ai/skills/test-coordinator.md`.
 
----
-
-## Two Ways to Use Test-Agent
-
-### Way 1: Standalone CLI (no AI required)
+### 🟢 CLI Mode — `runtime/` + `utils/`
+Standalone CLI that works without AI.
 
 ```bash
-cd project-dir
-# install.py 已自动安装 tagent CLI 到 venv
-tagent.bat                        # Windows
-./tagent                          # macOS / Linux
 tagent run "path/to/prd.md"      # router + orchestrator end-to-end
 tagent plan "path/to/prd.md"     # plan only (no execution)
 tagent catalog                   # list 16 experts + 32 skills
 tagent doctor                    # health check
 ```
 
-The CLI uses the same runtime (router + orchestrator + utils) without needing an AI agent.
-
-### Way 2: AI Agent Collaboration
-
-```bash
-cd project-dir
-# 任选其一:
-claude                   # Claude Code (Anthropic)
-cursor                   # Cursor (OpenAI / Claude / Gemini …)
-# GitHub Copilot / Windsurf / CodeBuddy 等均可
-```
-
-**LLM Provider 配置:** 编辑 `.env` → 设 `TAGENT_LLM_PROVIDER` + 对应 API key.
-内置 6 家: `claude` | `openai` | `gemini` | `deepseek` | `qwen` | `ollama`.
-OpenAI 兼容端点 (智谱/豆包/Kimi/百川/讯飞): 设 `TAGENT_LLM_API_BASE` + `TAGENT_LLM_API_KEY`.
-详见 `config/llm-providers.md`.
-
-**Agent 工作流:**
-1. Read `skills/<task>.md` to understand the workflow
-2. Follow the Skill doc's step-by-step agent call sequence
-3. Call `Agent(subagent_type="xxx")` ONLY when and how the Skill doc says
-
-**⚠️ Critical:** AI agents WILL try to bypass the Skill layer and call Agent() directly. The main thread MUST enforce reading Skill docs first.
+### 🟡 Deployment — `deploy/`
+Files copied by `install.py` to user projects. Do NOT put source code here.
 
 ---
 
 ## Architecture
 
 ```
-Standalone CLI (tagent)              AI Agent Mode (Claude / Cursor / Copilot ...)
-        │                                      │
-        ▼                                      ▼
-   runtime/router                    Skill docs (skills/*.md)
-        │                                      │
-        ▼                                      ▼
-   runtime/orchestrator              Agent defs (agents/*.md)
-        │                                      │
-        ▼                                      ▼
-   utils/*.py (79 modules)           utils/*.py (79 modules)
-```
+┌─────────────────────────────────────────┐
+│  ai/          AI Mode Interface          │
+│  agents/ + skills/   .md only           │
+│              ↓                           │
+├─────────────────────────────────────────┤
+│  runtime/     CLI Engine                 │
+│  utils/       Shared Tools               │
+│              ↑                           │
+├─────────────────────────────────────────┤
+│  apps/        Distributable Apps         │
+│  desktop/ + mobile/                      │
+├─────────────────────────────────────────┤
+│  deploy/      Install Materials          │
+│  config/ + marketplace/ + profiles/      │
+└─────────────────────────────────────────┘
 
-Both paths converge at the utils execution layer.
+Both paths converge at utils/ execution layer.
+```
 
 ## Directory Map
 
 | What | Where |
 |------|-------|
-| Agent definitions | `agents/` (16 agents) |
-| Skill workflow docs | `skills/` (32 skills + 3 meta-skill packages) |
-| Python utils | `utils/` (79 modules) |
-| Runtime (CLI + orchestrator + MCP) | `runtime/` |
-| Config templates | `config/` (incl. `.env.example`) |
-| Test outputs | `workspace/` |
+| Agent definitions | `ai/agents/` (16 agents) |
+| Skill workflow docs | `ai/skills/` (32 skills + 3 meta-skill packages) |
+| Python runtime engine | `runtime/` (CLI + orchestrator + MCP + API) |
+| Python utilities | `utils/` (79 modules, 12 subdirectories) |
+| Distributable apps | `apps/` (desktop, mobile) |
+| Deploy templates | `deploy/config/` (.env.example, pytest.ini, ...) |
+| Deploy marketplace | `deploy/marketplace/` |
+| Deploy profiles | `deploy/profiles/` (gdpr, hipaa, soc2, ...) |
+| Test outputs | `workspace/` (gitignored) |
 | CI pipelines | `ci/` |
-| Docs | `docs/` |
-| Marketplace | `marketplace/` |
+| Documentation | `docs/` |
+| Dev scripts | `scripts/` |
+
+---
+
+## Development Rules (MUST FOLLOW)
+
+1. **No new files in root.** Root has only entry points + project metadata.
+2. **New agent?** → `ai/agents/NN-name.md`
+3. **New skill?** → `ai/skills/name.md` (+ optional `runtime/orchestrator/skills/name.py`)
+4. **New CLI command?** → `runtime/cli/commands/name.py` + register in `main.py`
+5. **New utility?** → appropriate subdirectory under `utils/`
+6. **New app?** → `apps/name/` (self-contained)
+7. **New deploy template?** → `deploy/config/` or `deploy/profiles/`
+8. **Never commit:** build artifacts, caches, logs, node_modules, .coverage, workspace data
+9. **Read `ai/INDEX.md`** before touching ai/ files
+10. **Read `deploy/INDEX.md`** before touching deploy/ files
+
+## Quick Reference
+
+| Task | Where |
+|------|-------|
+| Add test capability | `ai/skills/` + `utils/<domain>/` |
+| Add agent role | `ai/agents/` |
+| Fix CLI bug | `runtime/` |
+| Add deployment config | `deploy/config/` |
+| Add compliance profile | `deploy/profiles/` |
+| Build desktop app | `apps/desktop/` |
+| Write docs | `docs/` |
+| Run tests | `pytest runtime/tests/` |
 
 ## Design Notes
 
-- Slash commands like `/smoke-test` are **not** registered. They are Skill workflow documents.
-- Agent definitions contain Python import hints as prompts for AI agents — not actual executable code.
+- Slash commands like `/smoke-test` are Skill workflow documents, not registered commands.
+- Agent definitions contain Python import hints as prompts — not executable code.
 - `test-lead` cannot recursively spawn sub-agents (Claude Code limitation). Main thread orchestrates.
 - Pentest workflows require `tagent.yml` with `pentest.authorized: true` — see `tagent.yml.example`.
-- MCP server (`python -m runtime.mcp.test_orchestrator.server`) provides catalog/plan/run/status/report tools.
+- MCP server: `python -m runtime.mcp.test_orchestrator.server` (catalog/plan/run/status/report).
+- LLM providers: edit `.env` → `TAGENT_LLM_PROVIDER`. Built-in: claude/openai/gemini/deepseek/qwen/ollama.
+- See `deploy/config/llm-providers.md` for OpenAI-compatible endpoints.

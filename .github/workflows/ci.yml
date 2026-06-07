@@ -222,7 +222,7 @@ jobs:
         run: |
           python -c "
           import json, sys
-          for f in ['config/.mcp.json']:
+          for f in ['deploy/config/.mcp.json']:
               try:
                   json.load(open(f))
                   print(f'✅ {f}')
@@ -317,8 +317,8 @@ jobs:
 
       - name: 统计核对
         run: |
-          AGENTS=$(ls agents/[0-9]*.md | wc -l)
-          SKILLS=$(ls skills/*.md | grep -v README | wc -l)
+          AGENTS=$(ls ai/agents/[0-9]*.md | wc -l)
+          SKILLS=$(ls ai/skills/*.md | grep -v README | wc -l)
           UTILS=$(find utils -name "*.py" ! -name "__init__.py" | wc -l)
           echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
           [ "$AGENTS" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $AGENTS)"; exit 1; }

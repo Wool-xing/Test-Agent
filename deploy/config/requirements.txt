@@ -56,7 +56,7 @@ loguru==0.7.3                      # [稳定层] 增强日志
 pytest-bdd==8.1.0                  # [稳定层] BDD 框架
 
 # ===== [稳定层] 契约测试 =====
-jsonschema==4.21.0                 # [稳定层] JSON Schema 验证
+jsonschema>=4.23.0                 # [稳定层] JSON Schema 验证
 
 # ===== [稳定层] 报告 =====
 reportlab==4.5.1                   # [稳定层] PDF 报告

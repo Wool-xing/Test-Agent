@@ -332,7 +332,8 @@ class ConversationMemory:
 
 def list_personalities() -> list[dict[str, str]]:
     """List available personalities from agents/ directory."""
-    agents_dir = Path(__file__).resolve().parents[2] / "agents"
+    from runtime.config.settings import get_settings
+    agents_dir = get_settings().experts_dir
     result: list[dict[str, str]] = []
     for f in sorted(agents_dir.glob("*.md")):
         if f.name.upper() in ("README.MD", "INDEX.MD"):
@@ -357,7 +358,8 @@ def list_personalities() -> list[dict[str, str]]:
 
 def load_personality(name: str) -> str | None:
     """Load the body (after frontmatter) of an agent .md as personality prompt."""
-    agents_dir = Path(__file__).resolve().parents[2] / "agents"
+    from runtime.config.settings import get_settings
+    agents_dir = get_settings().experts_dir
     for f in sorted(agents_dir.glob("*.md")):
         text = f.read_text(encoding="utf-8", errors="replace")
         if text.startswith("---"):

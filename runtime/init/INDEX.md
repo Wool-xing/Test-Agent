@@ -51,5 +51,5 @@ tagent init --overwrite
 ## 相关
 
 - 主宪章 §1(同步铁律)+ §5(多格式 I/O)+ §7(一键部署)+ §36(多端)+ §37(BugTracker)
-- 模板:[`config/templates/`](../../config/templates/INDEX.md)
+- 模板:[`config/templates/`](../../deploy/config/templates/INDEX.md)
 - 集成 CLI:`runtime/cli/main.py` `init` 子命令

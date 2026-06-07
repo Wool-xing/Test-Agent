@@ -67,11 +67,11 @@ python install.py ~/test-agent-project       # macOS / Linux 示例，可改为�
 | 角色 | 阅读 |
 |------|------|
 | **首次用户** | [快速开始](docs/getting-started/INDEX.md) → [部署说明](docs/getting-started/部署说明.md) |
-| **QA 工程师** | [使用手册](docs/getting-started/使用手册.md) → [Skill 目录](skills/) |
+| **QA 工程师** | [使用手册](docs/getting-started/使用手册.md) → [Skill 目录](ai/skills/) |
 | **架构师 / SRE** | [架构深度](docs/charter/06-test-architecture.md) → [Runtime 模块](runtime/INDEX.md) |
-| **安全研究员** | [渗透专家](agents/15-渗透测试.md) → [pentest-coordinator](skills/pentest-coordinator.md) |
-| **车载测试** | [车载专家](agents/16-车载测试.md) → [ASIL 工作流](skills/automotive-test.md) |
-| **贡献者** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](marketplace/INDEX.md) |
+| **安全研究员** | [渗透专家](ai/agents/15-渗透测试.md) → [pentest-coordinator](ai/skills/pentest-coordinator.md) |
+| **车载测试** | [车载专家](ai/agents/16-车载测试.md) → [ASIL 工作流](ai/skills/automotive-test.md) |
+| **贡献者** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](deploy/marketplace/INDEX.md) |
 
 ## 📊 覆盖度
 
