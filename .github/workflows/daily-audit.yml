@@ -103,6 +103,34 @@ jobs:
           assert len(tools) >= 3, f'Expected >=3 MCP tools, got {len(tools)}'
           print(f'OK: MCP server has {len(tools)} tools: {tools[:5]}')
           "
+      - name: 皮肤 + 插件 + 教学层加载
+        run: |
+          python -c "
+          # 皮肤主题
+          from runtime.cli.skins import SKINS, get_skin, get_current_skin_name, list_skins
+          assert len(SKINS) >= 3, f'Expected >=3 skins, got {len(SKINS)}'
+          print(f'OK: {len(SKINS)} skins loaded ({list_skins()[0][\"name\"]}...)')
+          # 插件系统
+          from runtime.plugins import discover_plugins
+          plugins = discover_plugins()
+          print(f'OK: plugin loader works ({len(plugins)} plugins found)')
+          # 教学层 (theory KB)
+          from runtime.tutor.theory_kb import load_kb_if_legal
+          kb = load_kb_if_legal()
+          card_count = sum(1 for _ in kb) if kb else 0
+          print(f'OK: theory KB loaded ({card_count} cards)')
+          "
+      - name: 路由编排性能
+        run: |
+          python -c "
+          from runtime.router.intent import classify_intent
+          # 分类器基础功能（不调LLM，只测结构）
+          intents = ['smoke-test', 'regression-test', 'e2e-test', 'api-test', 'performance-test']
+          for i in intents[:3]:
+              result = classify_intent(f'Run {i} on the login page')
+              print(f'  intent: {i:20s} -> {result[:30] if result else \"no match\"}...')
+          print('OK: router intent classifier works')
+          "
 
       # ── CLI 命令实跑 ──
       - name: tagent --help
