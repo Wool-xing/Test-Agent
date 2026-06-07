@@ -67,11 +67,11 @@ No Python / Node / Docker required. Download and run.
 | Audience | Read |
 |----------|------|
 | **First-time user** | [Quick start](docs/getting-started/INDEX.md) → [Deploy](docs/getting-started/部署说明.md) |
-| **QA engineer** | [User manual](docs/getting-started/使用手册.md) → [Skill catalog](skills/) |
+| **QA engineer** | [User manual](docs/getting-started/使用手册.md) → [Skill catalog](ai/skills/) |
 | **Architect / SRE** | [Architecture deep-dive](docs/charter/06-test-architecture.md) → [Runtime modules](runtime/INDEX.md) |
-| **Security researcher** | [Pentest expert](agents/15-渗透测试.md) → [pentest-coordinator](skills/pentest-coordinator.md) |
-| **Automotive tester** | [Automotive expert](agents/16-车载测试.md) → [ASIL workflow](skills/automotive-test.md) |
-| **Contributor** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](marketplace/INDEX.md) |
+| **Security researcher** | [Pentest expert](ai/agents/15-渗透测试.md) → [pentest-coordinator](ai/skills/pentest-coordinator.md) |
+| **Automotive tester** | [Automotive expert](ai/agents/16-车载测试.md) → [ASIL workflow](ai/skills/automotive-test.md) |
+| **Contributor** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](deploy/marketplace/INDEX.md) |
 
 ## 📊 Coverage
 

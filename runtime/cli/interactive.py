@@ -2477,7 +2477,7 @@ def start() -> None:
         import threading
         def _check_version():
             from runtime.config.settings import get_settings
-    checker = get_settings().config_dir / "check_version.py"
+            checker = get_settings().config_dir / "check_version.py"
             if checker.is_file():
                 r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
                 if r.stdout.strip():

@@ -87,7 +87,7 @@ def _scan_tsx_ts(expected: str) -> list[str]:
         (r"Test-Agent\s+(?:Desktop\s+)?v(\d+\.\d+\.\d+)", "display"),
     ]
     search_dirs = [
-        PROJECT_ROOT / "desktop",
+        PROJECT_ROOT / "apps" / "desktop",
         PROJECT_ROOT / "runtime" / "web" / "src",
     ]
     for sd in search_dirs:
@@ -117,9 +117,9 @@ def _check_doc_versions(expected: str) -> list[str]:
     checks = [
         ("FULL_GUIDE.md", r'\*\*版本\*\*：V(\d+\.\d+\.\d+)'),
         ("ROADMAP.md", r'当前状态:V(\d+\.\d+\.\d+)'),
-        ("agents/01-测试主管.md", r'\*\*V(\d+\.\d+\.\d+)\s+实装'),
-        ("config/llm-providers.md", r'实测有效\*\*\s*[\(（]V?(\d+\.\d+\.\d+)'),
-        ("config/templates/INDEX.md", r'#\s+配置模板库索引[（(]V?(\d+\.\d+\.\d+)'),
+        ("ai/agents/01-测试主管.md", r'\*\*V(\d+\.\d+\.\d+)\s+实装'),
+        ("deploy/config/llm-providers.md", r'实测有效\*\*\s*[\(（]V?(\d+\.\d+\.\d+)'),
+        ("deploy/config/templates/INDEX.md", r'#\s+配置模板库索引[（(]V?(\d+\.\d+\.\d+)'),
         ("runtime/web/INDEX.md", r'#\s+runtime/web\s+索引\s*[\(（]V?(\d+\.\d+\.\d+)'),
     ]
     for path, pattern in checks:
