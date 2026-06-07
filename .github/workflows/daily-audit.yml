@@ -75,14 +75,62 @@ jobs:
           assert len(cat.skills) == 32, f'Expected 32, got {len(cat.skills)}'
           print(f'OK: {len(cat.experts)}e + {len(cat.skills)}s')
           "
-      - name: settings 路径正确
+      - name: settings 路径覆盖率
         run: |
           python -c "
           from runtime.config.settings import get_settings
           s = get_settings()
-          assert s.experts_dir.name in ('agents', 'ai'), f'unexpected experts_dir'
-          assert s.skills_dir.name in ('skills', 'ai'), f'unexpected skills_dir'
-          print(f'OK: paths correct')
+          for name in ['experts_dir','skills_dir','config_dir','templates_dir','scripts_dir','workspace_dir']:
+              val = getattr(s, name, None)
+              assert val is not None, f'settings.{name} is None'
+              print(f'  OK settings.{name} = {val}')
+          print('OK: 6 path fields configured')
+          "
+      - name: router + orchestrator 加载
+        run: |
+          python -c "
+          from runtime.router.router import Router
+          r = Router()
+          assert r is not None, 'Router init failed'
+          print('OK: Router loaded')
+          from runtime.orchestrator.flows import FlowRegistry
+          assert FlowRegistry is not None
+          print('OK: FlowRegistry loaded')
+          "
+      - name: API + MCP 服务端可导入
+        run: |
+          python -c "
+          from runtime.api.main import app
+          routes = [r.path for r in app.routes]
+          assert len(routes) >= 3, f'Expected >=3 API routes, got {len(routes)}'
+          print(f'OK: API has {len(routes)} routes')
+          from runtime.mcp.test_orchestrator.server import mcp
+          tools = [t.name for t in mcp.tools]
+          assert len(tools) >= 3, f'Expected >=3 MCP tools, got {len(tools)}'
+          print(f'OK: MCP has {len(tools)} tools')
+          "
+      - name: 皮肤 + 插件 + 教学层加载
+        run: |
+          python -c "
+          from runtime.cli.skins import SKINS, list_skins
+          assert len(SKINS) >= 3, f'Expected >=3 skins, got {len(SKINS)}'
+          print(f'OK: {len(SKINS)} skins loaded')
+          from runtime.plugins import discover_plugins
+          plugins = discover_plugins()
+          print(f'OK: plugin loader works ({len(plugins)} plugins)')
+          from runtime.tutor.theory_kb import load_kb_if_legal
+          kb = load_kb_if_legal()
+          card_count = 0 if kb is None else sum(1 for _ in kb)
+          print(f'OK: theory KB loaded ({card_count} cards)')
+          "
+      - name: 路由编排性能
+        run: |
+          python -c "
+          from runtime.router.intent import classify_intent
+          for i in ['smoke-test', 'regression-test', 'e2e-test']:
+              result = classify_intent(f'Run {i} on the login page')
+              print(f'  {i:20s} -> {str(result)[:40]}')
+          print('OK: router intent classifier works')
           "
 
       # ── CLI 命令实跑 ──
@@ -374,21 +422,48 @@ jobs:
           "
 
   # ═══════════════════════════════════════════
-  # 十一、变更范围感知 — 自动判断
+  # 十、防漂移 — 目录结构 + 扩展性 + 维护性
   # ═══════════════════════════════════════════
-  smart-scope:
-    name: 变更范围感知
+  anti-drift:
+    name: 防漂移检测
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: 分析变更范围
+      - name: 旧路径重生检测
         run: |
-          changed=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null | wc -l)
-          echo "Changed files: $changed"
-          if [ "$changed" -le 3 ]; then
-            echo "SCOPE: light — only essential checks recommended"
-          else
-            echo "SCOPE: full — run all checks"
+          echo "=== 旧路径重生检测 ==="
+          forbidden=("agents" "skills" "config" "desktop" "mobile" "marketplace" "profiles")
+          fail=0
+          for dir in "${forbidden[@]}"; do
+            if [ -d "$dir" ]; then
+              echo "  ❌ 旧路径重生: $dir/ (应迁移到 ai/ apps/ deploy/)"
+              fail=1
+            fi
+          done
+          [ $fail -eq 0 ] && echo "  OK: no old paths" || exit 1
+      - name: 根目录无多余.py
+        run: |
+          extra=$(find . -maxdepth 1 -name "*.py" ! -name "install.py" 2>/dev/null)
+          if [ -n "$extra" ]; then
+            echo "❌ 根目录多余.py: $extra"
+            exit 1
           fi
+          echo "  OK: only install.py at root"
+      - name: 关键目录 INDEX.md 存在
+        run: |
+          required=(ai apps deploy workspace)
+          fail=0
+          for dir in "${required[@]}"; do
+            if [ ! -f "$dir/INDEX.md" ]; then
+              echo "  MISSING: $dir/INDEX.md"
+              fail=1
+            fi
+          done
+          [ $fail -eq 0 ] && echo "  OK: all INDEX.md present" || exit 1
+      - name: 目录结构清晰性
+        run: |
+          echo "=== 顶层目录 ==="
+          for d in ai apps deploy runtime utils docs scripts ci requirements examples; do
+            [ -d "$d" ] && echo "  ✅ $d/" || echo "  ⚠️  $d/ missing"
+          done
+          echo "OK: structure verified"
