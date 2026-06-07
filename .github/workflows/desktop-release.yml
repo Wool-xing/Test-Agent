@@ -42,7 +42,7 @@ jobs:
           npm run build
 
       - name: Build Electron
-        apps/desktop
+        working-directory: apps/desktop
         run: |
           npm ci
           npx tsc -p electron/tsconfig.json
@@ -82,7 +82,7 @@ jobs:
           npm run build
 
       - name: Build Electron
-        apps/desktop
+        working-directory: apps/desktop
         run: |
           npm ci
           npx tsc -p electron/tsconfig.json
