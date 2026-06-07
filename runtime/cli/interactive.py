@@ -613,6 +613,37 @@ def _cmd_fc(args: str) -> None:
     _BUILTIN_MAP.get(suggestion, lambda a: None)("")
 
 
+# ── /ready — release readiness score ─────────────────────────────────
+
+
+def _cmd_ready(args: str) -> None:
+    """Multi-dimensional release readiness check. Usage: /ready [--fast]."""
+    from runtime.cli.readiness import run_readiness
+    from rich.table import Table
+
+    fast = "--fast" in args
+    with console.status("[bold]Checking readiness...", spinner="dots"):
+        report = run_readiness(fast=fast)
+
+    table = Table(title="Release Readiness", show_header=True)
+    table.add_column("Check")
+    table.add_column("Status")
+    table.add_column("Detail")
+
+    for g in report.gates:
+        icon = "[green]✓[/]" if g.passed else "[red]✗[/]"
+        table.add_row(f"{icon} {g.label}", f"{g.score:.0%}", g.detail)
+
+    console.print(table)
+
+    score_pct = report.overall_score * 100
+    color = "green" if report.ready else "red"
+    verdict = "✓ Ready to release" if report.ready else "✗ Not ready"
+    console.print(f"\n[{color}]Overall: {score_pct:.0f}% — {verdict}[/]")
+    if not report.ready:
+        console.print("[dim]Fix failing checks above before release.[/]")
+
+
 # ── /update — check for new version ──────────────────────────────────
 
 
@@ -1643,6 +1674,7 @@ _BUILTIN_MAP = {
     "status": _cmd_status, "model": _cmd_model,
     "lang": _cmd_lang,
     "update": _cmd_update,
+    "ready": _cmd_ready,
     "personality": _cmd_personality,
     "tools": _cmd_tools,
     "cost": _cmd_cost, "usage": _cmd_cost,
