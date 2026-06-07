@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '${{ matrix.python-version }}' }
       - name: 安装依赖
-        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi prefect factory-boy
+        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi prefect factory-boy python-multipart
       - name: 全模块导入
         run: |
           python -c "
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - name: 安装依赖
-        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging
+        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi prefect factory-boy python-multipart
 
       - name: registry + settings + router + API + MCP
         run: |
@@ -187,7 +187,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - name: 安装依赖
-        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging
+        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi prefect factory-boy python-multipart
 
       - name: CLI隔离测试 — 删除ai/后CLI仍可运行
         run: |
@@ -271,7 +271,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - name: 安装依赖
-        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging
+        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi prefect factory-boy python-multipart
       - name: 导入 + catalog 耗时
         run: |
           python -c "
