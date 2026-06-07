@@ -189,13 +189,12 @@ def _print_banner() -> None:
     from rich.live import Live
     from rich.text import Text
 
-    import runtime
-
-    banner = _SHEEP.format(
-        version=runtime.__version__,
-        experts=_count_md_files("agents"),
-        skills=_count_md_files("skills"),
-    )
+    banner = _SHEEP  # fallback
+    try:
+        from runtime.cli.skins import apply_skin_to_banner
+        banner = apply_skin_to_banner()
+    except Exception:
+        pass  # use default _SHEEP
 
     # Animated typewriter reveal
     try:
@@ -233,6 +232,7 @@ def _print_help() -> None:
         ("Control", [
             ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
             ("/lang [zh|en|zh-en]", "Switch UI language"),
+            ("/skin [name]", "Switch CLI theme (4 skins)"),
             ("/fc", "Fix last typo (like thefuck)"),
             ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
@@ -660,6 +660,29 @@ def _cmd_update(args: str) -> None:
         console.print(r.stdout.strip())
     else:
         console.print("[green]Already up to date.[/]")
+
+
+# ── /skin — switch CLI theme ────────────────────────────────────────
+
+
+def _cmd_skin(args: str) -> None:
+    """Switch CLI skin/theme. Usage: /skin [name]. No args lists available."""
+    from runtime.cli.skins import list_skins, set_skin, get_current_skin_name
+
+    name = args.strip().lower()
+    if not name:
+        current = get_current_skin_name()
+        skins = list_skins()
+        console.print(f"[bold]Available skins ({len(skins)}):[/]")
+        for s in skins:
+            marker = " [green]← active[/]" if s["active"] else ""
+            console.print(f"  [cyan]{s['name']}{marker}[/] — {s['description']}")
+        return
+
+    if set_skin(name):
+        console.print(f"[green]Skin:[/] [cyan]{name}[/] (restart REPL to see banner)")
+    else:
+        console.print(f"[dim]Unknown skin '{name}'. Use /skin to list.[/]")
 
 
 # ── /lang — switch UI language ──────────────────────────────────────
@@ -1673,6 +1696,7 @@ _BUILTIN_MAP = {
     "quit": lambda a: _do_quit(), "q": lambda a: _do_quit(), "exit": lambda a: _do_quit(),
     "status": _cmd_status, "model": _cmd_model,
     "lang": _cmd_lang,
+    "skin": _cmd_skin,
     "update": _cmd_update,
     "ready": _cmd_ready,
     "personality": _cmd_personality,
