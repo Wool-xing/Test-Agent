@@ -241,6 +241,9 @@ def _print_help() -> None:
             ("/setup [--preset]", "Generate config files"),
             ("/check [--e2e]", "Framework self-test"),
         ]),
+        ("Automation", [
+            ("/hook add|list|prebuilt", "Lifecycle hooks (before/after/error)"),
+        ]),
         ("Learning", [
             ("/distill", "Save last execution as reusable skill"),
         ]),
@@ -660,6 +663,75 @@ def _cmd_update(args: str) -> None:
         console.print(r.stdout.strip())
     else:
         console.print("[green]Already up to date.[/]")
+
+
+# ── /hook — lifecycle hook management ───────────────────────────────
+
+
+def _cmd_hook(args: str) -> None:
+    """Manage lifecycle hooks: /hook list | add <phase> <cmd> | remove <id> | prebuilt."""
+    from runtime.orchestrator.user_hooks import (
+        list_hooks, add_hook, remove_hook, PREBUILT_HOOKS, activate_all,
+    )
+    from rich.table import Table
+
+    parts = args.strip().split(maxsplit=1)
+    action = parts[0].lower() if parts else "list"
+    rest = parts[1] if len(parts) > 1 else ""
+
+    if action == "list" or not action:
+        hooks = list_hooks()
+        if not hooks:
+            console.print("[dim]No hooks registered. Use /hook add or /hook prebuilt[/]")
+            return
+        table = Table(title=f"Hooks · {len(hooks)}", show_header=True)
+        table.add_column("ID", style="dim")
+        table.add_column("Phase")
+        table.add_column("Label")
+        active = 0
+        for h in hooks:
+            icon = "[green]✓[/]" if h.enabled else "[dim]—[/]"
+            table.add_row(h.id[:8], f"{icon} {h.phase}", h.label or h.command[:60])
+            if h.enabled:
+                active += 1
+        console.print(table)
+        console.print(f"[dim]{active}/{len(hooks)} active[/]")
+
+    elif action == "add":
+        sub_parts = rest.strip().split(maxsplit=1)
+        if len(sub_parts) < 2:
+            console.print("[dim]Usage: /hook add <phase> <command>[/]")
+            console.print("[dim]Phases: before | after | on_error[/]")
+            console.print("[dim]Example: /hook add after 'echo done'[/]")
+            return
+        phase = sub_parts[0]
+        if phase not in ("before", "after", "on_error"):
+            console.print(f"[red]Unknown phase: {phase}. Use: before | after | on_error[/]")
+            return
+        h = add_hook(phase, sub_parts[1], f"user:{phase}")
+        console.print(f"[green]Hook #{h.id}:[/] {phase} → {sub_parts[1][:60]}")
+
+    elif action == "prebuilt":
+        count = 0
+        for p in PREBUILT_HOOKS:
+            h = add_hook(p["phase"], p["command"], p["label"])
+            count += 1
+            console.print(f"[green]+ #{h.id}:[/] {p['label']}")
+        console.print(f"[dim]{count} pre-built hooks added[/]")
+
+    elif action == "remove":
+        hid = rest.strip()
+        if not hid:
+            console.print("[dim]Usage: /hook remove <id>[/]")
+            return
+        if remove_hook(hid):
+            console.print(f"[green]Hook #{hid} removed[/]")
+        else:
+            console.print(f"[red]Hook #{hid} not found[/]")
+
+    elif action == "activate":
+        n = activate_all()
+        console.print(f"[green]{n} hooks activated[/]")
 
 
 # ── /skin — switch CLI theme ────────────────────────────────────────
@@ -1697,6 +1769,7 @@ _BUILTIN_MAP = {
     "status": _cmd_status, "model": _cmd_model,
     "lang": _cmd_lang,
     "skin": _cmd_skin,
+    "hook": _cmd_hook,
     "update": _cmd_update,
     "ready": _cmd_ready,
     "personality": _cmd_personality,
