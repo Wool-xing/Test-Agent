@@ -1,0 +1,36 @@
+# PR 自动标签 — 根据修改文件自动标记影响范围
+ai:
+  - changed-files:
+    - any-glob-to-any-file: 'ai/**'
+
+runtime:
+  - changed-files:
+    - any-glob-to-any-file: 'runtime/**'
+
+utils:
+  - changed-files:
+    - any-glob-to-any-file: 'utils/**'
+
+deploy:
+  - changed-files:
+    - any-glob-to-any-file: 'deploy/**'
+
+apps:
+  - changed-files:
+    - any-glob-to-any-file: 'apps/**'
+
+docs:
+  - changed-files:
+    - any-glob-to-any-file: 'docs/**'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**'
+
+scripts:
+  - changed-files:
+    - any-glob-to-any-file: 'scripts/**'
+
+install:
+  - changed-files:
+    - any-glob-to-any-file: 'install.py'

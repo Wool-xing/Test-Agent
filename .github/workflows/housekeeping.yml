@@ -1,0 +1,39 @@
+name: Housekeeping
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"   # 每周一 UTC 04:00
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  # ── 过期 issue/PR 自动关闭 ──
+  stale:
+    name: 过期清理
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-message: "30天无活动，标记为过期。7天后自动关闭。"
+          stale-pr-message: "30天无活动，标记为过期。7天后自动关闭。"
+          exempt-issue-labels: "pinned,security,bug"
+          exempt-pr-labels: "pinned,security,in-progress"
+
+  # ── PR 自动标签 ──
+  labeler:
+    name: PR 自动标签
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: "${{ github.token }}"
+          sync-labels: true
