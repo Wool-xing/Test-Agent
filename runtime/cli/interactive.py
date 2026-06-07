@@ -1870,6 +1870,53 @@ def _cmd_task(args: str) -> None:
         console.print("[dim]Use: add, list, done, start, cancel, delete[/]")
 
 
+# ── /cross — cross-environment orchestration ────────────────────────
+
+
+def _cmd_cross(args: str) -> None:
+    """Run tests across environments: /cross env test staging <prompt>."""
+    from runtime.cli.cross_env import run_cross_env
+    from rich.table import Table
+
+    parts = args.strip().split(None, 1)
+    if len(parts) < 2 or parts[0] != "env":
+        console.print("[dim]Usage: /cross env <env1> [env2...] <prompt>[/]")
+        console.print("[dim]Example: /cross env test staging run API smoke tests[/]")
+        console.print("[dim]Presets saved via /env save <name>[/]")
+        return
+
+    rest = parts[1]
+    # Parse env names (before last part = prompt)
+    tokens = rest.split(maxsplit=1)
+    # env1 env2 ... → first is env, rest is prompt
+    sub = tokens[0].split()
+    envs = sub[:-1]  # env names
+    prompt = sub[-1]  # last token is prompt start
+    if len(tokens) > 1:
+        prompt += " " + tokens[1]
+
+    if not envs:
+        envs = ["test", "staging"]
+
+    console.print(f"[bold]Cross-env:[/] {' → '.join(envs)} [dim](stop on first failure)[/]")
+    with console.status("[bold]Running...", spinner="dots"):
+        report = run_cross_env(prompt, envs)
+
+    table = Table(title="Cross-Environment Results", show_header=True)
+    table.add_column("Env")
+    table.add_column("Result")
+    table.add_column("Duration")
+    for r in report.results:
+        icon = "[green]✓[/]" if r.ok else "[red]✗[/]"
+        dur = f"{r.duration_ms}ms" if r.duration_ms else "-"
+        detail = f"{r.succeeded}/{r.total} ok" if r.total else r.error
+        table.add_row(f"{icon} {r.env}", detail, dur)
+    console.print(table)
+
+    color = "green" if report.all_passed else "red"
+    console.print(f"[{color}]{report.summary}[/]")
+
+
 # ── /clean — data cleanup (preserve deliverables) ───────────────────
 
 
@@ -2225,6 +2272,7 @@ _BUILTIN_MAP = {
     "flaky": _cmd_flaky,
     "prioritize": _cmd_prioritize,
     "clean": _cmd_clean,
+    "cross": _cmd_cross,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
