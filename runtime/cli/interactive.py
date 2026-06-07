@@ -1870,6 +1870,38 @@ def _cmd_task(args: str) -> None:
         console.print("[dim]Use: add, list, done, start, cancel, delete[/]")
 
 
+# ── /clean — data cleanup (preserve deliverables) ───────────────────
+
+
+def _cmd_clean(args: str) -> None:
+    """Clean temporary data. /clean list | run. Delivery artifacts preserved."""
+    from runtime.cli.data_cleaner import get_cleanable, run_cleanup
+    from rich.table import Table
+
+    action = args.strip().lower()
+    if action == "run":
+        result = run_cleanup(dry_run=False)
+        console.print(f"[green]Cleaned:[/] {result['cleaned_count']} files, {result['freed_kb']} KB freed")
+        console.print("[dim]Reports/cases/plans/scripts/baselines preserved.[/]")
+        return
+
+    cleanable = get_cleanable()
+    if not cleanable:
+        console.print("[dim]Nothing to clean.[/]")
+        return
+
+    total_kb = sum(c["size_kb"] for c in cleanable)
+    console.print(f"[bold]{len(cleanable)} cleanable files ({total_kb:.0f} KB):[/]")
+    table = Table(show_header=True)
+    table.add_column("File")
+    table.add_column("Size")
+    table.add_column("Age")
+    for c in cleanable[:15]:
+        table.add_row(c["path"][:60], f"{c['size_kb']} KB", f"{c['age_hours']}h ago")
+    console.print(table)
+    console.print("[dim]Run /clean run to delete. Delivery artifacts never touched.[/]")
+
+
 # ── /prioritize — test priority by changed code ─────────────────────
 
 
@@ -2192,6 +2224,7 @@ _BUILTIN_MAP = {
     "regression": _cmd_regression,
     "flaky": _cmd_flaky,
     "prioritize": _cmd_prioritize,
+    "clean": _cmd_clean,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
