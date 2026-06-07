@@ -224,6 +224,7 @@ def _print_help() -> None:
         ]),
         ("Info", [
             ("/update", "Check for newer version"),
+            ("/progress", "Test coverage matrix"),
             ("/status", "Session, model, conversation stats"),
             ("/tools", "List agents + skills with status"),
             ("/ls", "Quick list experts + skills"),
@@ -1671,6 +1672,48 @@ def _cmd_task(args: str) -> None:
         console.print("[dim]Use: add, list, done, start, cancel, delete[/]")
 
 
+# ── /progress — test coverage matrix ────────────────────────────────
+
+
+def _cmd_progress(args: str) -> None:
+    """Show test coverage progress matrix: test types × modules."""
+    from runtime.cli.coverage_progress import get_matrix, get_summary, DEFAULT_MODULES, TEST_TYPES
+    from rich.table import Table
+
+    summary = get_summary()
+    console.print(
+        f"[bold]Coverage Progress:[/] {summary['coverage_pct']}% "
+        f"({summary['covered_slots']}/{summary['total_slots']} slots covered) "
+        f"[dim]({summary['recent_runs_24h']} runs in 24h)[/]"
+    )
+
+    modules, types, matrix = get_matrix()
+    # Show as ASCII heatmap
+    widths = {t: max(len(t), 6) for t in types}
+    header = " " * 12 + "".join(f"{t:^{widths[t]}}" for t in types)
+    console.print(f"[dim]{header}[/]")
+    for m in modules[:15]:
+        row = f" [cyan]{m:<10}[/] "
+        for t in types:
+            entry = matrix.get((m, t))
+            if entry and entry.run_count > 0:
+                rate = entry.pass_count / entry.run_count if entry.run_count else 0
+                if rate >= 0.9:
+                    cell = f"[green]{'■':^{widths[t]}}[/]"
+                elif rate >= 0.5:
+                    cell = f"[yellow]{'■':^{widths[t]}}[/]"
+                else:
+                    cell = f"[red]{'■':^{widths[t]}}[/]"
+            else:
+                cell = f"[dim]{'·':^{widths[t]}}[/]"
+            row += cell
+        console.print(row)
+    console.print(
+        "[dim]■=covered ·=not yet[/]  "
+        "[dim]Auto-record via hook: /hook prebuilt[/]"
+    )
+
+
 # ── /insights — cross-session analytics ─────────────────────────────
 
 
@@ -1831,6 +1874,7 @@ _BUILTIN_MAP = {
     "fc": _cmd_fc, "fuck": _cmd_fc,
     "doctor": _cmd_doctor,
     "insights": _cmd_insights,
+    "progress": _cmd_progress,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
