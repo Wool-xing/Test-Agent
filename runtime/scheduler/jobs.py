@@ -1,4 +1,4 @@
-"""Cron job storage ().
+"""Cron job storage (hermes-inspired §1.2).
 
 Jobs persist in `workspace/cron/jobs.json`. Each entry:
   - id: uuid

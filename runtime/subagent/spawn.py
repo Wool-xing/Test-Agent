@@ -1,4 +1,4 @@
-"""Spawn isolated subagent tasks; fork-and-join API ()."""
+"""Spawn isolated subagent tasks; fork-and-join API (hermes §1.3)."""
 
 from __future__ import annotations
 

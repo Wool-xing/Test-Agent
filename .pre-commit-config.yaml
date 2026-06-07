@@ -6,7 +6,7 @@ repos:
       - id: trailing-whitespace
         exclude: \.md$
       - id: end-of-file-fixer
-        # upstream skill 目录不动( darwin-skill / karpathy-guidelines 禁本地 fork)
+        # upstream skill 目录不动(主宪章 §14 §27 darwin-skill / karpathy-guidelines 禁本地 fork)
         exclude: ^skills/(darwin-skill|karpathy-guidelines)/
       - id: check-yaml
       - id: check-json
@@ -102,7 +102,7 @@ repos:
         # MD040(fenced-code-language) / MD014(dollar-prefix) / MD009(trailing) / MD012(multi-blank) / MD010(hard-tab)
         # / MD025(single-h1) / MD026(trailing-punct):中文项目常见 nit,与现有 disable 风格一致
         args: ['--disable', 'MD013', 'MD033', 'MD041', 'MD036', 'MD022', 'MD031', 'MD032', 'MD024', 'MD034', 'MD040', 'MD014', 'MD025', 'MD026', 'MD050', 'MD049', 'MD007', 'MD035', 'MD038', 'MD039', '--']
-        # upstream skill dirs 不改本地:darwin-skill / karpathy-guidelines()
+        # upstream skill dirs 不改本地:darwin-skill / karpathy-guidelines(主宪章 §14 §27)
         exclude: ^(skills/(darwin-skill|karpathy-guidelines)/.*)$
 
 # 配置：项目根 .markdownlint.json 自定义规则

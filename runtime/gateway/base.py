@@ -1,4 +1,4 @@
-"""Platform abstraction · ."""
+"""Platform abstraction · hermes §1.5."""
 
 from __future__ import annotations
 

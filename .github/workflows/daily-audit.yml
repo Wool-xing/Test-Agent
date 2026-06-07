@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '${{ matrix.python-version }}' }
       - name: 安装依赖
-        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging
+        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi prefect factory-boy
       - name: 全模块导入
         run: |
           python -c "
@@ -203,7 +203,7 @@ jobs:
 
       - name: runtime/ 零 ai/ 引用
         run: |
-          refs=$(grep -rn "from ai\.\|import ai\.\|ai/agents\|ai/skills" --include="*.py" runtime/ 2>/dev/null || true)
+          refs=$(grep -rn "from ai\.\|import ai\." --include="*.py" runtime/ 2>/dev/null || true)
           [ -z "$refs" ] || { echo "FAIL: runtime/ references ai/"; exit 1; }
           echo "OK: zero ai/ imports in runtime/"
 

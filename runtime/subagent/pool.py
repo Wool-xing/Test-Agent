@@ -1,4 +1,4 @@
-"""Global ThreadPool for subagent tasks ( pattern)."""
+"""Global ThreadPool for subagent tasks (hermes §1.3 pattern)."""
 
 from __future__ import annotations
 

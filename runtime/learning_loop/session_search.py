@@ -1,4 +1,4 @@
-"""FTS5 session search · .
+"""FTS5 session search · hermes §1.1.
 
 SQLite FTS5 over historical sessions. LLM summary attached at retrieval time.
 """

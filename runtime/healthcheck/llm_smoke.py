@@ -1,7 +1,7 @@
 """L3 lightweight LLM smoke · 单次最小往返,验真-LLM 通 + 报告延迟/token/估算成本.
 
 `tagent doctor --llm-smoke` 5 秒验证,远轻于 --probe (16 agent 全跑 ~$0.3-0.8).
-用 aux 通道 provider 隔离主 prompt cache ( 借鉴).
+用 aux 通道 provider 隔离主 prompt cache (hermes §1.3 借鉴).
 """
 
 from __future__ import annotations

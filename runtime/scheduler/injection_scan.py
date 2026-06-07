@@ -1,4 +1,4 @@
-"""Runtime prompt injection scan ( critical).
+"""Runtime prompt injection scan (hermes §1.2 critical).
 
 Charter §22 rule: 非交互自动批准模式下,assembled prompt(含动态加载的 skill 内容)
 必须全扫,不止 create-time。

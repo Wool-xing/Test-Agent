@@ -1,4 +1,4 @@
-"""Multi-platform messaging gateway · .
+"""Multi-platform messaging gateway · hermes §1.5.
 
 Single gateway process serves N platforms. Cross-platform conversation continuity.
 """

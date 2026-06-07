@@ -1,4 +1,4 @@
-"""Modal serverless backend ( 经济模型 — hibernate when idle).
+"""Modal serverless backend (hermes §1.4 经济模型 — hibernate when idle).
 
 Modal client SDK must be installed and authenticated:
     pip install modal
