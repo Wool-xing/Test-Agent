@@ -34,7 +34,7 @@ selftest:
   strict_on_release: true
 
 marketplace:
-  enabled: false        # 默认关 · 主宪章 §30 safe-by-default
+  enabled: false        # 默认关 ·  safe-by-default
 
 # ============== SAFETY GATES · safe-by-default(主宪章 §22 / §35 + W5 sprint v2) ==============
 # 危险操作 / 自动化 / 影响生产 的功能 必须显式开启, 否则 destructive-guard 拒绝运行。

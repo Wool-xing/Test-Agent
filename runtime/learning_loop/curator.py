@@ -1,4 +1,4 @@
-"""Curator coordinator · hermes §1.1.
+"""Curator coordinator · .
 
 Background skill maintenance:
   - inactivity-triggered (no daemon)

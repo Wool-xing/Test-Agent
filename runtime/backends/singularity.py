@@ -1,4 +1,4 @@
-"""Singularity / Apptainer backend (hermes §1.4; HPC-friendly)."""
+"""Singularity / Apptainer backend (; HPC-friendly)."""
 
 from __future__ import annotations
 
