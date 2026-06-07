@@ -103,6 +103,30 @@ jobs:
           assert len(tools) >= 3, f'Expected >=3 MCP tools, got {len(tools)}'
           print(f'OK: MCP server has {len(tools)} tools: {tools[:5]}')
           "
+      - name: 定时任务 + 社交互通 + 多端结构
+        run: |
+          python -c "
+          # 定时任务
+          from runtime.scheduler.scheduler import Scheduler
+          s = Scheduler()
+          jobs = s.list_jobs() if hasattr(s, 'list_jobs') else []
+          print(f'OK: scheduler loaded ({len(jobs)} jobs configured)')
+          # 社交互通 gateway
+          from runtime.gateway.platforms.dingtalk import DingTalkPlatform
+          from runtime.gateway.platforms.wechat import WeChatPlatform
+          from runtime.gateway.platforms.slack import SlackPlatform
+          print('OK: 3 IM platforms loadable (dingtalk/wechat/slack)')
+          # 多端结构
+          import os, json
+          for app in ['desktop', 'mobile']:
+              pkg = f'apps/{app}/package.json'
+              if os.path.isfile(pkg):
+                  with open(pkg) as f:
+                      data = json.load(f)
+                  print(f'OK: apps/{app}/package.json (name={data.get(\"name\",\"?\")})')
+              else:
+                  print(f'WARN: apps/{app}/package.json missing')
+          "
 
       # ── CLI 命令实跑 ──
       - name: tagent --help
