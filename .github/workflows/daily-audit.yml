@@ -422,21 +422,48 @@ jobs:
           "
 
   # ═══════════════════════════════════════════
-  # 十一、变更范围感知 — 自动判断
+  # 十、防漂移 — 目录结构 + 扩展性 + 维护性
   # ═══════════════════════════════════════════
-  smart-scope:
-    name: 变更范围感知
+  anti-drift:
+    name: 防漂移检测
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: 分析变更范围
+      - name: 旧路径重生检测
         run: |
-          changed=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null | wc -l)
-          echo "Changed files: $changed"
-          if [ "$changed" -le 3 ]; then
-            echo "SCOPE: light — only essential checks recommended"
-          else
-            echo "SCOPE: full — run all checks"
+          echo "=== 旧路径重生检测 ==="
+          forbidden=("agents" "skills" "config" "desktop" "mobile" "marketplace" "profiles")
+          fail=0
+          for dir in "${forbidden[@]}"; do
+            if [ -d "$dir" ]; then
+              echo "  ❌ 旧路径重生: $dir/ (应迁移到 ai/ apps/ deploy/)"
+              fail=1
+            fi
+          done
+          [ $fail -eq 0 ] && echo "  OK: no old paths" || exit 1
+      - name: 根目录无多余.py
+        run: |
+          extra=$(find . -maxdepth 1 -name "*.py" ! -name "install.py" 2>/dev/null)
+          if [ -n "$extra" ]; then
+            echo "❌ 根目录多余.py: $extra"
+            exit 1
           fi
+          echo "  OK: only install.py at root"
+      - name: 关键目录 INDEX.md 存在
+        run: |
+          required=(ai apps deploy workspace)
+          fail=0
+          for dir in "${required[@]}"; do
+            if [ ! -f "$dir/INDEX.md" ]; then
+              echo "  MISSING: $dir/INDEX.md"
+              fail=1
+            fi
+          done
+          [ $fail -eq 0 ] && echo "  OK: all INDEX.md present" || exit 1
+      - name: 目录结构清晰性
+        run: |
+          echo "=== 顶层目录 ==="
+          for d in ai apps deploy runtime utils docs scripts ci requirements examples; do
+            [ -d "$d" ] && echo "  ✅ $d/" || echo "  ⚠️  $d/ missing"
+          done
+          echo "OK: structure verified"
