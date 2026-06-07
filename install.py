@@ -376,6 +376,19 @@ def copy_skills(template_dir, project_root):
     print(f"  已部署 {md_count} 个业务 Skill + {dir_count} 个元 Skill 子目录（skills/ + .claude/skills/）")
 
 
+def copy_ai_support(template_dir, project_root):
+    """拷贝完整 ai/ 目录到部署项目 — AI 协作模式界面。"""
+    ai_src = os.path.join(template_dir, "ai")
+    if not os.path.isdir(ai_src):
+        return
+    ai_dst = os.path.join(project_root, "ai")
+    print("→ 拷贝 ai/ 目录...")
+    if os.path.exists(ai_dst):
+        shutil.rmtree(ai_dst)
+    shutil.copytree(ai_src, ai_dst)
+    print("  已部署 ai/ 目录")
+
+
 def _ensure_env_overrides(env_path: str) -> None:
     """确保 .env 中包含部署后路径覆盖。"""
     overrides = {
@@ -745,6 +758,7 @@ def do_update():
         # 拷贝新文件（跳过 create_dirs / setup_venv / claude code 安装）
         copy_agents(template_dir, PROJECT_ROOT)
         copy_skills(template_dir, PROJECT_ROOT)
+        copy_ai_support(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
@@ -868,6 +882,7 @@ def main():
         # 6. 拷贝文件
         copy_agents(template_dir, PROJECT_ROOT)
         copy_skills(template_dir, PROJECT_ROOT)
+        copy_ai_support(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
