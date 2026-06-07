@@ -107,6 +107,8 @@ archive/
 *.aab
 *.AppImage
 mobile/PUBLISH.md
+apps/mobile/PUBLISH.md
+install_log.txt
 
 # ===== Desktop apps ====
 # Electron/TS compiled output
