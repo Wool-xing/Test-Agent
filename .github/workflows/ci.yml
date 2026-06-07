@@ -44,6 +44,18 @@ jobs:
       - name: Scan for hardcoded values
         run: python scripts/check_hardcoded_values.py
 
+  # ===== 0d. 架构合规检测 (路径硬编码/目录纯净/构建产物) =====
+  arch-compliance:
+    name: 架构合规检测
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 架构合规 + 路径硬编码 + 构建产物
+        run: python scripts/check_arch_compliance.py
+
   # ===== 1. utils/ 代码质量 =====
   lint-utils:
     name: utils/ Ruff + 类型检查
