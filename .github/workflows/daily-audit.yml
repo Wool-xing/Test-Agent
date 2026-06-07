@@ -151,7 +151,22 @@ jobs:
           "
 
   # ═══════════════════════════════════════════
-  # 四、安全审计
+  # 四、终端命令健康检查（纠错 + 描述完整性 + 分发表）
+  # ═══════════════════════════════════════════
+  command-health:
+    name: 命令健康检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: 安装依赖
+        run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml prompt-toolkit
+      - name: 命令纠错 + 描述 + 分发表
+        run: python scripts/check_command_health.py
+
+  # ═══════════════════════════════════════════
+  # 五、安全审计
   # ═══════════════════════════════════════════
   security-audit:
     name: 安全审计
