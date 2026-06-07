@@ -44,6 +44,7 @@ _memory: ConversationMemory | None = None
 _last_trace: tuple | None = None  # (user_text, decision_dict) for /distill
 _last_fix: str | None = None  # last suggested command correction
 _start_time: float = 0.0
+_cmd_history: list[str] = []  # last 10 user commands for /N quick re-run
 
 _PROMPT_STYLE = Style.from_dict({
     "prompt": "bold cyan",
@@ -234,6 +235,7 @@ def _print_help() -> None:
             ("/lang [zh|en|zh-en]", "Switch UI language"),
             ("/skin [name]", "Switch CLI theme (4 skins)"),
             ("/fc", "Fix last typo (like thefuck)"),
+            ("/! /1..9", "Command history / re-run"),
             ("/personality [name]", "Set agent persona (loads expert)"),
             ("/clear", "Reset conversation memory"),
             ("/undo", "Remove last exchange from memory"),
@@ -599,6 +601,33 @@ def _cmd_cache(args: str) -> None:
     console.print(f"[bold]LLM Cache:[/] {stats['entries']} entries, {stats['size_kb']} KB, TTL={stats['ttl_hours']}h")
     if stats["entries"] > 0:
         console.print("[dim]Use /cache clear to flush.[/]")
+
+
+# ── /! — command history ────────────────────────────────────────────
+
+
+def _rerun_history(index: int) -> None:
+    """Re-run a command from history by index (0=most recent)."""
+    if not _cmd_history:
+        console.print("[dim]No commands in history.[/]")
+        return
+    try:
+        cmd = list(reversed(_cmd_history))[index]
+        console.print(f"[dim]Re-running: [cyan]{cmd[:80]}{'...' if len(cmd) > 80 else ''}[/][/]")
+        _handle_natural_language(cmd)
+    except IndexError:
+        console.print(f"[dim]History index {index + 1} not available.[/]")
+
+
+def _cmd_history(args: str) -> None:
+    """Show recent command history. Use /1..9 to re-run."""
+    if not _cmd_history:
+        console.print("[dim]No commands in history yet.[/]")
+        return
+    for i, cmd in enumerate(reversed(_cmd_history[-9:]), 1):
+        preview = cmd[:100] + ("..." if len(cmd) > 100 else "")
+        console.print(f"  [cyan]/{i}[/]  {preview}")
+    console.print(f"[dim]Run /1 (most recent) through /{min(9, len(_cmd_history))} to re-execute.[/]")
 
 
 # ── /fc — fix last command typo (thefuck-style) ────────────────────
@@ -1793,6 +1822,12 @@ _BUILTIN_MAP = {
     "plugins": _cmd_plugins_list,
     "distill": _cmd_distill,
     "cache": _cmd_cache,
+    "!": _cmd_history, "history": _cmd_history,
+    "1": lambda a: _rerun_history(0), "2": lambda a: _rerun_history(1),
+    "3": lambda a: _rerun_history(2), "4": lambda a: _rerun_history(3),
+    "5": lambda a: _rerun_history(4), "6": lambda a: _rerun_history(5),
+    "7": lambda a: _rerun_history(6), "8": lambda a: _rerun_history(7),
+    "9": lambda a: _rerun_history(8),
     "fc": _cmd_fc, "fuck": _cmd_fc,
     "doctor": _cmd_doctor,
     "insights": _cmd_insights,
@@ -2040,6 +2075,12 @@ def start() -> None:
         elif _is_multiline_candidate(user_input):
             # Already contains newlines from paste — process as-is
             pass
+
+        # Record in command history (non-slash only)
+        if not user_input.startswith("/"):
+            _cmd_history.append(user_input)
+            if len(_cmd_history) > 10:
+                _cmd_history.pop(0)
 
         try:
             if user_input.startswith("/"):
