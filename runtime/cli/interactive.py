@@ -1870,6 +1870,34 @@ def _cmd_task(args: str) -> None:
         console.print("[dim]Use: add, list, done, start, cancel, delete[/]")
 
 
+# ── /prioritize — test priority by changed code ─────────────────────
+
+
+def _cmd_prioritize(args: str) -> None:
+    """Show which tests to run first based on git changes."""
+    from runtime.cli.test_prioritizer import prioritize
+    from rich.table import Table
+
+    result = prioritize()
+    if result["changed_files"] == 0:
+        console.print("[dim]No git changes detected. Run full suite.[/]")
+        return
+
+    console.print(f"[bold]{result['changed_files']} changed files → {len(result['changed_modules'])} affected modules[/]")
+    if result["priority_detail"]:
+        table = Table(title="Test Priority Order", show_header=True)
+        table.add_column("Priority", style="cyan")
+        table.add_column("Module")
+        table.add_column("Changes")
+        for i, (module, count) in enumerate(result["priority_detail"], 1):
+            marker = "🔴" if count >= 5 else "🟡" if count >= 2 else "🟢"
+            table.add_row(f"{marker} #{i}", module, str(count))
+        console.print(table)
+        console.print("[dim]Tip: Run affected modules first, then full suite if time permits.[/]")
+    else:
+        console.print("[dim]Changed files not matched to known test modules.[/]")
+
+
 # ── /progress — test coverage matrix ────────────────────────────────
 
 
@@ -2163,6 +2191,7 @@ _BUILTIN_MAP = {
     "progress": _cmd_progress,
     "regression": _cmd_regression,
     "flaky": _cmd_flaky,
+    "prioritize": _cmd_prioritize,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
