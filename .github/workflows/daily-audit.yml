@@ -10,20 +10,7 @@ permissions:
 
 jobs:
   # ═══════════════════════════════════════════
-  # 一、架构合规
-  # ═══════════════════════════════════════════
-  arch-compliance:
-    name: 架构合规检测
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - name: 路径硬编码 + 目录纯净 + 构建产物
-        run: python scripts/check_arch_compliance.py
-
-  # ═══════════════════════════════════════════
-  # 二、逻辑验证 — Python 多版本导入
+  # 一、逻辑验证 — Python 多版本导入（架构合规在 ci.yml 每次PR已跑）
   # ═══════════════════════════════════════════
   logic-multi-py:
     name: Python 多版本导入
@@ -332,48 +319,5 @@ jobs:
             -A 100 2>/dev/null | awk '/^def/ {fn=$0; next} /^$|^[^ ]|^[a-zA-Z]/{next} END{}' || true
           echo "INFO: manual review recommended for large functions"
 
-  # ═══════════════════════════════════════════
-  # 十、workflow YAML 语法自检
-  # ═══════════════════════════════════════════
-  workflow-sanity:
-    name: workflow YAML 语法
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - name: 验证所有 workflow YAML
-        run: |
-          pip install pyyaml
-          python -c "
-          import yaml, sys, glob
-          ok = True
-          for f in glob.glob('.github/workflows/*.yml'):
-              try:
-                  yaml.safe_load(open(f))
-                  print(f'  OK {f}')
-              except Exception as e:
-                  print(f'  FAIL {f}: {e}')
-                  ok = False
-          sys.exit(0 if ok else 1)
-          "
-
-  # ═══════════════════════════════════════════
-  # 十一、变更范围感知 — 自动判断
-  # ═══════════════════════════════════════════
-  smart-scope:
-    name: 变更范围感知
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: 分析变更范围
-        run: |
-          changed=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null | wc -l)
-          echo "Changed files: $changed"
-          if [ "$changed" -le 3 ]; then
-            echo "SCOPE: light — only essential checks recommended"
-          else
-            echo "SCOPE: full — run all checks"
-          fi
+  # workflow YAML 语法校验已在 ci.yml 每次 PR 跑，此处不重复
+  # 变更范围感知仅适用于 PR 事件，schedule 触发无效，此处不重复
