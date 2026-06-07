@@ -66,7 +66,7 @@ jobs:
           print('OK: Router + FlowRegistry')
           from runtime.api.main import app; assert len(app.routes) >= 3
           print(f'OK: API {len(app.routes)} routes')
-          import runtime.mcp.test_orchestrator.server as mcp_server
+          import runtime.mcp.test_orchestrator.server as mcp_srv
           print(f'OK: MCP server loaded')
           "
 
