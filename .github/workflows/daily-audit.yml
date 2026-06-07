@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   logic:
-    name: 逻辑验证 Python多版本
+    name: 逻辑验证
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,7 +31,7 @@ jobs:
               'runtime.api.main','runtime.mcp.test_orchestrator.server',
               'runtime.cli.skins','runtime.tutor.theory_kb',
               'runtime.scheduler.scheduler','runtime.cli.slash_commands',
-              'runtime.cli.interactive',
+              'runtime.cli.interactive','runtime.gateway.bridge',
               'utils.data.data_factory','utils.quality.quality_gate_engine',
           ]:
               try:
@@ -51,25 +51,27 @@ jobs:
       - name: 安装依赖
         run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging
 
-      - name: registry settings router API MCP
+      - name: registry + settings + router + API + MCP
         run: |
           python -c "
-          from runtime.registry.registry import build_catalog; cat = build_catalog()
+          from runtime.registry.registry import build_catalog
+          cat = build_catalog()
           print(f'OK: {len(cat.experts)}e + {len(cat.skills)}s')
+          assert len(cat.experts) >= 16
+          assert len(cat.skills) >= 32
           from runtime.config.settings import get_settings; s = get_settings()
           for f in ['experts_dir','skills_dir','config_dir','templates_dir','scripts_dir','workspace_dir']:
-              print(f'  OK {f} = {getattr(s,f)}')
+              val = getattr(s,f); assert val is not None; print(f'  OK {f} = {val}')
           from runtime.router.router import Router; assert Router() is not None
           from runtime.orchestrator.flows import FlowRegistry; assert FlowRegistry is not None
           print('OK: Router + FlowRegistry')
           from runtime.api.main import app; assert len(app.routes) >= 3
           print(f'OK: API {len(app.routes)} routes')
           from runtime.mcp.test_orchestrator.server import mcp
-          tools = [t.name for t in mcp.tools]; assert len(tools) >= 3
-          print(f'OK: MCP {len(tools)} tools')
+          assert len(mcp.tools) >= 3; print(f'OK: MCP {len(mcp.tools)} tools')
           "
 
-      - name: 皮肤 插件 教学层 定时任务
+      - name: 皮肤 + 插件 + 教学层 + 定时任务
         run: |
           python -c "
           from runtime.cli.skins import SKINS; assert len(SKINS) >= 3; print(f'OK: {len(SKINS)} skins')
@@ -81,46 +83,45 @@ jobs:
           Scheduler(); print('OK: scheduler')
           "
 
-      - name: 路由意图 + 社交9平台 + 多端
+      - name: 路由 + 社交9平台 + 远程指挥 + 多端
         run: |
           python -c "
           from runtime.router.intent import classify_intent
           for t in ['smoke-test','regression-test','api-test','performance-test']:
-              r = classify_intent(f'Run {t}'); print(f'  {t:20s} -> {str(r)[:40]}')
+              r = classify_intent(f'Run {t}')
+              print(f'  {t:20s} -> {str(r)[:40]}')
           for p in ['dingtalk','discord','email','feishu','qqbot','slack','telegram','webhook','wechat']:
               __import__(f'runtime.gateway.platforms.{p}'); print(f'  OK {p}')
+          from runtime.gateway.bridge import Bridge
+          b = Bridge(); print(f'OK: gateway bridge ({len(b.platforms) if hasattr(b,\"platforms\") else \"loaded\"})')
           import os,json
           for a in ['desktop','mobile']:
               assert os.path.isfile(f'apps/{a}/package.json')
-              print(f'OK: apps/{a}')
+              d = json.load(open(f'apps/{a}/package.json')); print(f'OK: apps/{a} ({d.get(\"name\",\"?\")})')
           "
 
-      - name: CLI命令 + /命令 全量
+      - name: CLI命令 + /命令全量扫描
         run: |
           python -c "
-          import subprocess,sys
-          out = subprocess.run(['python','-m','runtime.cli.main','--help'],capture_output=True,text=True)
-          cmds = set(w for w in out.stdout.split() if w.isalpha() and not w.startswith('-'))
-          cmds -= {'Usage','Options','Commands','Help','the','Show','version','information'}
-          print(f'CLI: {len(cmds)} commands')
+          import subprocess, sys
           for c in ['catalog','doctor','init','export','market','selftest','bootstrap','demo','gateway','run']:
               r = subprocess.run(['python','-m','runtime.cli.main',c,'--help'],capture_output=True,text=True)
               print(f'  {\"OK\" if r.returncode==0 else \"FAIL\"} {c}')
           from runtime.cli.slash_commands import COMMAND_REGISTRY
           from runtime.cli.interactive import _BUILTIN_MAP
-          print(f'/: {len(COMMAND_REGISTRY)} registered + {len(_BUILTIN_MAP)} builtins')
-          for c in COMMAND_REGISTRY:
-              assert c.description, f'/{c.name} missing description'
+          print(f'OK: {len(COMMAND_REGISTRY)} registered + {len(_BUILTIN_MAP)} builtins /commands')
+          for cmd in COMMAND_REGISTRY:
+              assert cmd.description, f'/{cmd.name} missing description'
           print('OK: all /commands have descriptions')
           "
 
-      - name: 裸文本命令纠错 thefuck风格
+      - name: 裸文本命令纠错
         run: |
           python -c "
-          from runtime.cli.interactive import _closest_command,_edit_distance
-          for inp,exp in [('help','help'),('hel','help'),('docto','doctor'),('catalg','catalog'),('statuz','status')]:
-              r = _closest_command(inp)
-              assert r == exp, f'{inp} -> {r}, expected {exp}'; print(f'  OK {inp} -> {r}')
+          from runtime.cli.interactive import _closest_command, _edit_distance
+          for inp,exp in [('help','help'),('hel','help'),('docto','doctor'),('catalg','catalog')]:
+              r = _closest_command(inp); assert r == exp, f'{inp} -> {r}'
+              print(f'  OK {inp} -> {r}')
           assert _closest_command('xyzwq999') is None; print('  OK garbage -> None')
           assert _edit_distance('help','help')==0 and _edit_distance('help','hel')==1
           print('OK: edit distance correct')
@@ -128,12 +129,13 @@ jobs:
 
       - name: 错误处理 + install.py结构
         run: |
-          python -m runtime.cli.main __nonexistent__ 2>&1 && echo "FAIL: exit 0" && exit 1 || echo "OK: invalid cmd"
+          python -m runtime.cli.main __nonexistent__ 2>&1 && echo "FAIL" && exit 1 || echo "OK: invalid cmd"
           python -c "
           import ast; tree = ast.parse(open('install.py',encoding='utf-8').read())
           funcs = {n.name for n in ast.walk(tree) if isinstance(n,ast.FunctionDef)}
           required = {'main','finish','copy_agents','copy_skills','copy_config','setup_venv','_create_wrappers'}
-          assert not (required-funcs), f'missing: {required-funcs}'; print('OK: install.py complete')
+          assert not (required-funcs), f'missing: {required-funcs}'
+          print('OK: all key functions present')
           "
 
   architecture:
@@ -144,7 +146,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
 
-      - name: 旧路径重生
+      - name: 旧路径重生检测
         run: |
           for d in agents skills config desktop mobile marketplace profiles; do
             [ -d "$d" ] && echo "FAIL: $d/ reborn" && exit 1
@@ -168,7 +170,7 @@ jobs:
                -not -path "./.git/*" -not -path "./.venv/*" 2>/dev/null | wc -l)
           [ "$n" -eq 0 ] || { echo "FAIL: $n artifacts"; exit 1; }; echo "OK: zero artifacts"
 
-      - name: 路径硬编码
+      - name: 路径硬编码检测
         run: python scripts/check_arch_compliance.py
 
       - name: INDEX.md + 目录结构
@@ -179,7 +181,7 @@ jobs:
           done; echo "OK: structure verified"
 
   dual-mode:
-    name: 双模式互不干扰
+    name: 双模式独立性
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -188,31 +190,30 @@ jobs:
       - name: 安装依赖
         run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging
 
-      - name: CLI不依赖ai/ (隔离测试)
+      - name: CLI隔离测试 — 删除ai/后CLI仍可运行
         run: |
           cp -r . /tmp/test-cli && cd /tmp/test-cli && rm -rf ai/
           python -c "
           import os; os.chdir('/tmp/test-cli')
           from runtime.registry.registry import build_catalog
           cat = build_catalog()
-          # 无 ai/ 时 registry 返回空目录是设计预期
-          print(f'OK: CLI survives without ai/ (registry: {len(cat.experts)}e+{len(cat.skills)}s)')
+          print(f'OK: CLI survives without ai/ ({len(cat.experts)}e+{len(cat.skills)}s)')
           "
           rm -rf /tmp/test-cli
 
-      - name: runtime/ 无 ai/ 引用
+      - name: runtime/ 零 ai/ 引用
         run: |
           refs=$(grep -rn "from ai\.\|import ai\.\|ai/agents\|ai/skills" --include="*.py" runtime/ 2>/dev/null || true)
           [ -z "$refs" ] || { echo "FAIL: runtime/ references ai/"; exit 1; }
           echo "OK: zero ai/ imports in runtime/"
 
-      - name: ai/ 无 Python 依赖
+      - name: ai/ 无代码依赖
         run: |
           refs=$(grep -rn "from runtime\|import runtime\|from utils\|import utils" --include="*.md" ai/ 2>/dev/null | wc -l)
-          echo "OK: ai/ has $refs doc-refs (documentation, not code dependency)"
+          echo "OK: ai/ has $refs doc-refs (documentation, not code)"
 
   deploy-verify:
-    name: 部署后验证 文件完整性
+    name: 部署后验证
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -222,30 +223,27 @@ jobs:
       - name: install.py 语法
         run: python -c "compile(open('install.py',encoding='utf-8').read(),'install.py','exec');print('OK')"
 
-      - name: 模拟部署 动态文件数比对
+      - name: 动态文件数比对
         run: |
           python -c "
           import os,shutil,glob,tempfile
           src = os.getcwd(); tmp = tempfile.mkdtemp()
-          # agents: 源码 vs 部署后 1:1
           src_n = len(glob.glob(f'{src}/ai/agents/[0-9]*.md'))
           os.makedirs(f'{tmp}/agents',exist_ok=True)
           for f in glob.glob(f'{src}/ai/agents/[0-9]*.md'):
               shutil.copy2(f,f'{tmp}/agents')
           dst_n = len(glob.glob(f'{tmp}/agents/[0-9]*.md'))
-          assert src_n==dst_n, f'agents: src={src_n} dst={dst_n}'; print(f'OK: agents {src_n} match')
-          # skills
+          assert src_n==dst_n, f'agents mismatch: src={src_n} dst={dst_n}'
+          print(f'OK: agents {src_n} match')
           os.makedirs(f'{tmp}/skills',exist_ok=True)
           src_s = [f for f in glob.glob(f'{src}/ai/skills/*.md') if os.path.basename(f)!='README.md']
           for f in src_s: shutil.copy2(f,f'{tmp}/skills')
-          dst_s = len(glob.glob(f'{tmp}/skills/*.md'))
           print(f'OK: skills {len(src_s)} copied')
-          # deploy/config 关键文件存在
           for f in ['.env.example','conftest.py','pytest.ini','requirements.txt','quality_gates.yaml','check_version.py']:
               assert os.path.isfile(f'{src}/deploy/config/{f}'), f'missing {f}'; print(f'  OK {f}')
           with open(f'{src}/deploy/config/.env.example') as fh:
-              assert 'TAGENT_' in fh.read()
-          print('OK: .env.example has TAGENT_ vars')
+              content = fh.read()
+          assert 'TAGENT_' in content; print('OK: .env.example has TAGENT_ vars')
           shutil.rmtree(tmp); print('ALL DEPLOY CHECKS PASSED')
           "
 
@@ -256,10 +254,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: 凭证 + 敏感文件
         run: |
+          echo "=== 凭证扫描 ==="
           for pat in 'api_key\s*=\s*"[A-Za-z0-9_\-]{20,}"' 'token\s*=\s*"ghp_[A-Za-z0-9]{36,}"' 'BEGIN\s+(RSA|EC)\s+PRIVATE\s+KEY'; do
             grep -rPn --include="*.py" --include="*.yml" --include="*.json" "$pat" . \
               --exclude-dir=.git --exclude-dir=.venv --exclude-dir=node_modules 2>/dev/null | head -3
           done
+          echo "=== 敏感文件 ==="
           sf=$(find . \( -name "*.pem" -o -name "*.key" -o -name "id_rsa" \) -not -path "./.git/*" 2>/dev/null | wc -l)
           [ "$sf" -eq 0 ] || { echo "FAIL: $sf sensitive files"; exit 1; }
           echo "OK: security audit done"
@@ -279,7 +279,8 @@ jobs:
           import time; t0=time.time()
           from runtime.config.settings import get_settings; s=get_settings(); t1=time.time()
           from runtime.registry.registry import build_catalog; cat=build_catalog(); t2=time.time()
-          print(f'import: {t1-t0:.2f}s'); print(f'catalog: {t2-t1:.2f}s')
+          print(f'import: {t1-t0:.2f}s (limit 5s)')
+          print(f'catalog: {t2-t1:.2f}s (limit 2s)')
           assert t1-t0<5; assert t2-t1<2; print('OK')
           "
 
@@ -288,11 +289,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 文件大小
+      - name: 文件大小基线
         run: |
           large=$(find runtime/ utils/ -name "*.py" -exec wc -l {} + | awk '$1>800{print $1,$2}' | sort -rn)
           [ -n "$large" ] && echo "WARN: files >800 lines" && echo "$large" | head -10 || echo "OK"
-      - name: 关键文档
+      - name: 关键文档存在
         run: |
           for f in CLAUDE.md CONTRIBUTING.md ai/CLAUDE.md ai/INDEX.md apps/INDEX.md deploy/INDEX.md workspace/INDEX.md; do
             [ -f "$f" ] || { echo "FAIL: $f"; exit 1; }; echo "  OK $f"

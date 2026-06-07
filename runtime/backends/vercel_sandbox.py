@@ -1,4 +1,4 @@
-"""Vercel Sandbox backend (hermes §1.4 边缘运行)."""
+"""Vercel Sandbox backend ( 边缘运行)."""
 
 from __future__ import annotations
 

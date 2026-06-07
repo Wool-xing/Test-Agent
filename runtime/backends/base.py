@@ -1,4 +1,4 @@
-"""BaseExecutionEnv abstract base (hermes §1.4).
+"""BaseExecutionEnv abstract base ().
 
 All 7 backends implement this contract; new backend = new file + @register.
 """

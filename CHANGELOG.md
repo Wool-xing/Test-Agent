@@ -511,7 +511,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `runtime/marketplace/`:catalog.py + verifier.py + installer.py + INDEX
   - 4 关安全门:签名校验(SHA256/ed25519) + 注入扫(复用 §22 scheduler 模块) + 沙箱试跑(Docker network=none) + darwin 评分(≥75)
 - **CLI 加 5 子命令**:`tagent search/list/install/uninstall/verify`
-- **主宪章 §30**:Marketplace 安全栅栏(4 关铁律 + 3 信任级 + safe-by-default + 不复制官方源 + 卸载只归档 + 紧急 kill switch)
+- ****:Marketplace 安全栅栏(4 关铁律 + 3 信任级 + safe-by-default + 不复制官方源 + 卸载只归档 + 紧急 kill switch)
 - **主宪章 §31**:教学层扩 13 大类(byox P0/P1/P2 分档 + 预算检查 + essence_only policy)
 - TOC 同步;skill 数升级
 - 版本 V1.7.0 → V1.8.0

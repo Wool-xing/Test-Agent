@@ -1,4 +1,4 @@
-"""7 execution backends · hermes §1.4.
+"""7 execution backends · .
 
 local / docker / ssh / singularity / modal / daytona / vercel_sandbox.
 Use `get_backend(name)` to obtain an adapter implementing BaseExecutionEnv.

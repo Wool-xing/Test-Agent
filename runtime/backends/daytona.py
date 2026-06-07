@@ -1,4 +1,4 @@
-"""Daytona dev sandbox backend (hermes §1.4 serverless hibernate)."""
+"""Daytona dev sandbox backend ( serverless hibernate)."""
 
 from __future__ import annotations
 
