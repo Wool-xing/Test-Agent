@@ -62,14 +62,21 @@ jobs:
           assert len(cat.skills) == 32, f'Expected 32, got {len(cat.skills)}'
           print(f'OK: {len(cat.experts)}e + {len(cat.skills)}s')
           "
-      - name: settings 路径正确
+      - name: settings 路径覆盖率
         run: |
           python -c "
           from runtime.config.settings import get_settings
           s = get_settings()
-          assert s.experts_dir.name in ('agents', 'ai'), f'unexpected experts_dir'
-          assert s.skills_dir.name in ('skills', 'ai'), f'unexpected skills_dir'
-          print(f'OK: paths correct')
+          # 所有 Path 类型字段必须存在且非空
+          path_fields = [('experts_dir', 'ai/agents'), ('skills_dir', 'ai/skills'),
+                         ('config_dir', 'deploy/config'), ('templates_dir', 'deploy/config/templates'),
+                         ('scripts_dir', 'utils'), ('workspace_dir', 'workspace')]
+          for name, expected_sub in path_fields:
+              val = getattr(s, name, None)
+              assert val is not None, f'settings.{name} is None'
+              assert str(val), f'settings.{name} is empty'
+              print(f'  OK settings.{name} = {val}')
+          print(f'OK: {len(path_fields)} path fields configured')
           "
 
       # ── CLI 命令实跑 ──
@@ -248,6 +255,36 @@ jobs:
           assert os.path.isdir(f'{src}/deploy/config'), 'deploy/config/ missing'
           shutil.rmtree(tmp)
           print(f'OK: deploy paths valid')
+          "
+      - name: install.py 源路径可达性
+        run: |
+          python -c "
+          import os, ast, sys
+          # 解析 install.py copy_config() 中的文件列表
+          tree = ast.parse(open('install.py', encoding='utf-8').read())
+          files_list = None
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Assign) and hasattr(node, 'targets'):
+                  for t in node.targets:
+                      if isinstance(t, ast.Name) and t.id == 'files':
+                          if isinstance(node.value, ast.List):
+                              files_list = [e.value for e in node.value.elts]
+          if files_list:
+              src = os.getcwd()
+              ok = True
+              for f in files_list:
+                  fp = os.path.join(src, 'deploy', 'config', f)
+                  if os.path.isfile(fp):
+                      print(f'  OK deploy/config/{f}')
+                  else:
+                      print(f'  MISSING deploy/config/{f}')
+                      ok = False
+              # 额外检查
+              for f in ['.env.example', 'settings.json']:
+                  fp = os.path.join(src, 'deploy', 'config', f)
+                  assert os.path.isfile(fp), f'MISSING deploy/config/{f}'
+              print(f'OK: all source paths reachable')
+              sys.exit(0 if ok else 1)
           "
 
   # ═══════════════════════════════════════════
