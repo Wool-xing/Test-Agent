@@ -1,7 +1,11 @@
 """Prefect-less direct executor.
 
-Used when Prefect isn't installed (early demos, CI smoke). Same input/output
-contract as `flows.run_decision_flow` so callers can transparently fall back.
+Supports hard/soft dependencies:
+  - hard (default): upstream failure blocks downstream (data integrity)
+  - soft: upstream failure tolerated, downstream runs with integrity=degraded
+
+Parallel execution: independent branches run concurrently via ThreadPoolExecutor.
+Circuit breaker: ≥3 failures aborts remaining nodes.
 """
 
 from __future__ import annotations
@@ -20,6 +24,11 @@ from runtime.self_healing.retry import with_retry
 def _is_abort_exception(exc: Exception) -> bool:
     """Check if exception signals an on_failure=abort (not a transient error)."""
     return isinstance(exc, RuntimeError) and "aborted" in str(exc)
+
+
+def _is_hard(node: DAGNode) -> bool:
+    """Check if this node requires all upstream to succeed."""
+    return getattr(node, "dep_mode", "hard") == "hard"
 
 
 def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
@@ -125,12 +134,26 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                             pending.discard(nid)
                             _notify(on_progress, results.get(nid))
                     break
-                # find nodes whose deps are all done
-                ready = [
-                    nid
-                    for nid in list(pending)
-                    if all(d in results for d in by_id[nid].depends_on) and nid not in futures
-                ]
+                # find nodes whose deps are satisfied:
+                #   hard deps must ALL be OK (upstream failure → block)
+                #   soft deps just need a result (upstream failure → tolerated, run degraded)
+                ready = []
+                for nid in list(pending):
+                    if nid in futures:
+                        continue
+                    node = by_id[nid]
+                    all_deps = node.depends_on
+                    hard_deps = all_deps if _is_hard(node) else []
+                    # All hard deps succeeded, all deps have results
+                    if all(d in results and results[d].get("ok", False) for d in hard_deps) and \
+                       all(d in results for d in all_deps):
+                        # If any soft dep failed, inject partial flag
+                        soft_failed = [d for d in all_deps if d not in hard_deps
+                                       and d in results and not results[d].get("ok", False)]
+                        if soft_failed:
+                            node.inputs["integrity"] = "partial"
+                            node.inputs["degraded_by"] = soft_failed
+                        ready.append(nid)
                 for nid in ready:
                     futures[nid] = pool.submit(_run_node, by_id[nid])
                 # wait for at least one to finish
@@ -177,6 +200,24 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                                 circuit_broken = True
                     pending.discard(nid)
                     _notify(on_progress, r)
+                    # After processing results, skip nodes whose HARD deps failed
+                    unreachable = [
+                        nid for nid in list(pending)
+                        if nid not in futures
+                        and all(d in results for d in by_id[nid].depends_on)  # all deps resolved
+                        and not all(d in results and results[d].get("ok", False)
+                                    for d in by_id[nid].depends_on
+                                    if _is_hard(by_id[nid]))  # hard dep failed → unreachable
+                    ]
+                    for nid in unreachable:
+                        failed_upstream = [d for d in by_id[nid].depends_on
+                                          if d in results and not results[d].get("ok", False)]
+                        results[nid] = {
+                            "id": nid, "ok": False, "skipped": True,
+                            "error": f"skipped: upstream failed ({', '.join(failed_upstream[:3])})"
+                        }
+                        skipped.append(nid)
+                        pending.discard(nid)
     finally:
         if pool is not None:
             pool.shutdown(wait=True)

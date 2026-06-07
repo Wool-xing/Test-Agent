@@ -14,6 +14,7 @@ class DAGNode(BaseModel):
     kind: NodeKind
     name: str = Field(description="expert name / skill name / script filename")
     depends_on: list[str] = Field(default_factory=list)
+    dep_mode: Literal["hard", "soft"] = "hard"
     inputs: dict[str, object] = Field(default_factory=dict)
     on_failure: Literal["retry", "skip", "abort"] = "retry"
     timeout_seconds: int = Field(default=1800, ge=1, description="node timeout in seconds")
