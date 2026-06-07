@@ -433,6 +433,27 @@ def _handle_natural_language(text: str) -> None:
                 # Stash trace for /distill command
                 _last_trace = (text, ds)
                 console.print("  [dim]💡 Multi-agent pattern detected. Run [cyan]/distill[/] to save as reusable skill.[/]")
+
+        # Regression detection: compare against previous baseline
+        if total >= 3 and rate >= 0.5:
+            try:
+                from runtime.cli.regression_tracker import RunResult, save_baseline, compare_with_baseline, is_regression
+                current = RunResult(
+                    run_id=run_id, total=total, succeeded=succ,
+                    failed=summary.get("failed", 0), skipped=summary.get("skipped", 0),
+                    duration_ms=int(elapsed),
+                    node_results=summary.get("results", {}),
+                    coverage_pct=rate * 100,
+                )
+                report = compare_with_baseline(current)
+                save_baseline(current)
+                if is_regression(report):
+                    color = "red" if report.new_failures else "yellow"
+                    console.print(f"  [{color}]⚠ Regression: {report.summary}[/] [dim](/regression for details)[/]")
+                else:
+                    console.print(f"  [dim]📈 {report.summary}[/]")
+            except Exception:
+                pass
     except KeyboardInterrupt:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
@@ -1887,6 +1908,49 @@ def _cmd_progress(args: str) -> None:
     )
 
 
+# ── /regression — view regression report ────────────────────────────
+
+
+def _cmd_regression(args: str) -> None:
+    """Show regression report: current vs previous run."""
+    from runtime.cli.regression_tracker import _latest_baseline, RunResult, compare_with_baseline, is_regression
+    from rich.table import Table
+
+    baseline = _latest_baseline()
+    if baseline is None:
+        console.print("[dim]No regression baseline yet. Run a test first.[/]")
+        return
+
+    import json
+    try:
+        data = json.loads(baseline.read_text(encoding="utf-8"))
+    except Exception:
+        console.print("[red]Could not read baseline.[/]")
+        return
+
+    current = RunResult(**{k: v for k, v in data.items() if k in RunResult.__dataclass_fields__})
+    report = compare_with_baseline(current)
+
+    if report.summary == "No previous baseline — first run.":
+        console.print(f"[dim]Baseline from: {baseline.stem} (no comparison yet)[/]")
+    else:
+        color = "red" if is_regression(report) else "green"
+        console.print(f"[{color}]Regression: {report.summary}[/]")
+
+    if report.new_failures:
+        console.print(f"\n[red]New failures ({len(report.new_failures)}):[/]")
+        for f in report.new_failures:
+            console.print(f"  ✗ {f}")
+    if report.fixed:
+        console.print(f"\n[green]Fixed ({len(report.fixed)}):[/]")
+        for f in report.fixed:
+            console.print(f"  ✓ {f}")
+    if report.perf_regressions:
+        console.print(f"\n[yellow]Performance regressions ({len(report.perf_regressions)}):[/]")
+        for p in report.perf_regressions:
+            console.print(f"  ⏱ {p['node']}: {p['prev_ms']}ms → {p['curr_ms']}ms (+{p['increase_pct']}%)")
+
+
 # ── /insights — cross-session analytics ─────────────────────────────
 
 
@@ -2048,6 +2112,7 @@ _BUILTIN_MAP = {
     "doctor": _cmd_doctor,
     "insights": _cmd_insights,
     "progress": _cmd_progress,
+    "regression": _cmd_regression,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
     "ws": _cmd_ws,
