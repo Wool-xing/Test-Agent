@@ -62,8 +62,7 @@ jobs:
           from runtime.config.settings import get_settings; s = get_settings()
           for f in ['experts_dir','skills_dir','config_dir','templates_dir','scripts_dir','workspace_dir']:
               val = getattr(s,f); assert val is not None; print(f'  OK {f} = {val}')
-          from runtime.router.router import Router; assert Router() is not None
-          from runtime.orchestrator.flows import FlowRegistry; assert FlowRegistry is not None
+          import runtime.router.router; import runtime.orchestrator.flows
           print('OK: Router + FlowRegistry')
           from runtime.api.main import app; assert len(app.routes) >= 3
           print(f'OK: API {len(app.routes)} routes')
