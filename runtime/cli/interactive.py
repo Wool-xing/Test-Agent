@@ -256,6 +256,9 @@ def _print_help() -> None:
             ("/nudge", "Scan session for facts worth remembering"),
             ("/memory", "Show MEMORY.md contents"),
         ]),
+        ("Workspace", [
+            ("/ws add|list|switch|auto", "Manage project workspaces"),
+        ]),
         ("Gateway", [
             ("/gateway", "IM platform connection status"),
         ]),
@@ -1531,6 +1534,74 @@ def _cmd_plugins_list(args: str) -> None:
     console.print(table)
 
 
+# ── /ws — workspace management ─────────────────────────────────────
+
+
+def _cmd_ws(args: str) -> None:
+    """Manage workspaces: /ws list | add <name> [path] | switch <name> | auto."""
+    from runtime.cli.workspaces import (
+        list_workspaces, add_workspace, remove_workspace, switch_to, auto_discover, get_current,
+    )
+    from rich.table import Table
+
+    parts = args.strip().split(maxsplit=1)
+    action = parts[0].lower() if parts else "list"
+    rest = parts[1] if len(parts) > 1 else ""
+
+    if action == "list" or not action:
+        current = get_current()
+        workspaces = list_workspaces()
+        if not workspaces:
+            console.print("[dim]No workspaces. Use /ws add <name> [path] or /ws auto[/]")
+            return
+        table = Table(title=f"Workspaces · {len(workspaces)}", show_header=True)
+        table.add_column("Name", style="cyan")
+        table.add_column("Path")
+        table.add_column("Project")
+        for w in workspaces:
+            marker = " [green]←[/]" if current and w.name == current.name else ""
+            table.add_row(w.name + marker, w.path[:50], w.project_name)
+        console.print(table)
+
+    elif action == "add":
+        sub = rest.strip().split(maxsplit=1)
+        name = sub[0] if sub else ""
+        path = sub[1] if len(sub) > 1 else str(_Path.cwd())
+        if not name:
+            console.print("[dim]Usage: /ws add <name> [path][/]")
+            return
+        w = add_workspace(name, path)
+        console.print(f"[green]Workspace:[/] {w.name} → {w.path}")
+
+    elif action == "remove":
+        name = rest.strip()
+        if not name:
+            console.print("[dim]Usage: /ws remove <name>[/]")
+            return
+        if remove_workspace(name):
+            console.print(f"[green]Removed: {name}[/]")
+        else:
+            console.print(f"[red]Not found: {name}[/]")
+
+    elif action == "switch":
+        name = rest.strip()
+        if not name:
+            console.print("[dim]Usage: /ws switch <name>[/]")
+            return
+        w = switch_to(name)
+        if w:
+            console.print(f"[green]Switched to:[/] {w.name} [dim]({w.path})[/]")
+        else:
+            console.print(f"[red]Workspace '{name}' not found or path inaccessible[/]")
+
+    elif action == "auto":
+        w = auto_discover()
+        if w:
+            console.print(f"[green]Auto-discovered:[/] {w.name} [dim]({w.path})[/]")
+        else:
+            console.print("[dim]Current directory already registered[/]")
+
+
 # ── /gateway — IM message gateway status/start ──────────────────────
 
 
@@ -1877,6 +1948,7 @@ _BUILTIN_MAP = {
     "progress": _cmd_progress,
     "task": _cmd_task,
     "gateway": _cmd_gateway,
+    "ws": _cmd_ws,
     "ml": lambda a: None, "multiline": lambda a: None,  # handled by REPL loop
 }
 
