@@ -10,9 +10,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-_utils_dir = Path(__file__).resolve().parents[2] / "utils"
-if str(_utils_dir) not in sys.path:
-    sys.path.insert(0, str(_utils_dir))
+# utils package installed via pip install -e runtime/
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -81,14 +79,14 @@ def biased_predictions():
 
 class TestAuditDatasetBias:
     def test_balanced_dataset_passes(self, balanced_dataset):
-        from fairness_auditor import audit_dataset_bias
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = balanced_dataset
         report = audit_dataset_bias(y_true, sensitive, group_names=["A", "B"])
         assert report.overall_severity == "pass"
         assert report.source == "dataset"
 
     def test_biased_dataset_detects_representation_gap(self, biased_dataset):
-        from fairness_auditor import audit_dataset_bias
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = biased_dataset
         report = audit_dataset_bias(y_true, sensitive, group_names=["A", "B"],
                                     representation_threshold=0.15)
@@ -98,7 +96,7 @@ class TestAuditDatasetBias:
         assert not repr_result.passed
 
     def test_biased_dataset_detects_label_imbalance(self, biased_dataset):
-        from fairness_auditor import audit_dataset_bias
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = biased_dataset
         report = audit_dataset_bias(y_true, sensitive, group_names=["A", "B"])
         label_result = next(r for r in report.fairness_results
@@ -106,19 +104,19 @@ class TestAuditDatasetBias:
         assert not label_result.passed
 
     def test_recommendations_generated_for_biased(self, biased_dataset):
-        from fairness_auditor import audit_dataset_bias
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = biased_dataset
         report = audit_dataset_bias(y_true, sensitive, group_names=["A", "B"])
         assert len(report.recommendations) > 0
 
     def test_mismatched_group_names_raises(self, balanced_dataset):
-        from fairness_auditor import audit_dataset_bias
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = balanced_dataset
         with pytest.raises(ValueError):
             audit_dataset_bias(y_true, sensitive, group_names=["only_one"])
 
     def test_repr_custom_threshold(self, biased_dataset):
-        from fairness_auditor import audit_dataset_bias
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = biased_dataset
         # Very permissive threshold → should pass
         report = audit_dataset_bias(y_true, sensitive, group_names=["A", "B"],
@@ -134,21 +132,21 @@ class TestAuditDatasetBias:
 
 class TestAuditModelFairness:
     def test_perfect_predictions_pass_all_metrics(self, fair_predictions):
-        from fairness_auditor import audit_model_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness
         y_true, y_pred, sensitive = fair_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["A", "B"])
         assert report.overall_severity == "pass"
         assert all(r.passed for r in report.fairness_results)
 
     def test_biased_predictions_detected(self, biased_predictions):
-        from fairness_auditor import audit_model_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness
         y_true, y_pred, sensitive = biased_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["A", "B"])
         # At least equal_opportunity should fail (TPR gap)
         assert report.overall_severity in ("warning", "fail")
 
     def test_disparate_impact_computed(self, fair_predictions):
-        from fairness_auditor import audit_model_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness
         y_true, y_pred, sensitive = fair_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["A", "B"])
         di = next(r for r in report.fairness_results if r.metric == "disparate_impact")
@@ -156,7 +154,7 @@ class TestAuditModelFairness:
         assert di.value <= 1.0
 
     def test_group_metrics_populated(self, fair_predictions):
-        from fairness_auditor import audit_model_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness
         y_true, y_pred, sensitive = fair_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["X", "Y"])
         assert len(report.groups) == 2
@@ -166,7 +164,7 @@ class TestAuditModelFairness:
             assert g.fpr is not None
 
     def test_all_6_metrics_present(self, biased_predictions):
-        from fairness_auditor import audit_model_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness
         y_true, y_pred, sensitive = biased_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["A", "B"])
         metric_names = {r.metric for r in report.fairness_results}
@@ -197,13 +195,13 @@ class TestAuditIntersectional:
         return y_true, y_pred, {"gender": gender, "race": race}
 
     def test_intersectional_groups_created(self, intersectional_data):
-        from fairness_auditor import audit_intersectional
+        from utils.a11y_i18n.fairness_auditor import audit_intersectional
         y_true, y_pred, sensitive = intersectional_data
         report = audit_intersectional(y_true, y_pred, sensitive, min_group_size=5)
         assert len(report.groups) >= 2
 
     def test_intersectional_metrics_present(self, intersectional_data):
-        from fairness_auditor import audit_intersectional
+        from utils.a11y_i18n.fairness_auditor import audit_intersectional
         y_true, y_pred, sensitive = intersectional_data
         report = audit_intersectional(y_true, y_pred, sensitive, min_group_size=5)
         metric_names = {r.metric for r in report.fairness_results}
@@ -211,7 +209,7 @@ class TestAuditIntersectional:
         assert "intersectional_accuracy_gap" in metric_names
 
     def test_small_groups_filtered(self, intersectional_data):
-        from fairness_auditor import audit_intersectional
+        from utils.a11y_i18n.fairness_auditor import audit_intersectional
         y_true, y_pred, sensitive = intersectional_data
         # With high min_group_size, all groups should be filtered
         report = audit_intersectional(y_true, y_pred, sensitive, min_group_size=1000)
@@ -225,7 +223,7 @@ class TestAuditIntersectional:
 
 class TestAuditDecisionFairness:
     def test_fair_decisions_pass(self):
-        from fairness_auditor import audit_decision_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_decision_fairness
         rng = np.random.RandomState(42)
         decisions = rng.choice([0, 1], 200, p=[0.5, 0.5]).astype(float)
         sensitive = np.array([0] * 100 + [1] * 100)
@@ -234,7 +232,7 @@ class TestAuditDecisionFairness:
         assert report.overall_severity in ("pass", "warning")
 
     def test_biased_decisions_detected(self):
-        from fairness_auditor import audit_decision_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_decision_fairness
         rng = np.random.RandomState(42)
         # Group 0: 80% approved, Group 1: 20% approved
         d0 = rng.choice([0, 1], 100, p=[0.2, 0.8]).astype(float)
@@ -245,7 +243,7 @@ class TestAuditDecisionFairness:
         assert report.overall_severity == "fail"
 
     def test_decision_groups_match(self):
-        from fairness_auditor import audit_decision_fairness
+        from utils.a11y_i18n.fairness_auditor import audit_decision_fairness
         decisions = np.array([1, 1, 0, 0, 1, 0])
         sensitive = np.array([0, 0, 0, 1, 1, 1])
         report = audit_decision_fairness(decisions, sensitive, group_names=["X", "Y"])
@@ -260,7 +258,7 @@ class TestAuditDecisionFairness:
 
 class TestExport:
     def test_export_creates_file(self, balanced_dataset, tmp_path):
-        from fairness_auditor import audit_dataset_bias, export_bias_report
+        from utils.a11y_i18n.fairness_auditor import audit_dataset_bias, export_bias_report
         y_true, sensitive = balanced_dataset
         report = audit_dataset_bias(y_true, sensitive, group_names=["A", "B"])
         path = export_bias_report(report, output_dir=str(tmp_path))
@@ -271,7 +269,7 @@ class TestExport:
         assert len(data["fairness_results"]) == 2
 
     def test_summary_contains_metrics(self, fair_predictions):
-        from fairness_auditor import audit_model_fairness, summary
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness, summary
         y_true, y_pred, sensitive = fair_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["A", "B"])
         text = summary(report)
@@ -279,7 +277,7 @@ class TestExport:
         assert "equal_opportunity" in text
 
     def test_summary_shows_severity(self, fair_predictions):
-        from fairness_auditor import audit_model_fairness, summary
+        from utils.a11y_i18n.fairness_auditor import audit_model_fairness, summary
         y_true, y_pred, sensitive = fair_predictions
         report = audit_model_fairness(y_true, y_pred, sensitive, group_names=["A", "B"])
         text = summary(report)

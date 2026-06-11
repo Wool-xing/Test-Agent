@@ -37,8 +37,8 @@ class GitHubBugManager(BugTrackerBase):
         token: str | None = None,
         repo: str | None = None,
     ):
-        self.token = token or os.getenv("GITHUB_TOKEN", "")
-        self.repo = repo or os.getenv("GITHUB_REPO", "")
+        self.token = token or os.getenv("TAGENT_GITHUB_TOKEN") or os.getenv("GITHUB_TOKEN", "")
+        self.repo = repo or os.getenv("TAGENT_GITHUB_REPO") or os.getenv("GITHUB_REPO", "")
         self.session = requests.Session()
         self.session.headers.update({
             "Accept": "application/vnd.github+json",

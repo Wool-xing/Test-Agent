@@ -11,6 +11,7 @@ Supports:
 from __future__ import annotations
 
 import os
+import threading
 import time
 
 from loguru import logger
@@ -19,31 +20,35 @@ from runtime.gateway.base import DeliveryResult, Message, Platform, register
 
 _ACCESS_TOKEN: str | None = None
 _ACCESS_TOKEN_EXPIRY: float = 0
+_token_lock = threading.Lock()
 
 
 def _get_access_token(app_id: str, client_secret: str) -> str | None:
-    """Obtain QQ Bot access_token (cached, 2h TTL)."""
+    """Obtain QQ Bot access_token (cached, 2h TTL). Thread-safe."""
     global _ACCESS_TOKEN, _ACCESS_TOKEN_EXPIRY
     import httpx
 
     if _ACCESS_TOKEN and time.time() < _ACCESS_TOKEN_EXPIRY - 60:
         return _ACCESS_TOKEN
 
-    try:
-        r = httpx.post(
-            "https://bots.qq.com/app/getAppAccessToken",
-            json={"appId": app_id, "clientSecret": client_secret},
-            timeout=15,
-        )
-        data = r.json()
-        token = data.get("access_token")
-        if token:
-            _ACCESS_TOKEN = token
-            _ACCESS_TOKEN_EXPIRY = time.time() + data.get("expires_in", 7200)
-            return token
-    except Exception as e:
-        logger.warning("QQ Bot access_token fetch failed: {}", e)
-    return None
+    with _token_lock:
+        if _ACCESS_TOKEN and time.time() < _ACCESS_TOKEN_EXPIRY - 60:
+            return _ACCESS_TOKEN
+        try:
+            r = httpx.post(
+                "https://bots.qq.com/app/getAppAccessToken",
+                json={"appId": app_id, "clientSecret": client_secret},
+                timeout=15,
+            )
+            data = r.json()
+            token = data.get("access_token")
+            if token:
+                _ACCESS_TOKEN = token
+                _ACCESS_TOKEN_EXPIRY = time.time() + data.get("expires_in", 7200)
+                return token
+        except Exception as e:
+            logger.warning("QQ Bot access_token fetch failed: {}", e)
+        return None
 
 
 @register("qqbot")

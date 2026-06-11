@@ -8,6 +8,9 @@ from typing import Any
 
 from loguru import logger
 
+# Suppress litellm remote cost-map fetch noise (5s timeout in air-gapped envs)
+os.environ.setdefault("LITELLM_SUPPRESS_DEBUG_INFO", "1")
+
 from runtime.config.settings import get_settings
 
 PROVIDER_MODEL_MAP: dict[str, str] = {
@@ -18,6 +21,22 @@ PROVIDER_MODEL_MAP: dict[str, str] = {
     "deepseek": "deepseek/deepseek-chat",
     "ollama": "ollama/qwen2.5:7b",
 }
+
+
+def _resolve_model(provider: str) -> str:
+    """Resolve provider → model name. Env override: TAGENT_LLM_MODEL_<PROVIDER>."""
+    env_key = f"TAGENT_LLM_MODEL_{provider.upper()}"
+    return os.getenv(env_key, PROVIDER_MODEL_MAP.get(provider, provider))
+
+
+def _strip_json_fences(raw: str) -> str:
+    """Strip markdown code fences + language tag from LLM output."""
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw[3:-3].strip() if raw.endswith("```") else raw[3:]
+        if "\n" in raw:
+            _, raw = raw.split("\n", 1)
+    return raw
 
 
 def _call_responses_api(provider: str, model: str, system: str, user: str,
@@ -97,7 +116,7 @@ class LLMClient:
                 from runtime.router.model_router import select_model
                 model = select_model(user, provider)
             except ImportError:
-                model = PROVIDER_MODEL_MAP.get(provider, provider)
+                model = _resolve_model(provider)
             cached = get_cached(provider, model, system, user, temperature)
             if cached is not None:
                 return cached
@@ -111,7 +130,7 @@ class LLMClient:
             from runtime.router.model_router import select_model
             model = select_model(user, provider)
         except ImportError:
-            model = PROVIDER_MODEL_MAP.get(provider, provider)
+            model = _resolve_model(provider)
         # Allow env var override for any provider (supports any model / 中转站)
         if os.environ.get("TAGENT_LLM_MODEL"):
             model = os.environ["TAGENT_LLM_MODEL"]
@@ -157,13 +176,7 @@ class LLMClient:
 
     @staticmethod
     def _extract_json(raw: str) -> dict[str, Any]:
-        raw = raw.strip()
-        if raw.startswith("```"):
-            # Strip exactly one fenced code block marker
-            raw = raw[3:-3].strip() if raw.endswith("```") else raw[3:]
-            # strip leading lang tag e.g. ```json
-            if "\n" in raw:
-                _, raw = raw.split("\n", 1)
+        raw = _strip_json_fences(raw)
         start = raw.find("{")
         end = raw.rfind("}")
         if start < 0 or end < 0:

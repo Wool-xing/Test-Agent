@@ -251,6 +251,425 @@ $ _""",
             "info": "[ INFO ]",
         },
     },
+
+    "cat": {
+        "name": "cat",
+        "description": "curious testing companion",
+        "animation_speed": 0.0008,
+        "panel_style": {"text": "bold bright_yellow", "border": "bright_yellow"},
+        "banner": r"""
+[bold bright_yellow]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_yellow]  ▄█▌ ₍˶ᵔ ⃟ ᵜ˶₎ ▐█阄阄[/]
+[bold bright_yellow]  ██▌   🧶 🐾   ▐██[/]
+[bold bright_yellow]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim yellow]     🐾  🧶  🐾  🧶[/]
+[bold white] Test-Agent [bright_yellow]v{version}[/bright_yellow][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim yellow] !help — curious testing companion[/]
+""",
+        "prompt_style": {"prompt": "bold bright_yellow", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_yellow", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "dog": {
+        "name": "dog",
+        "description": "WOOF! enthusiastic test runner",
+        "animation_speed": 0.0006,
+        "panel_style": {"text": "bold bright_yellow", "border": "bright_yellow"},
+        "banner": r"""
+[bold bright_yellow]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_yellow]  ▄█▌ U ｺ U ▐█阄阄[/]
+[bold bright_yellow]  ██▌   ⚽ 🺴   ▐██[/]
+[bold bright_yellow]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim yellow]     🺴  ⚽  🺴  ⚽[/]
+[bold white] Test-Agent [bright_yellow]v{version}[/bright_yellow][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim yellow] !help — WOOF! enthusiastic test runner[/]
+""",
+        "prompt_style": {"prompt": "bold bright_yellow", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_yellow", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "owl": {
+        "name": "owl",
+        "description": "wisdom begins with a question",
+        "animation_speed": 0.002,
+        "panel_style": {"text": "bold magenta", "border": "magenta"},
+        "banner": r"""
+[bold magenta]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold magenta]  ▄█▌ (◉▿◉) ▐█阄阄[/]
+[bold magenta]  ██▌   📖 ✦   ▐██[/]
+[bold magenta]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim magenta]     ✦  📖  ✦  📖[/]
+[bold white] Test-Agent [magenta]v{version}[/magenta][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim magenta] !help — wisdom begins with a question[/]
+""",
+        "prompt_style": {"prompt": "bold magenta", "prompt.dim": "dim"},
+        "colors": {"primary": "magenta", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "fox": {
+        "name": "fox",
+        "description": "clever tests, zero bugs",
+        "animation_speed": 0.0008,
+        "panel_style": {"text": "bold bright_red", "border": "bright_red"},
+        "banner": r"""
+[bold bright_red]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_red]  ▄█▌ (◕‿◕✿) ▐█阄阄[/]
+[bold bright_red]  ██▌   🔥 🍂   ▐██[/]
+[bold bright_red]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_red]     🍂  🔥  🍂  🔥[/]
+[bold white] Test-Agent [bright_red]v{version}[/bright_red][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_red] !help — clever tests, zero bugs[/]
+""",
+        "prompt_style": {"prompt": "bold bright_red", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_red", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "frog": {
+        "name": "frog",
+        "description": "hop into testing",
+        "animation_speed": 0.0006,
+        "panel_style": {"text": "bold green", "border": "green"},
+        "banner": r"""
+[bold green]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold green]  ▄█▌ ( :3 ) ▐█阄阄[/]
+[bold green]  ██▌   🺷 💧   ▐██[/]
+[bold green]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim green]     💧  🺷  💧  🺷[/]
+[bold white] Test-Agent [green]v{version}[/green][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim green] !help — hop into testing[/]
+""",
+        "prompt_style": {"prompt": "bold green", "prompt.dim": "dim"},
+        "colors": {"primary": "green", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "penguin": {
+        "name": "penguin",
+        "description": "stay cool, test well",
+        "animation_speed": 0.001,
+        "panel_style": {"text": "bold bright_cyan", "border": "bright_cyan"},
+        "banner": r"""
+[bold bright_cyan]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_cyan]  ▄█▌ (°◡°♡) ▐█阄阄[/]
+[bold bright_cyan]  ██▌   ❄ 🧊   ▐██[/]
+[bold bright_cyan]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_cyan]     🧊  ❄  🧊  ❄[/]
+[bold white] Test-Agent [bright_cyan]v{version}[/bright_cyan][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_cyan] !help — stay cool, test well[/]
+""",
+        "prompt_style": {"prompt": "bold bright_cyan", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_cyan", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "bunny": {
+        "name": "bunny",
+        "description": "hop to quick testing",
+        "animation_speed": 0.0004,
+        "panel_style": {"text": "bold bright_magenta", "border": "bright_magenta"},
+        "banner": r"""
+[bold bright_magenta]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_magenta]  ▄█▌ (／.＼) ▐█阄阄[/]
+[bold bright_magenta]  ██▌   🥕 🌱   ▐██[/]
+[bold bright_magenta]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_magenta]     🌱  🥕  🌱  🥕[/]
+[bold white] Test-Agent [bright_magenta]v{version}[/bright_magenta][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_magenta] !help — hop to quick testing[/]
+""",
+        "prompt_style": {"prompt": "bold bright_magenta", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_magenta", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "panda": {
+        "name": "panda",
+        "description": "take it easy, test well",
+        "animation_speed": 0.0011,
+        "panel_style": {"text": "bold bright_white", "border": "bright_white"},
+        "banner": r"""
+[bold bright_white]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_white]  ▄█▌ ㅜ(◕ᵗ◕✿)ノ ▐█阄阄[/]
+[bold bright_white]  ██▌   🎋 🎍   ▐██[/]
+[bold bright_white]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_white]     🎍  🎋  🎍  🎋[/]
+[bold white] Test-Agent [bright_white]v{version}[/bright_white][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_white] !help — take it easy, test well[/]
+""",
+        "prompt_style": {"prompt": "bold bright_white", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_white", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "sunflower": {
+        "name": "sunflower",
+        "description": "let your tests bloom",
+        "animation_speed": 0.0009,
+        "panel_style": {"text": "bold bright_yellow", "border": "bright_yellow"},
+        "banner": r"""
+[bold bright_yellow]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_yellow]  ▄█▌ ✿◕‿◕✿ ▐█阄阄[/]
+[bold bright_yellow]  ██▌   🌻 🐝   ▐██[/]
+[bold bright_yellow]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_yellow]     🐝  🌻  🐝  🌻[/]
+[bold white] Test-Agent [bright_yellow]v{version}[/bright_yellow][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_yellow] !help — let your tests bloom[/]
+""",
+        "prompt_style": {"prompt": "bold bright_yellow", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_yellow", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "cactus": {
+        "name": "cactus",
+        "description": "resilient testing",
+        "animation_speed": 0.0009,
+        "panel_style": {"text": "bold green", "border": "green"},
+        "banner": r"""
+[bold green]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold green]  ▄█▌ (◠‿◠) ▐█阄阄[/]
+[bold green]  ██▌   🌵 🌺   ▐██[/]
+[bold green]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim green]     🌺  🌵  🌺  🌵[/]
+[bold white] Test-Agent [green]v{version}[/green][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim green] !help — resilient testing[/]
+""",
+        "prompt_style": {"prompt": "bold green", "prompt.dim": "dim"},
+        "colors": {"primary": "green", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "whale": {
+        "name": "whale",
+        "description": "dive deep into testing",
+        "animation_speed": 0.002,
+        "panel_style": {"text": "bold bright_blue", "border": "bright_blue"},
+        "banner": r"""
+[bold bright_blue]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_blue]  ▄█▌ (◉▿◉❀) ▐█阄阄[/]
+[bold bright_blue]  ██▌   💧 🐟   ▐██[/]
+[bold bright_blue]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_blue]     🐟  💧  🐟  💧[/]
+[bold white] Test-Agent [bright_blue]v{version}[/bright_blue][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_blue] !help — dive deep into testing[/]
+""",
+        "prompt_style": {"prompt": "bold bright_blue", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_blue", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "dolphin": {
+        "name": "dolphin",
+        "description": "leap into quality testing",
+        "animation_speed": 0.0004,
+        "panel_style": {"text": "bold bright_cyan", "border": "bright_cyan"},
+        "banner": r"""
+[bold bright_cyan]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_cyan]  ▄█▌ (◕▿◕✿) ▐█阄阄[/]
+[bold bright_cyan]  ██▌   💦 〰   ▐██[/]
+[bold bright_cyan]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_cyan]     〰  💦  〰  💦[/]
+[bold white] Test-Agent [bright_cyan]v{version}[/bright_cyan][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_cyan] !help — leap into quality testing[/]
+""",
+        "prompt_style": {"prompt": "bold bright_cyan", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_cyan", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "turtle": {
+        "name": "turtle",
+        "description": "steady wins the race",
+        "animation_speed": 0.0025,
+        "panel_style": {"text": "bold green", "border": "green"},
+        "banner": r"""
+[bold green]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold green]  ▄█▌ (◉ω◉) ▐█阄阄[/]
+[bold green]  ██▌   🌿 🥚   ▐██[/]
+[bold green]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim green]     🥚  🌿  🥚  🌿[/]
+[bold white] Test-Agent [green]v{version}[/green][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim green] !help — steady wins the race[/]
+""",
+        "prompt_style": {"prompt": "bold green", "prompt.dim": "dim"},
+        "colors": {"primary": "green", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "octopus": {
+        "name": "octopus",
+        "description": "eight arms, zero bugs",
+        "animation_speed": 0.0004,
+        "panel_style": {"text": "bold magenta", "border": "magenta"},
+        "banner": r"""
+[bold magenta]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold magenta]  ▄█▌ (◉⏠◉) ▐█阄阄[/]
+[bold magenta]  ██▌   🺸 🺸   ▐██[/]
+[bold magenta]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim magenta]     🺸  🺸  🺸  🺸[/]
+[bold white] Test-Agent [magenta]v{version}[/magenta][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim magenta] !help — eight arms, zero bugs[/]
+""",
+        "prompt_style": {"prompt": "bold magenta", "prompt.dim": "dim"},
+        "colors": {"primary": "magenta", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "eagle": {
+        "name": "eagle",
+        "description": "soar above the codebase",
+        "animation_speed": 0.0012,
+        "panel_style": {"text": "bold yellow", "border": "yellow"},
+        "banner": r"""
+[bold yellow]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold yellow]  ▄█▌ ψ(｀∇｀)ψ ▐█阄阄[/]
+[bold yellow]  ██▌   ☀ 🏔   ▐██[/]
+[bold yellow]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim yellow]     🏔  ☀  🏔  ☀[/]
+[bold white] Test-Agent [yellow]v{version}[/yellow][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim yellow] !help — soar above the codebase[/]
+""",
+        "prompt_style": {"prompt": "bold yellow", "prompt.dim": "dim"},
+        "colors": {"primary": "yellow", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "butterfly": {
+        "name": "butterfly",
+        "description": "graceful testing",
+        "animation_speed": 0.0007,
+        "panel_style": {"text": "bold bright_magenta", "border": "bright_magenta"},
+        "banner": r"""
+[bold bright_magenta]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_magenta]  ▄█▌ ε(｀ᐧ｀)っ ▐█阄阄[/]
+[bold bright_magenta]  ██▌   🌸 🌼   ▐██[/]
+[bold bright_magenta]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_magenta]     🌼  🌸  🌼  🌸[/]
+[bold white] Test-Agent [bright_magenta]v{version}[/bright_magenta][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_magenta] !help — graceful testing[/]
+""",
+        "prompt_style": {"prompt": "bold bright_magenta", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_magenta", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "parrot": {
+        "name": "parrot",
+        "description": "repeatable, reliable",
+        "animation_speed": 0.0005,
+        "panel_style": {"text": "bold bright_green", "border": "bright_green"},
+        "banner": r"""
+[bold bright_green]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_green]  ▄█▌ (◕⨊◕✿) ▐█阄阄[/]
+[bold bright_green]  ██▌   🌴 🍃   ▐██[/]
+[bold bright_green]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_green]     🍃  🌴  🍃  🌴[/]
+[bold white] Test-Agent [bright_green]v{version}[/bright_green][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_green] !help — repeatable, reliable[/]
+""",
+        "prompt_style": {"prompt": "bold bright_green", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_green", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "dragonfly": {
+        "name": "dragonfly",
+        "description": "dart, hover, test",
+        "animation_speed": 0.0003,
+        "panel_style": {"text": "bold bright_cyan", "border": "bright_cyan"},
+        "banner": r"""
+[bold bright_cyan]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_cyan]  ▄█▌ ⁽⁽ଘ( ˙Ꭓ˙ )ଓ⁾⁾ ▐█阄阄[/]
+[bold bright_cyan]  ██▌   🺷 💨   ▐██[/]
+[bold bright_cyan]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_cyan]     💨  🺷  💨  🺷[/]
+[bold white] Test-Agent [bright_cyan]v{version}[/bright_cyan][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_cyan] !help — dart, hover, test[/]
+""",
+        "prompt_style": {"prompt": "bold bright_cyan", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_cyan", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "lion": {
+        "name": "lion",
+        "description": "rule your test kingdom",
+        "animation_speed": 0.0009,
+        "panel_style": {"text": "bold bright_yellow", "border": "bright_yellow"},
+        "banner": r"""
+[bold bright_yellow]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_yellow]  ▄█▌ ʕ♛ᵥ♛ʔ ▐█阄阄[/]
+[bold bright_yellow]  ██▌   👑 🏆   ▐██[/]
+[bold bright_yellow]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_yellow]     🏆  👑  🏆  👑[/]
+[bold white] Test-Agent [bright_yellow]v{version}[/bright_yellow][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_yellow] !help — rule your test kingdom[/]
+""",
+        "prompt_style": {"prompt": "bold bright_yellow", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_yellow", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "elephant": {
+        "name": "elephant",
+        "description": "never forget a test",
+        "animation_speed": 0.0013,
+        "panel_style": {"text": "bold bright_white", "border": "bright_white"},
+        "banner": r"""
+[bold bright_white]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_white]  ▄█▌ (◕ᵥ◕)っ🎈 ▐█阄阄[/]
+[bold bright_white]  ██▌   🌍 📋   ▐██[/]
+[bold bright_white]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_white]     📋  🌍  📋  🌍[/]
+[bold white] Test-Agent [bright_white]v{version}[/bright_white][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_white] !help — never forget a test[/]
+""",
+        "prompt_style": {"prompt": "bold bright_white", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_white", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "deer": {
+        "name": "deer",
+        "description": "swift, elegant testing",
+        "animation_speed": 0.0007,
+        "panel_style": {"text": "bold yellow", "border": "yellow"},
+        "banner": r"""
+[bold yellow]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold yellow]  ▄█▌ ◌❲●❳◌ ▐█阄阄[/]
+[bold yellow]  ██▌   🌲 🍄   ▐██[/]
+[bold yellow]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim yellow]     🍄  🌲  🍄  🌲[/]
+[bold white] Test-Agent [yellow]v{version}[/yellow][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim yellow] !help — swift, elegant testing[/]
+""",
+        "prompt_style": {"prompt": "bold yellow", "prompt.dim": "dim"},
+        "colors": {"primary": "yellow", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
+    "hedgehog": {
+        "name": "hedgehog",
+        "description": "catch every edge case",
+        "animation_speed": 0.001,
+        "panel_style": {"text": "bold bright_black", "border": "bright_black"},
+        "banner": r"""
+[bold bright_black]    阄阄阄阄阄阄阄阄阄阄阈阈阈阈阈阈[/]
+[bold bright_black]  ▄█▌ (◉ᵥ◉)🍄 ▐█阄阄[/]
+[bold bright_black]  ██▌   🍂 🌰   ▐██[/]
+[bold bright_black]  阀█阄阄阄阄阄阄阄阄阄阄阄阄█阀[/]
+[dim bright_black]     🌰  🍂  🌰  🍂[/]
+[bold white] Test-Agent [bright_black]v{version}[/bright_black][/]
+[dim] {experts} experts · {skills} skills[/]
+[dim bright_black] !help — catch every edge case[/]
+""",
+        "prompt_style": {"prompt": "bold bright_black", "prompt.dim": "dim"},
+        "colors": {"primary": "bright_black", "success": "bright_green", "error": "bright_red", "warning": "yellow", "dim": "dim"},
+        "icons": {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"},
+    },
 }
 
 

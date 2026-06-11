@@ -1,7 +1,7 @@
 """Tab completion for interactive REPL — slash commands + paths + agent/skill names.
 
 Provides slash command completion, path completion, agent/skill name completion,
-and context-aware completion for /model provider names.
+and context-aware completion for !model provider names.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 _BUILTINS = [
     ("help", "Show help"),
     ("status", "Session stats + model info"),
-    ("session", "Alias for /status"),
+    ("session", "Alias for !status"),
     ("model", "Switch LLM provider"),
     ("tools", "List agents + skills"),
     ("memory", "Show MEMORY.md contents"),
@@ -51,7 +51,7 @@ _PROVIDERS = ["claude", "openai", "gemini", "deepseek", "qwen", "ollama"]
 
 
 class SlashCompleter(Completer):
-    """Complete /commands, provider names, file paths, and agent/skill names."""
+    """Complete !commands, provider names, file paths, and agent/skill names."""
 
     def __init__(self):
         self._path_completer = PathCompleter(expanduser=True)
@@ -77,10 +77,10 @@ class SlashCompleter(Completer):
         text = document.text_before_cursor
 
         # After /, complete command names or context-aware args
-        if text.startswith("/"):
-            word = text.lstrip("/")
+        if text.startswith("!"):
+            word = text.lstrip("!")
 
-            # /model <provider> — complete provider names
+            # !model <provider> — complete provider names
             if word.startswith("model "):
                 provider_part = word.split(" ", 1)[1]
                 # If there's a second arg (model name), fall through to no completion

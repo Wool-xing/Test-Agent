@@ -1,6 +1,10 @@
 """Test-Agent workspace output path helpers.
 
-All paths follow: workspace/测试报告/{PROJECT_NAME}[/{run_id}]/{sub_path}"""
+All paths follow: workspace/<output_dir>/{PROJECT_NAME}[/{run_id}]/{sub_path}
+
+Output dir auto-detects locale: zh_CN → 测试报告, else → test-reports.
+Override with TAGENT_OUTPUT_DIR env var.
+"""
 
 import os
 import uuid
@@ -10,6 +14,18 @@ from pathlib import Path
 _RUN_ID: str | None = None
 
 
+def _is_chinese_locale() -> bool:
+    try:
+        import locale
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            loc = locale.getdefaultlocale()[0] or ""
+        return loc.lower().startswith("zh")
+    except Exception:
+        return False
+
+
 def get_project_name() -> str:
     return os.getenv("PROJECT_NAME", "default")
 
@@ -17,7 +33,11 @@ def get_project_name() -> str:
 def get_output_base(project: str | None = None) -> Path:
     if project is None:
         project = get_project_name()
-    return Path("workspace/测试报告") / project
+    custom = os.getenv("TAGENT_OUTPUT_DIR")
+    if custom:
+        return Path(custom) / project
+    default = "workspace/测试报告" if _is_chinese_locale() else "workspace/test-reports"
+    return Path(default) / project
 
 
 def get_output_dir(sub_path: str = "", run_id: str | None = None) -> Path:

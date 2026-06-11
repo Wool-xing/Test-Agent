@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 
+from runtime.config.settings import get_settings
 from runtime.gateway.base import DeliveryResult, Message, Platform, register
 
 
@@ -14,8 +15,9 @@ class TelegramPlatform(Platform):
         self.default_chat: str | None = None
 
     async def configure(self, *, token: str | None = None, chat_id: str | None = None, **_kwargs) -> None:
-        self.token = token or os.getenv("TELEGRAM_BOT_TOKEN")
-        self.default_chat = chat_id or os.getenv("TELEGRAM_CHAT_ID")
+        s = get_settings()
+        self.token = token or s.telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN")
+        self.default_chat = chat_id or s.telegram_chat_id or os.getenv("TELEGRAM_CHAT_ID")
 
     async def send(self, msg: Message, *, target: str | None = None) -> DeliveryResult:
         try:

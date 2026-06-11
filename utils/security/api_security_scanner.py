@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+# DEPRECATED: use api_security_scanner_v2 instead. This file will be removed in V1.2.
 """
 API 安全测试 - OWASP API Top 10 覆盖
 - API1: BOLA（越权访问对象）

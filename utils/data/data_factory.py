@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+# DEPRECATED: use data_factory_v2 instead. This file will be removed in V1.2.
 """
 测试数据工厂 - Faker + Factory Boy 生成标准化测试数据
 被引用方：05-数据准备 agent / data-preparation skill / conftest.py

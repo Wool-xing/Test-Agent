@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+# DEPRECATED: use suite_minimizer_v2 instead. This file will be removed in V1.2.
 """
 测试套件减重（Suite Minimization）- 检测重复用例 / 冗余覆盖
 被引用方：testcase-designer / 测试质量

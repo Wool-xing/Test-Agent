@@ -6,11 +6,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-_utils_dir = Path(__file__).resolve().parents[2] / "utils"
-if str(_utils_dir) not in sys.path:
-    sys.path.insert(0, str(_utils_dir))
+# utils package installed via pip install -e runtime/
 
-from taboo_matrix import (  # noqa: E402
+from utils.design.taboo_matrix import (  # noqa: E402
     SACRED_CONTEXTS,
     TABOO_COLORS,
     TABOO_HOLIDAYS,

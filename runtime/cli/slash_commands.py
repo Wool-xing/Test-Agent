@@ -18,6 +18,7 @@ class CommandDef:
     args_hint: str = ""
     handler: Callable | None = None
     nl_triggers: list[str] = field(default_factory=list)  # 自然语言触发词
+    cli_module: str = ""          # 非空=暴露为CLI命令,值为模块名(如"bootstrap")
 
 
 COMMAND_REGISTRY: list[CommandDef] = []
@@ -27,8 +28,13 @@ def register(name: str, description: str, *,
              description_zh: str = "",
              aliases: list[str] | None = None,
              args_hint: str = "",
-             nl_triggers: list[str] | None = None):
-    """Decorator: register a slash command handler with bilingual metadata."""
+             nl_triggers: list[str] | None = None,
+             cli_module: str = ""):
+    """Decorator: register a slash command handler with bilingual metadata.
+
+    cli_module — if non-empty, also exposed as a CLI command via
+    `runtime.cli.commands.<cli_module>.register(app)`.
+    """
 
     def decorator(fn):
         COMMAND_REGISTRY.append(
@@ -40,6 +46,7 @@ def register(name: str, description: str, *,
                 args_hint=args_hint,
                 handler=fn,
                 nl_triggers=nl_triggers or [],
+                cli_module=cli_module,
             )
         )
         return fn
@@ -52,7 +59,7 @@ def register(name: str, description: str, *,
 
 def resolve(name: str) -> CommandDef | None:
     """Look up command by name or alias."""
-    name = name.lstrip("/").strip().lower()
+    name = name.lstrip("!").strip().lower()
     for cmd in COMMAND_REGISTRY:
         if cmd.name == name or name in cmd.aliases:
             return cmd
@@ -71,7 +78,7 @@ def resolve_nl(text: str) -> CommandDef | None:
 
 def closest(name: str) -> str | None:
     """Find closest matching command via edit distance (thefuck pattern)."""
-    name = name.lstrip("/").strip().lower()
+    name = name.lstrip("!").strip().lower()
     if not name:
         return None
     best, best_dist = None, 999
@@ -105,6 +112,15 @@ def _edit_distance(a: str, b: str) -> int:
 
 def all_commands() -> list[CommandDef]:
     return list(COMMAND_REGISTRY)
+
+
+def _exec_cli(command: str, args: str) -> None:
+    """Run a tagent CLI command via subprocess."""
+    import subprocess, sys
+    cmd = [sys.executable, "-m", "runtime.cli.main", command]
+    if args.strip():
+        cmd.extend(args.split())
+    subprocess.run(cmd)
 
 
 def _run_with_argv(cmd: list[str], fn) -> None:
@@ -160,11 +176,12 @@ def _cmd_quit(args: str) -> None:
 
 @register("test", "Full test pipeline (11-step)",
           description_zh="完整测试流程（11步）",
-          aliases=["tc"], args_hint="<target>", nl_triggers=["测试", "跑测试", "完整测试", "test"])
+          aliases=["tc"], args_hint="<target>", nl_triggers=["测试", "跑测试", "完整测试", "test"],
+          cli_module="test_coordinator")
 def _cmd_test(args: str) -> None:
     if not args.strip():
         from runtime.cli._shared import console
-        console.print("[red]Usage: /test <path|URL|text>[/]")
+        console.print("[red]Usage: !test <path|URL|text>[/]")
         return
     from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
     TestCoordinatorPipeline().run(args.strip())
@@ -172,74 +189,74 @@ def _cmd_test(args: str) -> None:
 
 @register("run", "Plan + execute (quick)",
           description_zh="快速规划执行",
-          aliases=["r"], args_hint="<target>", nl_triggers=["运行", "执行", "快速测试", "跑一下"])
+          aliases=["r"], args_hint="<target>", nl_triggers=["运行", "执行", "快速测试", "跑一下"],
+          cli_module="run")
 def _cmd_run(args: str) -> None:
     if not args.strip():
         from runtime.cli._shared import console
-        console.print("[red]Usage: /run <path|URL|text>[/]")
+        console.print("[red]Usage: !run <path|URL|text>[/]")
         return
-    from runtime.cli.commands.run import run
-    _run_with_argv(["tagent", "run"] + args.split(), run)
+    _exec_cli("run", args)
 
 
 @register("plan", "Plan only",
           description_zh="仅规划不执行",
-          aliases=["p"], args_hint="<target>", nl_triggers=["计划", "规划", "只规划", "不执行", "出计划"])
+          aliases=["p"], args_hint="<target>", nl_triggers=["计划", "规划", "只规划", "不执行", "出计划"],
+          cli_module="run")
 def _cmd_plan(args: str) -> None:
     if not args.strip():
         from runtime.cli._shared import console
-        console.print("[red]Usage: /plan <path|URL|text>[/]")
+        console.print("[red]Usage: !plan <path|URL|text>[/]")
         return
-    from runtime.cli.commands.run import plan
-    _run_with_argv(["tagent", "plan"] + args.split(), plan)
+    _exec_cli("plan", args)
 
 
 @register("doctor", "Health check",
           description_zh="健康检查",
-          aliases=["health"], args_hint="[--agents] [--probe]", nl_triggers=["健康检查", "检查一下", "诊断", "体检", "环境检查"])
+          aliases=["health"], args_hint="[--agents] [--probe]", nl_triggers=["健康检查", "检查一下", "诊断", "体检", "环境检查"],
+          cli_module="doctor")
 def _cmd_doctor(args: str) -> None:
-    from runtime.cli.commands.doctor import doctor
-    _run_with_argv(["tagent", "doctor"] + (args.split() if args.strip() else []), doctor)
+    _exec_cli("doctor", args)
 
 
-@register("ls", "List experts + skills",
+@register("catalog", "List experts + skills",
           description_zh="列出专家和技能",
-          aliases=["list", "catalog"], nl_triggers=["列出", "列表", "目录", "有哪些", "显示所有"])
+          aliases=["ls", "list"], nl_triggers=["列出", "列表", "目录", "有哪些", "显示所有"],
+          cli_module="catalog")
 def _cmd_ls(args: str) -> None:
-    from runtime.cli.commands.catalog import catalog
-    _run_with_argv(["tagent", "catalog"], catalog)
+    _exec_cli("catalog", args)
 
 
-@register("setup", "Generate config",
+@register("init", "Generate config",
           description_zh="生成配置文件",
-          aliases=["init"], args_hint="[--preset ...]", nl_triggers=["设置", "配置", "初始化", "生成配置"])
+          aliases=["setup"], args_hint="[--preset ...]", nl_triggers=["设置", "配置", "初始化", "生成配置"],
+          cli_module="init")
 def _cmd_setup(args: str) -> None:
-    from runtime.cli.commands.init import init_project
-    _run_with_argv(["tagent", "init"] + (args.split() if args.strip() else []), init_project)
+    _exec_cli("init", args)
 
 
-@register("ready", "Release readiness",
+@register("readiness", "Release readiness",
           description_zh="发布就绪检查",
-          aliases=["readiness"], nl_triggers=["就绪", "发布检查", "准备好了吗", "上线检查"])
+          aliases=["ready"], nl_triggers=["就绪", "发布检查", "准备好了吗", "上线检查"],
+          cli_module="readiness")
 def _cmd_ready(args: str) -> None:
-    from runtime.cli.commands.readiness import readiness
-    _run_with_argv(["tagent", "readiness"] + (args.split() if args.strip() else []), readiness)
+    _exec_cli("readiness", args)
 
 
-@register("check", "Framework self-test",
+@register("selftest", "Framework self-test",
           description_zh="框架自检",
-          aliases=["selftest"], args_hint="[--e2e] [--strict]", nl_triggers=["自检", "框架检查", "验证"])
+          aliases=["check"], args_hint="[--e2e] [--strict]", nl_triggers=["自检", "框架检查", "验证"],
+          cli_module="selftest")
 def _cmd_check(args: str) -> None:
-    from runtime.cli.commands.selftest import selftest
-    _run_with_argv(["tagent", "selftest"] + (args.split() if args.strip() else []), selftest)
+    _exec_cli("selftest", args)
 
 
 @register("demo", "Quick demo",
           description_zh="快速演示",
-          args_hint="[--real-llm]", nl_triggers=["演示", "demo", "试一下"])
+          args_hint="[--real-llm]", nl_triggers=["演示", "demo", "试一下"],
+          cli_module="demo")
 def _cmd_demo(args: str) -> None:
-    from runtime.cli.commands.demo import demo
-    _run_with_argv(["tagent", "demo"] + (args.split() if args.strip() else []), demo)
+    _exec_cli("demo", args)
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -314,7 +331,8 @@ def _repl_sessions(args): _cmd_sessions(args)
 @register("resume", "Load session", description_zh="恢复会话", nl_triggers=["恢复", "继续", "加载会话", "resume"])
 def _repl_resume(args): _cmd_resume(args)
 
-@register("export", "Export conversation", description_zh="导出对话", nl_triggers=["导出", "导出对话", "保存对话", "export"])
+@register("save", "Export conversation", description_zh="导出对话",
+          aliases=["export"], nl_triggers=["导出", "导出对话", "保存对话", "save"])
 def _repl_export(args): _cmd_export(args)
 
 @register("compact", "Compress context", description_zh="压缩上下文", nl_triggers=["压缩", "精简", "总结", "摘要"])
@@ -371,7 +389,8 @@ def _repl_alias(args): _cmd_alias(args)
 @register("ws", "Workspace manager", description_zh="工作区管理", nl_triggers=["工作区", "工作空间", "切换项目"])
 def _repl_ws(args): _cmd_ws(args)
 
-@register("gateway", "Gateway status", description_zh="网关状态", nl_triggers=["网关", "消息平台", "即时通讯"])
+@register("gateway", "Gateway status", description_zh="网关状态", nl_triggers=["网关", "消息平台", "即时通讯"],
+          cli_module="gateway")
 def _repl_gateway(args): _cmd_gateway(args)
 
 @register("task", "Task list", description_zh="任务管理", nl_triggers=["任务", "任务列表", "代办", "todo"])

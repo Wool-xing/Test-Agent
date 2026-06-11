@@ -21,9 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from paths import get_output_dir, current_run_id
+from utils.paths import get_output_dir, current_run_id
 
 logger = logging.getLogger(__name__)
 

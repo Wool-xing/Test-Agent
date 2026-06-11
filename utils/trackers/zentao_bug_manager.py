@@ -38,11 +38,12 @@ class ZentaoBugManager:
     ):
         self.base_url = (
             base_url
+            or os.getenv("TAGENT_ZENTAO_URL")
             or os.getenv("TEST_ZENTAO_URL")
             or os.getenv("ZENTAO_BASE_URL", "")
         ).rstrip("/")
-        self.account = account or os.getenv("ZENTAO_ACCOUNT", "")
-        self.password = password or os.getenv("ZENTAO_PASSWORD", "")
+        self.account = account or os.getenv("TAGENT_ZENTAO_ACCOUNT") or os.getenv("ZENTAO_ACCOUNT", "")
+        self.password = password or os.getenv("TAGENT_ZENTAO_PASSWORD") or os.getenv("ZENTAO_PASSWORD", "")
         self.session = requests.Session()
         self.token: Optional[str] = None
         if not self.base_url:

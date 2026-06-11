@@ -10,7 +10,7 @@ from typing import Any
 
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse as _JSONResponse
 from loguru import logger
 
 from runtime import __version__
@@ -26,9 +26,34 @@ from runtime.api.result_store import ResultStore
 from runtime.config.settings import get_settings
 from runtime.observability.prometheus_metrics import create_metrics_router
 
+import os as _os
+
+_DEFAULT_UPLOAD_EXTS: set[str] = {
+    ".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip",
+    ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml",
+    ".py", ".js", ".ts", ".apk", ".ipa",
+}
+
+
+def _allowed_upload_exts() -> set[str]:
+    custom = _os.getenv("TAGENT_ALLOWED_UPLOAD_EXTS")
+    return set(custom.split(",")) if custom else _DEFAULT_UPLOAD_EXTS
+
+
+class JSONResponse(_JSONResponse):
+    """JSONResponse that writes raw UTF-8 bytes — CJK chars unescaped."""
+
+    def render(self, content: Any) -> bytes:
+        import json as _json
+
+        return _json.dumps(
+            content, ensure_ascii=False, allow_nan=False, separators=(",", ":")
+        ).encode("utf-8")
+
+
 _settings = get_settings()
 
-app = FastAPI(title="Test-Agent Runtime", version=__version__)
+app = FastAPI(title="Test-Agent Runtime", version=__version__, default_response_class=JSONResponse)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["tauri://localhost"],
@@ -51,7 +76,7 @@ app.include_router(webhooks_router)
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next: Any) -> Any:
     token = _settings.api_auth_token
-    if token and request.url.path not in ("/health", "/docs", "/openapi.json"):
+    if token and request.url.path not in ("/health", "/health/deep", "/docs", "/openapi.json"):
         auth = request.headers.get("Authorization", "")
         if not auth or not secrets.compare_digest(auth.removeprefix("Bearer "), token):
             return JSONResponse(status_code=401, content={"detail": "unauthorized"})
@@ -65,6 +90,32 @@ _run_lock = threading.Lock()
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "version": __version__}
+
+
+@app.get("/health/deep")
+def health_deep() -> dict:
+    from runtime.cli.doctor import (
+        check_catalog,
+        check_config,
+        check_dependencies,
+        check_environment,
+        check_llm,
+        check_workspace,
+    )
+
+    sections: dict[str, list[dict]] = {}
+    for name, fn in [
+        ("environment", check_environment),
+        ("catalog", check_catalog),
+        ("config", check_config),
+        ("dependencies", check_dependencies),
+        ("llm", check_llm),
+        ("workspace", check_workspace),
+    ]:
+        sections[name] = fn()
+
+    all_ok = all(ch["ok"] for s in sections.values() for ch in s)
+    return {"status": "ok" if all_ok else "degraded", "version": __version__, "checks": sections}
 
 
 @app.get("/catalog", response_model=CatalogResponse)
@@ -100,7 +151,7 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 @app.post("/run/file", response_model=RunCreated)
 async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
     suffix = Path(file.filename or "upload").suffix.lower()
-    allowed = {".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip", ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml", ".py", ".js", ".ts", ".apk", ".ipa"}
+    allowed = _allowed_upload_exts()
     if suffix not in allowed:
         raise HTTPException(status_code=400, detail=f"file type not supported: {suffix}")
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:

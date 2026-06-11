@@ -10,9 +10,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-_utils_dir = Path(__file__).resolve().parents[2] / "utils"
-if str(_utils_dir) not in sys.path:
-    sys.path.insert(0, str(_utils_dir))
+# utils package installed via pip install -e runtime/
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -56,13 +54,13 @@ def declining_data():
 
 class TestDetectThresholdDrift:
     def test_stable_data_silent(self, stable_data):
-        from silent_failure_detector import detect_threshold_drift
+        from utils.security.silent_failure_detector import detect_threshold_drift
         r = detect_threshold_drift("test_metric", stable_data, threshold=200)
         assert r.severity == "silent"
         assert r.trend_pvalue is not None
 
     def test_trending_up_impending(self, trending_up_data):
-        from silent_failure_detector import detect_threshold_drift
+        from utils.security.silent_failure_detector import detect_threshold_drift
         r = detect_threshold_drift(
             "latency_ms", trending_up_data, threshold=200,
             drift_pct_threshold=0.10,
@@ -72,12 +70,12 @@ class TestDetectThresholdDrift:
         assert r.mean_shift_pct > 0
 
     def test_breached_detected(self, breached_data):
-        from silent_failure_detector import detect_threshold_drift
+        from utils.security.silent_failure_detector import detect_threshold_drift
         r = detect_threshold_drift("error_rate", breached_data, threshold=200)
         assert r.severity == "breached"
 
     def test_direction_below(self, declining_data):
-        from silent_failure_detector import detect_threshold_drift
+        from utils.security.silent_failure_detector import detect_threshold_drift
         r = detect_threshold_drift(
             "pass_rate", declining_data, threshold=0.80,
             direction="below",
@@ -87,12 +85,12 @@ class TestDetectThresholdDrift:
         assert r.current_mean < r.baseline_mean or r.trend_slope < 0
 
     def test_insufficient_data(self):
-        from silent_failure_detector import detect_threshold_drift
+        from utils.security.silent_failure_detector import detect_threshold_drift
         r = detect_threshold_drift("sparse", [1.0, 2.0], threshold=10)
         assert "Insufficient" in r.recommendation
 
     def test_baseline_points_used(self, trending_up_data):
-        from silent_failure_detector import detect_threshold_drift
+        from utils.security.silent_failure_detector import detect_threshold_drift
         rng = np.random.RandomState(42)
         baseline = list(rng.normal(100, 3, 50))  # stable baseline
         r = detect_threshold_drift(
@@ -102,19 +100,19 @@ class TestDetectThresholdDrift:
         assert r.baseline_mean < 105  # baseline should be near 100
 
     def test_mann_kendall_detects_trend(self, trending_up_data):
-        from silent_failure_detector import _mann_kendall
+        from utils.security.silent_failure_detector import _mann_kendall
         arr = np.asarray(trending_up_data)
         p = _mann_kendall(arr)
         assert p < 0.05  # strong upward trend
 
     def test_mann_kendall_no_trend(self, stable_data):
-        from silent_failure_detector import _mann_kendall
+        from utils.security.silent_failure_detector import _mann_kendall
         arr = np.asarray(stable_data)
         p = _mann_kendall(arr)
         assert p > 0.01  # no significant trend (M-K noisy with n=30)
 
     def test_linear_trend_slope(self, trending_up_data):
-        from silent_failure_detector import _linear_trend
+        from utils.security.silent_failure_detector import _linear_trend
         arr = np.asarray(trending_up_data)
         slope = _linear_trend(arr)
         assert slope > 0  # upward slope
@@ -126,7 +124,7 @@ class TestDetectThresholdDrift:
 
 class TestBatchDetect:
     def test_batch_all_stable(self, stable_data):
-        from silent_failure_detector import MetricConfig, batch_detect
+        from utils.security.silent_failure_detector import MetricConfig, batch_detect
         cfgs = [
             MetricConfig("m1", "custom", stable_data, 200),
             MetricConfig("m2", "custom", stable_data, 200),
@@ -136,7 +134,7 @@ class TestBatchDetect:
         assert report.silent_count == 2
 
     def test_batch_one_breached(self, stable_data, breached_data):
-        from silent_failure_detector import MetricConfig, batch_detect
+        from utils.security.silent_failure_detector import MetricConfig, batch_detect
         cfgs = [
             MetricConfig("stable", "custom", stable_data, 200),
             MetricConfig("breached", "custom", breached_data, 200),
@@ -146,7 +144,7 @@ class TestBatchDetect:
         assert report.breached_count >= 1
 
     def test_batch_one_impending(self, stable_data, trending_up_data):
-        from silent_failure_detector import MetricConfig, batch_detect
+        from utils.security.silent_failure_detector import MetricConfig, batch_detect
         cfgs = [
             MetricConfig("stable", "custom", stable_data, 200),
             MetricConfig("trending", "custom", trending_up_data, 200),
@@ -161,25 +159,25 @@ class TestBatchDetect:
 
 class TestSourceCollectors:
     def test_collect_from_tracing(self, trending_up_data):
-        from silent_failure_detector import collect_from_tracing
+        from utils.security.silent_failure_detector import collect_from_tracing
         r = collect_from_tracing(trending_up_data, threshold_ms=200)
         assert r.source == "tracing"
         assert r.metric_name == "trace_duration_p95_ms"
 
     def test_collect_from_web_vitals(self, trending_up_data):
-        from silent_failure_detector import collect_from_web_vitals
+        from utils.security.silent_failure_detector import collect_from_web_vitals
         r = collect_from_web_vitals("LCP_ms", trending_up_data, threshold=4000)
         assert r.source == "web_vitals"
         assert "LCP_ms" in r.metric_name
 
     def test_collect_from_prometheus_counter(self, trending_up_data):
-        from silent_failure_detector import collect_from_prometheus_counter
+        from utils.security.silent_failure_detector import collect_from_prometheus_counter
         r = collect_from_prometheus_counter("agent_errors", trending_up_data, threshold=10)
         assert r.source == "prometheus"
         assert "agent_errors" in r.metric_name
 
     def test_collect_from_prometheus_gauge_below(self, declining_data):
-        from silent_failure_detector import collect_from_prometheus_gauge
+        from utils.security.silent_failure_detector import collect_from_prometheus_gauge
         r = collect_from_prometheus_gauge(
             "pass_rate", declining_data, threshold=0.80, direction="below",
         )
@@ -192,7 +190,7 @@ class TestSourceCollectors:
 
 class TestSlidingWindow:
     def test_push_and_get(self):
-        from silent_failure_detector import SlidingWindowStore
+        from utils.security.silent_failure_detector import SlidingWindowStore
         store = SlidingWindowStore(max_points=5)
         for v in [1, 2, 3, 4, 5, 6, 7]:
             store.push("latency", v)
@@ -201,7 +199,7 @@ class TestSlidingWindow:
         assert vals == [3, 4, 5, 6, 7]
 
     def test_get_all(self):
-        from silent_failure_detector import SlidingWindowStore
+        from utils.security.silent_failure_detector import SlidingWindowStore
         store = SlidingWindowStore()
         store.push("a", 1)
         store.push("a", 2)
@@ -210,7 +208,7 @@ class TestSlidingWindow:
         assert len(all_data) == 2
 
     def test_clear(self):
-        from silent_failure_detector import SlidingWindowStore
+        from utils.security.silent_failure_detector import SlidingWindowStore
         store = SlidingWindowStore()
         store.push("x", 1)
         store.clear("x")
@@ -223,7 +221,7 @@ class TestSlidingWindow:
 
 class TestExport:
     def test_export_json(self, stable_data, tmp_path):
-        from silent_failure_detector import MetricConfig, batch_detect, export_report
+        from utils.security.silent_failure_detector import MetricConfig, batch_detect, export_report
         report = batch_detect([MetricConfig("m1", "custom", stable_data, 200)])
         path = export_report(report, output_dir=str(tmp_path))
         assert Path(path).exists()
@@ -231,7 +229,7 @@ class TestExport:
         assert data["overall_severity"] == "pass"
 
     def test_ci_summary(self, stable_data):
-        from silent_failure_detector import MetricConfig, batch_detect, ci_summary
+        from utils.security.silent_failure_detector import MetricConfig, batch_detect, ci_summary
         report = batch_detect([MetricConfig("m1", "custom", stable_data, 200)])
         text = ci_summary(report)
         assert "PASS" in text

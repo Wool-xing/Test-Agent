@@ -11,39 +11,45 @@ Inbound messages are handled by runtime/api/endpoints/webhooks.py.
 from __future__ import annotations
 
 import os
+import threading
 import time
 
 from loguru import logger
 
+from runtime.config.settings import get_settings
 from runtime.gateway.base import DeliveryResult, Message, Platform, is_safe_webhook_url, register
 
 _ACCESS_TOKEN: str | None = None
 _ACCESS_TOKEN_EXPIRY: float = 0
+_token_lock = threading.Lock()
 
 
 def _get_access_token(app_key: str, app_secret: str) -> str | None:
-    """Obtain DingTalk access_token (cached, 2h TTL)."""
+    """Obtain DingTalk access_token (cached, 2h TTL). Thread-safe."""
     global _ACCESS_TOKEN, _ACCESS_TOKEN_EXPIRY
     import httpx
 
     if _ACCESS_TOKEN and time.time() < _ACCESS_TOKEN_EXPIRY - 120:
         return _ACCESS_TOKEN
 
-    try:
-        r = httpx.get(
-            "https://oapi.dingtalk.com/gettoken",
-            params={"appkey": app_key, "appsecret": app_secret},
-            timeout=10,
-        )
-        data = r.json()
-        token = data.get("access_token")
-        if token:
-            _ACCESS_TOKEN = token
-            _ACCESS_TOKEN_EXPIRY = time.time() + data.get("expires_in", 7200)
-            return token
-    except Exception as e:
-        logger.warning("DingTalk access_token fetch failed: {}", e)
-    return None
+    with _token_lock:
+        if _ACCESS_TOKEN and time.time() < _ACCESS_TOKEN_EXPIRY - 120:
+            return _ACCESS_TOKEN
+        try:
+            r = httpx.get(
+                "https://oapi.dingtalk.com/gettoken",
+                params={"appkey": app_key, "appsecret": app_secret},
+                timeout=10,
+            )
+            data = r.json()
+            token = data.get("access_token")
+            if token:
+                _ACCESS_TOKEN = token
+                _ACCESS_TOKEN_EXPIRY = time.time() + data.get("expires_in", 7200)
+                return token
+        except Exception as e:
+            logger.warning("DingTalk access_token fetch failed: {}", e)
+        return None
 
 
 @register("dingtalk")
@@ -71,10 +77,11 @@ class DingTalkPlatform(Platform):
         agent_id: str | None = None,
         **_kwargs,
     ) -> None:
-        self.webhook = webhook_url or os.getenv("DINGTALK_WEBHOOK_URL")
-        self.app_key = app_key or os.getenv("DINGTALK_APP_KEY")
-        self.app_secret = app_secret or os.getenv("DINGTALK_APP_SECRET")
-        self.agent_id = agent_id or os.getenv("DINGTALK_AGENT_ID")
+        s = get_settings()
+        self.webhook = webhook_url or s.dingtalk_webhook_url or os.getenv("DINGTALK_WEBHOOK_URL")
+        self.app_key = app_key or s.dingtalk_app_key or os.getenv("DINGTALK_APP_KEY")
+        self.app_secret = app_secret or s.dingtalk_app_secret or os.getenv("DINGTALK_APP_SECRET")
+        self.agent_id = agent_id or s.dingtalk_agent_id or os.getenv("DINGTALK_AGENT_ID")
 
     async def send(self, msg: Message, *, target: str | None = None) -> DeliveryResult:
         """Send message. Uses API mode when target is a userid, webhook otherwise."""

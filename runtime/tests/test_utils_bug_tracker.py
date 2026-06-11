@@ -8,19 +8,17 @@ from pathlib import Path
 
 import pytest
 
-_utils_dir = Path(__file__).resolve().parents[2] / "utils"
-if str(_utils_dir) not in sys.path:
-    sys.path.insert(0, str(_utils_dir))
+# utils package installed via pip install -e runtime/
 
 
 class TestBugTrackerBase:
     def test_cannot_instantiate_abstract(self):
-        from bug_tracker_base import BugTrackerBase
+        from utils.trackers.bug_tracker_base import BugTrackerBase
         with pytest.raises(TypeError):
             BugTrackerBase()  # type: ignore[abstract]
 
     def test_concrete_subclass_instantiable(self):
-        from bug_tracker_base import BugTrackerBase
+        from utils.trackers.bug_tracker_base import BugTrackerBase
 
         class FakeTracker(BugTrackerBase):
             def submit_bug(self, title, description, severity, attachments=None, reproduce_steps=""):
@@ -43,7 +41,7 @@ class TestBugTrackerBase:
         assert tracker.get_status("BUG-1")["status"] == "open"
 
     def test_missing_method_fails(self):
-        from bug_tracker_base import BugTrackerBase
+        from utils.trackers.bug_tracker_base import BugTrackerBase
 
         class IncompleteTracker(BugTrackerBase):
             def submit_bug(self, title, description, severity, attachments=None, reproduce_steps=""):
@@ -55,27 +53,27 @@ class TestBugTrackerBase:
 
 class TestTrackerRegistry:
     def test_zentao_registered(self):
-        from bug_tracker_base import TRACKER_REGISTRY
+        from utils.trackers.bug_tracker_base import TRACKER_REGISTRY
         assert "zentao" in TRACKER_REGISTRY
 
     def test_jira_registered(self):
-        from bug_tracker_base import TRACKER_REGISTRY
+        from utils.trackers.bug_tracker_base import TRACKER_REGISTRY
         assert "jira" in TRACKER_REGISTRY
 
     def test_github_registered(self):
-        from bug_tracker_base import TRACKER_REGISTRY
+        from utils.trackers.bug_tracker_base import TRACKER_REGISTRY
         assert "github" in TRACKER_REGISTRY
 
     def test_linear_registered(self):
-        from bug_tracker_base import TRACKER_REGISTRY
+        from utils.trackers.bug_tracker_base import TRACKER_REGISTRY
         assert "linear" in TRACKER_REGISTRY
 
     def test_webhook_registered(self):
-        from bug_tracker_base import TRACKER_REGISTRY
+        from utils.trackers.bug_tracker_base import TRACKER_REGISTRY
         assert "webhook" in TRACKER_REGISTRY
 
     def test_all_registry_values_are_basetracker_subclasses(self):
-        from bug_tracker_base import TRACKER_REGISTRY, BugTrackerBase
+        from utils.trackers.bug_tracker_base import TRACKER_REGISTRY, BugTrackerBase
         for name, cls in TRACKER_REGISTRY.items():
             if name == "zentao":
                 # Legacy: ZentaoBugManager not yet migrated to BugTrackerBase ABC
@@ -86,12 +84,12 @@ class TestTrackerRegistry:
 class TestCreateBugManager:
     def test_returns_none_for_unknown_tracker(self, monkeypatch):
         monkeypatch.delenv("BUG_TRACKER", raising=False)
-        from bug_tracker_base import create_bug_manager
+        from utils.trackers.bug_tracker_base import create_bug_manager
         assert create_bug_manager("nonexistent-tracker") is None
 
     def test_returns_instance_for_webhook(self, monkeypatch):
         monkeypatch.setenv("WEBHOOK_BUG_URL", "https://example.com/webhook")
-        from bug_tracker_base import create_bug_manager
+        from utils.trackers.bug_tracker_base import create_bug_manager
         mgr = create_bug_manager("webhook")
         assert mgr is not None
         assert type(mgr).__name__ == "WebhookBugManager"

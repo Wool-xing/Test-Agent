@@ -73,14 +73,27 @@ UI_STRINGS = {
 
 
 def get_lang() -> Lang:
-    raw = os.getenv("TAGENT_LANG", "zh").lower()
+    raw = os.getenv("TAGENT_LANG", "").lower()
     if raw in ("zh", "zh-cn", "chinese", "中文"):
         return "zh"
     if raw in ("en", "english", "英文"):
         return "en"
     if raw in ("zh-en", "bilingual", "双语"):
         return "zh-en"
-    return "zh"
+    if raw:
+        return "zh"  # unknown value → default zh
+    # Auto-detect from system locale
+    try:
+        import locale
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            loc = locale.getdefaultlocale()[0] or ""
+        if loc.lower().startswith("zh"):
+            return "zh"
+    except Exception:
+        pass
+    return "en"  # global non-Chinese default
 
 
 def set_lang(lang: Lang | str) -> None:

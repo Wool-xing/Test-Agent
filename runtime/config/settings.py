@@ -78,6 +78,20 @@ class Settings(BaseSettings):
     notification_webhook_url: str = Field(default="")
     error_report_recipients: str = Field(default="")
 
+    # ── External integrations ──
+    dingtalk_app_key: str = Field(default="")
+    dingtalk_app_secret: str = Field(default="")
+    dingtalk_agent_id: str = Field(default="")
+    dingtalk_webhook_url: str = Field(default="")
+    telegram_bot_token: str = Field(default="")
+    telegram_chat_id: str = Field(default="")
+    zentao_url: str = Field(default="")
+    zentao_account: str = Field(default="")
+    zentao_password: str = Field(default="")
+    github_token: str = Field(default="")
+    github_repo: str = Field(default="")
+    prd_http_token: str = Field(default="")
+
     # ── Enterprise / CI ──
     proxy_url: str = Field(default="")
     trusted_ca_bundle: str = Field(default="")
@@ -88,7 +102,8 @@ class Settings(BaseSettings):
     def model_post_init(self, _context: object) -> None:
         """Resolve relative Path fields to absolute after model init."""
         root = self.project_root
-        for attr in ("experts_dir", "skills_dir", "scripts_dir", "workspace_dir"):
+        for attr in ("experts_dir", "skills_dir", "scripts_dir", "workspace_dir",
+                     "config_dir", "templates_dir"):
             p = getattr(self, attr)
             if not p.is_absolute():
                 object.__setattr__(self, attr, (root / p).resolve())
