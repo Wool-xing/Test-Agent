@@ -46,6 +46,7 @@ _last_trace: tuple | None = None  # (user_text, decision_dict) for /distill
 _last_fix: str | None = None  # last suggested command correction
 _start_time: float = 0.0
 _cmd_history: list[str] = []  # last 10 user commands for /N quick re-run
+_BUILTIN_MAP: dict = {}
 
 _PROMPT_STYLE = Style.from_dict({
     "prompt": "bold cyan",

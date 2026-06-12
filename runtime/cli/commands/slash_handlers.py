@@ -213,6 +213,7 @@ def _cmd_fc(args: str) -> None:
     suggestion = _last_fix
     _last_fix = None
     console.print(f"[green]Running: /{suggestion}[/]")
+    from runtime.cli.interactive import _BUILTIN_MAP
     _BUILTIN_MAP.get(suggestion, lambda a: None)("")
 
 
