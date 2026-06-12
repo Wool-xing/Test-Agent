@@ -265,6 +265,7 @@ jobs:
       - name: 核心 utils 导入测试
         run: |
           python -c "
+          import sys
           modules = [
               'utils.protocols.api_retry_util', 'utils.data.data_factory', 'utils.data.data_masking',
               'utils.reporting.excel_generator', 'utils.quality.flaky_detector', 'utils.performance.jmeter_csv_exporter',
