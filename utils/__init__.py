@@ -1,6 +1,15 @@
 # SPDX-License-Identifier: MIT
 """Test-Agent utils package."""
 
+import sys as _sys
+from pathlib import Path as _Path
+
+# Ensure project root is importable regardless of cwd.
+# Replaces 9 scattered sys.path.insert calls across utils/ submodules.
+_project_root = str(_Path(__file__).resolve().parent.parent)
+if _project_root not in _sys.path:
+    _sys.path.insert(0, _project_root)
+
 import logging as _logging
 
 

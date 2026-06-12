@@ -264,15 +264,12 @@ jobs:
 
       - name: 核心 utils 导入测试
         run: |
-          cd utils
           python -c "
-          import sys, os
-          sys.path.insert(0, '.')
           modules = [
-              'protocols.api_retry_util', 'data.data_factory', 'data.data_masking',
-              'reporting.excel_generator', 'quality.flaky_detector', 'performance.jmeter_csv_exporter',
-              'performance.jmeter_result_parser', 'infra.regression_scope',
-              'quality.ci_quality_gate', 'design.prd_loader',
+              'utils.protocols.api_retry_util', 'utils.data.data_factory', 'utils.data.data_masking',
+              'utils.reporting.excel_generator', 'utils.quality.flaky_detector', 'utils.performance.jmeter_csv_exporter',
+              'utils.performance.jmeter_result_parser', 'utils.infra.regression_scope',
+              'utils.quality.ci_quality_gate', 'utils.design.prd_loader',
           ]
           failed = []
           for m in modules:
