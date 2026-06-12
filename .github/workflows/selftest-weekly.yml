@@ -1,4 +1,4 @@
-name: 周自检 · L4 真 LLM e2e（主宪章 §33）
+name: 周自检 · L4 真 LLM e2e
 
 on:
   schedule:
