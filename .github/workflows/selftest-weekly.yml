@@ -1,4 +1,4 @@
-name: 周自检 · L4 真 LLM e2e（主宪章 §33）
+name: 周自检 · L4 真 LLM e2e
 
 on:
   schedule:
@@ -12,7 +12,7 @@ permissions:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-# 仅 main 分支 push 触发,fork PR 不跑（防 secrets 泄露,主宪章 §30）
+# 仅 main 分支 push 触发,fork PR 不跑（防 secrets 泄露）
 jobs:
   selftest-weekly:
     name: L4 · 真 LLM e2e
