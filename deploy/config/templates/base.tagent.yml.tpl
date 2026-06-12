@@ -62,7 +62,7 @@ gateway:
   # 例: enabled_platforms: [telegram, feishu]
 
 pentest:
-  # 法律契约(default refuse · charter ); rollout 阶段 yml gate 占位, V1.x 激活后接入真实路由
+  # 法律契约(default refuse · charter ); rollout 阶段 yml gate 占位, 激活后接入真实路由
   authorized: false                    # 法律授权确认
   scope_in_targets: []                 # IP/domain/URL 白名单(IN)
   scope_out_targets: []                # 强制黑名单(覆盖 IN)

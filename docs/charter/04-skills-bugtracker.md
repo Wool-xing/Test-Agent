@@ -50,7 +50,7 @@ darwin-skill 跑出的改进建议**不绕过协作协议**——重大改动（
 
 ### 6. 不做的事（Via Negativa 显式标注）
 
-V1.0.0 darwin-skill **不消费**项目运行数据（`discussions/` / `decisions/` / `history/` / `skill-evolution/results.tsv` 之外的运行历史），仅对 skill 文本结构本身做静态 + 实测评分优化。
+darwin-skill **不消费**项目运行数据（`discussions/` / `decisions/` / `history/` / `skill-evolution/results.tsv` 之外的运行历史），仅对 skill 文本结构本身做静态 + 实测评分优化。
 
 **为什么不做"运行数据反哺 skill"的自学习闭环**：
 1. 自学习难界定何时停止学习"坏样本"（如一段时期的高 flaky 反而被学进 skill 形成自我固化）
@@ -69,7 +69,7 @@ V1.0.0 darwin-skill **不消费**项目运行数据（`discussions/` / `decision
 
 | 适配器 | 状态 | 配置字段 | severity 映射 |
 |--------|------|---------|--------------|
-| **zentao**（默认） | ✅ V1.0.0 | `ZENTAO_URL / ZENTAO_USER / ZENTAO_TOKEN` | severity 1=P0 / 2=P1 / 3=P2 / 4=P3 |
+| **zentao**（默认） | ✅ | `ZENTAO_URL / ZENTAO_USER / ZENTAO_TOKEN` | severity 1=P0 / 2=P1 / 3=P2 / 4=P3 |
 | **jira** | ⚪ Phase 2 | `JIRA_URL / JIRA_USER / JIRA_TOKEN / JIRA_PROJECT_KEY` | Highest=P0 / High=P1 / Medium=P2 / Low=P3 |
 | **github** | ⚪ Phase 2 | `GITHUB_TOKEN / GITHUB_REPO` | label `priority:p0..p3` |
 | **linear** | ⚪ Phase 2 | `LINEAR_API_KEY / LINEAR_TEAM_ID` | priority 1=P0 / 2=P1 / 3=P2 / 4=P3 |

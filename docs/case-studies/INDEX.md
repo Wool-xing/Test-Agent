@@ -6,7 +6,7 @@
 
 | 文件 | 时间 | 范围 | 要点 |
 |------|------|------|------|
-| [2026-05-15-诚实化与防mock闭环.md](2026-05-15-诚实化与防mock闭环.md) | 2026-05-13 → 2026-05-15 | V1.14.0 → V1.14.0+1 (6 PR) | 16 expert + 32 skill frontmatter labeling → README/ROADMAP 数字诚实化 → registry 单源 + router warn + orchestrator hard block 4-step 闭环 |
+| [2026-05-15-诚实化与防mock闭环.md](2026-05-15-诚实化与防mock闭环.md) | 2026-05-13 → 2026-05-15 | → +1 (6 PR) | 16 expert + 32 skill frontmatter labeling → README/ROADMAP 数字诚实化 → registry 单源 + router warn + orchestrator hard block 4-step 闭环 |
 
 ## 复用导引
 

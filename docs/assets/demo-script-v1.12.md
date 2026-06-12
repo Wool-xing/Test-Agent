@@ -84,7 +84,7 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 |------|------|------|------|
 | Twitter / X | 30 秒 | mp4 | "5 sec AI testing setup with `tagent init`. 16 experts, 32 skills, 8640 config combinations. github.com/Wool-xing/Test-Agent" |
 | 微信视频号 / 抖音 | 30-60 秒 | mp4 1080×1920 竖屏 | "AI 测试 5 秒上手 · 用例 + 思维导图 + Bug 单 + 报告一键产出 · GitHub 搜 Test-Agent" |
-| 掘金 / V2EX / 少数派 | gif | terminalizer | 配文章:介绍 V1.12 配置自动组装 + 矩阵 8640 组合 + 5 preset |
+| 掘金 / V2EX / 少数派 | gif | terminalizer | 配文章:介绍 配置自动组装 + 矩阵 8640 组合 + 5 preset |
 | Hacker News | 静态截图 + 链接 | png + url | 标题:"Test-Agent: AI testing framework with `tagent init` to scaffold 8640 configurations" |
 
 ---
@@ -100,7 +100,7 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 
 ---
 
-## 后续 V1.13 扩(若 demo 火)
+## 后续 扩(若 demo 火)
 
 | 触发条件 | 加什么 |
 |----------|--------|

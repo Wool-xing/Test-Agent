@@ -87,7 +87,7 @@ Test-Agent/
 ├── skills/             ← 32 个业务 Skill + 3 元 Skill
 ├── utils/              ← 79 个生产工具（pytest · Playwright · JMeter · Appium · …）
 ├── config/             ← conftest / pytest.ini / .mcp.json
-├── runtime/            ← V1.x 运行时（router · orchestrator · MCP · …）
+├── runtime/ ← 运行时（router · orchestrator · MCP · …）
 ├── ci/                 ← GitHub Actions + Jenkins
 ├── docs/               ← 使用手册 / 架构 / 教学 / 合规
 ├── marketplace/        ← 社区 skills / agents / mcp / hooks

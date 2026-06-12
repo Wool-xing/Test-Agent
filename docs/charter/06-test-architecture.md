@@ -133,7 +133,7 @@
 
 | Phase | 触发条件 | 标志性交付 |
 |------|---------|----------|
-| **Phase 1**（已完成 V1.0.0-V1.36.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 完成 | 16 expert (11p+5s) + 32 skill (23p+7s+0r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
+| **Phase 1**（已完成 -） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 完成 | 16 expert (11p+5s) + 32 skill (23p+7s+0r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
 | **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 + skill rollout 继续 |
 | **Phase 3** | Phase 2 全交付 + 接入 ≥ 2 行业 | 合成监控 + canary/feature flag + 统一 dashboard + 沉默故障 + 缺席者注入 |
 | **Phase 4** | 接入合规行业（金融/医疗/司法）| 证据链司法可采信打包 + 数字考古学家 + AI 测试深化 |
@@ -156,10 +156,10 @@
 | **证据链 / 司法可采信打包** | 散落 | Phase 4 | 决策日志 + 模型版本 + 数据集 → 标准送审包 |
 | **数字考古学家**（遗留系统初始假设回溯） | 缺 | Phase 4 | 知识图谱冷启动 + Why 数据库 |
 | **神圣性守护 + 禁忌矩阵** | 缺 | Phase 5 | 跨文化禁忌词/色/数/节日组合（本地化共建） |
-| **darwin-skill 集成（自进化）** | ✅ V1.0.0 已并入 | Phase 1 | 上游 SKILL.md + workspace 落 results.tsv + 季度同步 |
-| **Bug Tracker 多适配** | ✅ V1.0.0 已并入 | Phase 1 | 5 套适配器（zentao/jira/github/linear/webhook）+ 工厂模式 |
-| **AgentChat 协作协议** | ✅ V1.0.0 已并入 | Phase 1 | discussions/ 纪要 + test-lead 中枢路由 + 反问 3 级预算 |
-| **按需安装与依赖分层** | ✅ V1.0.0 已并入 | Phase 1 | 6 requirements 文件 + install.py + 运行时补装回路 |
+| **darwin-skill 集成（自进化）** | ✅ 已并入 | Phase 1 | 上游 SKILL.md + workspace 落 results.tsv + 季度同步 |
+| **Bug Tracker 多适配** | ✅ 已并入 | Phase 1 | 5 套适配器（zentao/jira/github/linear/webhook）+ 工厂模式 |
+| **AgentChat 协作协议** | ✅ 已并入 | Phase 1 | discussions/ 纪要 + test-lead 中枢路由 + 反问 3 级预算 |
+| **按需安装与依赖分层** | ✅ 已并入 | Phase 1 | 6 requirements 文件 + install.py + 运行时补装回路 |
 
 > **第三公理在此节兑现**：项目有意识地**少承诺**——文明级伦理议题（如缓慢暴力、末日哨兵、神圣性守护）我们承认其存在，但**不在工程路线图上假装能做**。如果未来接入特定行业（金融 / 医疗 / 司法）需要其中某项能力，由业务方按需单独立项，不绑进通用框架。
 
@@ -204,12 +204,12 @@
 | # | 议题 |  |  |
 |---|------|---------|------|
 |  |  |  |  |
-| Q2 | Agent 架构：单体 vs 专 | | V1.0.0 选专科 + test-lead 中枢 |
-| Q3 | 五条铭文的技术实现机制（不可变区域、熔断条件）？ | 🔄 | V1.0.0 铭文锁死，无削弱机制；Phase 4 接入合规行业后重新设计 |
+| Q2 | Agent 架构：单体 vs 专 | | 选专科 + test-lead 中枢 |
+| Q3 | 五条铭文的技术实现机制（不可变区域、熔断条件）？ | 🔄 | 铭文锁死，无削弱机制；Phase 4 接入合规行业后重新设计 |
 | Q4 | 独立审计署的法律实体形态？ | ⏳ | 触发条件：团队 ≥ 20 人 或 接入合规行业 |
 | Q5 | 末日哨兵权的触发授权链？ | ⏳ | 需监管/学界共识，Phase 4 |
 |  |  |  |  |
-| Q7 | 团队最小配置（工程/行业专家/伦理责任人）？ | ⏳ | V1.0.0 单人可启动；剥离伦理责任人需 ≥ 20 人 |
+| Q7 | 团队最小配置（工程/行业专家/伦理责任人）？ | ⏳ | 单人可启动；剥离伦理责任人需 ≥ 20 人 |
 | Q8 | 与现有 AI 测试平台（Mabl / Applitools / Functionize）的差异化定位？ | ⏳ | 候选定位：「承诺学科 + 伦理护栏 + 行业隐喻先行」 |
 
 ---

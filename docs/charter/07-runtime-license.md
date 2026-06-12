@@ -4,7 +4,7 @@
 内容与原 FULL_GUIDE.md 对应段完全一致, 仅拆不动语义。
 -->
 
-## 🧠 V1.36.0 运行时层(`runtime/`)
+## 🧠 运行时层(`runtime/`)
 
 > 已有 16 专家 / 32 Skill / 79 utils**不动**(宪章规则),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
@@ -114,7 +114,7 @@ uvicorn runtime.api.main:app --port 8800
 | `utils/` 通知/Bug | 复用 `generate_report.py` / `zentao_bug_manager.py` |
 
 任何专家/Skill/脚本**新增**或**修改**仍按宪章 同步规则走;`runtime/` 是新增 **调度** 层,不重复实现专家逻辑。
-V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增执行能力,详见 [ROADMAP.md](../../ROADMAP.md)。
++ 真 LLM-driven agent runner + + SkillRunner 系统为 runtime 新增执行能力,详见 [ROADMAP.md](../../ROADMAP.md)。
 
 ---
 
@@ -141,9 +141,9 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 
 - 2026-05-11：宪章四章 + 三公理 + 五铭文起草完成
 - 2026-05-11：FULL_GUIDE.md 确立永久宪章地位
-- 2026-05-11：darwin-skill 不消费运行数据（Via Negativa）；反问 KB 不进 V1.0.0
-- 2026-05-12 ~ 2026-05-14：V1.1-V1.14 runtime 层 + 教学层 + Marketplace + 渗透/车载 + Hermes + GBrain + Karpathy + ECC
-- 2026-05-15 ~ 2026-05-18：V1.15-V1.36 22 版迭代 — 16 expert 全 production + 23 SkillRunner 生产落地 + 多 LLM config + 深审修复 + GUI + Dashboard + Mobile + 65发现全修
+- 2026-05-11：darwin-skill 不消费运行数据（Via Negativa）；反问 KB 不进
+- 2026-05-12 ~ 2026-05-14：-runtime 层 + 教学层 + Marketplace + 渗透/车载 + Hermes + GBrain + Karpathy + ECC
+- 2026-05-15 ~ 2026-05-18：-22 版迭代 — 16 expert 全 production + 23 SkillRunner 生产落地 + 多 LLM config + 深审修复 + GUI + Dashboard + Mobile + 65发现全修
 
 ### 下次会话进入项目时，按顺序检查
 
@@ -155,8 +155,8 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 ### 来源与引用（认知史）
 
 - 第一至五轮（DeepSeek + Claude）：测试 Agent 架构 + 九大簇
-- V1.0.0 工程基线：14 agent + 14 skill + 76 utils + CI/CD（历史基线）
-- V1.1.0 ~ V1.36.0：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
+- 工程基线：14 agent + 14 skill + 76 utils + CI/CD（历史基线）
+- ~ ：runtime + 11 agent runner + 16 skill runner + 教学/市场/多LLM（详见 CHANGELOG + ROADMAP）
 - 永久宪章糅合（2026-05-11/14/16）：FULL_GUIDE 工程主体 + 全局记忆哲学维度 + 持续回写
 
 ---

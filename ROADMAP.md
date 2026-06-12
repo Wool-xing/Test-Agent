@@ -1,13 +1,13 @@
-# Test-Agent V1.x ROADMAP
+# Test-Agent ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.0.0 (**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
+> 当前状态:(**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 32/32 active**(23 production + 7 script + 2 vision→production);0 rollout;0 vision。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
-> - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 全 16 实装 。
+> - **新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 全 16 实装 。
 
-## 当前活跃 expert (16 / 16) — V1.x rollout 收尾
+## 当前活跃 expert (16 / 16) — rollout 收尾
 
 ### 11 真 LLM-driven (已上线)
 
@@ -71,30 +71,30 @@
 
 ---
 
-## V1.x rollout — 6 expert LLM-driven minimum viable 实装路线
+## rollout — 6 expert LLM-driven minimum viable 实装路线
 
 **节奏**: 一周 1 expert,共 6 周。每完成 1 个,active 数字 +1,README 同步。
-**前置**: V1.15 Day 0 — runtime/router 防 mock 改造(拒绝未实装路由,返回明确错误)。
+**前置**: Day 0 — runtime/router 防 mock 改造(拒绝未实装路由,返回明确错误)。
 **完成标准**: 每 expert 接 LLM 真调用 + 结构化输出(markdown/JSON),通过 3 个测试 prompt 验证。
 
 | # | Expert | LLM-driven 实装范围(minimum viable) | 目标版本 | 状态 |
 |---|--------|------------------------------------|---------|------|
-| 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0+1 | **done** (PR X4) |
-| 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0 | **done** (runtime/orchestrator/agents/env_manager.py) |
-| 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0 | **done** (runtime/orchestrator/agents/mobile_tester.py) |
-| 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | V1.17.0 | **done** (runtime/orchestrator/agents/visual_tester.py) |
-| 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | V1.18.0 | **done** (runtime/orchestrator/agents/system_tester.py) |
-| 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | V1.19.0 | **done** (runtime/orchestrator/agents/pentest_tester.py;仅输出计划文本,真执行守护已在 utils 层 `api_security_scanner.py` / `ai_adversarial.py` 用 TAGENT_PENTEST_AUTHORIZED env gate;法律责任在操作者侧,见 SECURITY.md L84) |
-| 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | V1.20.0 | **done** (runtime/orchestrator/agents/automotive_tester.py;ASIL 评估 + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) |
+| 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | +1 | **done** (PR X4) |
+| 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | | **done** (runtime/orchestrator/agents/env_manager.py) |
+| 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | | **done** (runtime/orchestrator/agents/mobile_tester.py) |
+| 3 | `visual-tester` | LLM 读 PRD + UI 描述 → 视觉测试点 + Playwright 视觉对比脚本 | | **done** (runtime/orchestrator/agents/visual_tester.py) |
+| 4 | `system-tester` | LLM 读 PRD + IoT/串口/MQTT 上下文 → IoT 测试用例 + 命令清单 | | **done** (runtime/orchestrator/agents/system_tester.py) |
+| 5 | `pentest-tester` | LLM 读 PRD + 授权检查通过 → 渗透测试计划 + 工具调用清单(生成计划,不执行攻击) | | **done** (runtime/orchestrator/agents/pentest_tester.py;仅输出计划文本,真执行守护已在 utils 层 `api_security_scanner.py` / `ai_adversarial.py` 用 TAGENT_PENTEST_AUTHORIZED env gate;法律责任在操作者侧,见 SECURITY.md L84) |
+| 6 | `automotive-tester` | LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例 | | **done** (runtime/orchestrator/agents/automotive_tester.py;ASIL 评估 + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**rollout 收尾**) |
 
 ---
 
-## V1.x rollout — 16 skill 实装路线（已全部完成）
+## rollout — 16 skill 实装路线（已全部完成）
 
-**节奏**: skill rollout 起点 V1.21.0 (SkillRunner 基础设施 + pentest-coordinator 首落地);后续 1 skill / PR 推进。
+**节奏**: skill rollout 起点 (SkillRunner 基础设施 + pentest-coordinator 首落地);后续 1 skill / PR 推进。
 **完成标准**: 每 skill 接 LLM 真调用 (mock_output schema 覆盖 + production 升级 + ALL_SKILL_RUNNERS 锁规则同步)。
-**前置**: ~~runtime/router 防 mock 改造 + skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤~~ **已完成 V1.14.0+1 (PR X4)** — registry parse frontmatter + orchestrator.execute_node 拒 rollout/vision/unknown skill (returncode=2)。
-**基础设施**: **V1.21.0 完成** — `runtime/orchestrator/skills/__init__.py` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 skill runner (放在 SCRIPT_MAP fallback 前)。
+**前置**: ~~runtime/router 防 mock 改造 + skill 路由按 `SKILL_IMPL_STATUS` frontmatter 过滤~~ **已完成 +1 (PR X4)** — registry parse frontmatter + orchestrator.execute_node 拒 rollout/vision/unknown skill (returncode=2)。
+**基础设施**: **完成** — `runtime/orchestrator/skills/__init__.py` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 skill runner (放在 SCRIPT_MAP fallback 前)。
 
 ### 通用平台 4 skill
 
@@ -129,15 +129,15 @@
 
 ---
 
-## V1.36 能力扩展
+## 能力扩展
 
-- **V1.34**: script_bridge.py 桥接 5 独立脚本进 orchestrator pipeline
-- **V1.35**: 11 深度审计模块 (flaky guard / API security v2 / data factory v2 / perf orchestrator / event harness / visual regression / ML prioritizer / differential tester / EU AI Act / supply chain)
-- **V1.36**: 6 延期模块 (chaos v2 / state machine v2 / DB test v2 / BDD v2 / carbon scheduler / canary config) + CVE-2025-71176 fix + 深度审查65发现全修
+- ****: script_bridge.py 桥接 5 独立脚本进 orchestrator pipeline
+- ****: 11 深度审计模块 (flaky guard / API security v2 / data factory v2 / perf orchestrator / event harness / visual regression / ML prioritizer / differential tester / EU AI Act / supply chain)
+- ****: 6 延期模块 (chaos v2 / state machine v2 / DB test v2 / BDD v2 / carbon scheduler / canary config) + CVE-2025-71176 fix + 深度审查65发现全修
 
 ---
 
-## V2.x vision — 2 skill(暂留方法论参考形态)
+## vision — 2 skill(暂留方法论参考形态)
 
 | Skill | 当前形态 | V2 路线 |
 |-------|----------|---------|
@@ -146,7 +146,7 @@
 
 ---
 
-## V2.x 路线图 (longer-term)
+## 路线图 (longer-term)
 
 ### Skill Lifecycle 元工具改造 (适配测试领域)
 
@@ -169,7 +169,7 @@
 
 **绝不输出 mock 数据糊弄用户。**
 
-V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
++1 (PR X4) 起,双 layer 防 mock 已落地:
 - **registry 单源**: catalog 解析 `agents/*.md` `EXPERT_IMPL_STATUS` + `skills/*.md` `SKILL_IMPL_STATUS` frontmatter,实装状态来源唯一
 - **router 软警告**: `_validate_against_catalog` 检测 rollout / vision / unknown → 加 issues 并降 confidence 0.3
 - **orchestrator 硬拒**: `execute_node` 对 expert / skill 任意 rollout / vision / unknown 返回 `returncode=2` + stderr "未实装",绝不走 no-op "documented step recorded" 假成功路径
@@ -182,40 +182,40 @@ V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 
 | 版本 | 日期 | 完成项 | active expert 数 |
 |------|------|--------|----------------|
-| V1.14.0 | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
-| V1.14.0+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
-| V1.15.0 | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |
-| V1.16.0 | 2026-05-15 | mobile-tester LLM-driven minimum viable (runtime/orchestrator/agents/mobile_tester.py;LLM 读 PRD + Android/iOS 上下文 → test_cases + device_commands + mobile_specific 结构化 JSON) | 12/16 |
-| V1.17.0 | 2026-05-15 | visual-tester LLM-driven minimum viable (runtime/orchestrator/agents/visual_tester.py;LLM 读 PRD + UI 描述 → visual_test_points + comparison_scripts + tolerance + baseline_strategy 结构化 JSON) | 13/16 |
-| V1.18.0 | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
-| V1.19.0 | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
-| V1.20.0 | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**V1.x rollout 收尾**) | 16/16 expert (V1.x rollout 完成) |
-| V1.21.0 | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions). 解锁 14 rollout skill 后续流水线. | 16 expert + 8/32 production (15 rollout 待) |
-| V1.22.0 | 2026-05-16 | **tagent config CLI** — 多模型 onboarding Step 2 (runtime/cli/config.py · 6 provider 内置 + 厂商配置 cookbook + use/set/unset/list/show 子命令). **多 provider 通用 env 通道** (LLM_PROVIDER + LLM_API_KEY + LLM_MODEL) + stub 扩 4 path. | 16 expert + 8/32 production |
-| V1.23.0 | 2026-05-16 | **skill rollout #2** — mobile-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/mobile_test.py · Android/iOS 双平台 + 小程序支持) | 16 expert + 9/32 production |
-| V1.24.0 | 2026-05-16 | **skill rollout #3** — visual-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/visual_test.py · Airtest + OCR + SSIM 视觉对比) | 16 expert + 10/32 production |
-| V1.25.0 | 2026-05-16 | **skill rollout #4** — pentest-recon + pentest-vuln 双 skill LLM-driven 生产落地 (侦察: 端口/子域/服务指纹 + 漏洞: 5 攻击域 hybrid SAST+blackbox) | 16 expert + 12/32 production |
-| V1.26.0 | 2026-05-16 | **skill rollout #5** — system-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/system_test.py · IoT/音视频/追踪/消息队列 4 场景) | 16 expert + 13/32 production |
-| V1.27.0 | 2026-05-16 | **skill rollout #6** — eval-harness skill LLM-driven 生产落地 (runtime/orchestrator/skills/eval_harness.py · pass@k / Jaccard@k / top-1 stability / latency 4 指标 + 安全护栏) | 16 expert + 14/32 production |
-| V1.28.0 | 2026-05-16 | **skill rollout #7** — pentest-api + pentest-web 双 skill LLM-driven 生产落地 (API: OWASP API Top 10 + REST/GraphQL/gRPC/WebSocket · Web: OWASP Top 10 + ASVS + 2FA 自动登录) | 16 expert + 16/32 production |
-| V1.29.0 | 2026-05-16 | **skill rollout #8** — pentest-exploit + pentest-report 双 skill LLM-driven 生产落地 (exploit: 沙箱内验证 PoC + 不可破坏性约束 · report: working PoC 嵌入 + CWE/CVSS/PoC/修复 4 维) | 16 expert + 18/32 production |
-| V1.30.0 | 2026-05-16 | **skill rollout #9** — automotive-test + automotive-can-bus-test 双 skill LLM-driven 生产落地 (主编排: 10 阶段 HARA→报告 · CAN: CAN/CAN-FD/SOME-IP 协议一致性 + dbc 解析) | 16 expert + 20/32 production |
-| V1.31.0 | 2026-05-16 | **skill rollout #10 (收尾)** — automotive-adas-scenario + automotive-ota-update-test + automotive-hil-loop-test 3 skill LLM-driven 生产落地 (ADAS: AEB/ACC/LKA + CARLA 仿真 · OTA: 6 校验 + UN R156/GB 44496 合规 · HIL: MIL/SIL/HIL 三环 + dSPACE). **V1.x rollout 完成 — 23/32 production + 7 script + 0 rollout + 2 vision.** | 16 expert + 23/32 production (0 rollout 待) |
-| V1.32.0 | 2026-05-17 | 深审32发现全修 + 版本号全同步 + 私源泄漏清洗 | 16 expert + 23/32 production |
-| V1.32.1 | 2026-05-17 | CONTRIBUTING skill count 33→32 fix + 版本号同步 | 16 expert + 23/32 production |
-| V1.32.2 | 2026-05-17 | Security hardening batch: CWE-78 fix + credential removal + CORS + WebSocket leak + XML escape | 16 expert + 23/32 production |
-| V1.32.3 | 2026-05-17 | Refactor: _stub_response dispatch table + fuzzer ALL_PAYLOADS hoist | 16 expert + 23/32 production |
-| V1.32.4 | 2026-05-17 | Honesty pass: remove aspirational numbers + split overlong functions | 16 expert + 23/32 production |
-| V1.32.5 | 2026-05-17 | Security: shell injection + hardcoded creds + silent failures | 16 expert + 23/32 production |
-| V1.33.0 | 2026-05-17 | MASTER_PLAN 38/38 items across 8 phases complete | 16 expert + 23/32 production |
-| V1.34.0 | 2026-05-18 | Phase 1-5 initial audit: 18 additions (settings/IDE/Docker/Prometheus/streaming/PBT/contract/schema fuzz/compliance/DORA) | 16 expert + 23/32 production |
-| V1.35.0 | 2026-05-18 | Deep audit 11 core modules (flaky guard/API security v2/data factory v2/perf/e2e event harness/visual regression/ML prioritizer/differential/EU AI Act/supply chain) | 16 expert + 23/32 production |
-| V1.36.0 | 2026-05-18 | Remaining 6 deferred modules + CVE-2025-71176 fix + 深度审查65发现全修 | 16 expert + 30/32 active (23 production + 7 script) |
-| V1.37.0 | 2026-05-18 | Phase 2 charter closure: Bug 5适配器(YAML门禁+按需安装) + HIGH 2(H16/H18) + MEDIUM 4(M12/M14/M15/M19) + contract gate + utils tests | 16 expert + 30/32 active · Phase 2 complete |
-| V1.38.0 | 2026-05-18 | Phase 3.1 伦理/偏见审计: fairness_auditor.py (dataset bias + 6 model fairness metrics + intersectional + decision audit) + 20 tests + ai_validator bias audit pipeline | 16 expert + 30/32 active · 1/3 Phase 3 done |
-| V1.39.0 | 2026-05-18 | Phase 3.2 沉默故障检测: silent_failure_detector.py (threshold drift + Mann-Kendall + OLS trend + sliding window + multi-source batch) + 21 tests + tracing/web_vitals/prometheus collectors | 16 expert + 30/32 active · 2/3 Phase 3 done |
-| V1.40.0 | 2026-05-18 | Phase 3.3 缺席者场景注入: absentee_scenario_injector.py (9 absentee groups × 21 canonical scenarios + charter generation + coverage reporting) + 20 tests | 16 expert + 30/32 active · PHASE 3 COMPLETE |
-| V1.41.0 | 2026-05-19 | Phase 4 证据链可采信性: evidence_chain.py (SHA-256 hash chain + multi-source collection + ISO 27001/SOC2/NIST 800-53/GDPR compliance mapping + JSON/Markdown export + integrity verification) + 39 tests + ai_validator evidence chain audit pipeline | 16 expert + 30/32 active · PHASE 4 DELIVERED |
-| V1.42.0 | 2026-05-19 | Phase 5 神圣性与跨文化禁忌: taboo_matrix.py (135 entries × 16 locales × 5 dimensions: words/colors/numbers/holidays/sacred_contexts) + i18n_checker taboo audit extension (6 functions) + 84 tests | 16 expert + 30/32 active · PHASE 5 DELIVERED |
-| V1.43.0 | 2026-05-19 | Release cut: Phase 3.1+3.2+3.3+4+5 落版 (fairness_auditor / silent_failure_detector / absentee_scenario_injector / evidence_chain / taboo_matrix · 共 184 tests) + **2 ex-vision skill 实装** (agent-introspection-debugging + build-your-own-x-explorer · LLM-driven minimum viable · 中央 ALL_SKILL_RUNNERS 同步) | **16 expert + 32/32 active** (25 production + 7 script · V1.x SKILL ROLLOUT 完整收尾) |
-| V2.0.0 | TBD | V2.x 路线图启动 | 16/16 + V2 |
+| | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
+| +1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
+| | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |
+| | 2026-05-15 | mobile-tester LLM-driven minimum viable (runtime/orchestrator/agents/mobile_tester.py;LLM 读 PRD + Android/iOS 上下文 → test_cases + device_commands + mobile_specific 结构化 JSON) | 12/16 |
+| | 2026-05-15 | visual-tester LLM-driven minimum viable (runtime/orchestrator/agents/visual_tester.py;LLM 读 PRD + UI 描述 → visual_test_points + comparison_scripts + tolerance + baseline_strategy 结构化 JSON) | 13/16 |
+| | 2026-05-15 | system-tester LLM-driven minimum viable (runtime/orchestrator/agents/system_tester.py;LLM 读 PRD + IoT/串口/MQTT 上下文 → test_cases + device_commands + protocol_specific + test_environment 结构化 JSON;覆盖 IoT/audiovideo/tracing/mq/integration 5 类) | 14/16 |
+| | 2026-05-16 | pentest-tester LLM-driven minimum viable (runtime/orchestrator/agents/pentest_tester.py;LLM 读 PRD + 安全上下文 → test_mode + target_scope + recon/vuln/exploit/reporting phases 结构化 JSON;覆盖 5 攻击域 Injection/XSS/SSRF/Auth/Authz;仅输出计划文本,真执行守护在 utils 层 env gate;法律责任在操作者侧 SECURITY.md L84) | 15/16 |
+| | 2026-05-16 | automotive-tester LLM-driven minimum viable (runtime/orchestrator/agents/automotive_tester.py;LLM 读 PRD + CAN-bus/ISO-26262 上下文 → vehicle_subsystem + asil_assessment + test_cases + bus_test_plan + adas_scenarios + ota_plan + compliance_matrix + test_environment 结构化 JSON;覆盖 ECU/ADAS/IVI/V2X 4 子系统 + 8 协议 + 8 合规标准。**rollout 收尾**) | 16/16 expert (rollout 完成) |
+| | 2026-05-16 | **skill rollout 起点** — SkillRunner 基础设施 (runtime/orchestrator/skills/__init__.py + SKILL_RUNNERS registry + @register_skill deco + experts.py kind=skill 接 runner) + pentest-coordinator 首 skill 落地 (5 阶段编排 + authorization_check + subagent_pool + refuse_conditions). 解锁 14 rollout skill 后续流水线. | 16 expert + 8/32 production (15 rollout 待) |
+| | 2026-05-16 | **tagent config CLI** — 多模型 onboarding Step 2 (runtime/cli/config.py · 6 provider 内置 + 厂商配置 cookbook + use/set/unset/list/show 子命令). **多 provider 通用 env 通道** (LLM_PROVIDER + LLM_API_KEY + LLM_MODEL) + stub 扩 4 path. | 16 expert + 8/32 production |
+| | 2026-05-16 | **skill rollout #2** — mobile-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/mobile_test.py · Android/iOS 双平台 + 小程序支持) | 16 expert + 9/32 production |
+| | 2026-05-16 | **skill rollout #3** — visual-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/visual_test.py · Airtest + OCR + SSIM 视觉对比) | 16 expert + 10/32 production |
+| | 2026-05-16 | **skill rollout #4** — pentest-recon + pentest-vuln 双 skill LLM-driven 生产落地 (侦察: 端口/子域/服务指纹 + 漏洞: 5 攻击域 hybrid SAST+blackbox) | 16 expert + 12/32 production |
+| | 2026-05-16 | **skill rollout #5** — system-test skill LLM-driven 生产落地 (runtime/orchestrator/skills/system_test.py · IoT/音视频/追踪/消息队列 4 场景) | 16 expert + 13/32 production |
+| | 2026-05-16 | **skill rollout #6** — eval-harness skill LLM-driven 生产落地 (runtime/orchestrator/skills/eval_harness.py · pass@k / Jaccard@k / top-1 stability / latency 4 指标 + 安全护栏) | 16 expert + 14/32 production |
+| | 2026-05-16 | **skill rollout #7** — pentest-api + pentest-web 双 skill LLM-driven 生产落地 (API: OWASP API Top 10 + REST/GraphQL/gRPC/WebSocket · Web: OWASP Top 10 + ASVS + 2FA 自动登录) | 16 expert + 16/32 production |
+| | 2026-05-16 | **skill rollout #8** — pentest-exploit + pentest-report 双 skill LLM-driven 生产落地 (exploit: 沙箱内验证 PoC + 不可破坏性约束 · report: working PoC 嵌入 + CWE/CVSS/PoC/修复 4 维) | 16 expert + 18/32 production |
+| | 2026-05-16 | **skill rollout #9** — automotive-test + automotive-can-bus-test 双 skill LLM-driven 生产落地 (主编排: 10 阶段 HARA→报告 · CAN: CAN/CAN-FD/SOME-IP 协议一致性 + dbc 解析) | 16 expert + 20/32 production |
+| | 2026-05-16 | **skill rollout #10 (收尾)** — automotive-adas-scenario + automotive-ota-update-test + automotive-hil-loop-test 3 skill LLM-driven 生产落地 (ADAS: AEB/ACC/LKA + CARLA 仿真 · OTA: 6 校验 + UN R156/GB 44496 合规 · HIL: MIL/SIL/HIL 三环 + dSPACE). **rollout 完成 — 23/32 production + 7 script + 0 rollout + 2 vision.** | 16 expert + 23/32 production (0 rollout 待) |
+| | 2026-05-17 | 深审32发现全修 + 版本号全同步 + 私源泄漏清洗 | 16 expert + 23/32 production |
+| | 2026-05-17 | CONTRIBUTING skill count 33→32 fix + 版本号同步 | 16 expert + 23/32 production |
+| | 2026-05-17 | Security hardening batch: CWE-78 fix + credential removal + CORS + WebSocket leak + XML escape | 16 expert + 23/32 production |
+| | 2026-05-17 | Refactor: _stub_response dispatch table + fuzzer ALL_PAYLOADS hoist | 16 expert + 23/32 production |
+| | 2026-05-17 | Honesty pass: remove aspirational numbers + split overlong functions | 16 expert + 23/32 production |
+| | 2026-05-17 | Security: shell injection + hardcoded creds + silent failures | 16 expert + 23/32 production |
+| | 2026-05-17 | MASTER_PLAN 38/38 items across 8 phases complete | 16 expert + 23/32 production |
+| | 2026-05-18 | Phase 1-5 initial audit: 18 additions (settings/IDE/Docker/Prometheus/streaming/PBT/contract/schema fuzz/compliance/DORA) | 16 expert + 23/32 production |
+| | 2026-05-18 | Deep audit 11 core modules (flaky guard/API security v2/data factory v2/perf/e2e event harness/visual regression/ML prioritizer/differential/EU AI Act/supply chain) | 16 expert + 23/32 production |
+| | 2026-05-18 | Remaining 6 deferred modules + CVE-2025-71176 fix + 深度审查65发现全修 | 16 expert + 30/32 active (23 production + 7 script) |
+| | 2026-05-18 | Phase 2 charter closure: Bug 5适配器(YAML门禁+按需安装) + HIGH 2(H16/H18) + MEDIUM 4(M12/M14/M15/M19) + contract gate + utils tests | 16 expert + 30/32 active · Phase 2 complete |
+| | 2026-05-18 | Phase 3.1 伦理/偏见审计: fairness_auditor.py (dataset bias + 6 model fairness metrics + intersectional + decision audit) + 20 tests + ai_validator bias audit pipeline | 16 expert + 30/32 active · 1/3 Phase 3 done |
+| | 2026-05-18 | Phase 3.2 沉默故障检测: silent_failure_detector.py (threshold drift + Mann-Kendall + OLS trend + sliding window + multi-source batch) + 21 tests + tracing/web_vitals/prometheus collectors | 16 expert + 30/32 active · 2/3 Phase 3 done |
+| | 2026-05-18 | Phase 3.3 缺席者场景注入: absentee_scenario_injector.py (9 absentee groups × 21 canonical scenarios + charter generation + coverage reporting) + 20 tests | 16 expert + 30/32 active · PHASE 3 COMPLETE |
+| | 2026-05-19 | Phase 4 证据链可采信性: evidence_chain.py (SHA-256 hash chain + multi-source collection + ISO 27001/SOC2/NIST 800-53/GDPR compliance mapping + JSON/Markdown export + integrity verification) + 39 tests + ai_validator evidence chain audit pipeline | 16 expert + 30/32 active · PHASE 4 DELIVERED |
+| | 2026-05-19 | Phase 5 神圣性与跨文化禁忌: taboo_matrix.py (135 entries × 16 locales × 5 dimensions: words/colors/numbers/holidays/sacred_contexts) + i18n_checker taboo audit extension (6 functions) + 84 tests | 16 expert + 30/32 active · PHASE 5 DELIVERED |
+| | 2026-05-19 | Release cut: Phase 3.1+3.2+3.3+4+5 落版 (fairness_auditor / silent_failure_detector / absentee_scenario_injector / evidence_chain / taboo_matrix · 共 184 tests) + **2 ex-vision skill 实装** (agent-introspection-debugging + build-your-own-x-explorer · LLM-driven minimum viable · 中央 ALL_SKILL_RUNNERS 同步) | **16 expert + 32/32 active** (25 production + 7 script · SKILL ROLLOUT 完整收尾) |
+| | TBD | 路线图启动 | 16/16 + V2 |

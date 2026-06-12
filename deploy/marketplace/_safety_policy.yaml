@@ -52,7 +52,7 @@ trust_tiers:
 
 # 卸载策略
 uninstall:
-  archive_only: true # 决策不可逆禁止
+  archive_only: true # 不可逆操作操作
   archive_dir: marketplace/.archive/
 
 # 紧急 kill switch

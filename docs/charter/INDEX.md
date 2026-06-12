@@ -11,7 +11,7 @@
 | 04 | [skills-bugtracker](04-skills-bugtracker.md) | Skills 自进化机制 + Bug Tracker 多适配器 | ~103 |
 | 05 | [install-deploy](05-install-deploy.md) | 按需安装 + 架构图 + 快速开始 + 工作流 + 技术栈 + 闭环 + 升级 + 协作 + 跨 AI | ~311 |
 | 06 | [test-architecture](06-test-architecture.md) | 测试架构深度 + 关键反问 + 开放问题 + 术语表 | ~240 |
-| 07 | [runtime-license](07-runtime-license.md) | V1.1.0 运行时层 + LICENSE / CHANGELOG / 项目当前状态 | ~162 |
+| 07 | [runtime-license](07-runtime-license.md) | 运行时层 + LICENSE / CHANGELOG / 项目当前状态 | ~162 |
 
 ## 维护原则
 

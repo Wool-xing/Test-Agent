@@ -87,7 +87,7 @@ Test-Agent/
 ├── skills/             ← 32 business skills + 3 meta-skills
 ├── utils/              ← 79 production utils (pytest · Playwright · JMeter · Appium · …)
 ├── config/             ← conftest / pytest.ini / .mcp.json
-├── runtime/            ← V1.x runtime (router · orchestrator · MCP · …)
+├── runtime/ ← runtime (router · orchestrator · MCP · …)
 ├── ci/                 ← GitHub Actions + Jenkins
 ├── docs/               ← user manual / architecture / theory / compliance
 ├── marketplace/        ← community skills / agents / mcp / hooks

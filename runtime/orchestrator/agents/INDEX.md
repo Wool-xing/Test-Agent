@@ -16,7 +16,7 @@
 
 - test-lead 自身已实现(用全链路上游),其他 11 个:env-manager / data-preparer(scripted)/ testcase-designer(scripted)/ report-generator(scripted)/ mobile-tester / desktop-tester(scripted)/ visual-tester / system-tester / ai-tester(scripted)/ 渗透 / 车载
 - **5 个有 script 真跑**(testcase-designer / data-preparer / report-generator / desktop-tester / ai-tester)→ SCRIPT_MAP 兜
-- **6 个 no-op**(env-manager / mobile-tester / visual-tester / system-tester / 渗透 / 车载)→ 待 V1.15+
+- **6 个 no-op**(env-manager / mobile-tester / visual-tester / system-tester / 渗透 / 车载)→ 待 +
 
 ## 协议
 

@@ -67,7 +67,7 @@
 - `/forget` 关键词太短导致误删：最小 3 字符
 - `load_memory_md` 异常静默吞噬：改为 `logger.warning`
 - skill rollout 总数: 16 → 18 (中央 `runtime/tests/test_skill_runners.py` `ALL_SKILL_RUNNERS` 同步加 2 行)
-- skill active 数: 30/32 → **32/32** (V1.x SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
+- skill active 数: 30/32 → **32/32** (SKILL ROLLOUT 完整收尾,0 vision/0 rollout/0 unknown)
 - runtime/orchestrator/skills/__init__.py: 聚合 import 新增 agent_introspection_debugging + build_your_own_x_explorer
 
 - **P2 能力层 — Agent 交互层 6 项全部实装:**
@@ -299,7 +299,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ## [v1.32.0] - 2026-05-17
 
-> **V1.15.0 → V1.32.0 (2026-05-15 ~ 2026-05-17) 共 17 版累积**。
+> **→ (2026-05-15 ~ 2026-05-17) 共 17 版累积**。
 > expert rollout 收尾 + skill rollout 全 16/16 完成 。
 > 版本历史见 [ROADMAP.md](ROADMAP.md#进度跟踪) 进度跟踪表。
 
@@ -336,11 +336,11 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **多 provider 通用 env 通道**: `LLM_PROVIDER` + `LLM_API_KEY` + `LLM_MODEL` 通用 env, 6 provider 内置 (claude/openai/gemini/qwen/deepseek/ollama)
 - Stub 扩 4 path 支持 vendor-neutral 多厂商 routing
 
-### Added (MCP 6 件套 · V1.2.0)
+### Added (MCP 6 件套 · )
 
 - `runtime/mcp/` 6 MCP server: test-orchestrator / protocol-adapter / evidence-vault / defect-tracker / knowledge-base / compliance-checker
 
-### Added (Web UI · V1.2.0)
+### Added (Web UI · )
 
 - `runtime/web/` 4 页: Upload / Run Status / Report / Catalog (React 18 + Vite 5 + shadcn/ui + TanStack Query v5)
 
@@ -361,11 +361,11 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 
 ## [v1.14.0] - 2026-05-12
 
-> **首次正式版本切节**(W7-2, 2026-05-14): V1.1.0 到 V1.14.0 共 13 个内部 alpha 累积归入本节。后续新变更入 [Unreleased]。
+> **首次正式版本切节**(W7-2, 2026-05-14): 到 共 13 个内部 alpha 累积归入本节。后续新变更入 [Unreleased]。
 
 ### Added(5 核心 expert 真 LLM 落地 + 录制脚本 · 2026-05-12)
 
-> 起因:战略参谋诚实交底——V1.13 的 selftest 100% PASS 是"骨架通"不是"内涵通",16 expert 里 11 个仍是 no-op。用户授权 C 路线(5 核心 expert 真 LLM)+ B(录制脚本)。
+> 起因:战略参谋诚实交底——的 selftest 100% PASS 是"骨架通"不是"内涵通",16 expert 里 11 个仍是 no-op。用户授权 C 路线(5 核心 expert 真 LLM)+ B(录制脚本)。
 
 - **`runtime/orchestrator/agents/` 新模块**:
   - `base.py`:`AgentRunner` ABC + `RunnerContext` + `RunnerResult` + `AGENT_RUNNERS` registry + `@register` + `get_runner`
@@ -375,7 +375,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - **真 LLM** 时:调 `aux_client.complete()` → 解析 JSON → 落盘 → 给下游
   - INDEX.md 文档化 5 runner schema + 上下游
 - **adapter wiring**(`runtime/orchestrator/adapters/experts.py`):
-  - `execute_node` 先查 `AGENT_RUNNERS`(优先 V1.14),fallback `SCRIPT_MAP`
+  - `execute_node` 先查 `AGENT_RUNNERS`(优先 ),fallback `SCRIPT_MAP`
   - `_upstream_outputs` 缓存:每 runner 产物给下游 RunnerContext.upstream
   - `reset_upstream_cache()` 由 flow 每 run 开头调
   - SCRIPT_MAP 路径排除 `artifact_text/lang/mode` 防多行文本炸 argparse
@@ -391,10 +391,10 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `_demo-commands.sh`:实际 demo 命令序列(被 record-demo-* 调)
   - `record-demo-asciinema.sh`:`asciinema rec` 自动录,产 .cast 可上传 asciinema.org 或转 GIF/SVG
   - `record-demo-obs.sh`:OBS / QuickTime 屏幕录制配套(用户摁录制 → 跑此脚本,节奏自动)
-  - `docs/assets/terminalizer-config.yml`:精修 V1.14 配置(Catppuccin Mocha 主题 + UTF-8 + stub LLM env)
+  - `docs/assets/terminalizer-config.yml`:精修 配置(Catppuccin Mocha 主题 + UTF-8 + stub LLM env)
 - **真 agent 落地 canon**:5 核心 + 11 fallback + 加新 runner 流程 + RunnerContext / RunnerResult 协议
-- 烟测:**9/9 strict PASS · 5 真 runner 产物全落盘**(原 V1.13 8/8 是 3 script + 5 no-op
-- 版本 V1.13.0 → **V1.14.0**
+- 烟测:**9/9 strict PASS · 5 真 runner 产物全落盘**(原 8/8 是 3 script + 5 no-op
+- 版本 → ****
 
 ### Added(README hero 重写 + `tagent demo` + 30 秒 demo 录制脚本 · 2026-05-12)
 
@@ -411,7 +411,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - 渠道适配:Twitter/X · 微信视频号 · 掘金/V2EX · Hacker News(同一份素材 4 平台)
 - **00-导航 同步**:CLI 行加 `demo` 子命令
 - 烟测 `tagent demo` 产 36+ 文件全过 · L1/L3 strict 不破
-- 版本 V1.12.0 → **V1.13.0**
+- 版本 → ****
 
 ### Added(`tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 2026-05-12)
 
@@ -439,13 +439,13 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **STARTUP.md 启动指南**:含填占位清单 + 装依赖 hint + 健康检查 + 烟雾跑通命令 + 推荐 skill 顺序 + 出错对照表
 - 烟测:5 preset × 全过 + 8 测试类型组合全过
 - L1 + L3 strict 不破:agents=16/16 skills=32/≥25 + selftest 8/8 100%
-- 版本 V1.11.0 → **V1.12.0**
+- 版本 → ****
 
 ### Fixed(同步规则批改 + BugTracker/多端 canon + n7 修 · 2026-05-12)
 
 - **同步规则()执行**:17 文件批改"三端通知"→"多端通知";"禅道 Bug 提交"项目级框架→"BugTracker(默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook)"
   - `00-项目导航.md` · `agents/{01,07,08,09}.md` · `agents/README.md` · `skills/{README,test-coordinator,zentao-bug-submission}.md` · `config/mcp-server-impl.md` · `utils/{README.md,api_retry_util.py}` · `ci/{INDEX,CICD集成说明}.md` · `docs/getting-started/{交付物清单,使用手册,配置清单}.md` · `examples/web-demo/README.md` · `CONTRIBUTING.md` · `FULL_GUIDE.md`
-- **adapter 修 V1.10 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
+- **adapter 修 n7 bug**:`runtime/orchestrator/adapters/experts.py` 加 `SCRIPT_DEFAULT_ARGS` + `_ensure_fixture()` 通用机制
   - 现 `tagent selftest --e2e --strict` **100% PASS 8/8**(原 88% 7/8)
   - generate_report.py 默认注入 `--data=workspace/测试报告/{项目名}/_selftest_summary.json`,fixture 自动生成
 - **扩**:
@@ -492,11 +492,11 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   tagent export plan.json --format opml    --out workspace/测试用例/login.opml
   tagent export plan.json --format all     --out-dir workspace/测试用例/
   ```
-- **`/testcase-design` skill 扩**:description 加多格式声明;末尾加 V1.9 思维导图 / 大纲段(Excel 仍是默认)
+- **`/testcase-design` skill 扩**:description 加多格式声明;末尾加 思维导图 / 大纲段(Excel 仍是默认)
 - **保留**:Excel 4-Sheet(`utils/excel_generator.py`)不动
 - **扩展点 P2 留位**:freemind / plantuml / mermaid-mindmap(按需加)
 - 烟雾测试:3 exporter × sample TestCaseTree 全过(content.json 解析正常 / OPML XML 解析正常 / Markmap frontmatter 完整)
-- 版本 V1.8.0 → V1.9.0
+- 版本 →
 
 ### Added(build-your-own-x 教学扩 + Marketplace 4 lane · 2026-05-12)
 
@@ -514,7 +514,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - ****:Marketplace 安全栅栏(4 关规则 + 3 信任级 + safe-by-default + 不复制官方源 + 卸载只归档 + 紧急 kill switch)
 - ****:教学层扩 13 大类(byox P0/P1/P2 分档 + 预算检查 + essence_only policy)
 - TOC 同步;skill 数升级
-- 版本 V1.7.0 → V1.8.0
+- 版本 →
 
 ### Added(Karpathy 4 原则 + ECC 测试加固 + Essence 自动汲取 · 2026-05-12)
 
@@ -536,7 +536,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - safe-by-default:`tagent.yml essence_watcher.enabled: true` 才跑
 - **新增 3 节**:Karpathy 4 原则 / ECC 测试加固 / Essence 自动汲取 + TOC 同步
 - 数字:14 skill → **32**(原 14 + 7 pentest + 5 automotive + 6 ECC) + `karpathy-guidelines/SKILL.md` upstream 1 个
-- 版本 V1.6.0 → V1.7.0
+- 版本 →
 
 ### Added(渗透&安全 + 车载&自动驾驶 双垂直专家+skill 集 · 2026-05-12)
 
@@ -548,12 +548,12 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `pentest-coordinator`(主)/ `pentest-recon` / `pentest-vuln` / `pentest-exploit` / `pentest-web` / `pentest-api` / `pentest-report`
 - **5 新 automotive skill**:
   - `automotive-test`(主)/ `automotive-can-bus-test` / `automotive-adas-scenario` / `automotive-ota-update-test` / `automotive-hil-loop-test`
-- ****:渗透 & 安全测试强化(规则化:授权前置 / scope 防护 / prod 禁 / 沙箱 / PoC-only / 不可逆禁止 / 责任披露 / PII scrub)
+- ****:渗透 & 安全测试强化(规则化:授权前置 / scope 防护 / prod 禁 / 沙箱 / PoC-only / 不可逆操作 / 责任披露 / PII scrub)
 - ****:车载 & 自动驾驶强化(规则化:ASIL C/D 必 HIL / L4 极深 / OTA 必回退 / 公开道路授权 / 录波 MDF4 / PII 禁存 / 领域档案签字)
 - **升级**:专家 14 → 16(核心 9 + 平台扩展 7)
 - **TOC 同步**:加
 - 数字:14 expert → **16** | 14 skill → **26**(7 pentest + 5 automotive 新增)
-- 版本 V1.5.0 → V1.6.0
+- 版本 →
 
 ### Added(GBrain-inspired 强化 + 跨项目精髓库扩 · 2026-05-12)
 
@@ -562,7 +562,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **eval 回放**:`runtime/tutor/eval_replay.py`,`TAGENT_EVAL_CAPTURE=1` opt-in;PII 自动 scrub(email/phone/SSN/API-key/card 6 类正则);replay 3 数(Jaccard@k/top-1 stability/latency Δ);默认 off
 - **safe-by-default yaml 栅栏**:`runtime/config/safety.py` + `tagent.yml.example`;scheduler/curator/backends/gateway/destructive_ops 默认 deny;`assert_allowed` / `gate_*` 工厂函数;缺配置 → `SafeByDefaultBlocked` 异常
 - ****:GBrain-inspired 强化(自连图谱 + 混合检索 + eval 回放 + safe-by-default + PII 单源)+ TOC 同步
-- 版本 V1.4.0 → V1.5.0
+- 版本 →
 
 ### Added(教学层 · 用户边用边学 · 2026-05-12)
 
@@ -582,7 +582,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
 - **CLI**:`tagent run --mode exec|learn|silent --lang zh|en|zh-en`
 - **API**:`POST /run/text?mode=&lang=` query 参数
 - **反幻觉**:实测 unknown-id 正确标记"该领域未收录,慎用"
-- 版本 V1.3.0 → V1.4.0
+- 版本 →
 
 ### Added(Hermes-inspired 5 模块 + 跨项目精髓库 · 2026-05-11)
 
@@ -596,7 +596,7 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - `runtime/backends/`:7 执行后端(`local/docker/ssh/singularity/modal/daytona/vercel_sandbox`);统一 `BaseExecutionEnv` 7 方法;Modal/Daytona 提供 serverless hibernate
   - `runtime/gateway/`:多平台 messaging(`telegram/discord/slack/wechat/feishu/dingtalk/email/webhook` 8 平台);统一 `Platform.send/configure`;`session.py` 跨平台对话连续
 - ****:Hermes-inspired 扩展能力章节(规则化);TOC 同步更新
-- 版本 V1.2.0 → V1.3.0
+- 版本 →
 
 ### Added(M2 MCP 6 件套 + Web UI + 真模型路由 + 飞轮回灌 · 2026-05-11)
 
@@ -616,12 +616,12 @@ _后续累积变更入此节;切版本时移到下方版本节。_
   - L2 必测项:Playwright E2E 7 用例(功能+边界+异常+兼容+可访问性);axe-core a11y 0 critical 门槛
   - 配套 vite 代理 `/api` → FastAPI(:8800)
 - **`.mcp.json` 升级**:启用 `filesystem` + `test-orchestrator`;其他 5 件套写入 `_pending_servers_v1_2_0_alpha` 段供按需启用
-- 版本 V1.1.0 → V1.2.0
+- 版本 →
 
 ### Added(宪章合一 · darwin-skill 入库 · 2026-05-11)
 
 - **扩展(memory `project_test_agent_workflow.md`)**:原 -+ How to apply 1-6 **字符级保留**;新增 -仅承载规则/要求/约束(剔除示例/枚举/参考表):
-  - 灵魂底色:三公理 + 五条铭文 + V1.0.0 锁死 + 双签解锁条件
+  - 灵魂底色:三公理 + 五条铭文 + 锁死 + 双签解锁条件
   - FULL_GUIDE.md 定位补充(优先级链:memory ＞ FULL_GUIDE ＞ README)
   - 多 Bug Tracker(默认 zentao + 扩展位 `BugTrackerBase` 契约)
   - 按需安装 + 运行时补装规则

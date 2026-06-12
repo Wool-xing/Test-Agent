@@ -1,4 +1,4 @@
-# terminalizer 配置 · V1.14 30s Test-Agent demo
+# terminalizer 配置 · 30s Test-Agent demo
 # 用法:
 #   npm install -g terminalizer
 #   terminalizer record demo --config docs/assets/terminalizer-config.yml
