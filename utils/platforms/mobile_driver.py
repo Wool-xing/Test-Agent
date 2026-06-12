@@ -168,7 +168,7 @@ def _parse_gfxinfo_fps(output: str) -> Optional[float]:
     """
     粗略统计 gfxinfo framestats 帧数(非精确 FPS)。
     PROFILEDATA 段下每行 CSV 是一帧;真精确 FPS 需 timestamp 列差。
-    TODO(V2.x): 解析 timestamp 列,计算 (frame_count - 1) / (timestamp[-1] - timestamp[0]) 真 FPS
+    TODO: 解析 timestamp 列,计算 (frame_count - 1) / (timestamp[-1] - timestamp[0]) 真 FPS
     """
     frame_count = 0
     in_data = False

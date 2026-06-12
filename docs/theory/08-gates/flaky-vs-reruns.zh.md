@@ -9,7 +9,7 @@ one_liner_en: No reruns at smoke (preserve flaky signal); reruns at regression (
 authority:
   - "Google Testing Blog: Flaky Tests at Google and How We Mitigate Them"
   - "pytest-rerunfailures docs"
-  - ISTQB Advanced Test Manager §6 Risk-based Testing
+  - ISTQB Advanced Test Manager Risk-based Testing
 confidence: high
 last_reviewed: 2026-05-12
 reviewer: agent-curator

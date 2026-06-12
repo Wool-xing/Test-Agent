@@ -1,6 +1,6 @@
 ---
 name: zentao-bug-submission
-description: BugTracker Bug 提交技能（默认 adapter:禅道,主宪章 §12 BugTrackerBase 统一契约支持 Jira/GitHub/GitLab/Linear/Webhook,由 .env BUG_TRACKER 选）。输入 Bug 描述或测试失败信息，自动规范化 Bug 报告并提交到所选 BugTracker，支持批量提交和状态追踪。默认实现 utils/zentao_bug_manager.py（severity 1=P0/2=P1/3=P2/4=P3）。
+description: BugTracker Bug 提交技能。输入 Bug 描述或测试失败信息，自动规范化 Bug 报告并提交到所选 BugTracker，支持批量提交和状态追踪。默认实现 utils/zentao_bug_manager.py（severity 1=P0/2=P1/3=P2/4=P3）。
 tools: Read, Write, Bash, Grep, Glob
 SKILL_IMPL_STATUS: script
 ---

@@ -7,7 +7,7 @@
 
 command: bash scripts/_demo-commands.sh
 
-cwd: .
+cwd:.
 
 env:
   recording: true

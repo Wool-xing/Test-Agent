@@ -1,4 +1,4 @@
-# 配置模板库索引（V1.0.0）
+# 配置模板库索引
 
 > `tagent init` 交互向导从本目录读取模板 + matrix · 5 分钟生成 `.env` + `tagent.yml` + `STARTUP.md`。
 
@@ -39,6 +39,6 @@ llm_providers:
 
 ## 相关
 
-- 主宪章 §5 多格式 I/O · §36 多端通知 canon · §37 BugTracker canon
+- 多格式 I/O · 多端通知 canon · BugTracker canon
 - 上一级:[`../INDEX.md`](../INDEX.md)
 - 实现:[`../../runtime/init/INDEX.md`](../../../runtime/init/INDEX.md)

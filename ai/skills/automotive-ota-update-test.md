@@ -28,7 +28,7 @@ SKILL_IMPL_STATUS: production
 
 - 升级流量重放:wireshark + scapy
 - 中断模拟:`utils/chaos_helper.py` 在升级中触发(`runtime/scheduler` 集成)
-- 弱网模拟:tc + netem(主宪章已用)
+- 弱网模拟:tc + netem
 
 ## 输出
 

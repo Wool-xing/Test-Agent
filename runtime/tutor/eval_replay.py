@@ -1,4 +1,4 @@
-"""Eval capture + replay · gbrain §1.6 派生.
+"""Eval capture + replay · gbrain 派生.
 
 opt-in via TAGENT_EVAL_CAPTURE=1. PII-scrubbed routing queries land in
 `workspace/learning/eval_candidates.jsonl`. Replay computes 3 metrics:
@@ -30,7 +30,7 @@ def _capture_path() -> Path:
     return d / "eval_candidates.jsonl"
 
 
-# PII scrub — single source of truth (gbrain §1.9)
+# PII scrub — single source of truth (gbrain )
 PII_PATTERNS = [
     (re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"), "<EMAIL>"),
     (re.compile(r"\b1[3-9]\d{9}\b"), "<PHONE-CN>"),

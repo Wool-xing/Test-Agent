@@ -1,9 +1,9 @@
 """Shared MCP server scaffolding.
 
 Honors charter:
-  - §18-12 决策可追溯:工具调用自动落 `decisions/{date}_mcp_{tool}_{run_id}.json`
-  - §21 横切可复现性:run_id 注入 + seed 记录 + 失败 snapshot
-  - §1 同步铁律:服务列表必须与 `config/.mcp.json` 一致
+  - 决策可追溯:工具调用自动落 `decisions/{date}_mcp_{tool}_{run_id}.json`
+  - 横切可复现性:run_id 注入 + seed 记录 + 失败 snapshot
+  - 同步规则:服务列表必须与 `config/.mcp.json` 一致
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ def _decisions_dir() -> Path:
 
 
 def log_decision(tool: str, payload: dict, run_id: str | None = None) -> Path:
-    """Persist a decision record per charter §18-12.
+    """Persist a decision record per charter.
 
     Returns the written file path.
     """
@@ -68,7 +68,7 @@ def log_decision(tool: str, payload: dict, run_id: str | None = None) -> Path:
 def tool_decision_logged(tool_name: str) -> Callable:
     """Wrap an async MCP tool handler with decision logging.
 
-    Charter §18-12 决策可追溯: every call (success or failure) writes a record.
+    Charter 决策可追溯: every call (success or failure) writes a record.
     Logging failures must not mask the original handler exception/result.
     """
 

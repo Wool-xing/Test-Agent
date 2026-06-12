@@ -1,4 +1,4 @@
-"""tagent config CLI 测试 (V1.22.0 · 4 子命令 list/show/use/use-compat).
+"""tagent config CLI 测试 (4 子命令 list/show/use/use-compat).
 
 本文件中所有 API key/secret 均为虚构测试数据，不是真实凭据。
 All API keys and secrets in this file are fake test fixtures — not real credentials.

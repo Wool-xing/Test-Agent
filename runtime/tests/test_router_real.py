@@ -1,9 +1,9 @@
 """Real-model router accuracy test (M2-7).
 
-Charter §21:
+Charter :
   - 横切准则: 失败必带 seed + snapshot (固定 random seed)
   - 横切准则: 测试预算上限 (timeout per call)
-  - 决策可追溯 §18-12: 每次失败入 decisions/
+  - 决策可追溯 : 每次失败入 decisions/
 
 Run conditions:
   - Requires TAGENT_LLM_PROVIDER ∈ {claude, openai, gemini, qwen, deepseek, ollama}
@@ -30,7 +30,7 @@ from runtime.router.llm_client import LLMClient
 from runtime.router.router import route, route_with_vote
 from runtime.router.schema import TargetArtifact
 
-RANDOM_SEED = 42  # §21 可复现性: 固定 seed
+RANDOM_SEED = 42 # 可复现性: 固定 seed
 random.seed(RANDOM_SEED)
 
 # 20 test samples: 4 types × 5 phrasings each
@@ -63,7 +63,7 @@ SAMPLES: list[tuple[str, str]] = [
 
 
 def _decisions_log(record: dict) -> Path:
-    """Charter §18-12 决策可追溯: log each routing decision."""
+    """Charter 决策可追溯: log each routing decision."""
     s = get_settings()
     d = s.resolve(s.workspace_dir) / "测试报告" / "decisions"
     d.mkdir(parents=True, exist_ok=True)

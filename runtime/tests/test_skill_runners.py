@@ -1,6 +1,6 @@
-"""LLM-driven SkillRunner 专项 unit test (V1.21.0 — skill rollout 起点).
+"""LLM-driven SkillRunner 专项 unit test.
 
-照 test_agent_runners.py pattern (V1.16-followup 锁规则) 同构:
+照 test_agent_runners.py pattern 同构:
 覆盖 3 维度 × N skill_runner = 3N case (参数化):
 - registration: @register_skill("name") + skills/__init__.py import 双链路 → get_skill_runner(name) 非空
   (防 __init__.py 漏 import 致 silent fallback no-op)
@@ -9,7 +9,7 @@
 - summary 非空: 一行业务摘要存在
   (防 summary 改空 regression, report-generator 下游消费)
 
-模板规则锁定 (V1.21+ 新 SkillRunner 必填):
+模板规则锁定 :
 - 加 1 skill_runner → 更新 ALL_SKILL_RUNNERS 加 1 行 (name, required_keys)
 - 不加 → 参数化漏覆盖, pytest 不报错但 silent gap
 """
@@ -25,7 +25,7 @@ from runtime.orchestrator.skills import SKILL_RUNNERS, get_skill_runner
 # 不含下划线开头字段 (e.g., _mode 是 stub 标志, 非业务字段)
 ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
     (
-        "pentest-coordinator",  # V1.21.0 (skill rollout 起点)
+        "pentest-coordinator", # (skill rollout 起点)
         [
             "project_name",
             "run_id",
@@ -55,55 +55,55 @@ ALL_SKILL_RUNNERS: list[tuple[str, list[str]]] = [
         ["project_name","run_id","sections","findings","pii_scrub","outputs","risks","confidence"],
     ),
     (
-        "pentest-recon",  # V1.31.0
+        "pentest-recon", #
         ["project_name","run_id","target","authorization","outputs","risks","confidence"],
     ),
     (
-        "pentest-vuln",  # V1.31.0
+        "pentest-vuln", #
         ["project_name","run_id","source_available","mode","domains","outputs","risks","confidence"],
     ),
     (
-        "mobile-test",  # V1.23.0
+        "mobile-test", #
         ["project_name","run_id","target_platform","phases","outputs","risks","confidence"],
     ),
     (
-        "visual-test",  # V1.23.0
+        "visual-test", #
         ["project_name","run_id","visual_target_type","phases","outputs","risks","confidence"],
     ),
     (
-        "system-test",  # V1.31.0
+        "system-test", #
         ["project_name","run_id","sub_scenarios","phases","outputs","risks","confidence"],
     ),
     (
-        "eval-harness",  # V1.27.0
+        "eval-harness", #
         ["project_name","run_id","eval_target","model_version","baseline_version","safety_checks","outputs","risks","confidence"],
     ),
     (
-        "automotive-test",  # V1.31.0
+        "automotive-test", #
         ["project_name","run_id","vehicle_subsystem","asil_level","phases","sub_skills","outputs","risks","confidence"],
     ),
     (
-        "automotive-can-bus-test",  # V1.31.0
+        "automotive-can-bus-test", #
         ["project_name","run_id","protocols","checks","outputs","risks","confidence"],
     ),
     (
-        "automotive-adas-scenario",  # V1.31.0
+        "automotive-adas-scenario", #
         ["project_name","run_id","categories","odd_levels","simulation","outputs","risks","confidence"],
     ),
     (
-        "automotive-ota-update-test",  # V1.31.0
+        "automotive-ota-update-test", #
         ["project_name","run_id","checks","compliance","outputs","risks","confidence"],
     ),
     (
-        "automotive-hil-loop-test",  # V1.31.0
+        "automotive-hil-loop-test", #
         ["project_name","run_id","loops","asil_required","fault_injection","platform","outputs","risks","confidence"],
     ),
     (
-        "agent-introspection-debugging",  # V1.x
+        "agent-introspection-debugging", #
         ["project_name","run_id","target_run_id","dimensions","findings","recommendations","outputs","confidence"],
     ),
     (
-        "build-your-own-x-explorer",  # V1.x
+        "build-your-own-x-explorer", #
         ["project_name","run_id","user_scenario","detected_concepts","recommendations","warnings","outputs","confidence"],
     ),
 ]

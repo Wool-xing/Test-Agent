@@ -1,4 +1,4 @@
-"""Theory KB loader · 主宪章 §23 反幻觉 L1.
+"""Theory KB loader
 
 Scans `docs/theory/**/*.{zh,en}.md`, parses frontmatter, exposes lookup API.
 LLM in learn mode 只能引用 KB 中存在的 id;非 KB 输出"该领域未收录".

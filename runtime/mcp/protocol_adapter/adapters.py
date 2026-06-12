@@ -146,7 +146,7 @@ class WebSocketAdapter(ProtocolAdapter):
 class MQTTAdapter(ProtocolAdapter):
     """MQTT v3.1.1 via paho-mqtt sync client wrapped in asyncio threadpool.
 
-    Charter §21 横切准则: paho-mqtt's on_message callback runs on the network
+    Charter 横切准则: paho-mqtt's on_message callback runs on the network
     thread. We guard the shared buffer with a lock so async recv() and the
     callback don't race.
     """

@@ -1,11 +1,11 @@
-"""Curator coordinator · hermes §1.1.
+"""Curator coordinator · hermes.
 
 Background skill maintenance:
   - inactivity-triggered (no daemon)
   - only touches agent-created skills
   - never auto-deletes — archives only
   - pinned skills bypass
-  - uses aux client (charter §22; runtime/subagent/aux_client)
+  - uses aux client (charter ; runtime/subagent/aux_client)
 """
 
 from __future__ import annotations

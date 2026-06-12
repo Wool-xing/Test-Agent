@@ -34,9 +34,9 @@
 
 任一关失败 → 全部回滚 + decisions/ 落原因。
 
-## 与主宪章融合
+## 规则
 
-- §22 决策不可逆禁止:卸载只归档(`marketplace/.archive/`)
-- §24 safe-by-default:`tagent.yml marketplace.enabled` 默认 false
-- §27 Karpathy 原则 3 Surgical:卸载只动安装时建的文件,不动相邻
-- §29 Essence watcher:可关联 marketplace 远程 registry 自动同步
+- 分类卸载:按类型归档(`marketplace/.archive/`)
+- safe-by-default:`tagent.yml marketplace.enabled` 默认 false
+- Karpathy 原则 3 Surgical:卸载只动安装时建的文件,不动相邻
+- Essence watcher:可关联 marketplace 远程 registry 自动同步

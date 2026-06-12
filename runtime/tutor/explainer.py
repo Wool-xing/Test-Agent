@@ -1,10 +1,10 @@
-"""Explainer · 主宪章 §23 反幻觉 L2 自检.
+"""Explainer
 
 Decorates DAG nodes / tool calls with教学注释:
   exec mode  → one_liner only (≤30 字)
   learn mode → why + theory_ref + alternatives + reading
 
-Charter §23 L2 self-check: verify_refs() re-asks LLM to confirm cited card ids
+Charter L2 self-check: verify_refs() re-asks LLM to confirm cited card ids
 are real KB entries; non-existent → strip + downgrade confidence.
 """
 
@@ -61,7 +61,7 @@ class Explanation:
 
 
 def filter_refs(refs: list[str]) -> tuple[list[str], list[str]]:
-    """Charter §23 L1: split into (in_kb, not_in_kb)."""
+    """Charter L1: split into (in_kb, not_in_kb)."""
     kb = get_kb()
     in_kb, not_in_kb = [], []
     for r in refs:

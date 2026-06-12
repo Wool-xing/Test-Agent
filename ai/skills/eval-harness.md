@@ -1,6 +1,6 @@
 ---
 name: eval-harness
-description: "Eval 框架 Skill。LLM/AI 系统评测:pass@k / Jaccard@k / top-1 stability / latency Δ。融合 gbrain eval 回放(主宪章 §24)+ ECC eval-harness。"
+description: "Eval 框架 Skill。LLM/AI 系统评测:pass@k / Jaccard@k / top-1 stability / latency Δ。融合 gbrain eval 回放+ ECC eval-harness。"
 tools: Read, Write, Bash, Grep, Glob
 SKILL_IMPL_STATUS: production
 ---
@@ -32,7 +32,7 @@ SKILL_IMPL_STATUS: production
 ## 使用
 
 ```bash
-# 1. opt-in capture(主宪章 §24)
+# 1. opt-in capture
 TAGENT_EVAL_CAPTURE=1 tagent run "..."
 
 # 2. 改 router/prompt/KB
@@ -41,7 +41,7 @@ TAGENT_EVAL_CAPTURE=1 tagent run "..."
 python -m runtime.tutor.eval_replay  # 输出 3 指标
 ```
 
-## 评测原则(主宪章 §24)
+## 评测原则
 
 - **opt-in 不偷数据**:`TAGENT_EVAL_CAPTURE=1` 必显式
 - **PII 必 scrub**:落档前 6 类正则

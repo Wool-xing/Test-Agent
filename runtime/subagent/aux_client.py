@@ -1,4 +1,4 @@
-"""Auxiliary LLM client (hermes §1.3 'never touches main session prompt cache').
+"""Auxiliary LLM client (hermes 'never touches main session prompt cache').
 
 Subagents and curator share NOTHING with the main routing path beyond raw model API.
 Different env vars (TAGENT_AUX_*) so users can pin a cheaper/faster aux model.

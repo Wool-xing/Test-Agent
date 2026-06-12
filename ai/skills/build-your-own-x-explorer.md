@@ -1,6 +1,6 @@
 ---
 name: build-your-own-x-explorer
-description: "Build-your-own-X 教学引导 Skill。按用户当前测试场景推荐对应 byox 教程深度学习路径;每条标 estimated_time_hours;主宪章 §31 教学层 13 大类落地。"
+description: "Build-your-own-X 教学引导 Skill。按用户当前测试场景推荐对应 byox 教程深度学习路径;每条标 estimated_time_hours;教学层 13 大类落地。"
 tools: Read, Write, Grep, Glob
 SKILL_IMPL_STATUS: production
 ---
@@ -47,11 +47,11 @@ SKILL_IMPL_STATUS: production
 | E2E 调试 / 视觉回归 | byox-web-browser |
 | webhook / gateway | byox-bot |
 
-## 与主宪章融合
+## 与融合
 
-- §23 教学层:本 skill 是 learn mode 深度路径入口
-- §27 Karpathy 原则 4(Goal-Driven):推荐前必问用户**时间预算**;无预算 → 拒推
-- §29 essence-watcher:byox 标 `essence_only`(默认不动 Test-Agent),需要时本 skill 主动引
+- 教学层:本 skill 是 learn mode 深度路径入口
+- Karpathy 原则 4(Goal-Driven):推荐前必问用户**时间预算**;无预算 → 拒推
+- essence-watcher:byox 标 `essence_only`(默认不动 Test-Agent),需要时本 skill 主动引
 
 ## 不做
 

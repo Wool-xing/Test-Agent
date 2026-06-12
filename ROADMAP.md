@@ -5,7 +5,7 @@
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 32/32 active**(23 production + 7 script + 2 vision→production);0 rollout;0 vision。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
-> - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 全 16 实装 (V1.21-V1.31)。
+> - **V1.21.0 新增 SkillRunner 基础设施** (`runtime/orchestrator/skills/` + `SKILL_RUNNERS` registry + `@register_skill` deco + `experts.py` kind=skill 接 runner),解锁 skill 层 LLM-driven 全 16 实装 。
 
 ## 当前活跃 expert (16 / 16) — V1.x rollout 收尾
 
@@ -18,12 +18,12 @@
 | `automation-engineer` | Web/API 脚本编写 + 性能测试编排 |
 | `test-executor` | 测试执行与监控 |
 | `bug-manager` | Bug 提交与追踪 |
-| `env-manager` | 环境检查清单 + 准备步骤(V1.15.0 minimum viable) |
-| `mobile-tester` | 移动测试用例 + ADB/Xcode 命令清单(V1.16.0 minimum viable) |
-| `visual-tester` | 视觉测试点 + 对比脚本片段 + 容差配置(V1.17.0 minimum viable) |
-| `system-tester` | IoT/串口/MQTT 测试用例 + 命令清单 + 协议特定配置(V1.18.0 minimum viable) |
-| `pentest-tester` | 5 攻击域渗透测试计划 + 工具清单 + PoC plan(V1.19.0 minimum viable;仅输出计划文本,真执行守护在 utils 层 env gate) |
-| `automotive-tester` | ASIL 评估 + HIL 测试 + ADAS 场景 + OTA 升级 + 合规矩阵(V1.20.0 minimum viable;V1.x rollout 收尾) |
+| `env-manager` | 环境检查清单 + 准备步骤 |
+| `mobile-tester` | 移动测试用例 + ADB/Xcode 命令清单 |
+| `visual-tester` | 视觉测试点 + 对比脚本片段 + 容差配置 |
+| `system-tester` | IoT/串口/MQTT 测试用例 + 命令清单 + 协议特定配置 |
+| `pentest-tester` | 5 攻击域渗透测试计划 + 工具清单 + PoC plan |
+| `automotive-tester` | ASIL 评估 + HIL 测试 + ADAS 场景 + OTA 升级 + 合规矩阵 |
 
 ### 5 script-backed (已上线)
 
@@ -45,17 +45,17 @@
 |-------|------|
 | `tdd-workflow` | TDD 工作流 |
 | `e2e-testing` | E2E 测试 |
-| `automotive-test` | 车载主编排(V1.31.0 · automotive batch) |
-| `automotive-can-bus-test` | CAN总线测试(V1.31.0) |
-| `automotive-adas-scenario` | ADAS场景库(V1.31.0) |
-| `automotive-ota-update-test` | OTA升级测试(V1.31.0) |
-| `automotive-hil-loop-test` | HIL环路测试(V1.31.0) |
+| `automotive-test` | 车载主编排(automotive batch) |
+| `automotive-can-bus-test` | CAN总线测试 |
+| `automotive-adas-scenario` | ADAS场景库 |
+| `automotive-ota-update-test` | OTA升级测试 |
+| `automotive-hil-loop-test` | HIL环路测试 |
 | `regression-test` | 回归测试 |
 | `smoke-test` | 冒烟测试 |
 | `testcase-design` | 用例设计 |
 | `test-coordinator` | 测试流程编排 |
 | `verification-loop` | 5-phase 验证循环 |
-| `eval-harness` | LLM 评测编排(V1.27.0 · skill rollout #5) |
+| `eval-harness` | LLM 评测编排(skill rollout #5) |
 
 ### 7 script-backed (已上线)
 
@@ -100,36 +100,36 @@
 
 | Skill | 范围 | 关联 expert | 状态 |
 |-------|------|-------------|------|
-| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | **done** (V1.23.0 · runtime/orchestrator/skills/mobile_test.py) |
-| `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | **done** (V1.24.0 · runtime/orchestrator/skills/visual_test.py) |
-| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | **done** (V1.26.0 · runtime/orchestrator/skills/system_test.py) |
-| `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | **done** (V1.27.0 · runtime/orchestrator/skills/eval_harness.py · 5 阶段编排 + 质量门禁 + 安全护栏) |
+| `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | **done** (runtime/orchestrator/skills/mobile_test.py) |
+| `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | **done** (runtime/orchestrator/skills/visual_test.py) |
+| `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | **done** (runtime/orchestrator/skills/system_test.py) |
+| `eval-harness` | LLM 评测(pass@k / Jaccard / stability) | ai-tester(深化) | **done** (runtime/orchestrator/skills/eval_harness.py · 5 阶段编排 + 质量门禁 + 安全护栏) |
 
 ### Pentest 7 skill（已全部完成 · SECURITY.md 武器化授权 wiring 已实装）
 
 | Skill | 范围 | 状态 |
 |-------|------|------|
-| `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0 · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
-| `pentest-recon` | 侦察(被动+主动信息收集) | **done** (V1.25.0) |
-| `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) | **done** (V1.25.0) |
-| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) | **done** (V1.30.0 · pentest batch 2) |
-| `pentest-api` | API 渗透(OWASP API Top 10 2023) | **done** (V1.30.0 · pentest batch 2) |
-| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) | **done** (V1.30.0 · pentest batch 2) |
-| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) | **done** (V1.30.0 · pentest batch 2) |
+| `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
+| `pentest-recon` | 侦察(被动+主动信息收集) | **done** |
+| `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) | **done** |
+| `pentest-exploit` | 漏洞利用(沙箱 PoC,不真破坏) | **done** (pentest batch 2) |
+| `pentest-api` | API 渗透(OWASP API Top 10 2023) | **done** (pentest batch 2) |
+| `pentest-web` | Web 渗透(OWASP Top 10 + ASVS) | **done** (pentest batch 2) |
+| `pentest-report` | 渗透报告(仅 working PoC 入报告,shannon 哲学) | **done** (pentest batch 2) |
 
 ### Automotive 5 skill
 
 | Skill | 范围 |
 |-------|------|
-| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (V1.31.0 · automotive batch) |
-| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (V1.31.0 · automotive batch) |
-| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (V1.31.0 · automotive batch) |
-| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) | **done** (V1.31.0 · automotive batch) |
-| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (V1.31.0 · automotive batch) |
+| `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (automotive batch) |
+| `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (automotive batch) |
+| `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (automotive batch) |
+| `automotive-ota-update-test` | OTA 升级(UN R156 / GB 44496-2024) | **done** (automotive batch) |
+| `automotive-hil-loop-test` | HIL/SIL/MIL/PIL 环路 | **done** (automotive batch) |
 
 ---
 
-## V1.34-V1.36 能力扩展
+## V1.36 能力扩展
 
 - **V1.34**: script_bridge.py 桥接 5 独立脚本进 orchestrator pipeline
 - **V1.35**: 11 深度审计模块 (flaky guard / API security v2 / data factory v2 / perf orchestrator / event harness / visual regression / ML prioritizer / differential tester / EU AI Act / supply chain)

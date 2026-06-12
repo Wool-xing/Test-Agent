@@ -1,7 +1,7 @@
 # profiles/compliance 索引
 
 > 行业合规规则库插槽。每个 YAML 文件 = 一个合规框架的检查项集。
-> 真规则由领域专家提供;本目录仅含**空载示例**,V1.2.0 起步。
+> 真规则由领域专家提供;本目录仅含**空载示例**
 
 ## 已提供示例(空载)
 
@@ -35,5 +35,5 @@ checks:
 
 ## 接入方式
 
-L4 级被测项(charter §21 深度准则 L4)必须通过 `mcp-compliance-checker.check_compliance(profile, run_id)` 验证。
-真规则文件由领域专家+test-lead 双签签字后入库(charter §10 五条铭文 + §15 AgentChat 协议)。
+L4 级被测项(charter 深度准则 L4)必须通过 `mcp-compliance-checker.check_compliance(profile, run_id)` 验证。
+真规则文件由领域专家+test-lead 双签签字后入库(charter 五条铭文 + AgentChat 协议)。

@@ -1,6 +1,6 @@
-# Theory KB card schema (charter §23).
+# Theory KB card schema (charter ).
 # 每张卡片(*.zh.md / *.en.md) frontmatter 必须满足此 schema.
-# 主宪章 §23 铁律:LLM 在 learn mode 下只能引用 KB 中存在的 id;不在 KB 的概念输出"该领域未收录"。
+# 规则:LLM 在 learn mode 下只能引用 KB 中存在的 id;不在 KB 的概念输出"该领域未收录"。
 
 required_fields:
   id:

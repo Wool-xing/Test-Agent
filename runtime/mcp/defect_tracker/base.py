@@ -1,6 +1,6 @@
 """BugTrackerBase contract (mirrors utils/bug_manager.py 5 adapter).
 
-Charter §12: 实现该 5 方法才能注册。
+Charter : 实现该 5 方法才能注册。
 severity 映射统一权威 (`utils/bug_severity_map.py`): 1=P0 / 2=P1 / 3=P2 / 4=P3.
 """
 

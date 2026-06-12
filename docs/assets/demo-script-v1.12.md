@@ -1,4 +1,4 @@
-# 30 秒 demo · 录制脚本(V1.12 配置自动组装)
+# 30 秒 demo · 录制脚本
 
 > 目标:让观众在 30 秒内看到"从 0 到测试报告"完整链路 · 用于推特 / 微信视频号 / 掘金 / Hacker News
 > 录制工具:[Terminalizer](https://terminalizer.com) / [asciinema](https://asciinema.org) / OBS 屏幕录制
@@ -37,7 +37,7 @@ cat STARTUP.md | head -30
 # Step 4 · 健康检查(秒过)
 tagent doctor --agents
 
-# Step 5 · 跑 demo(V1.13 加 · 全 stub LLM 0 成本)
+# Step 5 · 跑 demo
 tagent demo
 
 # Step 6 · 看产物(树形)
@@ -112,6 +112,6 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 
 ## 相关
 
-- 项目宪章 §1 一键部署 · §38 配置自动组装 canon · §5 多格式 I/O
+- 项目宪章 一键部署 · 配置自动组装 canon · 多格式 I/O
 - Terminalizer 配置:[`terminalizer-config.yml`](terminalizer-config.yml)
-- 录制原 recipe:[`demo.recipe.md`](demo.recipe.md)(V1.7 起占位)
+- 录制原 recipe:[`demo.recipe.md`](demo.recipe.md)

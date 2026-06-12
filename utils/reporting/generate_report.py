@@ -68,13 +68,13 @@ def _write_docx_degraded_warning(doc, data: Dict) -> None:
     warning_p = doc.add_paragraph()
     warning_run = warning_p.add_run(
         f"本次报告基于不完整测试数据生成。共 {len(degraded_upstream)} 个 expert "
-        f"输出 degraded(mock 兜底 / LLM 失败 / 未实装 V1.x rollout):"
+        f"输出 degraded(mock 兜底 / LLM 失败 / 未实装 rollout):"
     )
     warning_run.font.color.rgb = RGBColor(255, 140, 0)
     warning_run.bold = True
     for name in degraded_upstream:
         item = doc.add_paragraph(style="List Bullet")
-        item.add_run(f"expert '{name}' — 详见 ROADMAP.md V1.x rollout 节奏")
+        item.add_run(f"expert '{name}' — 详见 ROADMAP.md rollout 节奏")
     impact_p = doc.add_paragraph()
     impact_run = impact_p.add_run("→ 上线决策建议: conditional 或 no-go(由 test-lead 判定);不应基于此报告直接发版。")
     impact_run.bold = True

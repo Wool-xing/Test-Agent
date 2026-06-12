@@ -50,10 +50,10 @@ pip-audit
 safety check
 ```
 
-## 与主宪章融合
+## 与融合
 
-- §17 Shift-Left 7 层:本 skill 是 L4 pre-commit + L5 PR gate + L6 静态分析
-- §25 渗透 PoC-only 哲学:本 skill 报 unverified 候选;喂 `/pentest-vuln` 验证
+- Shift-Left 7 层:本 skill 是 L4 pre-commit + L5 PR gate + L6 静态分析
+- 渗透 PoC-only 哲学:本 skill 报 unverified 候选;喂 `/pentest-vuln` 验证
 
 ## 不做
 

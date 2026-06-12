@@ -347,7 +347,7 @@ jobs:
             { echo "❌ .gitignore 未排除源 MD"; exit 1; }
           echo "✅ 敏感本地文档受保护"
 
-      - name: 验证 .gitignore 排除精髓库（V1.10 §34）
+      - name: 验证 .gitignore 排除精髓库
         run: |
           if [ -d "_精髓库" ] || [ -d "**/_精髓库" ]; then
             echo "❌ 私有知识库不应出现在仓库"
@@ -357,7 +357,7 @@ jobs:
             { echo "❌ .gitignore 未排除私有知识库"; exit 1; }
           echo "✅ 私有知识库受保护"
 
-  # ===== 8. L2 self-test(mock LLM,主宪章 §33,V1.10)=====
+  # ===== 8. L2 self-test=====
   selftest-mock:
     name: L2 self-test · mock LLM e2e
     runs-on: ubuntu-latest
@@ -375,7 +375,7 @@ jobs:
           # 兜底:确保关键运行时模块在
           pip install pydantic pydantic-settings typer rich loguru pyyaml openpyxl factory-boy faker prefect defusedxml prompt-toolkit
 
-      - name: L1 frontmatter lint(主宪章 §33 第 1 层)
+      - name: L1 frontmatter lint
         run: |
           python -m runtime.healthcheck.agent_smoke
 

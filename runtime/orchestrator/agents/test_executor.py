@@ -17,7 +17,7 @@ class TestExecutor(AgentRunner):
             "原则:\n"
             "1) 四阶段执行:冒烟(P0) → 回归(P0+P1) → 全量 → 性能\n"
             "2) 失败 4 类:product_bug / test_code_bug / env_issue / flaky\n"
-            "3) Flaky 检测:连续 3 跑 2 过即标 flaky 隔离(主宪章 §21)\n"
+            "3) Flaky 检测:连续 3 跑 2 过即标 flaky 隔离\n"
             "4) 不真跑 sandbox,产**执行计划 JSON**(由 utils 真执行)\n"
             "输出严格 JSON,不 markdown 包裹。"
         )

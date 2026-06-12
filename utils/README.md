@@ -20,7 +20,7 @@
 | `jmeter_csv_exporter.py` | JMeter 参数化 CSV 生成 | `generate_jmeter_dataset(count, output)` |
 | `jmeter_result_parser.py` | JTL 解析 + 性能门禁 + 基线对比 | `parse_jtl(jtl)` / `check_performance_gates` / `compare_with_baseline` |
 | `regression_scope.py` | git diff 影响范围分析（YAML 配置） | `analyze_change_impact(base_branch)` |
-| `zentao_bug_manager.py` | BugTracker 默认 adapter:禅道 SDK + token 续期（其他 adapter 同契约 BugTrackerBase,主宪章 §12） | `ZentaoBugManager.create_bug` / `batch_submit_from_failures` |
+| `zentao_bug_manager.py` | BugTracker 默认 adapter:禅道 SDK + token 续期 | `ZentaoBugManager.create_bug` / `batch_submit_from_failures` |
 | `ci_quality_gate.py` | CI 门禁统一（junit + cov） | `parse_junit` / `check_smoke` / `check_regression` / `check_coverage` |
 | `quality_gate_engine.py` | YAML 驱动门禁引擎（替代硬编码阈值） | `QualityGateEngine` / `check_smoke/regression/coverage/performance/release` |
 | `bug_tracker_base.py` | BugTracker 抽象基类 + 工厂模式（5 适配器注册） | `BugTrackerBase` / `create_bug_manager` / `TRACKER_REGISTRY` |

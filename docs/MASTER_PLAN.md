@@ -61,8 +61,8 @@
 
 ### #7 Karpathy 诚实化
 - **文件**: `README.md` + `README.zh-CN.md` — "8640 combinations" → "~12 common combinations tested in CI"; "95% aspirational" → "Coverage is broad but not exhaustive"
-- **文件**: `00-项目导航.md` — 移除 9 处 "主宪章 §X" 引用
-- **文件**: `ROADMAP.md` — 移除 3 处 "主宪章" 引用
+- **文件**: `00-项目导航.md` — 移除 9 处 "X" 引用
+- **文件**: `ROADMAP.md` — 移除 3 处 "" 引用
 - **文件**: `utils/generate_report.py` — `generate_test_report()` 143→30 行, 提取 6 helper
 - **文件**: `utils/mobile_driver.py` — `run_monkey()` 107→55 行, 提取 2 helper
 - **文件**: `runtime/router/llm_client.py` — `_stub_response()` 77 行 if/elif → dispatch table 8 条目

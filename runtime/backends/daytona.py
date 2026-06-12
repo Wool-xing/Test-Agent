@@ -1,4 +1,4 @@
-"""Daytona dev sandbox backend (hermes §1.4 serverless hibernate)."""
+"""Daytona dev sandbox backend (hermes serverless hibernate)."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ class DaytonaBackend(BaseExecutionEnv):
     """Wrap a Daytona workspace via its CLI (`daytona`).
 
     Requires the Daytona CLI on PATH + authenticated profile.
-    Hermes §1.4 经济模型: workspace hibernates when idle, wakes on demand.
+    Hermes 经济模型: workspace hibernates when idle, wakes on demand.
     """
 
     def __init__(self, workspace: str, *, profile: str | None = None) -> None:

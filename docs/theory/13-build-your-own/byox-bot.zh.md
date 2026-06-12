@@ -24,8 +24,8 @@ reading_en: ["https://core.telegram.org/bots/api"]
 
 # 对测试工作
 
-- **gateway 测试**(本项目 §22 runtime/gateway 8 平台):理解 webhook 校验 + 限流 + retry
+- **gateway 测试**(本项目 runtime/gateway 8 平台):理解 webhook 校验 + 限流 + retry
 - **消息回调测试**:测平台超时 / 重试策略
-- **scheduler + bot**(§22):懂 webhook 才能测自动化日报推送
+- **scheduler + bot**():懂 webhook 才能测自动化日报推送
 - **垃圾消息防御**:bot 必测 rate-limit + 签名校验
 - **bot 模拟器**:用 from-scratch bot 当测试 mock

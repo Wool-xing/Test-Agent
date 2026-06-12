@@ -1,9 +1,9 @@
 """visual-tester · LLM 读 PRD + UI 描述 → 视觉测试点 + 视觉对比脚本片段.
 
-V1.17.0 minimum viable (ROADMAP rollout #3 落地):
+minimum viable (ROADMAP rollout #3 落地):
 - 仅生成 visual test points + comparison scripts + tolerance + baseline_strategy 结构化 JSON
 - 不实装 12-视觉游戏测试.md 全部职责 (Airtest 真跑 / OCR 调用 / SSIM 像素对比执行
-  等留 V1.x 深化)
+  等留 深化)
 - 覆盖 Web Canvas/WebGL + 手游/PC 游戏 + OCR + 视觉回归
 """
 

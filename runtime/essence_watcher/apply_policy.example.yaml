@@ -1,4 +1,4 @@
-# essence_watcher 选择性应用 policy(主宪章 §29)
+# essence_watcher 选择性应用 policy
 #
 # 实际部署:cp 到 <essence-repo>/_apply_policy.yaml 启用
 # 默认所有 delta 仅入精髓库,不动 Test-Agent.
@@ -6,7 +6,7 @@
 # 自动提议入 Test-Agent(待审)
 auto_propose:
   - skill_definitions       # 新 skill name/description/metadata
-  - charter_rules           # 主宪章规则更新建议
+  - charter_rules # 规则更新建议
   - safety_patterns         # 防护模式
   - test_methodology        # 测试方法论新增
   - tool_integrations       # 工具集成模式

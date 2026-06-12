@@ -1,6 +1,6 @@
 ---
 name: bug-manager
-description: Bug管理专家 - 规范提交Bug到BugTracker（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook,主宪章 §12 BugTrackerBase 统一契约），追踪Bug修复进度，验证修复结果，生成Bug统计分析报告。默认实现 utils/zentao_bug_manager.py（权威 severity 1=P0/2=P1/3=P2/4=P3）;切换 adapter 由 .env `BUG_TRACKER` 字段指定。
+description: Bug管理专家 - 规范提交Bug到BugTracker，追踪Bug修复进度，验证修复结果，生成Bug统计分析报告。默认实现 utils/zentao_bug_manager.py（权威 severity 1=P0/2=P1/3=P2/4=P3）;切换 adapter 由 .env `BUG_TRACKER` 字段指定。
 tools: Read, Write, Bash, Grep, Glob
 EXPERT_IMPL_STATUS: production
 paired_skills: [zentao-bug-submission]

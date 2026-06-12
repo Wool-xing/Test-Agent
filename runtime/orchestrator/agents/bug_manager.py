@@ -1,4 +1,4 @@
-"""bug-manager · 分类失败 → 产 BugTracker-ready Bug 列表(主宪章 §37)."""
+"""bug-manager · 分类失败 → 产 BugTracker-ready Bug 列表."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ class BugManager(AgentRunner):
     def system_prompt(self) -> str:
         return (
             "你是 Test-Agent 项目内 bug-manager 专家(agents/08-Bug管理.md)。\n"
-            "职责:把 test-executor 的失败列表转 BugTracker-ready Bug(默认 zentao,可换 Jira/GitHub Issues 等,主宪章 §37)。\n"
+            "职责:把 test-executor 的失败列表转 BugTracker-ready Bug。\n"
             "原则:\n"
             "1) severity 权威映射:1=P0(阻塞)/ 2=P1(高)/ 3=P2(中)/ 4=P3(低)\n"
             "2) STAR 格式:Situation / Task / Action / Result\n"
@@ -69,7 +69,7 @@ class BugManager(AgentRunner):
                 "severity": 1,  # P0 阻塞 — 不应作为发版决策依据
                 "pri": 1,
                 "steps": [
-                    "检查上游 expert 实装状态 (ROADMAP.md V1.15-V1.20 rollout)",
+                    "检查上游 expert 实装状态 (ROADMAP.md rollout)",
                     "确认 LLM provider 不在 stub mode (settings.llm_provider)",
                     "若 expert 处于 rollout,等待对应版本完成实装",
                 ],

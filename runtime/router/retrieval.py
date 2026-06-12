@@ -6,7 +6,7 @@ Requires Postgres+pgvector + populated embeddings. Gracefully no-op otherwise.
 Async-safety:
   - Called from sync `route()`. If already inside a running event loop (e.g. FastAPI
     request handler), running `asyncio.run` or `run_coroutine_threadsafe` on the
-    same loop deadlocks. We detect that and degrade to no-op (charter §21 横切
+    same loop deadlocks. We detect that and degrade to no-op (charter 横切
     可复现性: never block, never silently misbehave).
 """
 

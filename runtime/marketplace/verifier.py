@@ -1,4 +1,4 @@
-"""4 关安全门 · 主宪章 §30.
+"""4 关安全门
 
 关 1: signature_check  (sha256 + ed25519 可选)
 关 2: injection_scan   (prompt 注入扫,复用 scheduler 模块)

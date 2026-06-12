@@ -1,4 +1,4 @@
-"""11 个 LLM-driven AgentRunner 专项 unit test (V1.16-followup, V1.x rollout 收尾).
+"""11 个 LLM-driven AgentRunner 专项 unit test.
 
 覆盖 3 维度 × 11 runner = 33 case (参数化):
 - registration: @register("name") + __init__.py import 双链路 → get_runner(name) 非空
@@ -8,7 +8,7 @@
 - summary 非空: 一行业务摘要存在
   (防 summary 改空 regression, report-generator 下游消费)
 
-模板规则锁定 (V1.17+ 新 AgentRunner 必填):
+模板规则锁定 :
 - 加 1 runner → 更新 ALL_RUNNERS 加 1 行 (name, required_keys)
 - 不加 → 参数化漏覆盖, pytest 不报错但 silent gap
 
@@ -47,27 +47,27 @@ ALL_RUNNERS: list[tuple[str, list[str]]] = [
         ["verdict", "rationale", "metrics", "known_risks", "fallback_plan", "summary_zh", "requires_human_signoff", "signoff_owner"],
     ),
     (
-        "env-manager",  # V1.15.0
+        "env-manager", #
         ["project_name", "target_env", "env_checks", "prep_steps", "dependencies", "risks", "confidence"],
     ),
     (
-        "mobile-tester",  # V1.16.0
+        "mobile-tester", #
         ["project_name", "target_platform", "test_cases", "device_commands", "test_environment", "mobile_specific", "risks", "confidence"],
     ),
     (
-        "visual-tester",  # V1.17.0
+        "visual-tester", #
         ["project_name", "visual_target_type", "visual_test_points", "comparison_scripts", "tolerance", "baseline_strategy", "risks", "confidence"],
     ),
     (
-        "system-tester",  # V1.18.0
+        "system-tester", #
         ["project_name", "system_target_type", "test_cases", "device_commands", "protocol_specific", "test_environment", "risks", "confidence"],
     ),
     (
-        "pentest-tester",  # V1.19.0
+        "pentest-tester", #
         ["project_name", "test_mode", "target_scope", "recon_phase", "vuln_assessment_phase", "exploit_plan", "reporting", "risks", "confidence"],
     ),
     (
-        "automotive-tester",  # V1.20.0 (V1.x rollout 收尾)
+        "automotive-tester", # (rollout 收尾)
         ["project_name", "vehicle_subsystem", "asil_assessment", "test_cases", "bus_test_plan", "adas_scenarios", "ota_plan", "compliance_matrix", "test_environment", "risks", "confidence"],
     ),
 ]

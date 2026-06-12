@@ -1,4 +1,4 @@
-# runtime/exporters 索引(V1.9.0)
+# runtime/exporters 索引
 
 > 用例多格式导出 · 用户自选 · 默认 Excel(已有)+ 3 新格式.
 
@@ -38,7 +38,7 @@ class TestCaseTree:
 
 `testcase-designer` 专家 / `/testcase-design` skill 产此 IR,再 dispatch 到具体 exporter.
 
-## CLI(V1.9 加)
+## CLI
 
 ```bash
 tagent export <plan.json> --format xmind --out workspace/测试用例/login.xmind
@@ -56,7 +56,7 @@ tagent export <plan.json> --format all --out-dir workspace/测试用例/
 - `plantuml`(文本驱动 mindmap)
 - `mermaid-mindmap`(Markdown 嵌入,GitHub 渲染)
 
-## 与主宪章关系
+## 与关系
 
-- §5 多格式 I/O(扩输出端 3 种思维导图格式)
-- §27 简洁优先:**只加用户用得到的 3 格式**(P0+P1),P2 留位
+- 多格式 I/O(扩输出端 3 种思维导图格式)
+- 简洁优先:**只加用户用得到的 3 格式**(P0+P1),P2 留位

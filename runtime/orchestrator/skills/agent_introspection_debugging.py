@@ -1,4 +1,4 @@
-"""agent-introspection-debugging skill · 五维自省分析 (V1.x).
+"""agent-introspection-debugging skill · 五维自省分析 .
 
 职责: 对 agent 行为做五维自省 (决策回放/工具调用/token/上下文/状态机) → 结构化报告。
 """

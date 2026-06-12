@@ -1,6 +1,6 @@
 """eval-harness skill · LLM 读上游 ai-tester 产物 → 4 维度 LLM/AI 评测编排.
 
-V1.27.0 minimum viable (ROADMAP skill rollout #5 落地):
+minimum viable (ROADMAP skill rollout #5 落地):
 - LLM 读 PRD + 上游 ai-tester expert 产物 → 5 阶段评测计划
   (评测配置 / pass@k / 稳定性 / 延迟 / 报告归档)
   + 质量门禁 + 安全护栏

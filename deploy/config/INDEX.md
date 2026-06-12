@@ -29,7 +29,7 @@
 - 真实凭据（`TEST_DB_PASSWORD` / `ZENTAO_PASSWORD` / `WECHAT_WEBHOOK_URL` 等）只放 `.env` 或 GitHub Secrets / Jenkins Credentials
 - 修改 `.env.example` 加新字段时，必须同步 `conftest.py::EnvConfig` 与 `docs/getting-started/配置清单.md`
 
-## 同步链路（宪章§1 同步铁律）
+## 同步链路（宪章同步规则）
 
 修改本目录任一配置文件时，**必须**联动检查：
 

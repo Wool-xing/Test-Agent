@@ -76,7 +76,7 @@ def _validate_evidence_path(path_str: str) -> Path:
 def _persist_evidence(run_id: str, kind: str, data: bytes, key: str) -> dict:
     """DB insert first, then MinIO upload; if upload fails, rollback DB row.
 
-    Charter §18 闭环约定: 防止 MinIO 与 Postgres 不一致 (orphaned file or dangling row).
+    Charter 闭环约定: 防止 MinIO 与 Postgres 不一致 (orphaned file or dangling row).
     """
     import hashlib
 

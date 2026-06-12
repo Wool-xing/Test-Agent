@@ -40,12 +40,12 @@ def analyze_users(users: list[dict]) -> dict:
 
 
 def cut_decision(skill_usage: list[dict]) -> dict:
-    """W3 砍/留 决策(主宪章 §21 + §27 简洁优先).
+    """W3 砍/留 决策.
 
     重度(≥10% 用户): keep + 文档加强
     中度(3-10%):     keep + 不主推
     长尾(<3%):       deprecated 月观察
-    0%:               archive(主宪章 §22 归档不删)
+    0%: archive
     """
     keep_core: list[str] = []
     keep_mid: list[str] = []
@@ -78,7 +78,7 @@ def render_md(user_stats: dict, cuts: dict, output: Path) -> None:
         f"- 行业 top:{user_stats['industries']}",
         f"- 团队规模:{user_stats['team_sizes']}",
         f"- 来源渠道:{user_stats['channels']}",
-        f"\n## Skill 决策(主宪章 §21 §27)\n",
+        f"\n## Skill 决策\n",
     ]
     for k, v in cuts.items():
         lines.append(f"\n### {k}({len(v)} 项)")
@@ -88,7 +88,7 @@ def render_md(user_stats: dict, cuts: dict, output: Path) -> None:
         "1. **keep_core**:文档加强 + demo gif + 教学视频\n"
         "2. **keep_mid**:不主推,留\n"
         "3. **deprecate**:30 天观察期;再无人用 → 转 archive\n"
-        "4. **archive**:`marketplace/.archive/` 归档(主宪章 §22 不可逆禁止)\n"
+        "4. **archive**:`marketplace/.archive/` 归档\n"
     )
     output.write_text("\n".join(lines), encoding="utf-8")
 

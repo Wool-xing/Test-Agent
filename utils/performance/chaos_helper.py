@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use chaos_helper_v2 instead. This file will be removed in V1.2.
+# DEPRECATED: use chaos_helper_v2 instead. This file will be removed in
 """
 混沌工程：故障注入（CPU/内存/磁盘/网络/进程杀死）
 被引用方：16-可靠性稳定性 agent / chaos-test skill

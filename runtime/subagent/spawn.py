@@ -29,7 +29,7 @@ def spawn(task: Callable[..., Any], *args, **kwargs) -> concurrent.futures.Futur
 def fanout(tasks: list[Callable[..., Any]], *, timeout: float = 600.0) -> list[SubagentResult]:
     """Run multiple subagent tasks in parallel; collect results in submission order.
 
-    Charter §21 横切准则:
+    Charter 横切准则:
       - 失败隔离:任一子任务 crash 不影响其他
       - 测试预算:总 timeout 上限
     """

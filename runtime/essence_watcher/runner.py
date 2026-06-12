@@ -1,7 +1,7 @@
 """Essence watcher main runner.
 
 CLI:  python -m runtime.essence_watcher.runner
-Cron: 接入 runtime/scheduler 由 cron 触发(主宪章 §22)
+Cron: 接入 runtime/scheduler 由 cron 触发
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from runtime.essence_watcher.tracker import detect_changes
 
 def run() -> dict:
     """Main entry. Returns summary of changes detected + reports written."""
-    # Safe-by-default gate (charter §24)
+    # Safe-by-default gate (charter )
     if not is_allowed("essence_watcher.enabled"):
         raise SafeByDefaultBlocked(op="essence_watcher.run", key_path="essence_watcher.enabled")
 

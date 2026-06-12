@@ -13,7 +13,7 @@ authority:
 confidence: high
 last_reviewed: 2026-05-12
 reviewer: agent-curator
-when_to_use: 任何项目;主宪章 §17 测试架构 7 层左移
+when_to_use: 任何项目;测试架构 7 层左移
 common_pitfall:
   - "只测开发末端 → 修复成本爆炸"
   - "需求阶段不评审 → 测试用例无所依"

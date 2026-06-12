@@ -39,7 +39,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
-    reset_upstream_cache()  # V1.14 主宪章 §40 — 每 run 清 runner 间产物缓存
+    reset_upstream_cache() # 每 run 清 runner 间产物缓存
     decision = RoutingDecision.model_validate(decision_dict)
     ordered: list[DAGNode] = decision.topological()
     log.info("flow start: run_id={} nodes={}", run_id, len(ordered))
@@ -91,7 +91,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
     # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
-        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+        if not r.get("ok") and "[rollout]" in (r.get("stderr_tail") or "")
     ] + skipped
 
     summary = {

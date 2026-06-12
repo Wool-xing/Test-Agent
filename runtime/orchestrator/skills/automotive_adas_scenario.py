@@ -1,4 +1,4 @@
-"""automotive-adas-scenario · ADAS 场景库测试编排 (V1.31.0)."""
+"""automotive-adas-scenario · ADAS 场景库测试编排 ."""
 from __future__ import annotations
 
 from pathlib import Path

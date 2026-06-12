@@ -1,6 +1,6 @@
 ---
 name: verification-loop
-description: "5-phase 验证循环 Skill:build → typecheck → lint → test → coverage。任意失败 STOP + 修。派生自 ECC 同名 skill(主宪章 §28)。PR 前 / 质量门禁前 / refactor 后必跑。"
+description: "5-phase 验证循环 Skill:build → typecheck → lint → test → coverage。任意失败 STOP + 修。派生自 ECC 同名 skill。PR 前 / 质量门禁前 / refactor 后必跑。"
 tools: Read, Write, Bash, Grep, Glob
 SKILL_IMPL_STATUS: production
 ---
@@ -11,7 +11,7 @@ SKILL_IMPL_STATUS: production
 
 - feature 完成后
 - PR 提交前
-- 质量门禁前(主宪章 §17 五层门禁)
+- 质量门禁前
 - refactor 后
 - darwin-skill 评分前
 
@@ -48,16 +48,16 @@ pytest runtime/tests/ -v 2>&1 | tail -50
 ```bash
 pytest --cov=runtime --cov-report=term-missing 2>&1 | tail -30
 ```
-对比 §17 regression 门槛 cov ≥ 80%
+对比 regression 门槛 cov ≥ 80%
 
-## 与主宪章融合
+## 与融合
 
-- §17 五层门禁:本 skill 是**进 smoke → regression** 的前置
-- §18-14 修改四关:四关 = 本 skill 4 阶段简化版
-- §21 横切可复现性:失败必固定 seed + snapshot
+- 五层门禁:本 skill 是**进 smoke → regression** 的前置
+- 修改四关:四关 = 本 skill 4 阶段简化版
+- 横切可复现性:失败必固定 seed + snapshot
 
 ## 不做
 
-- 不跳阶段(主宪章 §21 跳阶段 = 测试不诚信)
+- 不跳阶段
 - 不忽略 type 错误"等会儿再修"
 - 不静默吞 lint warning(--fix 默认开)

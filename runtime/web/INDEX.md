@@ -1,7 +1,7 @@
-# runtime/web 索引 (V1.0.0)
+# runtime/web 索引
 
 > Web UI for `runtime/api`. 4 页:Upload / Run Status / Report / Catalog。
-> 被测项级别 §21 **L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。
+> 被测项级别 **L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。
 
 ## 技术栈
 
@@ -49,7 +49,7 @@ npm run test:a11y    # axe-core 可访问性扫
 | Catalog | `GET /catalog` |
 | Health | `GET /health` |
 
-## §21 必测项(L2 级)
+## 必测项(L2 级)
 
 - 功能正常路径:上传→看 DAG→看报告
 - 边界:超大文件/空文本/超长 run_id

@@ -5,7 +5,7 @@
 > **维护原则**：决策入档、开放问题入档、不打脸的承诺才写。重大决策须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。
 
 **项目名称**：`Test-Agent`（内部代号 `test-agent-team`）
-**当前阶段**：Phase 2 前期（V1.0.0 · 16 expert + 32/32 skill active (11 production + 5 script-backed) + 0 rollout + 0 vision）
+**当前阶段**：Phase 2 前期（16 expert + 32/32 skill active (11 production + 5 script-backed) + 0 rollout + 0 vision）
 **版本**：V1.0.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-06-04
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）

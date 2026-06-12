@@ -1,4 +1,4 @@
-"""Global ThreadPool for subagent tasks (hermes §1.3 pattern)."""
+"""Global ThreadPool for subagent tasks (hermes pattern)."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def resize_pool(max_workers: int) -> None:
     """Replace the pool with a new one sized to `max_workers`.
 
     Safe to call before tasks are submitted; existing tasks finish on the old pool.
-    Charter §21 横切预算:避免大并发饥饿。
+    Charter 横切预算:避免大并发饥饿。
     """
     global _executor
     with _lock:

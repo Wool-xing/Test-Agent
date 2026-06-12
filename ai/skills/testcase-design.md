@@ -1,6 +1,6 @@
 ---
 name: testcase-design
-description: 快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选：默认 Excel（4 Sheet），可选 xmind / markmap / opml 思维导图（V1.9 加），或 --format all 一键产全部。适用于用例评审、快速梳理测试点。
+description: 快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选：默认 Excel（4 Sheet），可选 xmind / markmap / opml 思维导图，或 --format all 一键产全部。适用于用例评审、快速梳理测试点。
 tools: Read, Write, Grep, Glob
 SKILL_IMPL_STATUS: production
 ---
@@ -82,7 +82,7 @@ P1 主要用例（12 条）：
 - **Sheet3 P0冒烟集**：仅 P0 用例（带前置条件、数据）
 - **Sheet4 P0_P1回归集**：P0+P1 用例
 
-### 思维导图 / 大纲（V1.9 加，按需）
+### 思维导图 / 大纲
 
 `runtime/exporters/` 已注册 3 个 exporter，用户自选；同一 TestCaseTree 一份 IR，三种落盘：
 

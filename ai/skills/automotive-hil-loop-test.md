@@ -17,7 +17,7 @@ SKILL_IMPL_STATUS: production
 | **PIL** | Processor-in-the-Loop | 真 ECU + 仿真环境 |
 | **HIL** | Hardware-in-the-Loop | **真 ECU + 真 I/O**(模拟外设)|
 
-**ASIL C / D 必经 HIL**(主宪章 §21 L4 极深);ASIL A/B 可 PIL 替代。
+**ASIL C / D 必经 HIL**;ASIL A/B 可 PIL 替代。
 
 ## HIL 平台
 
@@ -39,7 +39,7 @@ SKILL_IMPL_STATUS: production
 
 - 格式:**MDF 4.x** / MF4(AUTOSAR 标准)
 - 工具:Vector CANape / ASAM ODS
-- 必含 seed + 算法版本 + ECU 固件 hash + 仿真版本(主宪章 §21 可复现性)
+- 必含 seed + 算法版本 + ECU 固件 hash + 仿真版本
 
 ## 输出
 

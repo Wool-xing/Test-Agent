@@ -1,5 +1,5 @@
 {
-  "_comment": "Marketplace registry · 4 lane(skills/agents/mcp/hooks)· 主宪章 §30. 初始为空,装时由 tagent install 写入.",
+  "_comment": "Marketplace registry · 4 lane(skills/agents/mcp/hooks)
   "version": "1.0",
   "last_updated": "2026-05-12",
   "entries": []

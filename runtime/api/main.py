@@ -126,7 +126,7 @@ def catalog() -> CatalogResponse:
 
 @app.post("/run/text", response_model=RunCreated)
 def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", lang: str = "zh") -> RunCreated:
-    # Charter §23 mode+lang per-request
+    # Charter mode+lang per-request
     from runtime.tutor.i18n import set_lang
     from runtime.tutor.verbosity import set_mode
 

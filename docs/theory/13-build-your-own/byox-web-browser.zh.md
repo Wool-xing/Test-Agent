@@ -27,4 +27,4 @@ reading_en: ["https://browser.engineering/"]
 - **视觉回归**:理解 layout/paint → 知道为什么字体抖动 / DPR / 动画导致 SSIM 不稳
 - **Web Vitals**(LCP/FID/CLS/INP):懂渲染管线才能优化
 - **selector 失效**(M1-10 web-demo bug):懂 DOM 才知道用 `role` / `text` 而非 CSS class
-- **§28 ECC e2e-testing skill** 落地的底层
+- **ECC e2e-testing skill** 落地的底层

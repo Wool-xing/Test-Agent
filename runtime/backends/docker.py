@@ -1,4 +1,4 @@
-"""Docker backend (hermes §1.4). Wraps `docker exec` for a named container."""
+"""Docker backend (hermes ). Wraps `docker exec` for a named container."""
 
 from __future__ import annotations
 

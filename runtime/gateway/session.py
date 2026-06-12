@@ -1,4 +1,4 @@
-"""Cross-platform session continuity (hermes §1.5).
+"""Cross-platform session continuity (hermes ).
 
 Stores conversation handles keyed by (user, app_session); each platform may attach
 its native chat_id so a user moving Telegram → Slack still finds the same context.

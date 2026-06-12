@@ -1,7 +1,7 @@
 # essence_watcher 索引
 
 > 自动追踪 upstream reference 引用的所有 upstream repo 更新。
-> 主宪章 §29 教学层加固之 essence 自动汲取。
+> 教学层加固之 essence 自动汲取。
 
 ## 文件清单
 
@@ -26,7 +26,7 @@
    d. 标 confidence: llm-draft-unreviewed
 5. 应用 policy.yaml:
    - skill-related delta → 提议入 skills/
-   - rule-related delta → 提议入主宪章 § 待审
+   - rule-related delta → 提议入待审
    - 其他 → 仅入 upstream 不动 Test-Agent
 ```
 
@@ -47,9 +47,9 @@ essence_watcher:
 # 哪些 delta 自动提议入 Test-Agent
 auto_propose:
   - skill_definitions          # 新 skill 名字 / 描述 / 元数据 → 提议 skills/
-  - charter_rules             # 主宪章规则更新 → 提议 主宪章
-  - safety_patterns           # 防护模式 → 提议 §24 safe-by-default
-  - test_methodology          # 测试方法论新增 → 提议 §17/§21
+  - charter_rules # 规则更新 → 提议
+  - safety_patterns # 防护模式 → 提议 safe-by-default
+  - test_methodology # 测试方法论新增 → 提议 /
 
 # 仅入精髓库,不动 Test-Agent
 essence_only:
