@@ -106,7 +106,7 @@ jobs:
 
       - name: 上传契约产物
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: contracts
           path: workspace/contracts/
@@ -202,7 +202,7 @@ jobs:
 
       - name: 上传 install.log (失败时排错用)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos-install-log
           path: /tmp/install.log
