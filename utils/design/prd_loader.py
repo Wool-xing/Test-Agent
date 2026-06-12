@@ -278,8 +278,9 @@ def _load_url(url: str) -> Dict:
     """
     import requests
     headers = {"User-Agent": "Mozilla/5.0 PRDLoader/1.0"}
-    if os.getenv("PRD_HTTP_TOKEN"):
-        headers["Authorization"] = f"Bearer {os.environ['PRD_HTTP_TOKEN']}"
+    token = os.getenv("TAGENT_PRD_HTTP_TOKEN") or os.getenv("PRD_HTTP_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
 
     r = requests.get(url, headers=headers, timeout=20)
     r.raise_for_status()

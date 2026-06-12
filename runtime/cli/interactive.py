@@ -2,7 +2,7 @@
 
 Bare `tagent` enters interactive session:
   - Natural language → LLM routing → streaming activity feed
-  - /command  → slash dispatch with Tab completion + history
+  - !command → command dispatch with Tab completion + history
   - ↑↓ arrows → command history
   - Ctrl+C    → interrupt (REPL stays alive)
   - Ctrl+D    → quit (auto-saves session)
@@ -35,7 +35,7 @@ _SHEEP = r"""
 
   ૮₍˶ᵔ ᗜ ᵔ˶₎ა  Test-Agent v{version}
   AI Router · {experts} Experts · {skills} Skills
-  Type /help for commands, or describe your test task."""
+  Type !help for commands, or describe your test task."""
 
 _SESSION_DIR = _Path(__file__).resolve().parents[2] / "workspace" / "gateway"
 _SESSION_FILE = _SESSION_DIR / "active_session.json"
@@ -199,14 +199,24 @@ def _print_banner() -> None:
     except Exception:
         pass  # use default _SHEEP
 
-    # Animated typewriter reveal
+    # Animated typewriter reveal — speed from skin config
     try:
+        from runtime.cli.skins import get_skin, get_current_skin_name
+        skin = get_skin(get_current_skin_name())
+        animation_speed = skin.get("animation_speed", 0.0005)
+        text_style = skin.get("panel_style", {}).get("text", "bold white")
+    except Exception:
+        animation_speed = 0.0005
+        text_style = "bold white"
+    try:
+        from rich.markup import render as _render_markup
         accumulated = Text("")
         with Live(accumulated, console=console, refresh_per_second=120, transient=False) as live:
             for ch in banner:
-                accumulated.append_text(Text(ch, style="bold white"))
-                live.update(accumulated)
-                time.sleep(0.0005)
+                accumulated.append(ch)
+                # Re-render with markup so colors appear inline
+                live.update(Text.from_markup(str(accumulated)))
+                time.sleep(animation_speed)
     except Exception:
         # Fallback: plain print if terminal doesn't support Live
         console.print(banner)
@@ -219,74 +229,74 @@ def _print_help() -> None:
 
     groups = [
         ("Run", [
-            ("/task add|list|done|start", "Manage task list with criteria"),
-            ("/test  <target>", "Full 11-step test pipeline"),
-            ("/run   <target>", "Plan + execute (quick)"),
-            ("/plan  <target>", "Plan only, no execution"),
+            ("!task add|list|done|start", "Manage task list with criteria"),
+            ("!test  <target>", "Full 11-step test pipeline"),
+            ("!run   <target>", "Plan + execute (quick)"),
+            ("!plan  <target>", "Plan only, no execution"),
         ]),
         ("Data & API", [
-            ("/data users|related <N>", "Generate test data"),
-            ("/api gen|test", "OpenAPI contract testing"),
-            ("/cross env <e1> <e2>", "Cross-environment test run"),
+            ("!data users|related <N>", "Generate test data"),
+            ("!api gen|test", "OpenAPI contract testing"),
+            ("!cross env <e1> <e2>", "Cross-environment test run"),
         ]),
         ("Quality", [
-            ("/regression", "Regression detection vs baseline"),
-            ("/flaky list|quarantine", "Flaky test management"),
-            ("/prioritize", "Prioritize by git changes"),
-            ("/clean", "Clean temp data (preserves deliverables)"),
+            ("!regression", "Regression detection vs baseline"),
+            ("!flaky list|quarantine", "Flaky test management"),
+            ("!prioritize", "Prioritize by git changes"),
+            ("!clean", "Clean temp data (preserves deliverables)"),
         ]),
         ("Info", [
-            ("/update", "Check for newer version"),
-            ("/progress", "Test coverage matrix"),
-            ("/status", "Session, model, conversation stats"),
-            ("/tools", "List agents + skills with status"),
-            ("/ls", "Quick list experts + skills"),
-            ("/doctor [--agents]", "Environment health check"),
-            ("/ready", "Release readiness score"),
+            ("!update", "Check for newer version"),
+            ("!progress", "Test coverage matrix"),
+            ("!status", "Session, model, conversation stats"),
+            ("!tools", "List agents + skills with status"),
+            ("!ls", "Quick list experts + skills"),
+            ("!doctor [--agents]", "Environment health check"),
+            ("!ready", "Release readiness score"),
         ]),
         ("Control", [
-            ("/model [provider] [model]", "Switch LLM (Tab to complete)"),
-            ("/lang [zh|en|zh-en]", "Switch UI language"),
-            ("/skin [name]", "Switch CLI theme (4 skins)"),
-            ("/fc", "Fix last typo (like thefuck)"),
-            ("/! /1..9", "Command history / re-run"),
-            ("/alias add|list", "Command shortcuts"),
-            ("/personality [name]", "Set agent persona (loads expert)"),
-            ("/clear", "Reset conversation memory"),
-            ("/undo", "Remove last exchange from memory"),
-            ("/retry", "Re-run last prompt after undo"),
-            ("/setup [--preset]", "Generate config files"),
-            ("/check [--e2e]", "Framework self-test"),
+            ("!model [provider] [model]", "Switch LLM (Tab to complete)"),
+            ("!lang [zh|en|zh-en]", "Switch UI language"),
+            ("!skin [name]", "Switch CLI theme (4 skins)"),
+            ("!fc", "Fix last typo (like thefuck)"),
+            ("!1..9", "Command history / re-run"),
+            ("!alias add|list", "Command shortcuts"),
+            ("!personality [name]", "Set agent persona (loads expert)"),
+            ("!clear", "Reset conversation memory"),
+            ("!undo", "Remove last exchange from memory"),
+            ("!retry", "Re-run last prompt after undo"),
+            ("!setup [--preset]", "Generate config files"),
+            ("!check [--e2e]", "Framework self-test"),
         ]),
         ("Automation", [
-            ("/hook add|list|prebuilt", "Lifecycle hooks (before/after/error)"),
+            ("!hook add|list|prebuilt", "Lifecycle hooks (before/after/error)"),
         ]),
         ("Learning", [
-            ("/distill", "Save last execution as reusable skill"),
+            ("!distill", "Save last execution as reusable skill"),
         ]),
         ("Memory", [
-            ("/remember <fact>", "Save fact to MEMORY.md"),
-            ("/forget <keyword>", "Remove facts by keyword"),
-            ("/nudge", "Scan session for facts worth remembering"),
-            ("/memory", "Show MEMORY.md contents"),
+            ("!remember <fact>", "Save fact to MEMORY.md"),
+            ("!forget <keyword>", "Remove facts by keyword"),
+            ("!nudge", "Scan session for facts worth remembering"),
+            ("!memory", "Show MEMORY.md contents"),
         ]),
         ("Workspace", [
-            ("/ws add|list|switch|auto", "Manage project workspaces"),
+            ("!ws add|list|switch|auto", "Manage project workspaces"),
         ]),
         ("Gateway", [
-            ("/gateway", "IM platform connection status"),
+            ("!gateway", "IM platform connection status"),
         ]),
         ("Session", [
-            ("/cost", "Token usage and cost estimate"),
-            ("/cache [clear]", "LLM response cache stats/clear"),
-            ("/insights [days]", "Cross-session usage analytics"),
-            ("/sessions", "List saved sessions"),
-            ("/resume <id>", "Load a saved session"),
-            ("/export", "Export conversation to markdown"),
-            ("/compact", "Summarize and compress context"),
-            ("/context", "Full conversation history"),
-            ("/help", "This help"),
-            ("/quit  (Ctrl+D)", "Save session and exit"),
+            ("!cost", "Token usage and cost estimate"),
+            ("!cache [clear]", "LLM response cache stats/clear"),
+            ("!insights [days]", "Cross-session usage analytics"),
+            ("!sessions", "List saved sessions"),
+            ("!resume <id>", "Load a saved session"),
+            ("!save", "Export conversation to markdown"),
+            ("!compact", "Summarize and compress context"),
+            ("!context", "Full conversation history"),
+            ("!help", "This help"),
+            ("!quit  (Ctrl+D)", "Save session and exit"),
         ]),
     ]
 
@@ -337,7 +347,7 @@ def _diagnose_error(exc: Exception) -> str | None:
     # Invalid request / bad gateway from LLM
     if any(k in _msg for k in ("500", "502", "503", "internal", "bad gateway")):
         provider = _current_provider()
-        return f"{provider} service returned a server error. The provider may be down — try again or switch with [cyan]/model[/]."
+        return f"{provider} service returned a server error. The provider may be down — try again or switch with [cyan]!model[/]."
 
     # General: give the error message itself as info, with next steps
     return None
@@ -452,7 +462,7 @@ def _handle_natural_language(text: str) -> None:
             ds = decision.model_dump() if hasattr(decision, "model_dump") else {}
             nodes = ds.get("dag", ds.get("nodes", []))
             if len(set(n.get("kind", "") for n in nodes)) >= 2:
-                # Stash trace for /distill command
+                # Stash trace for !distill command
                 _last_trace = (text, ds)
                 console.print("  [dim]💡 Multi-agent pattern detected. Run [cyan]/distill[/] to save as reusable skill.[/]")
 
@@ -494,9 +504,9 @@ def _handle_natural_language(text: str) -> None:
             console.print(f"  [yellow]💡 {_hint}[/]")
         elif _err_msg:
             console.print(f"  [dim]{_err_msg}[/]")
-            console.print("  [dim]Run [cyan]/help[/] for commands, [cyan]/doctor[/] for health check.[/]")
+            console.print("  [dim]Run [cyan]!help[/] for commands, [cyan]!doctor[/] for health check.[/]")
         else:
-            console.print("  [dim]Run [cyan]/doctor[/] to check environment, [cyan]/help[/] for commands.[/]")
+            console.print("  [dim]Run [cyan]!doctor[/] to check environment, [cyan]!help[/] for commands.[/]")
 
         mem.add("assistant", f"[Error: {type(_exc).__name__}]")
 
@@ -507,7 +517,7 @@ def _handle_natural_language(text: str) -> None:
 # ── Slash Dispatch ─────────────────────────────────────────────
 
 def _handle_slash(text: str) -> None:
-    parts = text.lstrip("/").strip().split(maxsplit=1)
+    parts = text.lstrip("!").strip().split(maxsplit=1)
     name = parts[0].lower()
     args = parts[1] if len(parts) > 1 else ""
 
@@ -530,7 +540,7 @@ def _handle_slash(text: str) -> None:
                 f"[dim]Did you mean [/][cyan]/{suggestion}[/][dim]? Run [/][cyan]/fc[/][cyan][/][dim] to fix.[/]"
             )
         else:
-            console.print(f"[red]Unknown: /{name}[/]  [dim](/help for commands)[/]")
+            console.print(f"[red]Unknown: /{name}[/]  [dim](!help for commands)[/]")
         return
 
     try:
@@ -548,7 +558,7 @@ def _handle_slash(text: str) -> None:
         else:
             err_msg = str(_exc)[:200]
             console.print(f"[red]✗ {type(_exc).__name__}: {err_msg}[/]")
-            console.print("[dim]/help for commands, /doctor for health check.[/]")
+            console.print("[dim]!help for commands, !doctor for health check.[/]")
 
 
 def _save_session() -> None:
@@ -720,8 +730,8 @@ def start() -> None:
         if not user_input:
             continue
 
-        # Multi-line detection: code blocks + /ml command
-        if user_input.strip() == "/ml" or user_input.strip() == "/multiline":
+        # Multi-line detection: code blocks + !ml command
+        if user_input.strip() == "!ml" or user_input.strip() == "!multiline":
             user_input = _read_multiline(session)
             if not user_input:
                 continue
@@ -730,7 +740,7 @@ def start() -> None:
             pass
 
         # Alias expansion: check non-slash input against aliases
-        if not user_input.startswith("/"):
+        if not user_input.startswith("!"):
             from runtime.cli.aliases import expand_alias
             expanded = expand_alias(user_input)
             if expanded:
@@ -738,13 +748,13 @@ def start() -> None:
                 user_input = expanded
 
         # Record in command history (non-slash only)
-        if not user_input.startswith("/"):
+        if not user_input.startswith("!"):
             _cmd_history.append(user_input)
             if len(_cmd_history) > 10:
                 _cmd_history.pop(0)
 
         try:
-            if user_input.startswith("/"):
+            if user_input.startswith("!"):
                 _handle_slash(user_input)
             else:
                 _handle_natural_language(user_input)
@@ -752,4 +762,4 @@ def start() -> None:
             break
         except Exception as exc:
             console.print(f"[red]Error: {exc}[/]")
-            console.print("[dim]REPL continuing — /help for commands.[/]")
+            console.print("[dim]REPL continuing — !help for commands.[/]")

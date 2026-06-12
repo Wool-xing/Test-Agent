@@ -6,11 +6,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-_utils_dir = Path(__file__).resolve().parents[2] / "utils"
-if str(_utils_dir) not in sys.path:
-    sys.path.insert(0, str(_utils_dir))
+# utils package installed via pip install -e runtime/
 
-from i18n_checker import (  # noqa: E402
+from utils.a11y_i18n.i18n_checker import (  # noqa: E402
     audit_sacred_contexts,
     audit_taboo_colors,
     audit_taboo_holidays,

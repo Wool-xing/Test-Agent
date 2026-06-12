@@ -264,15 +264,13 @@ jobs:
 
       - name: 核心 utils 导入测试
         run: |
-          cd utils
           python -c "
-          import sys, os
-          sys.path.insert(0, '.')
+          import sys
           modules = [
-              'protocols.api_retry_util', 'data.data_factory', 'data.data_masking',
-              'reporting.excel_generator', 'quality.flaky_detector', 'performance.jmeter_csv_exporter',
-              'performance.jmeter_result_parser', 'infra.regression_scope',
-              'quality.ci_quality_gate', 'design.prd_loader',
+              'utils.protocols.api_retry_util', 'utils.data.data_factory', 'utils.data.data_masking',
+              'utils.reporting.excel_generator', 'utils.quality.flaky_detector', 'utils.performance.jmeter_csv_exporter',
+              'utils.performance.jmeter_result_parser', 'utils.infra.regression_scope',
+              'utils.quality.ci_quality_gate', 'utils.design.prd_loader',
           ]
           failed = []
           for m in modules:
@@ -418,6 +416,8 @@ jobs:
           python -m pytest runtime/tests/ \
             --ignore=runtime/tests/test_router_real.py \
             --ignore=runtime/tests/test_smoke_e2e.py \
+            --cov=runtime --cov=utils \
+            --cov-report=term --cov-report=html \
             -p no:cacheprovider \
             -v --tb=short
           echo "✅ pytest 单元测试全过"

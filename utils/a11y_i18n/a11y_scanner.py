@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+# DEPRECATED: use a11y_scanner_v2 instead. This file will be removed in V1.2.
 """
 无障碍 / Accessibility 测试（WCAG 2.1）
 被引用方：UX / 易用性 / 合规

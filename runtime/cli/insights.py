@@ -50,6 +50,8 @@ def collect_stats(days: int = 30) -> list[SessionStats]:
         except (json.JSONDecodeError, OSError):
             continue
 
+        if not isinstance(data, dict):
+            continue
         messages = data.get("messages", [])
         if not messages:
             continue

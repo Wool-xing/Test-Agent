@@ -12,7 +12,7 @@ from runtime.tutor.i18n import Lang, set_lang
 from runtime.tutor.verbosity import Mode, set_mode
 
 
-def register_run(app: typer.Typer) -> None:
+def register(app: typer.Typer) -> None:
     @app.command()
     def run(
         target: str = typer.Argument(..., help="path / url / free-form text"),

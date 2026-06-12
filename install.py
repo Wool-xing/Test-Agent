@@ -15,6 +15,12 @@
     python install.py --update                         # 轻量更新当前目录
     python install.py /path/to/project --update        # 轻量更新指定目录
 
+开发者本地部署（无需 GitHub）：
+    将 install.py 放在源码仓库根目录（与 ai/ runtime/ utils/ 同级），直接运行即可：
+        python install.py /path/to/deploy-target
+    脚本自动检测到 ai/agents/ + runtime/ + utils/ 后跳过 git clone，
+    直接从本地源码拷贝到目标目录。
+
 安全提示：不要 pipe-to-python。先下载再审查后执行：
     curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
     python install.py /path/to/your-test-project
@@ -22,7 +28,7 @@
 环境变量（可选）：
     TEST_AGENT_REPO_URL      仓库 URL
     TEST_AGENT_REPO_BRANCH   分支名（默认 main）
-    TEST_AGENT_LOCAL_SRC     CI 用：本地源码路径，跳过 git clone
+    TEST_AGENT_LOCAL_SRC     显式指定本地源码路径（自动检测失败时兜底）
     TEST_AGENT_NO_CN_MIRROR  设为 1 跳过清华 PyPI 镜像
 """
 
@@ -84,6 +90,13 @@ if IS_WINDOWS and len(PROJECT_ROOT) >= 2 and PROJECT_ROOT[1] == ":":
         sys.exit(1)
 REPO_URL = os.environ.get("TEST_AGENT_REPO_URL", "https://github.com/Wool-xing/Test-Agent.git")
 REPO_BRANCH = os.environ.get("TEST_AGENT_REPO_BRANCH", "main")
+
+# 源码根目录标记（用于自动检测本地开发环境）
+_SOURCE_MARKERS = [
+    os.path.join("ai", "agents"),
+    "runtime",
+    "utils",
+]
 
 PRESERVE_FILES = [
     ".env",
@@ -233,6 +246,32 @@ def _print_manual_hint(missing):
         if m in hints:
             print(f"  {hints[m]}")
     print("→ 安装完成后重新运行: python install.py")
+
+
+def _detect_source_dir():
+    """检测本地源码目录。
+
+    优先级：
+    1. TEST_AGENT_LOCAL_SRC 环境变量（显式覆盖）
+    2. 自动检测：install.py 所在目录是否包含源码标记（ai/agents/, runtime/, utils/）
+
+    Returns:
+        (source_dir, is_local) — is_local=True 时可直接用源码，无需 clone。
+    """
+    # 显式覆盖
+    local_src = os.environ.get("TEST_AGENT_LOCAL_SRC")
+    if local_src:
+        if not os.path.isdir(local_src):
+            print(f"❌ TEST_AGENT_LOCAL_SRC 指向的目录不存在: {local_src}")
+            sys.exit(1)
+        return os.path.abspath(local_src), True
+
+    # 自动检测：install.py 所在目录是否就是源码仓库根目录
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    for marker in _SOURCE_MARKERS:
+        if not os.path.isdir(os.path.join(script_dir, marker)):
+            return None, False
+    return script_dir, True
 
 
 def find_python():
@@ -706,7 +745,7 @@ def _update_deps(project_root):
 
 
 def do_update():
-    """轻量更新：克隆最新模板 → 比较版本 → 拷贝文件 → 更新依赖 → 保留用户数据。"""
+    """轻量更新：获取最新模板 → 比较版本 → 拷贝文件 → 更新依赖 → 保留用户数据。"""
     version_file = os.path.join(PROJECT_ROOT, "VERSION")
     legacy_file = os.path.join(PROJECT_ROOT, ".version")
     # Migration: rename legacy .version to VERSION if VERSION is missing
@@ -725,21 +764,23 @@ def do_update():
 
     print(f"→ 当前版本: {local_version}")
 
-    template_dir_parent = tempfile.mkdtemp()
-    template_dir = os.path.join(template_dir_parent, "Test-Agent")
+    # 检测源码来源
+    source_dir, is_local = _detect_source_dir()
+
+    if is_local:
+        template_dir = source_dir
+        template_dir_parent = None
+        print(f"→ [本地源码] 从 {source_dir} 部署更新")
+    else:
+        template_dir_parent = tempfile.mkdtemp()
+        template_dir = os.path.join(template_dir_parent, "Test-Agent")
+        print("→ 检查更新...")
+        subprocess.run(
+            ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
+            check=True,
+        )
 
     try:
-        local_src = os.environ.get("TEST_AGENT_LOCAL_SRC")
-        if local_src:
-            print(f"→ [dev mode] 复制本地源代码: {local_src} → {template_dir}")
-            shutil.copytree(local_src, template_dir)
-        else:
-            print("→ 检查更新...")
-            subprocess.run(
-                ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
-                check=True,
-            )
-
         remote_version = _read_template_version(template_dir)
         if remote_version is None:
             print("❌ 无法读取远程版本信息")
@@ -822,10 +863,8 @@ def do_update():
         print("=" * 50)
 
     finally:
-        if os.path.isdir(template_dir_parent):
+        if template_dir_parent is not None and os.path.isdir(template_dir_parent):
             shutil.rmtree(template_dir_parent, onerror=_rmtree_onerror)
-        # cleanup backup tmp if any leftover (restore_user_data usually handles this)
-        # handled in finally block of main, but do_update has its own finally
 
 
 def main():
@@ -843,34 +882,34 @@ def main():
     # 2. 幂等备份
     backed = backup_user_data(PROJECT_ROOT)
 
-    template_dir_parent = tempfile.mkdtemp()
-    template_dir = os.path.join(template_dir_parent, "Test-Agent")
+    # 3. 获取模板来源（本地源码自动检测 → 跳过 clone 和临时目录）
+    source_dir, is_local = _detect_source_dir()
+
+    if is_local:
+        template_dir = source_dir
+        template_dir_parent = None
+        print(f"→ [本地源码] 从 {source_dir} 部署")
+    else:
+        template_dir_parent = tempfile.mkdtemp()
+        template_dir = os.path.join(template_dir_parent, "Test-Agent")
+        print(f"→ 从 GitHub 克隆模板...")
+        print(f"   {REPO_URL} ({REPO_BRANCH})")
+        try:
+            subprocess.run(
+                ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
+                check=True, timeout=120,
+            )
+        except subprocess.TimeoutExpired:
+            print("❌ Git 克隆超时（>120 秒），请检查网络或使用本地模式：")
+            print(f"   直接将 install.py 放到源码仓库根目录运行即可自动识别")
+            sys.exit(1)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Git 克隆失败: {e}")
+            print(f"   仓库: {REPO_URL}")
+            print(f"   可将 install.py 放到源码仓库根目录运行，自动识别本地源码")
+            sys.exit(1)
 
     try:
-        # 3. 获取模板
-        local_src = os.environ.get("TEST_AGENT_LOCAL_SRC")
-        if local_src:
-            print(f"→ [dev mode] 复制本地源代码: {local_src} → {template_dir}")
-            shutil.copytree(local_src, template_dir)
-        else:
-            print(f"→ 从 GitHub 克隆模板...")
-            print(f"   {REPO_URL} ({REPO_BRANCH})")
-            try:
-                subprocess.run(
-                    ["git", "clone", "--depth", "1", "--branch", REPO_BRANCH, REPO_URL, template_dir],
-                    check=True, timeout=120,
-                )
-            except subprocess.TimeoutExpired:
-                print("❌ Git 克隆超时（>120 秒），请检查网络或使用本地模式：")
-                print(f"   set TEST_AGENT_LOCAL_SRC={os.getcwd()}")
-                print(f"   python install.py <目标目录>")
-                sys.exit(1)
-            except subprocess.CalledProcessError as e:
-                print(f"❌ Git 克隆失败: {e}")
-                print(f"   仓库: {REPO_URL}")
-                print(f"   可以尝试本地模式：set TEST_AGENT_LOCAL_SRC={os.getcwd()}")
-                sys.exit(1)
-
         # 4. 安装 Claude Code
         if shutil.which("claude") is None:
             print("→ 安装 Claude Code...")
@@ -895,10 +934,10 @@ def main():
         # 8. 创建 tagent.bat / tagent 包装脚本
         _create_wrappers(PROJECT_ROOT)
 
-        # 10. 恢复用户数据
+        # 9. 恢复用户数据
         restore_user_data(PROJECT_ROOT, backed)
 
-        # 11. 写入 VERSION 供后续更新检测
+        # 10. 写入 VERSION 供后续更新检测
         version = _read_template_version(template_dir)
         if version:
             _write_local_version(PROJECT_ROOT, version)
@@ -911,8 +950,8 @@ def main():
         traceback.print_exc()
 
     finally:
-        # 清理临时目录
-        if os.path.isdir(template_dir_parent):
+        # 仅清理远程 clone 的临时目录（本地源码不删）
+        if template_dir_parent is not None and os.path.isdir(template_dir_parent):
             shutil.rmtree(template_dir_parent, onerror=_rmtree_onerror)
         tmp = backed.pop("__tmp__", None)
         if tmp and os.path.isdir(tmp):

@@ -147,11 +147,6 @@ def format_check_examples(lang: str) -> Dict:
 
 def _load_taboo_matrix():
     """Lazy-load taboo_matrix to avoid circular import at module level."""
-    from pathlib import Path as _Path
-    import sys as _sys
-    _here = _Path(__file__).resolve().parent
-    if str(_here) not in _sys.path:
-        _sys.path.insert(0, str(_here))
     from utils.design.taboo_matrix import (
         TABOO_WORDS, TABOO_COLORS, TABOO_NUMBERS,
         TABOO_HOLIDAYS, SACRED_CONTEXTS,

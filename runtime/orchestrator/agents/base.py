@@ -11,6 +11,8 @@ from typing import Any
 
 from loguru import logger
 
+from runtime.router.llm_client import _strip_json_fences
+
 
 @dataclass(slots=True)
 class RunnerContext:
@@ -146,11 +148,7 @@ class AgentRunner(abc.ABC):
 
     @staticmethod
     def _parse_json(raw: str) -> dict[str, Any]:
-        raw = raw.strip()
-        if raw.startswith("```"):
-            raw = raw[3:-3].strip() if raw.endswith("```") else raw[3:]
-            if "\n" in raw:
-                _, raw = raw.split("\n", 1)
+        raw = _strip_json_fences(raw)
         start = raw.find("{")
         end = raw.rfind("}")
         if start < 0 or end < 0:

@@ -35,19 +35,29 @@ def _version_callback(
         raise typer.Exit(0)
 
 
-# Register command modules
-from runtime.cli.commands.bootstrap import register as _reg_bootstrap  # noqa: E402
-from runtime.cli.commands.catalog import register as _reg_catalog  # noqa: E402
-from runtime.cli.commands.demo import register as _reg_demo  # noqa: E402
-from runtime.cli.commands.doctor import register as _reg_doctor  # noqa: E402
-from runtime.cli.commands.export import register as _reg_export  # noqa: E402
-from runtime.cli.commands.init import register as _reg_init  # noqa: E402
-from runtime.cli.commands.market import register as _reg_market  # noqa: E402
-from runtime.cli.commands.readiness import register as _reg_readiness  # noqa: E402
-from runtime.cli.commands.run import register_run as _reg_run  # noqa: E402
-from runtime.cli.commands.selftest import register as _reg_selftest  # noqa: E402
-from runtime.cli.commands.gateway import register as _reg_gateway  # noqa: E402
-from runtime.cli.commands.test_coordinator import register as _reg_test_coordinator  # noqa: E402
+# Auto-discover CLI commands from slash command registry.
+# Commands with cli_module set are exposed as typer CLI commands.
+from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG  # noqa: E402
+
+_seen: set[str] = set()
+for _cmd in _REG:
+    if not _cmd.cli_module:
+        continue
+    if _cmd.cli_module in _seen:
+        continue
+    _seen.add(_cmd.cli_module)
+    _mod = __import__(f"runtime.cli.commands.{_cmd.cli_module}", fromlist=["register"])  # noqa: E402
+    _mod.register(app)
+
+# Manual registrations — modules that register multiple commands or sub-apps
+# Manual registrations — CLI-only or name-collision commands
+import runtime.cli.commands.bootstrap as _reg_bootstrap  # noqa: E402
+import runtime.cli.commands.export as _reg_export  # noqa: E402
+_reg_bootstrap.register(app)
+_reg_export.register(app)
+import runtime.cli.commands.market as _reg_market  # noqa: E402
+_reg_market.register(app)
+
 # P3 #19 daemon mode (inline — simple enough)
 @app.command(name="serve", help="Start 7x24 daemon (FastAPI + scheduler)")
 def _serve(
@@ -56,19 +66,6 @@ def _serve(
 ):
     from runtime.cli.commands.serve import serve
     serve(host, port)
-
-_reg_bootstrap(app)
-_reg_catalog(app)
-_reg_demo(app)
-_reg_doctor(app)
-_reg_export(app)
-_reg_init(app)
-_reg_market(app)
-_reg_readiness(app)
-_reg_run(app)
-_reg_selftest(app)
-_reg_gateway(app)
-_reg_test_coordinator(app)
 
 if __name__ == "__main__":
     app()

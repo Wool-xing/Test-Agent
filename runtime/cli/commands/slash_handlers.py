@@ -3,10 +3,11 @@ from __future__ import annotations
 import os, sys, time
 from pathlib import Path
 from runtime.cli._shared import console
+from runtime.cli.completer import _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
 _SESSION_FILE = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
-_cmd_history = []
+_command_history_list = []
 _last_fix = None
 _last_trace = None
 _start_time = 0.0
@@ -67,7 +68,7 @@ def _do_quit() -> None:
     raise SystemExit(0)
 
 
-# ── /status ───────────────────────────────────────────────────────
+# ── !status ───────────────────────────────────────────────────────
 
 
 def _cmd_status(args: str) -> None:
@@ -100,7 +101,7 @@ def _cmd_status(args: str) -> None:
         console.print("[dim]No conversation yet.[/]")
 
 
-# ── /model ────────────────────────────────────────────────────────
+# ── !model ────────────────────────────────────────────────────────
 
 
 def _cmd_model(args: str) -> None:
@@ -124,7 +125,7 @@ def _cmd_model(args: str) -> None:
             marker = " [bold green]← current[/]" if p == current else ""
             detail = models.get(p, "")
             console.print(f"  [cyan]{p}[/]{marker}  [dim]{detail}[/]")
-        console.print("\n[dim]Usage: /model <provider> [model]   e.g. /model deepseek deepseek-chat[/]")
+        console.print("\n[dim]Usage: !model <provider> [model]   e.g. !model deepseek deepseek-chat[/]")
         return
 
     # Check if user typed a model name instead of provider
@@ -132,12 +133,12 @@ def _cmd_model(args: str) -> None:
         # Try fuzzy match against known models → providers
         for p in _PROVIDERS:
             if name.startswith(p) or p.startswith(name):
-                console.print(f"[yellow]'{name}' is a model name. Did you mean [cyan]/model {p}[/]?[/]")
+                console.print(f"[yellow]'{name}' is a model name. Did you mean [cyan]!model {p}[/]?[/]")
                 break
         else:
             console.print(f"[red]Unknown provider: {name}[/]")
             console.print(f"[dim]Available: {', '.join(_PROVIDERS)}[/]")
-            console.print("[dim]Tip: provider first, then model — e.g. [cyan]/model deepseek deepseek-chat[/][/]")
+            console.print("[dim]Tip: provider first, then model — e.g. [cyan]!model deepseek deepseek-chat[/][/]")
         return
 
     os.environ["TAGENT_LLM_PROVIDER"] = name
@@ -157,11 +158,11 @@ def _cmd_model(args: str) -> None:
     console.print(f"[green]Switched[/] → provider: [cyan]{name}[/]  model: [cyan]{_current_model()}[/]")
 
 
-# ── /cache — LLM response cache stats/clear ─────────────────────────
+# ── !cache — LLM response cache stats/clear ─────────────────────────
 
 
 def _cmd_cache(args: str) -> None:
-    """Show or clear the LLM response cache. Usage: /cache [clear]."""
+    """Show or clear the LLM response cache. Usage: !cache [clear]."""
     from runtime.router.llm_cache import cache_stats, clear_cache
     if args.strip() == "clear":
         n = clear_cache()
@@ -170,7 +171,7 @@ def _cmd_cache(args: str) -> None:
     stats = cache_stats()
     console.print(f"[bold]LLM Cache:[/] {stats['entries']} entries, {stats['size_kb']} KB, TTL={stats['ttl_hours']}h")
     if stats["entries"] > 0:
-        console.print("[dim]Use /cache clear to flush.[/]")
+        console.print("[dim]Use !cache clear to flush.[/]")
 
 
 # ── /! — command history ────────────────────────────────────────────
@@ -178,11 +179,11 @@ def _cmd_cache(args: str) -> None:
 
 def _rerun_history(index: int) -> None:
     """Re-run a command from history by index (0=most recent)."""
-    if not _cmd_history:
+    if not _command_history_list:
         console.print("[dim]No commands in history.[/]")
         return
     try:
-        cmd = list(reversed(_cmd_history))[index]
+        cmd = list(reversed(_command_history_list))[index]
         console.print(f"[dim]Re-running: [cyan]{cmd[:80]}{'...' if len(cmd) > 80 else ''}[/][/]")
         _handle_natural_language(cmd)
     except IndexError:
@@ -191,16 +192,16 @@ def _rerun_history(index: int) -> None:
 
 def _cmd_history(args: str) -> None:
     """Show recent command history. Use /1..9 to re-run."""
-    if not _cmd_history:
+    if not _command_history_list:
         console.print("[dim]No commands in history yet.[/]")
         return
-    for i, cmd in enumerate(reversed(_cmd_history[-9:]), 1):
+    for i, cmd in enumerate(reversed(_command_history_list[-9:]), 1):
         preview = cmd[:100] + ("..." if len(cmd) > 100 else "")
         console.print(f"  [cyan]/{i}[/]  {preview}")
-    console.print(f"[dim]Run /1 (most recent) through /{min(9, len(_cmd_history))} to re-execute.[/]")
+    console.print(f"[dim]Run /1 (most recent) through /{min(9, len(_command_history_list))} to re-execute.[/]")
 
 
-# ── /fc — fix last command typo (thefuck-style) ────────────────────
+# ── !fc — fix last command typo (thefuck-style) ────────────────────
 
 
 def _cmd_fc(args: str) -> None:
@@ -219,7 +220,7 @@ def _cmd_fc(args: str) -> None:
 
 
 def _cmd_ready(args: str) -> None:
-    """Multi-dimensional release readiness check. Usage: /ready [--fast]."""
+    """Multi-dimensional release readiness check. Usage: !ready [--fast]."""
     from runtime.cli.readiness import run_readiness
     from rich.table import Table
 
@@ -282,7 +283,7 @@ def _cmd_hook(args: str) -> None:
     if action == "list" or not action:
         hooks = list_hooks()
         if not hooks:
-            console.print("[dim]No hooks registered. Use /hook add or /hook prebuilt[/]")
+            console.print("[dim]No hooks registered. Use !hook add or /hook prebuilt[/]")
             return
         table = Table(title=f"Hooks · {len(hooks)}", show_header=True)
         table.add_column("ID", style="dim")
@@ -300,7 +301,7 @@ def _cmd_hook(args: str) -> None:
     elif action == "add":
         sub_parts = rest.strip().split(maxsplit=1)
         if len(sub_parts) < 2:
-            console.print("[dim]Usage: /hook add <phase> <command>[/]")
+            console.print("[dim]Usage: !hook add <phase> <command>[/]")
             console.print("[dim]Phases: before | after | on_error[/]")
             console.print("[dim]Example: /hook add after 'echo done'[/]")
             return
@@ -322,7 +323,7 @@ def _cmd_hook(args: str) -> None:
     elif action == "remove":
         hid = rest.strip()
         if not hid:
-            console.print("[dim]Usage: /hook remove <id>[/]")
+            console.print("[dim]Usage: !hook remove <id>[/]")
             return
         if remove_hook(hid):
             console.print(f"[green]Hook #{hid} removed[/]")
@@ -334,11 +335,11 @@ def _cmd_hook(args: str) -> None:
         console.print(f"[green]{n} hooks activated[/]")
 
 
-# ── /skin — switch CLI theme ────────────────────────────────────────
+# ── !skin — switch CLI theme ────────────────────────────────────────
 
 
 def _cmd_skin(args: str) -> None:
-    """Switch CLI skin/theme. Usage: /skin [name]. No args lists available."""
+    """Switch CLI skin/theme. Usage: !skin [name]. No args lists available."""
     from runtime.cli.skins import list_skins, set_skin, get_current_skin_name
 
     name = args.strip().lower()
@@ -354,7 +355,7 @@ def _cmd_skin(args: str) -> None:
     if set_skin(name):
         console.print(f"[green]Skin:[/] [cyan]{name}[/] (restart REPL to see banner)")
     else:
-        console.print(f"[dim]Unknown skin '{name}'. Use /skin to list.[/]")
+        console.print(f"[dim]Unknown skin '{name}'. Use !skin to list.[/]")
 
 
 # ── /lang — switch UI language ──────────────────────────────────────
@@ -367,7 +368,7 @@ def _cmd_lang(args: str) -> None:
     if name not in ("zh", "en", "zh-en"):
         current = get_lang()
         console.print(f"Current: [cyan]{current}[/]")
-        console.print("[dim]Usage: /lang zh | en | zh-en[/]")
+        console.print("[dim]Usage: !lang zh | en | zh-en[/]")
         return
     set_lang(name)
     labels = {"zh": "中文", "en": "English", "zh-en": "中文/English"}
@@ -390,13 +391,13 @@ def _cmd_personality(args: str) -> None:
             marker = " [green]← active[/]" if p["name"] == current else ""
             console.print(f"  [cyan]{p['name']}{marker}[/] — {p['description']}")
         if not current:
-            console.print("\n[dim]Usage: /personality <name>[/]")
+            console.print("\n[dim]Usage: !personality <name>[/]")
         return
 
     if set_personality(name):
         console.print(f"[green]Personality:[/] [cyan]{name}[/] (injected into context)")
     else:
-        console.print(f"[dim]Unknown personality '{name}'. Use /personality to list.[/]")
+        console.print(f"[dim]Unknown personality '{name}'. Use !personality to list.[/]")
 
 
 # ── /tools — dynamic agent/skill list ──────────────────────────────
@@ -457,7 +458,7 @@ def _cmd_undo(args: str) -> None:
     """Remove last user+assistant exchange from conversation memory.
 
     Can be called repeatedly to unwind multiple turns.
-    Run /retry after undo to re-submit the undone prompt.
+    Run !retry after undo to re-submit the undone prompt.
     """
     mem = _get_memory()
     user_text, assistant_text = mem.undo_last_exchange()
@@ -576,7 +577,7 @@ def _cmd_resume(args: str) -> None:
 
     sid = args.strip()
     if not sid:
-        console.print("[dim]Usage: /resume <session_id_or_filename>[/]")
+        console.print("[dim]Usage: !resume <session_id_or_filename>[/]")
         return
 
     match = None
@@ -586,7 +587,7 @@ def _cmd_resume(args: str) -> None:
             break
 
     if match is None:
-        console.print(f"[dim]No session matching '{sid}' found. Use /sessions to list.[/]")
+        console.print(f"[dim]No session matching '{sid}' found. Use !sessions to list.[/]")
         return
 
     loaded = ConversationMemory.load(match)
@@ -671,7 +672,7 @@ def _cmd_remember(args: str) -> None:
     """Save a fact to MEMORY.md for cross-session persistence."""
     fact = args.strip()
     if not fact:
-        console.print("[red]Usage: /remember <fact>[/]")
+        console.print("[red]Usage: !remember <fact>[/]")
         console.print("[dim]Example: /remember This project uses PostgreSQL[/]")
         return
     from runtime.cli.conversation import load_memory_md, save_memory_fact
@@ -687,7 +688,7 @@ def _cmd_forget(args: str) -> None:
     """Remove facts from MEMORY.md matching a keyword."""
     keyword = args.strip()
     if not keyword:
-        console.print("[red]Usage: /forget <keyword>[/]")
+        console.print("[red]Usage: !forget <keyword>[/]")
         console.print("[dim]Example: /forget PostgreSQL[/]")
         return
     from runtime.cli.conversation import forget_memory_fact, load_memory_md
@@ -706,7 +707,7 @@ def _cmd_memory(args: str) -> None:
     from runtime.cli.conversation import load_memory_md
     mem = load_memory_md()
     if not mem:
-        console.print("[dim]MEMORY.md is empty. Use /remember <fact> to save knowledge.[/]")
+        console.print("[dim]MEMORY.md is empty. Use !remember <fact> to save knowledge.[/]")
         return
     from rich.panel import Panel
     lines = mem.count("\n") + 1
@@ -760,7 +761,7 @@ def _cmd_mcp_call(args: str) -> None:
 
     parts = args.strip().split(maxsplit=2)
     if len(parts) < 2:
-        console.print("[red]Usage: /mcp-call <server> <tool> [json_args][/]")
+        console.print("[red]Usage: !mcp-call <server> <tool> [json_args][/]")
         console.print("[dim]Example: /mcp-call test-orchestrator catalog[/]")
         return
 
@@ -815,7 +816,7 @@ def _cmd_cron(args: str) -> None:
 
         jobs = list_jobs()
         if not jobs:
-            console.print("[dim]No scheduled jobs. Use /cron add <cron> <prompt>[/]")
+            console.print("[dim]No scheduled jobs. Use !cron add <cron> <prompt>[/]")
             console.print("[dim]Example: /cron add '0 9 * * *' smoke test daily[/]")
             return
 
@@ -850,7 +851,7 @@ def _cmd_cron(args: str) -> None:
             tokens = rest.split(maxsplit=1)
 
         if len(tokens) < 2:
-            console.print("[red]Usage: /cron add <schedule> <prompt>[/]")
+            console.print("[red]Usage: !cron add <schedule> <prompt>[/]")
             console.print("[dim]Cron: /cron add '0 9 * * *' run full regression[/]")
             console.print("[dim]Natural: /cron add 'every morning' run smoke tests[/]")
             console.print("[dim]Try: every morning / every day at 18 / every monday / hourly[/]")
@@ -885,7 +886,7 @@ def _cmd_cron(args: str) -> None:
     elif sub == "remove":
         job_id = rest.strip()
         if not job_id:
-            console.print("[red]Usage: /cron remove <job_id>[/]")
+            console.print("[red]Usage: !cron remove <job_id>[/]")
             return
         from runtime.scheduler.jobs import remove_job
 
@@ -920,7 +921,7 @@ def _cmd_cron_health(args: str) -> None:
     console.print(f"[green]✓ Health check scheduled hourly[/] {job_id}")
 
 
-# ── /model-router — display auto-routing configuration ─────────────
+# ── !model-router — display auto-routing configuration ─────────────
 
 
 def _cmd_model_router(args: str) -> None:
@@ -953,7 +954,7 @@ def _cmd_model_router(args: str) -> None:
 
     console.print(table)
     console.print("[dim]Auto: classify_task(prompt) → LIGHT/HEAVY → model selection[/]")
-    console.print("[dim]Override via /model <provider> [model] or TAGENT_LLM_MODEL env[/]")
+    console.print("[dim]Override via !model <provider> [model] or TAGENT_LLM_MODEL env[/]")
 
 
 # ── /search — full-text conversation search (P3 #16) ───────────────
@@ -963,7 +964,7 @@ def _cmd_search(args: str) -> None:
     """Search conversation history with FTS5."""
     query = args.strip()
     if not query:
-        console.print("[red]Usage: /search <query>[/]")
+        console.print("[red]Usage: !search <query>[/]")
         console.print("[dim]Example: /search login page bug[/]")
         return
 
@@ -1053,7 +1054,7 @@ def _cmd_distill(args: str) -> None:
     """Distill the last execution into a reusable skill document.
 
     Requires a complex execution (3+ nodes, 2+ agent types).
-    Usage: /distill [name] — name is auto-generated if omitted.
+    Usage: !distill [name] — name is auto-generated if omitted.
     The generated skill is saved to skills/<name>.md.
     """
     global _last_trace
@@ -1088,7 +1089,7 @@ def _cmd_api(args: str) -> None:
     if action == "gen":
         sub = rest.split(maxsplit=1)
         if len(sub) < 2:
-            console.print("[dim]Usage: /api gen <spec_path_or_url> <base_url>[/]")
+            console.print("[dim]Usage: !api gen <spec_path_or_url> <base_url>[/]")
             return
         try:
             from utils.design.openapi_test_gen import load_openapi_spec, generate_test_cases
@@ -1102,14 +1103,14 @@ def _cmd_api(args: str) -> None:
     elif action == "test":
         sub = rest.split(maxsplit=1)
         if not sub:
-            console.print("[dim]Usage: /api test <base_url> [spec_path][/]")
+            console.print("[dim]Usage: !api test <base_url> [spec_path][/]")
             return
         console.print(f"[bold]API Smoke:[/] {sub[0]}")
         try:
             from utils.design.openapi_test_gen import load_openapi_spec, smoke_test_all_endpoints
             spec = load_openapi_spec(sub[1]) if len(sub) > 1 else {"paths": {}}
             if not spec.get("paths"):
-                console.print("[dim]No OpenAPI spec — use /api gen first[/]")
+                console.print("[dim]No OpenAPI spec — use !api gen first[/]")
                 return
             result = smoke_test_all_endpoints(spec, sub[0])
             table = Table(title="API Smoke Results")
@@ -1123,7 +1124,7 @@ def _cmd_api(args: str) -> None:
         except Exception as e:
             console.print(f"[red]{e}[/]")
     else:
-        console.print("[dim]Usage: /api gen <spec> <base_url> | test <base_url> [spec][/]")
+        console.print("[dim]Usage: !api gen <spec> <base_url> | test <base_url> [spec][/]")
 
 
 # ── /plugins — list loaded plugins (P3 #22) ────────────────────────
@@ -1152,7 +1153,7 @@ def _cmd_plugins_list(args: str) -> None:
     console.print(table)
 
 
-# ── /alias — command shortcuts ─────────────────────────────────────
+# ── !alias — command shortcuts ─────────────────────────────────────
 
 
 def _cmd_alias(args: str) -> None:
@@ -1167,7 +1168,7 @@ def _cmd_alias(args: str) -> None:
     if action == "list" or not action:
         aliases = list_aliases()
         if not aliases:
-            console.print("[dim]No aliases. /alias add smoke '/test --quick'[/]")
+            console.print("[dim]No aliases. !alias add smoke '/test --quick'[/]")
             return
         table = Table(title=f"Aliases · {len(aliases)}", show_header=True)
         table.add_column("Name", style="cyan")
@@ -1181,8 +1182,8 @@ def _cmd_alias(args: str) -> None:
         name = sub[0] if sub else ""
         cmd = sub[1] if len(sub) > 1 else ""
         if not name or not cmd:
-            console.print("[dim]Usage: /alias add <name> <command>[/]")
-            console.print("[dim]Example: /alias add smoke '/test --quick'[/]")
+            console.print("[dim]Usage: !alias add <name> <command>[/]")
+            console.print("[dim]Example: !alias add smoke '/test --quick'[/]")
             return
         a = add_alias(name, cmd)
         console.print(f"[green]Alias:[/] [cyan]{a.name}[/] → {a.command}")
@@ -1190,7 +1191,7 @@ def _cmd_alias(args: str) -> None:
     elif action == "remove":
         name = rest.strip()
         if not name:
-            console.print("[dim]Usage: /alias remove <name>[/]")
+            console.print("[dim]Usage: !alias remove <name>[/]")
             return
         if remove_alias(name):
             console.print(f"[green]Removed: {name}[/]")
@@ -1216,7 +1217,7 @@ def _cmd_ws(args: str) -> None:
         current = get_current()
         workspaces = list_workspaces()
         if not workspaces:
-            console.print("[dim]No workspaces. Use /ws add <name> [path] or /ws auto[/]")
+            console.print("[dim]No workspaces. Use !ws add <name> [path] or /ws auto[/]")
             return
         table = Table(title=f"Workspaces · {len(workspaces)}", show_header=True)
         table.add_column("Name", style="cyan")
@@ -1232,7 +1233,7 @@ def _cmd_ws(args: str) -> None:
         name = sub[0] if sub else ""
         path = sub[1] if len(sub) > 1 else str(_Path.cwd())
         if not name:
-            console.print("[dim]Usage: /ws add <name> [path][/]")
+            console.print("[dim]Usage: !ws add <name> [path][/]")
             return
         w = add_workspace(name, path)
         console.print(f"[green]Workspace:[/] {w.name} → {w.path}")
@@ -1240,7 +1241,7 @@ def _cmd_ws(args: str) -> None:
     elif action == "remove":
         name = rest.strip()
         if not name:
-            console.print("[dim]Usage: /ws remove <name>[/]")
+            console.print("[dim]Usage: !ws remove <name>[/]")
             return
         if remove_workspace(name):
             console.print(f"[green]Removed: {name}[/]")
@@ -1250,7 +1251,7 @@ def _cmd_ws(args: str) -> None:
     elif action == "switch":
         name = rest.strip()
         if not name:
-            console.print("[dim]Usage: /ws switch <name>[/]")
+            console.print("[dim]Usage: !ws switch <name>[/]")
             return
         w = switch_to(name)
         if w:
@@ -1310,7 +1311,7 @@ def _cmd_gateway(args: str) -> None:
 
 
 def _cmd_task(args: str) -> None:
-    """Manage tasks: add, list, done, cancel. Usage: /task <action> [args]."""
+    """Manage tasks: add, list, done, cancel. Usage: !task <action> [args]."""
     from rich.table import Table
 
     from runtime.cli.tasks import add_task, delete_task, list_tasks, stats, update_task
@@ -1331,7 +1332,7 @@ def _cmd_task(args: str) -> None:
                 crit_str = ""
             criteria = [c.strip() for c in crit_str.split(",") if c.strip()]
         if not title.strip():
-            console.print("[dim]Usage: /task add <title> [--criteria <cond1>,<cond2>][/]")
+            console.print("[dim]Usage: !task add <title> [--criteria <cond1>,<cond2>][/]")
             console.print("[dim]Example: /task add Run API smoke tests --criteria all P0 pass,coverage 80%[/]")
             return
         task = add_task(title, criteria=criteria)
@@ -1344,7 +1345,7 @@ def _cmd_task(args: str) -> None:
         status_filter = rest if rest else None
         tasks = list_tasks(status_filter)
         if not tasks:
-            console.print("[dim]No tasks. Use /task add <title> to create one.[/]")
+            console.print("[dim]No tasks. Use !task add <title> to create one.[/]")
             return
         st = stats()
         console.print(f"[bold]Tasks:[/] {st['total']} total ({st['pending']} pending, {st['in_progress']} active, {st['done']} done)")
@@ -1362,7 +1363,7 @@ def _cmd_task(args: str) -> None:
     elif action == "done":
         tid = rest.strip()
         if not tid:
-            console.print("[dim]Usage: /task done <id>[/]")
+            console.print("[dim]Usage: !task done <id>[/]")
             return
         t = update_task(tid, status="done")
         if t:
@@ -1373,7 +1374,7 @@ def _cmd_task(args: str) -> None:
     elif action == "start":
         tid = rest.strip()
         if not tid:
-            console.print("[dim]Usage: /task start <id>[/]")
+            console.print("[dim]Usage: !task start <id>[/]")
             return
         t = update_task(tid, status="in_progress")
         if t:
@@ -1384,7 +1385,7 @@ def _cmd_task(args: str) -> None:
     elif action == "cancel":
         tid = rest.strip()
         if not tid:
-            console.print("[dim]Usage: /task cancel <id>[/]")
+            console.print("[dim]Usage: !task cancel <id>[/]")
             return
         t = update_task(tid, status="cancelled")
         if t:
@@ -1395,7 +1396,7 @@ def _cmd_task(args: str) -> None:
     elif action == "delete":
         tid = rest.strip()
         if not tid:
-            console.print("[dim]Usage: /task delete <id>[/]")
+            console.print("[dim]Usage: !task delete <id>[/]")
             return
         if delete_task(tid):
             console.print(f"[dim]Task #{tid} deleted.[/]")
@@ -1417,7 +1418,7 @@ def _cmd_cross(args: str) -> None:
 
     parts = args.strip().split(None, 1)
     if len(parts) < 2 or parts[0] != "env":
-        console.print("[dim]Usage: /cross env <env1> [env2...] <prompt>[/]")
+        console.print("[dim]Usage: !cross env <env1> [env2...] <prompt>[/]")
         console.print("[dim]Example: /cross env test staging run API smoke tests[/]")
         console.print("[dim]Presets saved via /env save <name>[/]")
         return
@@ -1483,7 +1484,7 @@ def _cmd_clean(args: str) -> None:
     for c in cleanable[:15]:
         table.add_row(c["path"][:60], f"{c['size_kb']} KB", f"{c['age_hours']}h ago")
     console.print(table)
-    console.print("[dim]Run /clean run to delete. Delivery artifacts never touched.[/]")
+    console.print("[dim]Run !clean run to delete. Delivery artifacts never touched.[/]")
 
 
 # ── /data — test data generation ────────────────────────────────────
@@ -1523,7 +1524,7 @@ def _cmd_data(args: str) -> None:
             console.print(f"[green]Generated:[/] {count} products [dim]→ {out}[/]")
 
         else:
-            console.print("[dim]Usage: /data users|products|related <count>[/]")
+            console.print("[dim]Usage: !data users|products|related <count>[/]")
             console.print("[dim]Example: /data users 100[/]")
     except ImportError:
         console.print("[red]DataFactoryV2 not available. Install: pip install faker[/]")
@@ -1694,7 +1695,7 @@ def _cmd_insights(args: str) -> None:
     """Show usage analytics across saved sessions.
 
     Scans workspace/gateway/*.json for session data.
-    Usage: /insights [days] — default 30 days.
+    Usage: !insights [days] — default 30 days.
     Shows: session count, avg turns, top agents, daily activity chart.
     """
     from rich.table import Table
@@ -1739,7 +1740,7 @@ def _cmd_insights(args: str) -> None:
             console.print(f"  {day}  {bar} {count}")
 
 
-# ── /doctor — comprehensive environment health check ────────────────
+# ── !doctor — comprehensive environment health check ────────────────
 
 
 def _cmd_doctor(args: str) -> None:
@@ -1766,7 +1767,7 @@ def _cmd_doctor(args: str) -> None:
             table.add_row(label, check.get("detail", ""))
 
     console.print(table)
-    console.print(f"\n[bold]{ok_count} checks passed[/]   [dim]Run /help for next steps.[/]")
+    console.print(f"\n[bold]{ok_count} checks passed[/]   [dim]Run !help for next steps.[/]")
 
 
 # ── /nudge — suggest facts worth remembering ───────────────────────
@@ -1776,7 +1777,7 @@ def _cmd_nudge(args: str) -> None:
     """Scan recent conversation for facts worth persisting to MEMORY.md.
 
     Detects patterns: config changes, preferences, decisions.
-    Use /remember <fact> to save suggestions, /memory to review.
+    Use !remember <fact> to save suggestions, /memory to review.
     """
     mem = _get_memory()
     if not mem.messages:
@@ -1795,7 +1796,7 @@ def _cmd_nudge(args: str) -> None:
                 seen.add(m.content[:80])
                 break
     if not suggestions:
-        console.print("[dim]No notable facts detected. Use /remember <fact> manually.[/]")
+        console.print("[dim]No notable facts detected. Use !remember <fact> manually.[/]")
         return
     console.print("[bold]Suggestions from this session:[/]")
     for i, s in enumerate(suggestions[:5], 1):

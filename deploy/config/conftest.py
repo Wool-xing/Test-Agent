@@ -295,6 +295,14 @@ def pytest_configure(config):
     for d in workflow_dirs:
         Path(d).mkdir(parents=True, exist_ok=True)
 
+    # 动态设置 allure / junit 输出路径 → workspace/测试报告/{项目名}/
+    _output_base = get_output_dir("", current_run_id())
+    _allure_dir = _output_base / "allure-results"
+    _junit_file = _output_base / "junit-results.xml"
+    _allure_dir.mkdir(parents=True, exist_ok=True)
+    config.option.allure_report_dir = str(_allure_dir)
+    config.option.xmlpath = str(_junit_file)
+
     # 标记已初始化
     sentinel.parent.mkdir(parents=True, exist_ok=True)
     sentinel.touch()

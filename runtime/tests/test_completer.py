@@ -96,19 +96,19 @@ class TestSlashCommandCompletion:
         return [comp.text for comp in c.get_completions(doc, None)]
 
     def test_partial_command_prefix(self):
-        comps = self._completions("/he")
+        comps = self._completions("!he")
         assert "help" in comps
 
     def test_exact_command_prefix(self):
-        comps = self._completions("/status")
+        comps = self._completions("!status")
         assert "status" in comps
 
     def test_no_match_returns_empty(self):
-        comps = self._completions("/xyznonexistent999")
+        comps = self._completions("!xyznonexistent999")
         assert len(comps) == 0
 
     def test_empty_after_slash(self):
-        comps = self._completions("/")
+        comps = self._completions("!")
         # All commands should match empty prefix
         assert len(comps) > 5  # multiple commands available
         assert "help" in comps or any("help" == c for c in comps)
@@ -126,29 +126,29 @@ class TestModelProviderCompletion:
         return [comp.text for comp in c.get_completions(doc, None)]
 
     def test_partial_provider_claude(self):
-        comps = self._completions("/model cl")
+        comps = self._completions("!model cl")
         assert "claude" in comps
 
     def test_partial_provider_deepseek(self):
-        comps = self._completions("/model dee")
+        comps = self._completions("!model dee")
         assert "deepseek" in comps
 
     def test_partial_provider_openai(self):
-        comps = self._completions("/model op")
+        comps = self._completions("!model op")
         assert "openai" in comps
 
     def test_provider_no_match(self):
-        comps = self._completions("/model xyznon")
+        comps = self._completions("!model xyznon")
         assert len(comps) == 0
 
     def test_second_arg_no_completion(self):
         """After /model <provider> <model_name>, no completion."""
-        comps = self._completions("/model claude sonnet")
+        comps = self._completions("!model claude sonnet")
         assert len(comps) == 0
 
     def test_model_prefix_only(self):
         """Ensure /model gets command completion not provider completion."""
-        comps = self._completions("/mod")
+        comps = self._completions("!mod")
         assert "model" in comps  # command name completion
 
 
@@ -199,12 +199,12 @@ class TestCompletionDedup:
 
     def test_help_not_duplicated(self):
         """'help' is in both registry and builtins — appears once."""
-        comps = self._completions("/hel")
+        comps = self._completions("!hel")
         assert comps.count("help") == 1
 
     def test_quit_not_duplicated(self):
         """'quit' is in both registry and builtins — appears once."""
-        comps = self._completions("/qu")
+        comps = self._completions("!qu")
         assert comps.count("quit") == 1
 
 

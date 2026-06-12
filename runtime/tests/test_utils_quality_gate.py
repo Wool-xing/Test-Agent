@@ -9,10 +9,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-# Ensure utils is importable
-_utils_dir = Path(__file__).resolve().parents[2] / "utils"
-if str(_utils_dir) not in sys.path:
-    sys.path.insert(0, str(_utils_dir))
+# utils package installed via pip install -e runtime/
 
 
 # ── ci_quality_gate tests ──────────────────────────────────────────────
@@ -28,7 +25,7 @@ class TestParseJunit:
         return ET.tostring(root, encoding="unicode")
 
     def test_all_pass(self):
-        from ci_quality_gate import parse_junit
+        from utils.quality.ci_quality_gate import parse_junit
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
             f.write(self.make_junit_xml(100, 0, 0, 0))
             path = f.name
@@ -42,7 +39,7 @@ class TestParseJunit:
             Path(path).unlink()
 
     def test_mixed_failures(self):
-        from ci_quality_gate import parse_junit
+        from utils.quality.ci_quality_gate import parse_junit
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
             f.write(self.make_junit_xml(50, 5, 2, 3))
             path = f.name
@@ -58,11 +55,11 @@ class TestParseJunit:
             Path(path).unlink()
 
     def test_missing_file(self):
-        from ci_quality_gate import parse_junit
+        from utils.quality.ci_quality_gate import parse_junit
         assert parse_junit("/nonexistent/path.xml") is None
 
     def test_empty_file(self):
-        from ci_quality_gate import parse_junit
+        from utils.quality.ci_quality_gate import parse_junit
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
             f.write("not xml")
             path = f.name
@@ -75,8 +72,8 @@ class TestParseJunit:
 
 class TestCheckSmoke:
     def test_pass(self):
-        import ci_quality_gate as m
-        from ci_quality_gate import check_smoke
+        import utils.quality.ci_quality_gate as m
+        from utils.quality.ci_quality_gate import check_smoke
         m.GATES["smoke"]["min_pass_rate_pct"] = 95
 
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
@@ -91,8 +88,8 @@ class TestCheckSmoke:
             Path(path).unlink()
 
     def test_fail_below_threshold(self):
-        import ci_quality_gate as m
-        from ci_quality_gate import check_smoke
+        import utils.quality.ci_quality_gate as m
+        from utils.quality.ci_quality_gate import check_smoke
         m.GATES["smoke"]["min_pass_rate_pct"] = 95
 
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
@@ -112,7 +109,7 @@ class TestCheckCoverage:
         return ET.tostring(root, encoding="unicode")
 
     def test_pass_above_threshold(self):
-        from ci_quality_gate import check_coverage
+        from utils.quality.ci_quality_gate import check_coverage
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
             f.write(self.make_coverage_xml(0.85))
             path = f.name
@@ -123,7 +120,7 @@ class TestCheckCoverage:
             Path(path).unlink()
 
     def test_fail_below_threshold(self):
-        from ci_quality_gate import check_coverage
+        from utils.quality.ci_quality_gate import check_coverage
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
             f.write(self.make_coverage_xml(0.55))
             path = f.name
@@ -138,7 +135,7 @@ class TestCheckCoverage:
 
 class TestQualityGateEngine:
     def test_builtin_defaults_load(self):
-        from quality_gate_engine import _builtin_defaults
+        from utils.quality.quality_gate_engine import _builtin_defaults
         cfg = _builtin_defaults()
         assert "smoke" in cfg
         assert cfg["smoke"]["min_pass_rate_pct"] == 95
@@ -146,12 +143,12 @@ class TestQualityGateEngine:
         assert cfg["performance_full"]["min_tps"] == 100
 
     def test_engine_init_default(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         assert "smoke" in engine.config
 
     def test_engine_smoke_pass(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         engine.config["smoke"]["min_pass_rate_pct"] = 90
 
@@ -166,7 +163,7 @@ class TestQualityGateEngine:
             Path(path).unlink()
 
     def test_engine_smoke_fail(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         engine.config["smoke"]["min_pass_rate_pct"] = 95
 
@@ -181,7 +178,7 @@ class TestQualityGateEngine:
             Path(path).unlink()
 
     def test_engine_coverage(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
 
         with tempfile.NamedTemporaryFile(suffix=".xml", mode="w", delete=False) as f:
@@ -195,14 +192,14 @@ class TestQualityGateEngine:
             Path(path).unlink()
 
     def test_engine_release_missing_gates(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         ok, msg = engine.check_release()
         assert not ok
         assert "smoke" in msg.lower()
 
     def test_engine_release_all_pass(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         engine.config["release"]["require_smoke"] = False
         engine.config["release"]["require_regression"] = False
@@ -211,14 +208,14 @@ class TestQualityGateEngine:
         assert ok
 
     def test_engine_summary_json(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         engine._record("smoke", True, "ok")
         data = engine.summary_json()
         assert data["overall_pass"] is True
 
     def test_engine_performance_parse(self):
-        from quality_gate_engine import QualityGateEngine
+        from utils.quality.quality_gate_engine import QualityGateEngine
         engine = QualityGateEngine(config_path="/nonexistent/config.yaml")
         engine.config["performance_ci_quick"] = {
             "min_tps": 20, "max_p95_ms": 800, "max_avg_ms": 400, "max_error_pct": 1.0

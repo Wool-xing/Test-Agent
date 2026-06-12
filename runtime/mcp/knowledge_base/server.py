@@ -23,6 +23,7 @@ from runtime.storage.models import Embedding
 
 DEFAULT_EMBED_MODEL = os.getenv("TAGENT_EMBED_MODEL", "openai/text-embedding-3-small")
 DEFAULT_DIM = int(os.getenv("TAGENT_EMBED_DIM", "1536"))
+_EMBED_DEGRADED = False  # set True when embedding falls back to stub
 
 
 def _vec_literal(vec: list[float]) -> str:
@@ -53,6 +54,8 @@ async def _embed(text: str) -> list[float]:
         resp = await litellm.aembedding(model=DEFAULT_EMBED_MODEL, input=[text])
         return resp.data[0]["embedding"]
     except Exception as e:
+        global _EMBED_DEGRADED
+        _EMBED_DEGRADED = True
         logger.warning("embedding failed, fallback to stub: {}", e)
         return _embed_stub(text)
 
@@ -60,7 +63,7 @@ async def _embed(text: str) -> list[float]:
 @tool_decision_logged("embed")
 async def tool_embed(text: str) -> dict:
     vec = await _embed(text)
-    return {"dim": len(vec), "model": DEFAULT_EMBED_MODEL, "sample": vec[:8]}
+    return {"dim": len(vec), "model": DEFAULT_EMBED_MODEL, "sample": vec[:8], "degraded": _EMBED_DEGRADED}
 
 
 def _is_postgres() -> bool:
@@ -151,6 +154,7 @@ async def tool_search_similar(text: str, top_k: int = 5, source_type: str = "cas
             ).mappings().all()
             return {
                 "count": len(rows),
+                "degraded": _EMBED_DEGRADED,
                 "results": [
                     {
                         "id": r["id"],

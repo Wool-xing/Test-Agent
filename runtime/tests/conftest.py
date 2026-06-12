@@ -2,25 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import os
-import sys
 from pathlib import Path
 
 import pytest
-
-# Inject utils/ and all subdirectories into sys.path
-# V1.x: utils/ reorganized from flat into 12 functional subdirectories
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(_PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(_PROJECT_ROOT))
-
-_UTILS_DIR = _PROJECT_ROOT / "utils"
-if _UTILS_DIR.is_dir() and str(_UTILS_DIR) not in sys.path:
-    sys.path.insert(0, str(_UTILS_DIR))
-    for _sub in _UTILS_DIR.iterdir():
-        if _sub.is_dir() and not _sub.name.startswith(("_", ".")) and str(_sub) not in sys.path:
-            sys.path.insert(0, str(_sub))
-
 
 @pytest.fixture(autouse=True)
 def _env_isolation(tmp_path: Path, monkeypatch):
@@ -45,3 +31,21 @@ def _env_isolation(tmp_path: Path, monkeypatch):
 @pytest.fixture()
 def project_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _prefect_log_cleanup():
+    """Remove Prefect Rich handlers before pytest teardown to prevent
+    'I/O operation on closed file' errors when Rich tries to write to
+    a console that pytest already closed."""
+    yield
+    for logger_name in list(logging.root.manager.loggerDict):
+        lg = logging.getLogger(logger_name)
+        for h in getattr(lg, "handlers", [])[:]:
+            mod = type(h).__module__
+            if "prefect" in mod or "rich" in mod:
+                lg.removeHandler(h)
+    for h in logging.root.handlers[:]:
+        mod = type(h).__module__
+        if "prefect" in mod or "rich" in mod:
+            logging.root.removeHandler(h)
