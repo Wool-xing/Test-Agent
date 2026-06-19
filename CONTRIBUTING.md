@@ -122,7 +122,7 @@ perf(jmeter): 减少不必要心跳
    pip-audit -r requirements.txt --strict
    ```
 
-4. 提 PR → 等 Dependabot / CI 绿灯 → reviewer 审 → merge
+1. 提 PR → 等 Dependabot / CI 绿灯 → reviewer 审 → merge
 
 ---
 

@@ -16,7 +16,7 @@ SKILL_IMPL_STATUS: production
 1.**Tests BEFORE Code**:**始终**先写测试,再实现让测试过
 2.**80%+ 覆盖**:unit + integration + E2E
 
-3. 边界 + 错误 + 异常 + 临界全覆盖
+1. 边界 + 错误 + 异常 + 临界全覆盖
 
 ## 3 类测试矩阵
 
@@ -32,7 +32,7 @@ SKILL_IMPL_STATUS: production
 2.**写最少代码**让它过(green)
 3.**重构**保持测试过(refactor)
 
-4. 移到下一个测试 case
+1. 移到下一个测试 case
 
 ## 融合
 

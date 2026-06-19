@@ -23,7 +23,8 @@ SKILL_IMPL_STATUS: production
    - 若 ≥20h → 推荐 P0 深度卡
 
 4.**输出推荐 + 警告**:
-   ```
+
+   ```text
    🎓 你测的是 SQL injection,推荐 deep-dive:
 
    ⭐ byox-database (30h) — 懂 parser → 知道注入点

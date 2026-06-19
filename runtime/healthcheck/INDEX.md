@@ -14,6 +14,7 @@
 ## 接入
 
 -**pre-push / pre-commit**:`.pre-commit-config.yaml` 已 wire `agent_smoke`
+
 -**CLI**:
   ```bash
   tagent doctor --agents      # L1 + L3 真 LLM 16 agent

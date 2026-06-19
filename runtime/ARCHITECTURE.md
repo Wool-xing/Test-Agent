@@ -69,7 +69,7 @@
 | 3 | 注册中心 | `runtime/registry/` | ✅ 14+13 实跑验证 |
 | 4 | 编排(Prefect+Direct) | `runtime/orchestrator/` | ✅ E2E 通 |
 | 5 | FastAPI 入口 | `runtime/api/` | ✅ 6 端点 |
-| 6 | Typer CLI | `runtime/cli/` | ✅ `tagent run|plan|catalog|doctor` |
+| 6 | Typer CLI | `runtime/cli/` | ✅ `tagent run / plan / catalog / doctor` |
 | 7 | 飞轮 schema | `runtime/storage/` | ✅ 6 表 + Alembic |
 | 8 | OTel+Loguru | `runtime/observability/` | ✅ |
 | 9 | docker-compose | `runtime/docker-compose.yml` | ✅ 含 observability profile |

@@ -62,6 +62,6 @@ De facto Python testing standard. This project's `runtime/` uses pytest end-to-e
 -**conftest.py**: auto-loaded fixture file
 -**plugin ecosystem**: `pytest-xdist` (parallel) / `pytest-cov` (coverage) / `pytest-bdd` (BDD) / `allure-pytest` (reports)
 
-## Why does the Agent call pytest?
+## Why does the Agent call pytest
 
 Subject is a Python project → pytest is the first choice for unit+integration; outputs junit-xml feeding Allure; parallelize via xdist; retry flakes via rerunfailures.
