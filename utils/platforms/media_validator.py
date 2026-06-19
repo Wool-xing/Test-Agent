@@ -11,6 +11,7 @@ import subprocess
 from fractions import Fraction
 from pathlib import Path
 from typing import Dict, List
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ def compare_frames(video_a: str, video_b: str, timestamps: List[float],
                    ssim_threshold: float = 0.95,
                    tmp_dir: str = None) -> List[Dict]:
     if tmp_dir is None:
-        tmp_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/media-frames"
+        tmp_dir = str(get_output_dir("media-frames"))
     """
     在指定时间点抽帧对比两个视频，返回差异帧列表。
     """

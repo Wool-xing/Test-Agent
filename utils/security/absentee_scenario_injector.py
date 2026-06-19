@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -442,7 +443,7 @@ def export_injection_plan(
 ) -> str:
     """Export the absentee scenario injection plan as JSON."""
     if output_dir is None:
-        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/absentee-scenarios"
+        output_dir = str(get_output_dir("absentee-scenarios"))
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = Path(output_dir) / f"absentee_plan_{ts}.json"

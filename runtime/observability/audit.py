@@ -11,11 +11,12 @@ import os
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
+from utils.paths import get_output_dir
 from typing import Any
 
 from loguru import logger
 
-_DEFAULT_DIR = Path(f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/audit")
+_DEFAULT_DIR = get_output_dir("audit")
 _lock = threading.Lock()
 
 

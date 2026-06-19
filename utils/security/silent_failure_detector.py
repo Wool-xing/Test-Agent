@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -389,7 +390,7 @@ class SlidingWindowStore:
 def export_report(report: SilentFailureReport,
                   output_dir: str = None) -> str:
     if output_dir is None:
-        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/silent-failures"
+        output_dir = str(get_output_dir("silent-failures"))
     """Export SilentFailureReport as JSON."""
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")

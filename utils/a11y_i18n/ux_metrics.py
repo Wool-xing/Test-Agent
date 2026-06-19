@@ -10,6 +10,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +107,7 @@ def error_recovery_rate(error_count: int, recovery_count: int) -> float:
 def save_ux_report(summaries: List[Dict],
                    output_dir: str = None) -> str:
     if output_dir is None:
-        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/ux"
+        output_dir = str(get_output_dir("ux"))
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     path = Path(output_dir) / f"ux_{datetime.now():%Y%m%d_%H%M%S}.json"
     path.write_text(json.dumps(summaries, indent=2, ensure_ascii=False), encoding="utf-8")

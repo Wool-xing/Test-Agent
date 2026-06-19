@@ -15,6 +15,7 @@ from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 import requests
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ def _block_private_url(url: str) -> None:
 
 def run_bandit(target_path: str, output: Optional[str] = None) -> Dict:
     """Bandit Python SAST。需 pip install bandit"""
-    output = output or f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/security/bandit_report.json"
+    output = output or str(get_output_dir("security/bandit_report.json"))
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     cmd = ["bandit", "-r", target_path, "-f", "json", "-o", output, "-q"]
     proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")

@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -541,7 +542,7 @@ def audit_decision_fairness(
 def export_bias_report(report: BiasReport, output_dir: str = None) -> str:
     """Export a BiasReport as JSON to the fairness workspace directory."""
     if output_dir is None:
-        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/ai-fairness"
+        output_dir = str(get_output_dir("ai-fairness"))
     from datetime import datetime
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)

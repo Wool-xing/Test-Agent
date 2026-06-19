@@ -28,6 +28,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +241,7 @@ def save_perf(samples: list, output_dir: str, prefix: str = "desktop_perf") -> s
 def screenshot(output: str = None):
     """跨平台截图"""
     if output is None:
-        output = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/screenshots/desktop/screen.png"
+        output = str(get_output_dir("screenshots/desktop/screen.png"))
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     try:
         import pyautogui
@@ -268,10 +269,10 @@ def main():
     perf = sub.add_parser("collect-perf")
     perf.add_argument("--pid", type=int, required=True)
     perf.add_argument("--duration", type=int, default=60)
-    perf.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/desktop-perf")
+    perf.add_argument("--output", default=str(get_output_dir("desktop-perf")))
 
     shot = sub.add_parser("screenshot")
-    shot.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/screenshots/desktop/screen.png")
+    shot.add_argument("--output", default=str(get_output_dir("screenshots/desktop/screen.png")))
 
     args = parser.parse_args()
     if args.cmd == "collect-perf":
