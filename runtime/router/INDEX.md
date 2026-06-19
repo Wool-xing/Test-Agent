@@ -3,7 +3,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `llm_client.py` | LiteLLM 多厂商封装 + Ollama 兜底 |
 | `expert_loader.py` | 扫描 `agents/*.md` frontmatter |
 | `skill_loader.py` | 扫描 `skills/*.md` frontmatter |

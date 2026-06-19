@@ -5,7 +5,7 @@
 ## 速查表
 
 | 子目录 | 用途 | 跑法 |
-|--------|------|------|
+| -------- | ------ | ------ |
 | `web-demo/` | Playwright + pytest 网页测试最小例(saucedemo.com) | `cd web-demo && pip install -r requirements.txt && pytest` |
 
 ## 新手 5 分钟
@@ -23,9 +23,9 @@
 
 ## 私有边界
 
-- **禁止**:真实客户 PRD 样本入 `examples/`
-- **占位**:用 `_template_*` 前缀(如 `_template_login_prd.md`)
-- **隔离**:含敏感场景的 demo 放私有仓
+-**禁止**:真实客户 PRD 样本入 `examples/`
+-**占位**:用 `_template_*` 前缀(如 `_template_login_prd.md`)
+-**隔离**:含敏感场景的 demo 放私有仓
 
 ## 相关
 

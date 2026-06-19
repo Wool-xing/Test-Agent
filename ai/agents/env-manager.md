@@ -12,13 +12,14 @@ paired_skills: []
 
 ### 1. 环境准备（Pre-test Setup）
 
-环境配置由 **conftest.py** 中的 `EnvConfig` / `get_current_env()` 提供（已对齐 .env）。本 agent 不再单独维护 EnvConfig 副本，避免双源漂移。
+环境配置由**conftest.py**中的 `EnvConfig` / `get_current_env()` 提供（已对齐 .env）。本 agent 不再单独维护 EnvConfig 副本，避免双源漂移。
 
 环境健康检查脚本位置：`workspace/自动化脚本/python/scripts/health_check.sh`
 
 ```bash
 #!/bin/bash
 # 健康检查（独立 .sh 文件，避免 heredoc 嵌套引号问题）
+
 set -euo pipefail
 
 API_URL="${TEST_API_URL:-http://test-api.example.com}"
@@ -30,6 +31,7 @@ DB_NAME="${TEST_DB_NAME:-testdb}"
 echo "=== 测试环境健康检查 ==="
 
 # 1) 应用可达性
+
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$API_URL/health" || echo "000")
 if [[ "$HTTP_CODE" =~ ^2 ]]; then
     echo "✅ 应用 $API_URL/health (HTTP $HTTP_CODE)"
@@ -39,6 +41,7 @@ else
 fi
 
 # 2) 数据库 TCP 探活
+
 if command -v pg_isready &>/dev/null; then
     pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t 5 \
         && echo "✅ 数据库 $DB_HOST:$DB_PORT" \
@@ -50,6 +53,7 @@ else
 fi
 
 # 3) Redis
+
 REDIS_HOST="${TEST_REDIS_HOST:-localhost}"
 REDIS_PORT="${TEST_REDIS_PORT:-6379}"
 if command -v redis-cli &>/dev/null; then
@@ -59,18 +63,22 @@ if command -v redis-cli &>/dev/null; then
 fi
 
 # 4) Mock 服务（可选）
+
 if [[ -n "${MOCK_SERVER_URL:-}" ]]; then
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 3 "$MOCK_SERVER_URL/__admin/health" || echo "000")
     [[ "$HTTP_CODE" =~ ^2 ]] && echo "✅ Mock $MOCK_SERVER_URL" || echo "⚠️ Mock 未启用"
 fi
 
 echo "=== 环境检查通过 ==="
-```
+
+```text
 
 ### 2. Python 健康检查（更精细，落地 JSON 报告）
 
 ```python
+
 # 调用 utils/jmeter_csv_exporter 等工具的相同 import 模式（部署后 utils/ 在 sys.path）
+
 import json
 import logging
 import time
@@ -78,7 +86,6 @@ from datetime import datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
-
 
 def health_check(env_config) -> dict:
     """执行环境健康检查，返回报告 dict 并写盘。"""
@@ -149,12 +156,15 @@ def health_check(env_config) -> dict:
     out.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info(f"环境健康报告：{out}")
     return report
-```
+
+```text
 
 ### 3. Docker 环境管理
 
 ```yaml
+
 # docker-compose.test.yml
+
 version: '3.8'
 
 services:
@@ -165,6 +175,7 @@ services:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpassword
     ports:
+
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
@@ -175,6 +186,7 @@ services:
   test-redis:
     image: redis:7-alpine
     ports:
+
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -185,15 +197,19 @@ services:
   mock-server:
     image: wiremock/wiremock:3.3.1   # 固定版本，不用 :3.x 通配
     ports:
+
       - "8080:8080"
     volumes:
+
       - ./mock-data:/home/wiremock/__files
       - ./mock-mappings:/home/wiremock/mappings
-```
+
+```text
 
 ### 4. 环境健康检查报告（JSON 标准）
 
 ```json
+
 {
   "timestamp": "2026-05-10T10:00:00",
   "environment": "test",
@@ -205,14 +221,17 @@ services:
     "mock_server": {"status": "ok"}
   }
 }
-```
+
+```text
 
 落盘路径：`workspace/测试报告/{项目名}/环境检查_{时间戳}.json`
 
 ### 5. 环境清理（Post-test Teardown）
 
 ```bash
+
 # 清理测试数据（保留环境配置）
+
 python -c "
 from data_factory import TestDataManager
 mgr = TestDataManager()
@@ -220,19 +239,21 @@ mgr.cleanup()
 "
 
 # 重置容器（如使用 docker-compose）
+
 docker-compose -f docker-compose.test.yml restart test-db test-redis
-```
+
+```text
 
 ## ⚠️ 异常处理机制
 
 ### 环境准备失败处理（带指数退避）
 
 ```python
+
 import logging
 import time
 
 logger = logging.getLogger(__name__)
-
 
 def prepare_environment_with_retry(env_config, max_retries: int = 3) -> bool:
     """带指数退避的环境准备：10s/20s/40s（与全栈重试策略对齐）"""
@@ -246,13 +267,14 @@ def prepare_environment_with_retry(env_config, max_retries: int = 3) -> bool:
         except Exception as e:
             logger.warning(f"环境检查异常 (尝试 {attempt + 1}/{max_retries}): {e}")
         if attempt < max_retries - 1:
-            wait = min(10 * (2 ** attempt), 60)
+            wait = min(10 * (2**attempt), 60)
             logger.info(f"等待 {wait}s 后重试")
             time.sleep(wait)
 
     logger.error("环境准备失败，已达最大重试次数，阻止测试执行")
     return False
-```
+
+```text
 
 ### 异常处理原则
 
@@ -267,24 +289,26 @@ def prepare_environment_with_retry(env_config, max_retries: int = 3) -> bool:
 调用前确认（缺项 test-lead 会 prompt 用户补齐）：
 
 ```text
+
 □ .env 已填 TEST_APP_URL / TEST_API_URL / TEST_DB_HOST / TEST_DB_PASSWORD
 □ 数据库 / Redis / Mock 服务可达（ping 通）
 □ pip 装 SQLAlchemy + redis（如需深度健康检查）
 □ Docker 已装（如用 docker-compose.test.yml）
 □ TEST_ENV=test 或 staging（不接受 prod）
-```
+
+```text
 
 ## 协作输出
 
-- 向 **test-lead**：环境健康 JSON 报告（status: ready / fail）
-- 向 **data-preparer**：env_config 对象（含 db/redis 凭证）
-- 向 **test-executor**：环境就绪信号（基础 connectivity 通过即放行）
-- 向 **bug-manager**：环境异常时 Bug 类型为 environment_issue
+- 向**test-lead**：环境健康 JSON 报告（status: ready / fail）
+- 向**data-preparer**：env_config 对象（含 db/redis 凭证）
+- 向**test-executor**：环境就绪信号（基础 connectivity 通过即放行）
+- 向**bug-manager**：环境异常时 Bug 类型为 environment_issue
 
 ## 📋 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/环境检查_{时间戳}.json` | 健康报告 |
 | `workspace/测试报告/{项目名}/环境清理_{时间戳}.json` | 清理报告 |
 

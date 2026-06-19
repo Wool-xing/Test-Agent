@@ -5,7 +5,7 @@
 ## 文件清单
 
 | 文件 | 用途 | 是否提交 Git |
-|------|------|------------|
+| ------ | ------ | ------------ |
 | [conftest.py](conftest.py) | pytest 全局 fixture（项目根唯一权威：`EnvConfig` / `env_config` / `test_data` / `browser_context` / `api_client` / 失败截图 hook） | ✅ |
 | [pytest.ini](pytest.ini) | pytest 行为：markers / addopts / timeout / junit-xml / log | ✅ |
 | [requirements.txt](requirements.txt) | Python 依赖（`==` 锁版本，CI 可复现） | ✅ |
@@ -16,12 +16,12 @@
 ## 配置生效位置
 
 | 配置文件 | 部署后落地位置 | 是否覆盖用户修改 |
-|---------|---------------|----------------|
+| --------- | --------------- | ---------------- |
 | `conftest.py` | `<PROJECT_ROOT>/conftest.py` | 升级时**覆盖**（用户自定义请抽到 `tests/conftest_user.py`） |
-| `pytest.ini` | `<PROJECT_ROOT>/pytest.ini` | 升级时**覆盖** |
-| `.env.example` | `<PROJECT_ROOT>/.env`（首次部署，已存在则跳过） | **不覆盖** |
-| `.mcp.json` | `<PROJECT_ROOT>/.mcp.json` | 升级时**覆盖** |
-| `requirements.txt` | `<PROJECT_ROOT>/requirements.txt` | 升级时**覆盖** |
+| `pytest.ini` | `<PROJECT_ROOT>/pytest.ini` | 升级时**覆盖**|
+| `.env.example` | `<PROJECT_ROOT>/.env`（首次部署，已存在则跳过） |**不覆盖**|
+| `.mcp.json` | `<PROJECT_ROOT>/.mcp.json` | 升级时**覆盖**|
+| `requirements.txt` | `<PROJECT_ROOT>/requirements.txt` | 升级时**覆盖**|
 
 ## 必读：用户责任
 
@@ -34,7 +34,7 @@
 修改本目录任一配置文件时，**必须**联动检查：
 
 | 修改 | 同步至 |
-|------|--------|
+| ------ | -------- |
 | `.env.example` 加新字段 | `conftest.py::EnvConfig` + `配置清单.md` 字段表 + `.github/workflows/*.yml` Secrets 引用 |
 | `pytest.ini` 加 marker | 自动化脚本对应 `@pytest.mark.X` 必须用已注册 marker（`strict-markers` 启用） |
 | `requirements.txt` 加依赖 | `部署说明.md` utils 列表 + `.github/dependabot.yml` 分组（按需）|
@@ -44,8 +44,10 @@
 
 ```bash
 # 验证配置完整
+
 test -f .env && echo "✅" || echo "❌ .env 缺失"
 test -f .mcp.json && echo "✅"
 pytest --collect-only         # 应能收集（即使无用例）
 python -c "from conftest import get_current_env; print(get_current_env())"
-```
+
+```text

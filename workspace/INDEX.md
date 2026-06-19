@@ -1,11 +1,13 @@
 # Workspace — Runtime Output
 
 ## Purpose
+
 ALL runtime-generated data lives here. This directory is **completely gitignored**.
 The only exception is `_demo/` — a reference demo project used by `runtime/` for demos and smoke tests.
 
 ## Structure
-```
+
+```text
 workspace/
 ├── _demo/                   ← Demo project fixture (referenced by runtime)
 │   .env                     ← Demo environment config
@@ -19,22 +21,25 @@ workspace/
 ├── 需求分析/                ← Requirements analysis (gitignored)
 ├── 自动化脚本/              ← Generated automation scripts (gitignored)
 └── gateway/                 ← Export history + runtime state (gitignored)
-```
+```text
 
 ## Rules
 
 ### What goes here
+
 - Test execution output (reports, logs, screenshots)
 - Generated test data and automation scripts
 - Runtime state (cron jobs, feedback, export history)
 - Demo project fixtures (`_demo/`)
 
 ### What does NOT go here
+
 - Source code — goes in `runtime/`, `utils/`, `ai/`, `apps/`
 - Configuration — goes in `deploy/`
 - Documentation — goes in `docs/`
 
 ### Cleanup
+
 - Use `tagent clean` or `python -m runtime.cli.data_cleaner` to purge runtime output
 - Everything except `_demo/` can be safely deleted
 - This directory is created by `install.py` during deployment

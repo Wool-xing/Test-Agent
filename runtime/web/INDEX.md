@@ -1,12 +1,12 @@
 # runtime/web 索引
 
 > Web UI for `runtime/api`. 4 页:Upload / Run Status / Report / Catalog。
-> 被测项级别 **L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。
+> 被测项级别**L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。
 
 ## 技术栈
 
 | 项 | 选 |
-|----|----|
+| ---- | ---- |
 | 构建 | Vite 5 + TypeScript 5 |
 | UI 框架 | React 18 |
 | 组件库 | shadcn/ui (Radix + Tailwind) |
@@ -19,7 +19,7 @@
 ## 4 页
 
 | 路由 | 用途 |
-|------|------|
+| ------ | ------ |
 | `/` | Upload(多格式:PDF/Word/MD/exe/APK/IPA/Docker/URL/口头) |
 | `/runs/:run_id` | Run Status(SSE 流式 DAG 实时进度) |
 | `/runs/:run_id/report` | Report(执行结果+证据+缺陷链接) |
@@ -35,12 +35,13 @@ npm run build        # 产出 dist/
 npm run test         # Vitest
 npm run test:e2e     # Playwright
 npm run test:a11y    # axe-core 可访问性扫
-```
+
+```text
 
 ## API 端点对接
 
 | 前端 | 后端(`runtime/api/main.py`) |
-|------|-----------------------------|
+| ------ | ----------------------------- |
 | Upload 文本 | `POST /run/text` |
 | Upload 文件 | `POST /run/file` |
 | Upload URL | `POST /run/url` |

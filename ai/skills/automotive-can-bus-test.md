@@ -10,7 +10,7 @@ SKILL_IMPL_STATUS: production
 ## 协议矩阵
 
 | 协议 | 工具(开源) | 工具(商业) |
-|------|------------|------------|
+| ------ | ------------ | ------------ |
 | CAN / CAN-FD | python-can / SocketCAN / cantools(DBC) | Vector CANoe / PEAK PCAN |
 | LIN | python-lin / Saleae | Vector LIN |
 | FlexRay | (少开源) | Vector / Synopsys |
@@ -19,12 +19,12 @@ SKILL_IMPL_STATUS: production
 
 ## 必测维度
 
-- **协议一致性**:CAN 2.0B / CAN-FD / SOME/IP 标准
-- **DBC 解析**:每信号在 frame 内位置 + 符号 + 偏移
-- **时序约束**:周期帧 / 事件帧 / 响应帧 timing
-- **故障注入**:总线断 / 错误帧 / 总线 off / 节点掉电
-- **诊断 UDS**:0x10/0x11/0x22/0x27/0x31/0x34/0x36/0x37 服务
-- **安全 SecOC**(AUTOSAR):MAC 校验 / freshness 防重放
+-**协议一致性**:CAN 2.0B / CAN-FD / SOME/IP 标准
+-**DBC 解析**:每信号在 frame 内位置 + 符号 + 偏移
+-**时序约束**:周期帧 / 事件帧 / 响应帧 timing
+-**故障注入**:总线断 / 错误帧 / 总线 off / 节点掉电
+-**诊断 UDS**:0x10/0x11/0x22/0x27/0x31/0x34/0x36/0x37 服务
+-**安全 SecOC**(AUTOSAR):MAC 校验 / freshness 防重放
 
 ## 输出
 

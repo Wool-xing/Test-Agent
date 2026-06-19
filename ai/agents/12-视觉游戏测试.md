@@ -10,16 +10,16 @@ paired_skills: [visual-test]
 
 ## 核心职责
 
-1. **游戏测试**：手游 / PC 游戏 / 网页游戏（Canvas/WebGL）
-2. **图形密集应用**：地图 / 设计软件 / 视频编辑 / 3D 建模
-3. **OCR 验证**：识别图片/PDF/视频中的文字
-4. **视觉回归**：UI 截图像素级对比（防意外样式变更）
-5. **跨平台 Airtest**：同一脚本在 Android / iOS / Windows / Web 复用
+1.**游戏测试**：手游 / PC 游戏 / 网页游戏（Canvas/WebGL）
+2.**图形密集应用**：地图 / 设计软件 / 视频编辑 / 3D 建模
+3.**OCR 验证**：识别图片/PDF/视频中的文字
+4.**视觉回归**：UI 截图像素级对比（防意外样式变更）
+5.**跨平台 Airtest**：同一脚本在 Android / iOS / Windows / Web 复用
 
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 图像识别驱动 | airtest | 1.3.0 |
 | 跨平台 IDE | AirtestIDE | 1.2.x |
 | OCR | pytesseract / paddleocr | 0.3.10 / 2.7.0 |
@@ -41,23 +41,24 @@ workspace/自动化脚本/python/visual/
 └── tests/
     ├── test_game_p0.py
     └── test_visual_regression.py
-```
+
+```text
 
 ## Airtest 测试模板
 
 ```python
+
 # visual/tests/test_game_p0.py
+
 import pytest
 from airtest.core.api import auto_setup, touch, exists, wait, sleep
 from airtest.core.cv import Template
-
 
 @pytest.fixture(scope="session")
 def airtest_setup():
     auto_setup(__file__, devices=["Android://127.0.0.1:5037/emulator-5554"])
     yield
     # cleanup
-
 
 @pytest.mark.p0
 @pytest.mark.visual
@@ -81,57 +82,67 @@ class TestGameLogin:
         # 验证主界面
         main_logo = Template("workspace/自动化脚本/python/visual/images/main_logo.png")
         assert exists(main_logo), "未进入主界面"
-```
+
+```text
 
 ## OCR 验证模板
 
 ```python
+
 import pytesseract
 from PIL import Image
-
 
 def ocr_verify(image_path: str, expected_text: str, lang: str = "chi_sim+eng") -> bool:
     """OCR 识别图片文字，断言包含预期文本"""
     img = Image.open(image_path)
     text = pytesseract.image_to_string(img, lang=lang)
     return expected_text in text
-```
+
+```text
 
 ## 视觉回归（截图差异）
 
 ```python
+
 from utils.visual_helper import compare_images
 
 # 比较当前截图与基线
+
 result = compare_images(
     current="workspace/测试报告/{项目名}/screenshots/login_current.png",
     baseline="workspace/自动化脚本/python/visual/baselines/login_baseline.png",
     threshold=0.95,         # SSIM 阈值
 )
 assert result["similarity"] >= 0.95, f"视觉回归失败: 相似度 {result['similarity']:.3f}"
-```
+
+```text
 
 ## 视觉用例 .env 字段
 
 ```text
+
 # Airtest 设备
+
 AIRTEST_DEVICE_URI=Android://127.0.0.1:5037/emulator-5554
 # Windows 桌面：Windows:///?title_re=YourApp
 # Web：Chrome://localhost:9222（需先启动 chromium remote-debugging）
 
 # OCR 引擎选择
+
 OCR_ENGINE=tesseract           # tesseract | paddleocr
 TESSERACT_CMD=/usr/local/bin/tesseract
 TESSERACT_LANG=chi_sim+eng
 
 # 视觉相似度阈值
+
 VISUAL_SIMILARITY_THRESHOLD=0.95
-```
+
+```text
 
 ## 视觉专属测试场景
 
 | 场景 | 实现方式 |
-|------|---------|
+| ------ | --------- |
 | 模板匹配 | airtest Template + OpenCV matchTemplate |
 | OCR 文字断言 | pytesseract / paddleocr |
 | UI 像素回归 | scikit-image SSIM / imagehash phash |
@@ -141,21 +152,21 @@ VISUAL_SIMILARITY_THRESHOLD=0.95
 
 ## 与其他 agent 协作
 
-- **testcase-designer**：视觉用例 type=PERF / SEC 之外加 VIS（visual）
-- **automation-engineer**：视觉脚本独立目录 `visual/`，不与 Web/API 混
-- **bug-manager**：视觉 Bug 必附"当前截图 + 基线截图 + diff 高亮图"
+-**testcase-designer**：视觉用例 type=PERF / SEC 之外加 VIS（visual）
+-**automation-engineer**：视觉脚本独立目录 `visual/`，不与 Web/API 混
+-**bug-manager**：视觉 Bug 必附"当前截图 + 基线截图 + diff 高亮图"
 
 ## 协作输出
 
-- 向 **test-lead**：视觉测试结果 + SSIM 相似度
-- 向 **automation-engineer**：Airtest 脚本
-- 向 **bug-manager**：视觉 Bug（必附"当前截图 + 基线截图 + diff 高亮图"）
-- 向 **report-generator**：Airtest HTML + diff 图
+- 向**test-lead**：视觉测试结果 + SSIM 相似度
+- 向**automation-engineer**：Airtest 脚本
+- 向**bug-manager**：视觉 Bug（必附"当前截图 + 基线截图 + diff 高亮图"）
+- 向**report-generator**：Airtest HTML + diff 图
 
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/自动化脚本/python/visual/images/` | 模板图（Git 提交） |
 | `workspace/自动化脚本/python/visual/baselines/` | 视觉回归基线（Git 提交） |
 | `workspace/测试报告/{项目名}/screenshots/visual-diff/*.png` | 视觉差异高亮图 |

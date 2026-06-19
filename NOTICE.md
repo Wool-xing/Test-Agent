@@ -5,7 +5,7 @@ Test-Agent 本体 MIT License。以下组件保留各自上游协议。
 ## Upstream Skills(项目内 skills/ 子目录)
 
 | 路径 | 上游 | 协议 |
-|------|------|------|
+| ------ | ------ | ------ |
 | `skills/darwin-skill/` | [alchaincyf/darwin-skill](https://github.com/alchaincyf/darwin-skill) | MIT |
 | `skills/karpathy-guidelines/` | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | MIT |
 | `skills/nuwa-skill/` | [alchaincyf/nuwa-skill](https://github.com/alchaincyf/nuwa-skill) | MIT |

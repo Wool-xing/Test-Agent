@@ -1,4 +1,4 @@
-# Marketplace 4 关安全门(主宪章 §30)
+# Marketplace 四重安全验证
 # 4 关任一不过 → 拒装 + 落 decisions/
 
 gates:
@@ -52,7 +52,7 @@ trust_tiers:
 
 # 卸载策略
 uninstall:
-  archive_only: true         # 主宪章 §22 决策不可逆禁止
+  archive_only: true         #
   archive_dir: marketplace/.archive/
 
 # 紧急 kill switch

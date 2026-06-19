@@ -17,19 +17,20 @@ SKILL_IMPL_STATUS: production
 ## 5 维度自省
 
 | 维 | 工具 |
-|----|------|
-| **决策回放** | `workspace/测试报告/{项目名}/decisions/` JSON 时间序 |
-| **工具调用** | OTel span(`runtime/observability/otel.py`)+ Loguru |
-| **token 消耗** | LLM provider header + LiteLLM 记账 |
-| **上下文** | prompt 长度 + 截断点 + 主-子 session 隔离审查 |
-| **状态机** | Prefect flow run state(`runtime/orchestrator/flows.py`)|
+| ---- | ------ |
+|**决策回放**| `workspace/测试报告/{项目名}/decisions/` JSON 时间序 |
+|**工具调用**| OTel span(`runtime/observability/otel.py`)+ Loguru |
+|**token 消耗**| LLM provider header + LiteLLM 记账 |
+|**上下文**| prompt 长度 + 截断点 + 主-子 session 隔离审查 |
+|**状态机**| Prefect flow run state(`runtime/orchestrator/flows.py`)|
 
-## 决策回放 
+## 决策回放
 
 每次 routing / curator / scheduler 决策已自动落 `decisions/{date}_{tool}_{run_id}.json`。
 含:输入快照 + 模型版本 + 阈值 + 判断结论 + 理由。
 
 调试流:
+
 1. 找 run_id
 2. cat `decisions/*_<run_id>.json`
 3. 看 LLM 看到的输入(input snapshot)+ 给的输出(decision)
@@ -38,7 +39,8 @@ SKILL_IMPL_STATUS: production
 ## 工具调用 trace
 
 OTel 启用时:
-```
+
+```text
 flow.run                      # api.request 总 span
 ├─ router.decide              # LLM 决策
 │  ├─ llm.call provider=claude
@@ -46,7 +48,8 @@ flow.run                      # api.request 总 span
 └─ orchestrator.flow_run
    ├─ task.requirements-analyst
    └─ task.testcase-designer ...
-```
+
+```text
 
 ## token 异常诊断
 

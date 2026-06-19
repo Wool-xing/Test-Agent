@@ -13,19 +13,19 @@ paired_skills: [testcase-design]
 ### 核心方法组合
 
 | 方法 | 适用场景 | 优先级 |
-|------|---------|-------|
+| ------ | --------- | ------- |
 | 等价类划分 | 输入验证、状态转换 | 必用 |
 | 边界值分析 | 数值范围、字符长度 | 必用 |
 | 判定表 | 多条件组合逻辑 | 复杂业务 |
 | 场景法 | 业务流程、用户故事 | 必用 |
 | 错误推测法 | 历史缺陷区域 | 重点模块 |
-| 探索性测试 | 新功能、未知风险、用例覆盖盲区 | **必用**（详见下方） |
+| 探索性测试 | 新功能、未知风险、用例覆盖盲区 |**必用**（详见下方） |
 | 正交实验法 | 参数组合爆炸 | 性能/兼容 |
-| **状态迁移法**（State Transition） | 状态机系统（订单/工作流/会话） | utils.state_machine_tester |
-| **因果图法**（Cause-Effect） | 多输入多输出复杂逻辑 | 文档手动 |
-| **配对测试**（Pairwise） | 多参数组合（OS×Browser×Lang） | utils.pairwise_generator |
-| **基于风险测试**（Risk-Based） | 资源有限优先测高风险 | 风险矩阵 |
-| 用户易用性走查 | 真实用户视角操作流 | **必用**（详见下方） |
+|**状态迁移法**（State Transition） | 状态机系统（订单/工作流/会话） | utils.state_machine_tester |
+|**因果图法**（Cause-Effect） | 多输入多输出复杂逻辑 | 文档手动 |
+|**配对测试**（Pairwise） | 多参数组合（OS×Browser×Lang） | utils.pairwise_generator |
+|**基于风险测试**（Risk-Based） | 资源有限优先测高风险 | 风险矩阵 |
+| 用户易用性走查 | 真实用户视角操作流 |**必用**（详见下方） |
 
 ### 探索性测试（Exploratory Testing）
 
@@ -34,8 +34,10 @@ paired_skills: [testcase-design]
 **Session-Based Test Management（SBTM）流程**：
 
 ```text
+
 1. Charter（章程）：定义本次探索目标
    示例 charter：
+
      - 模块：登录
      - 时长：60 分钟
      - 关注点：异常输入 / 并发会话 / 浏览器后退 / Cookie 篡改
@@ -49,38 +51,47 @@ paired_skills: [testcase-design]
 3. Debrief（汇报）：
    - Session 总结：覆盖了哪些区域 + 发现的问题
    - 转换为正式用例（如某场景值得回归）
-```
+
+```text
 
 **章程模板**（落 `workspace/测试用例/` 目录）：
 
 ```markdown
+
 # Charter: 登录模块异常输入探索
 ## 范围
+
 - 探索区域：登录表单 / 错误提示 / 限流
 - 时长：60 min
 - 测试者：xxx
 
 ## 风险假设
+
 - 限流可能不严
 - Cookie 可能被篡改
 
 ## 启发式方法（Heuristics）
+
 - SFDPOT（Structure / Function / Data / Platform / Operations / Time）
 - Boundary（边界）
 - Goldilocks（极小 / 极大 / 刚好）
 
 ## 计划探索的场景
+
 - [ ] 输入超长字符（10K+）
 - [ ] 高频快速点击（DDoS 风格）
 - [ ] 浏览器禁用 JS 后登录
 - [ ] 多 Tab 同时登录同账号
 
 ## Session Notes
+
 （执行时填）
 
 ## 发现的 Bug / 疑问
+
 （执行后填）
-```
+
+```text
 
 **用例 ID 类型**：`TC-{MODULE}-EXPL-{NUM}`（探索性 charter 转用例时）。
 
@@ -89,14 +100,16 @@ paired_skills: [testcase-design]
 ### 用户易用性走查（Usability Walkthrough）
 
 **与 UX 量化（utils/ux_metrics）的区别**：
-- **易用性走查**：人工角色扮演 + 启发式（Nielsen 10 原则），定性
-- **UX 量化**：自动化采集任务时长 / 点击数，定量
+
+-**易用性走查**：人工角色扮演 + 启发式（Nielsen 10 原则），定性
+-**UX 量化**：自动化采集任务时长 / 点击数，定量
 
 二者结合用。
 
 **Nielsen 10 启发式原则检查清单**：
 
 ```text
+
 □ 1. 系统状态可见性（loading 提示、操作反馈）
 □ 2. 系统与现实匹配（术语贴近用户语言）
 □ 3. 用户控制权（撤销 / 退出 / 取消）
@@ -107,12 +120,13 @@ paired_skills: [testcase-design]
 □ 8. 美学与极简（信息密度合理）
 □ 9. 帮助用户识别错误并恢复（错误信息明确 + 恢复建议）
 □ 10. 帮助文档（搜索 / 任务导向 / 上下文敏感）
-```
+
+```text
 
 **用户角色扮演**（必走 3 类用户）：
 
 | 角色 | 关注点 |
-|------|-------|
+| ------ | ------- |
 | 新手用户（首次使用） | 引导是否清晰 / 概念可懂 |
 | 熟练用户（高频使用） | 效率 / 快捷键 / 批量 |
 | 受限用户（无障碍 / 老年） | 字体大小 / 对比度 / 屏幕阅读器 / 键盘可达 |
@@ -126,6 +140,7 @@ paired_skills: [testcase-design]
 适合：订单状态机 / 用户会话 / 审批流程 / 设备状态。
 
 ```python
+
 from utils.state_machine_tester import StateMachine
 
 fsm = StateMachine("ORDER")
@@ -140,10 +155,13 @@ fsm.add_transition("已支付", "发货", "已发货")
 fsm.add_transition("已发货", "确认收货", "已完成")
 
 # 自动生成 0-switch（每条迁移）+ 1-switch（连续 2 步）+ 负例（非法事件）
+
 fsm.export_all("workspace/测试用例/order_state_cases.json")
-```
+
+```text
 
 输出三类用例：
+
 - `0-switch`：每条迁移 1 用例（最少覆盖）
 - `1-switch`：连续 2 条迁移（深度覆盖）
 - `negative`：每个状态下未定义事件应被拒绝（错误推测）
@@ -153,6 +171,7 @@ fsm.export_all("workspace/测试用例/order_state_cases.json")
 适合：多输入多输出业务规则。手工绘制因果图 → 转判定表 → 生成用例。
 
 5 类约束：
+
 - E（互斥）：A 和 B 不能同时为 1
 - I（包含）：A 和 B 至少一个为 1
 - O（唯一）：A 和 B 必有且只有一个为 1
@@ -168,6 +187,7 @@ fsm.export_all("workspace/测试用例/order_state_cases.json")
 原理：保证任意两因素的水平组合都覆盖 ≥1 次（基于"大多数 Bug 由两因素交互导致"的统计研究）。
 
 ```python
+
 from utils.pairwise_generator import generate_test_cases
 
 generate_test_cases({
@@ -176,14 +196,15 @@ generate_test_cases({
     "Lang":    ["zh-CN", "en-US", "ja-JP"],
     "DB":      ["MySQL", "Postgres", "SQLite"],
 })  # 全组合 81 → pairwise 仅 9 用例
-```
+
+```text
 
 ### 基于风险的测试（Risk-Based）
 
-风险评分 = **影响（Impact）** × **概率（Probability）**。
+风险评分 =**影响（Impact）**×**概率（Probability）**。
 
 | 风险等级 | 标准 | 测试投入 |
-|---------|------|---------|
+| --------- | ------ | --------- |
 | 高（H） | 影响金钱/数据丢失/法规违规 + 高发生概率 | P0 全用例 + 探索性 + 混沌 |
 | 中（M） | 业务功能受影响但可绕过 | P1 核心用例 |
 | 低（L） | 体验问题，无业务损失 | P2 抽样 |
@@ -191,7 +212,7 @@ generate_test_cases({
 风险矩阵示例：
 
 | 模块 | 影响（1-5） | 概率（1-5） | 风险 | 测试策略 |
-|------|----------|----------|------|---------|
+| ------ | ---------- | ---------- | ------ | --------- |
 | 支付 | 5（资金损失） | 3 | 15 H | 全用例 + 探索 + 混沌 + 灾备 |
 | 登录 | 4（无法使用） | 4 | 16 H | 全用例 + 安全深度 + Monkey |
 | 头像上传 | 1（体验） | 2 | 2 L | 冒烟即可 |
@@ -201,7 +222,7 @@ generate_test_cases({
 ### 优先级分级标准（占比合计 = 100%）
 
 | 优先级 | 标准 | 占比 |
-|--------|------|------|
+| -------- | ------ | ------ |
 | P0 | 核心业务路径，阻塞上线 | 10% |
 | P1 | 主要功能，影响主流程 | 30% |
 | P2 | 次要功能，影响体验 | 40% |
@@ -212,6 +233,7 @@ generate_test_cases({
 经典 Cohn 金字塔（推荐配比）：
 
 ```text
+
         /\
        /UI\        ~ 10%（少而稳，端到端）
       /----\
@@ -219,47 +241,56 @@ generate_test_cases({
     /------\
    / 单元   \    ~ 70%（多而快，函数级）
   /----------\
-```
+
+```text
 
 **变体**：
-- **测试钻石**（Diamond）：API 层加厚到 50%（适合后端为主项目）
-- **测试奖杯**（Trophy，Kent C. Dodds）：静态（lint/类型）+ 单元 + 集成 + e2e（前端项目推荐）
+
+-**测试钻石**（Diamond）：API 层加厚到 50%（适合后端为主项目）
+-**测试奖杯**（Trophy，Kent C. Dodds）：静态（lint/类型）+ 单元 + 集成 + e2e（前端项目推荐）
 
 **实践要求**：
+
 - 单元测试：用 `pytest` + `pytest-mock`，**不依赖外部资源**，秒级
 - 集成测试：API 层 + 数据库，**用真实依赖或 Hoverfly Service Virtualization**
 - E2E：Playwright / Appium，覆盖核心 user flow，慢但必有
 
 ```python
+
 # pytest 标记按层分目录组织
+
 workspace/自动化脚本/python/tests/
 ├── unit/           # @pytest.mark.unit
 ├── integration/    # @pytest.mark.integration
 └── e2e/            # @pytest.mark.e2e
-```
+
+```text
 
 ## 测试套件减重（Suite Minimization）
 
 随着用例增长，重复 / 冗余难免。定期跑：
 
 ```bash
+
 # 静态：检测疑似重复用例（基于标题/步骤/预期 Jaccard 相似度）
+
 python -m utils.suite_minimizer dup-excel \
     workspace/测试用例/testcases_*.xlsx --threshold 0.85
 
 # 动态：基于覆盖率减重（保留覆盖独特路径的用例）
 # 见 utils.suite_minimizer.minimize_by_coverage
-```
+
+```text
 
 输出：`workspace/测试报告/{项目名}/suite_minimization_report.json`，含可删除候选清单（人工最终决定）。
 
 ## 用例设计原则
 
-1. **独立性**：每条用例独立可执行，不依赖其他用例的执行结果
-2. **原子性**：一条用例只验证一个功能点
-3. **可重复性**：用例可以在任何时间多次执行并得到相同结果
-4. **可追溯性**：用例与需求点一一对应
-5. **完整性**：覆盖正向、反向、边界、异常四类场景
+1.**独立性**：每条用例独立可执行，不依赖其他用例的执行结果
+2.**原子性**：一条用例只验证一个功能点
+3.**可重复性**：用例可以在任何时间多次执行并得到相同结果
+4.**可追溯性**：用例与需求点一一对应
+5.**完整性**：覆盖正向、反向、边界、异常四类场景
 
 ## 用例 ID 规范
 
@@ -274,7 +305,7 @@ python -m utils.suite_minimizer dup-excel \
 ## 标准用例字段
 
 | 字段 | 说明 | 通用 / API |
-|------|------|----------|
+| ------ | ------ | ---------- |
 | 用例ID | 见上规范 | 通用 |
 | 模块 | 所属功能模块 | 通用 |
 | 类型 | UI / API / PERF / SEC | 通用 |
@@ -297,7 +328,9 @@ python -m utils.suite_minimizer dup-excel \
 设计完成后，逐项验证覆盖情况：
 
 ### 功能覆盖
+
 ```text
+
 ✅ 核心 Happy Path（正向主流程）
 ✅ 替代路径（其他有效操作方式）
 ✅ 异常路径（错误处理）
@@ -305,99 +338,111 @@ python -m utils.suite_minimizer dup-excel \
 ✅ 权限控制（不同角色的访问权限）
 ✅ 并发场景（同一资源并发操作）
 ✅ 数据状态（各种数据状态下的行为）
-```
+
+```text
 
 ### 非功能覆盖（8 大维度）
 
 | 维度 | 必测场景 | 工具 / utils | marker |
-|------|---------|-------------|--------|
-| **性能** | 单接口响应、并发 TPS、P95、错误率 | JMeter + utils.jmeter_result_parser | `@performance` |
-| **安全** | SQL 注入 / XSS / CSRF / 越权 / 鉴权失效 / SAST / 依赖漏洞 / TLS / 安全 Header | utils.security_scanner（bandit/safety/zap） | `@security` |
-| **兼容** | 浏览器矩阵（chromium/firefox/webkit）/ OS 矩阵 / 分辨率（1920/1366/iPhone/Android）/ 多语言 | utils.compatibility_matrix | `@compat` |
-| **弱网** | 3G / 4G / wifi_weak / satellite / offline / 高丢包 | utils.network_throttle | `@weak_network` |
-| **稳定性** | Android Monkey / 长时 soak（≥24h）/ 内存泄漏 | utils.mobile_driver.run_monkey + utils.soak_runner | `@stability` / `@soak` |
-| **可靠性** | 重连 / 断电恢复 / 数据库切主 / 服务降级 | utils.api_retry_util + 业务自实现 | `@reliability` |
-| **混沌** | CPU/内存/磁盘压力 / kill 进程/pod / 网络分区 / 时钟漂移 | utils.chaos_helper | `@chaos` |
-| **UX** | 任务完成时间 ≤ 30s / 点击数 ≤ 10 / TTI ≤ 3s / 错误恢复率 ≥ 80% | utils.ux_metrics.UXTracker | `@ux` |
-| **易用性**（Nielsen 10 原则定性） | 状态可见 / 防错 / 一致性 / 帮助文档 / 无障碍 | 人工走查 + 角色扮演 | `@usability` |
-| **探索性**（SBTM session） | charter 章程 / heuristics 启发式 / 风险假设 | 手工 + 录屏 + 截图 | `@exploratory` |
-| **单元测试**（unit） | 函数级隔离测试 + Mock | pytest + pytest-mock | `@unit` |
-| **验收测试**（UAT，BDD Gherkin） | 业务可读场景 / Given-When-Then | utils.bdd_runner（pytest-bdd） | `@uat` |
-| **灾备/Failover** | 主从切换 / 服务恢复 / 数据一致性 | utils.chaos_helper.kill_pod | `@failover` |
-| **Volume 容量** | 海量数据下表现（百万记录 / 大文件） | jmeter + 数据库压测脚本 | `@volume` |
-| **Spike 峰值** | 瞬时流量飙升（黑五/秒杀） | jmeter Synchronizing Timer | `@spike` |
-| **前端性能 Web Vitals** | LCP/FID/CLS/FCP/TTFB/INP | utils.web_vitals_collector（Lighthouse / web-vitals.js） | `@web_vitals` |
+| ------ | --------- | ------------- | -------- |
+|**性能**| 单接口响应、并发 TPS、P95、错误率 | JMeter + utils.jmeter_result_parser | `@performance` |
+|**安全**| SQL 注入 / XSS / CSRF / 越权 / 鉴权失效 / SAST / 依赖漏洞 / TLS / 安全 Header | utils.security_scanner（bandit/safety/zap） | `@security` |
+|**兼容**| 浏览器矩阵（chromium/firefox/webkit）/ OS 矩阵 / 分辨率（1920/1366/iPhone/Android）/ 多语言 | utils.compatibility_matrix | `@compat` |
+|**弱网**| 3G / 4G / wifi_weak / satellite / offline / 高丢包 | utils.network_throttle | `@weak_network` |
+|**稳定性**| Android Monkey / 长时 soak（≥24h）/ 内存泄漏 | utils.mobile_driver.run_monkey + utils.soak_runner | `@stability` / `@soak` |
+|**可靠性**| 重连 / 断电恢复 / 数据库切主 / 服务降级 | utils.api_retry_util + 业务自实现 | `@reliability` |
+|**混沌**| CPU/内存/磁盘压力 / kill 进程/pod / 网络分区 / 时钟漂移 | utils.chaos_helper | `@chaos` |
+|**UX**| 任务完成时间 ≤ 30s / 点击数 ≤ 10 / TTI ≤ 3s / 错误恢复率 ≥ 80% | utils.ux_metrics.UXTracker | `@ux` |
+|**易用性**（Nielsen 10 原则定性） | 状态可见 / 防错 / 一致性 / 帮助文档 / 无障碍 | 人工走查 + 角色扮演 | `@usability` |
+|**探索性**（SBTM session） | charter 章程 / heuristics 启发式 / 风险假设 | 手工 + 录屏 + 截图 | `@exploratory` |
+|**单元测试**（unit） | 函数级隔离测试 + Mock | pytest + pytest-mock | `@unit` |
+|**验收测试**（UAT，BDD Gherkin） | 业务可读场景 / Given-When-Then | utils.bdd_runner（pytest-bdd） | `@uat` |
+|**灾备/Failover**| 主从切换 / 服务恢复 / 数据一致性 | utils.chaos_helper.kill_pod | `@failover` |
+|**Volume 容量**| 海量数据下表现（百万记录 / 大文件） | jmeter + 数据库压测脚本 | `@volume` |
+|**Spike 峰值**| 瞬时流量飙升（黑五/秒杀） | jmeter Synchronizing Timer | `@spike` |
+|**前端性能 Web Vitals**| LCP/FID/CLS/FCP/TTFB/INP | utils.web_vitals_collector（Lighthouse / web-vitals.js） | `@web_vitals` |
 
 ### 用例 ID 类型扩展
 
 `TC-{MODULE}-{TYPE}-{NUM}`，TYPE 扩展：
 
 - `UI` / `API` / `PERF` / `SEC`（已有）
-- **`COMPAT`**（兼容性）
-- **`STAB`**（稳定性，含 Monkey）
-- **`SOAK`**（长时）
-- **`UX`**（用户体验量化）
-- **`USAB`**（易用性走查 / Nielsen 10）
-- **`EXPL`**（探索性 / SBTM）
-- **`CHAOS`**（混沌）
-- **`NET`**（弱网）
+-**`COMPAT`**（兼容性）
+-**`STAB`**（稳定性，含 Monkey）
+-**`SOAK`**（长时）
+-**`UX`**（用户体验量化）
+-**`USAB`**（易用性走查 / Nielsen 10）
+-**`EXPL`**（探索性 / SBTM）
+-**`CHAOS`**（混沌）
+-**`NET`**（弱网）
 
 示例：`TC-LOGIN-COMPAT-001` / `TC-PAYMENT-CHAOS-002` / `TC-CART-UX-003`。
 
 ### 各维度用例模板示例
 
 ```python
+
 # 安全（除 SQL/XSS）
+
 {"id": "TC-LOGIN-SEC-010", "type": "SEC", "priority": "P1",
  "name": "鉴权 token 篡改", "data": "篡改 token 第三段",
  "expected": "返回 401，无敏感信息回显"}
 
 # 兼容（矩阵驱动）
+
 {"id": "TC-HOME-COMPAT-001", "type": "COMPAT", "priority": "P1",
  "name": "跨浏览器首页渲染",
  "matrix": "browser=[chromium,firefox,webkit] × resolution=[1920,375]",
  "expected": "所有组合下首页布局一致"}
 
 # 弱网
+
 {"id": "TC-LOGIN-NET-001", "type": "NET", "priority": "P1",
  "name": "3G 弱网下登录可用",
  "precondition": "tc 应用 3g 预设（latency=300ms, rate=750kbps, loss=1%）",
  "expected": "10s 内登录成功"}
 
 # UX 量化
+
 {"id": "TC-CART-UX-001", "type": "UX", "priority": "P2",
  "name": "下单任务点击数",
  "expected": "完成下单 ≤ 10 次点击，时长 ≤ 30s"}
 
 # 混沌
+
 {"id": "TC-PAYMENT-CHAOS-001", "type": "CHAOS", "priority": "P0",
  "name": "支付时数据库主从切换",
  "precondition": "kubectl delete pod payment-db-master 后立即下单",
  "expected": "5s 内自动重试成功，无重复扣款"}
 
 # Soak
+
 {"id": "TC-API-SOAK-001", "type": "SOAK", "priority": "P1",
  "name": "登录接口 24h soak",
  "duration_hours": 24,
  "expected": "失败率 < 0.1% / 内存增长 < 30%"}
-```
+
+```text
 
 ## Excel 输出（4 Sheet 标准）
 
 由 `utils/excel_generator.create_testcase_excel(testcases, output_path)` 生成：
 
 ```text
+
 Sheet1 用例总览     - 优先级分布 + 模块分布统计
 Sheet2 测试用例     - 完整字段（16 列，含 API 字段）
 Sheet3 P0冒烟集     - 仅 P0 用例（带前置条件、数据）
 Sheet4 P0_P1回归集  - P0+P1 用例
-```
+
+```text
 
 落盘路径：`workspace/测试用例/testcases_{模块}_{YYYYMMDD}.xlsx`
 
 ## 登录模块示例
 
 ```python
+
 LOGIN_TESTCASES = [
     # P0 核心
     {"id": "TC-LOGIN-UI-001", "module": "登录", "type": "UI", "priority": "P0",
@@ -430,24 +475,27 @@ LOGIN_TESTCASES = [
      "data": "账号: admin' OR '1'='1",
      "expected": "登录失败，无异常错误，无 SQL 报错回显"},
 ]
-```
+
+```text
 
 ## 调用示例
 
 ```python
+
 from utils.excel_generator import create_testcase_excel
 
 create_testcase_excel(
     LOGIN_TESTCASES,
     f"workspace/测试用例/testcases_登录_{datetime.now():%Y%m%d}.xlsx"
 )
-```
+
+```text
 
 ## 协作输出
 
 用例设计完成后，提供给：
 
-- **data-preparer**：从用例 `data` 字段提取数据需求（数据类型、数量、特殊条件）
-- **automation-engineer**：用例 Excel 文件 + 自动化优先级标注（P0 必自动化、P1 ≥80%）
-- **test-executor**：完整用例 Excel + 执行顺序建议
-- **test-lead**：覆盖率分析 + 风险提示
+-**data-preparer**：从用例 `data` 字段提取数据需求（数据类型、数量、特殊条件）
+-**automation-engineer**：用例 Excel 文件 + 自动化优先级标注（P0 必自动化、P1 ≥80%）
+-**test-executor**：完整用例 Excel + 执行顺序建议
+-**test-lead**：覆盖率分析 + 风险提示

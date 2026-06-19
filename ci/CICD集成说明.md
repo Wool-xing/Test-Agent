@@ -22,12 +22,13 @@
 
 ```text
 your-test-project/.github/workflows/test.yml
-```
+
+```text
 
 ### 触发条件
 
 | 触发事件 | 默认测试级别 | 性能模式 |
-|---------|-----------|---------|
+| --------- | ----------- | --------- |
 | push 到 main / develop | regression | ci_quick |
 | push 到 release/* | regression | full |
 | PR 到 main / develop | smoke（仅冒烟） | 不执行 |
@@ -38,7 +39,9 @@ your-test-project/.github/workflows/test.yml
 在 GitHub 仓库 → Settings → Secrets and variables → Actions：
 
 ```text
+
 # 应用与数据库
+
 TEST_APP_URL              # 应用 URL（如 http://test.example.com）
 TEST_API_URL              # API URL（如 http://test-api.example.com）
 TEST_DB_HOST              # 数据库主机
@@ -47,40 +50,49 @@ TEST_DB_USER              # 数据库账号
 TEST_DB_PASSWORD          # 数据库密码
 
 # Staging（如需要 staging 流水线）
+
 STAGING_APP_URL
 STAGING_API_URL
 STAGING_DB_HOST
 STAGING_DB_PASSWORD
 
 # 测试账号
+
 TEST_USER
 TEST_PASS
 ADMIN_USER
 ADMIN_PASS
 
 # 性能压测账号
+
 PERF_TEST_USER
 PERF_TEST_PASS
 
 # Mock 服务（可选）
+
 MOCK_SERVER_URL
 
 # 禅道
+
 ZENTAO_BASE_URL
 ZENTAO_ACCOUNT
 ZENTAO_PASSWORD
 
 # 通知（可选，未配置则跳过）
+
 WECHAT_WEBHOOK_URL
 FEISHU_WEBHOOK
 DINGTALK_WEBHOOK
 
 # 覆盖率（可选）
+
 CODECOV_TOKEN             # 私库需要
 
 # 被测系统源码路径（覆盖率指向）
+
 APP_SRC_PATH              # 默认 ./src
-```
+
+```text
 
 > Secrets 在 if 表达式中**不能直接引用**。yml 中通过 `outputs` 中转或 `if: env.X != ''` 模式判断。
 
@@ -99,7 +111,7 @@ APP_SRC_PATH              # 默认 ./src
 ### 环境要求
 
 | 组件 | 版本 |
-|------|------|
+| ------ | ------ |
 | Jenkins | 2.400+ |
 | Python | 3.11+ |
 | Docker | 20.10+（推荐，使用容器化环境） |
@@ -120,6 +132,7 @@ APP_SRC_PATH              # 默认 ./src
 Manage Jenkins → Credentials → 添加以下 Secret text：
 
 ```text
+
 TEST_APP_URL
 TEST_API_URL
 TEST_DB_HOST
@@ -130,7 +143,8 @@ MOCK_SERVER_URL（可选）
 ZENTAO_BASE_URL / ZENTAO_ACCOUNT / ZENTAO_PASSWORD
 WECHAT_WEBHOOK_URL / FEISHU_WEBHOOK / DINGTALK_WEBHOOK（可选）
 APP_SRC_PATH
-```
+
+```text
 
 ### 创建 Pipeline
 
@@ -149,7 +163,7 @@ APP_SRC_PATH
 ### 功能门禁
 
 | 指标 | 冒烟 | 回归 | 不达标处置 |
-|------|------|------|---------|
+| ------ | ------ | ------ | --------- |
 | P0 通过率 | ≥95% | 100% | 停止 / 等待修复 |
 | P1 通过率 | - | ≥95% | 记录遗留风险 |
 | 整体通过率 | - | ≥90% | 评估风险 |
@@ -160,7 +174,7 @@ APP_SRC_PATH
 ### 性能门禁（双模式）
 
 | 指标 | full（50并发） | ci_quick（5并发） | 不达标处置 |
-|------|--------------|------------------|---------|
+| ------ | -------------- | ------------------ | --------- |
 | TPS | ≥100 | ≥20 | 性能 Bug |
 | P95 响应 | ≤500ms | ≤800ms | 慢接口分析 |
 | 平均响应 | ≤200ms | ≤400ms | 告警 |
@@ -179,17 +193,22 @@ APP_SRC_PATH
 ### Allure 报告
 
 ```bash
+
 # 本地查看
+
 allure serve workspace/测试报告/{项目名}/allure-results
 
 # 生成静态报告
+
 allure generate workspace/测试报告/{项目名}/allure-results \
     --output workspace/测试报告/{项目名}/allure-report --clean
-```
+
+```text
 
 ### 报告目录结构
 
 ```text
+
 workspace/测试报告/{项目名}/
 ├── allure-results/                # Allure 原始数据
 ├── allure-report/                 # Allure 静态 HTML
@@ -205,17 +224,21 @@ workspace/测试报告/{项目名}/
 ├── smoke-results.xml              # 冒烟 junit
 ├── regression-results.xml         # 回归 junit
 └── 环境检查_{时间戳}.json
-```
+
+```text
 
 ### 通知方式
 
 CI 通过 curl 调 webhook 直接发送，未走 MCP（与全栈一致）。
 
 通知内容示例：
+
 ```text
+
 ✅ 测试通过 | 构建#42 | 级别:regression | 模式:ci_quick | 查看报告
 ❌ 测试失败 | 构建#43 | 级别:smoke    | 查看报告
-```
+
+```text
 
 如需启用 MCP 通道（zentao / wechat / feishu / dingtalk mcp_server），自行实现对应模块后追加 `.mcp.json`（参见 `.mcp.json` `_comment` 字段）。
 

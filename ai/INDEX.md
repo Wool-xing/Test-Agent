@@ -1,12 +1,14 @@
 # AI Mode — Interface Layer
 
 ## Purpose
+
 Contains ALL files that AI coding tools read to operate in AI mode — any tool supporting AGENTS.md / SKILL.md standard.
-These are **prompt definitions** and **workflow documents** (.md only).
+These are**prompt definitions**and**workflow documents**(.md only).
 Not executable code.
 
 ## Structure
-```
+
+```text
 ai/
 ├── agents/                  ← 16 Agent role definitions
 │   01-测试主管.md           ← test-lead: orchestrate full flow
@@ -66,17 +68,20 @@ ai/
 ## Rules
 
 ### What goes here
+
 - Agent role prompt files (.md with YAML frontmatter)
 - Skill workflow documents (.md with step-by-step instructions)
 - Meta-skill packages (self-contained directories)
 
 ### What does NOT go here
+
 - Python code (.py) — goes in `runtime/` or `utils/`
 - Config files (.json, .yaml) — goes in `deploy/`
 - Test data or output — goes in `workspace/`
 - Build artifacts
 
 ### Convention
+
 - Agent files: numbered `01-` to `16-`, Chinese names
 - Skill files: lowercase-hyphenated English names
 - Each .md has YAML frontmatter: `id`, `category`, `agent_count`

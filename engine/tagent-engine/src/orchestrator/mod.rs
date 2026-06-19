@@ -153,7 +153,7 @@ impl DagExecutor {
 
         // Topological sort ---------------------------------------------------
         let sorted = toposort(&graph, None).map_err(|e| {
-            EngineError::Graph(format!("DAG contains a cycle: {}", e))
+            EngineError::Graph(format!("DAG contains a cycle: {:?}", e))
         })?;
 
         let ordered: Vec<&ExecNode> =

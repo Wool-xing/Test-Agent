@@ -21,7 +21,7 @@ skills:
 
 bug_tracker:
   primary: webhook
-  # 多 tracker 并存(主宪章 §37):写成 [zentao, github],按 Bug label 路由
+  # 多 tracker 并存:写成 [zentao, github],按 Bug label 路由
   # extra: [github]
 
 notifiers:
@@ -34,15 +34,15 @@ quality_gates:
   perf_p99_ms_max: 300
 
 selftest:
-  # 主宪章 §33 自检铁律
+  # 自检规则:定期跑 selftest 验证项目健康度
   pre_tag_required: true
   pass_threshold: 0.80
   strict_on_release: true
 
 marketplace:
-  enabled: false        # 默认关 · 主宪章 §30 safe-by-default
+  enabled: false        # 默认关 · safe-by-default
 
-# ============== SAFETY GATES · safe-by-default(主宪章 §22 / §35 + W5 sprint v2) ==============
+# ============== SAFETY GATES · safe-by-default ==============
 # 危险操作 / 自动化 / 影响生产 的功能 必须显式开启, 否则 destructive-guard 拒绝运行。
 # 详见 SECURITY.md 武器化代码使用边界 + 测试工具准入控制 节。
 

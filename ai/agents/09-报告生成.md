@@ -20,19 +20,20 @@ paired_skills: []
 □ 通知 webhook（按需）：.env 填 WECHAT_WEBHOOK_URL / FEISHU_WEBHOOK / DINGTALK_WEBHOOK
 □ 邮件分发（按需）：.env 填 SMTP_HOST / SMTP_USER / SMTP_PASSWORD
 □ 报告 URL（report_url 字段）：CI 部署到 GitHub Pages / 内部静态服务器
-```
+
+```text
 
 ## 协作输出
 
-- 向 **test-lead**：报告路径（Word/PDF/PPTX）+ 摘要 JSON
-- 向 **项目组**：多端 webhook 通知（企微/飞书/钉钉/Slack/Teams，未配置自动跳过）
-- 向 **PM/管理层**：邮件分发（HTML body + 多附件）
+- 向**test-lead**：报告路径（Word/PDF/PPTX）+ 摘要 JSON
+- 向**项目组**：多端 webhook 通知（企微/飞书/钉钉/Slack/Teams，未配置自动跳过）
+- 向**PM/管理层**：邮件分发（HTML body + 多附件）
 - 存档：所有报告 → `workspace/测试报告/{项目名}/`
 
 ## 报告类型
 
 | 报告 | 受众 | 格式 | 触发时机 | 工具 |
-|------|------|------|---------|------|
+| ------ | ------ | ------ | --------- | ------ |
 | 冒烟报告 | 开发/测试 | 即时消息 | 每次冒烟完成 | utils/generate_report.send_* |
 | 日报 | 项目组 | 消息+Excel | 每天 17:30（GitHub Actions schedule） | utils/generate_report + utils/excel_generator |
 | 阶段报告 | 测试主管/PM | Word | 里程碑节点 | utils/generate_report.generate_test_report |
@@ -43,6 +44,7 @@ paired_skills: []
 ## Word 测试报告（实现位于 utils/generate_report.py）
 
 ```python
+
 from utils.generate_report import generate_test_report
 
 generate_test_report(
@@ -69,7 +71,8 @@ generate_test_report(
     },
     output_path=f"workspace/测试报告/{项目名}/测试报告_{datetime.now():%Y%m%d}.docx",
 )
-```
+
+```text
 
 字体 fallback：`["微软雅黑", "PingFang SC", "Noto Sans CJK SC"]`（generate_report.py 内已实现，跨平台兼容）。
 
@@ -78,22 +81,27 @@ generate_test_report(
 ### PDF 报告
 
 ```python
+
 from utils.generate_report import generate_pdf_report
 generate_pdf_report(data, "workspace/测试报告/{项目名}/测试报告_20260510.pdf")
 # 依赖：reportlab（按需 pip install reportlab）
-```
+
+```text
 
 ### PPTX 高管摘要（5 页）
 
 ```python
+
 from utils.generate_report import generate_pptx_summary
 generate_pptx_summary(data, "workspace/测试报告/{项目名}/测试摘要_20260510.pptx")
 # 依赖：python-pptx（已在 requirements）
-```
+
+```text
 
 ### SMTP 邮件分发（含附件）
 
 ```python
+
 from utils.email_sender import send_test_report_email
 
 send_test_report_email(
@@ -111,21 +119,26 @@ send_test_report_email(
     to=["pm@example.com", "dev-lead@example.com"],
     cc=["qa-team@example.com"],
 )
-```
+
+```text
 
 `.env` 加：
+
 ```text
+
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=test@example.com
 SMTP_PASSWORD=
-```
+
+```text
 
 ## 通知（直连 webhook，无 MCP 依赖）
 
 ### 多端统一接口
 
 ```python
+
 from utils.generate_report import send_all_notifications
 
 results = send_all_notifications({
@@ -141,9 +154,11 @@ results = send_all_notifications({
     "report_url": "https://your-org.github.io/test-reports/2026-05-10/",
 })
 # {"wechat": True, "feishu": True, "dingtalk": True}
-```
+
+```text
 
 各平台 webhook 由 `.env` 注入：
+
 - `WECHAT_WEBHOOK_URL`
 - `FEISHU_WEBHOOK`
 - `DINGTALK_WEBHOOK`
@@ -159,20 +174,20 @@ results = send_all_notifications({
 ### 在 conftest.py 中增强（项目根 conftest.py 已含 pytest_configure 创建目录，本节为可选 Allure 标签）
 
 ```python
+
 # conftest.py 顶部已 import os/Path（与权威 conftest 同步）
+
 import os
 from pathlib import Path
 
 import allure
 import pytest
 
-
 @pytest.fixture(autouse=True)
 def allure_test_env(env_config):
     """在 Allure 报告中显示测试环境信息"""
     allure.dynamic.label("environment", env_config.env_name)
     allure.dynamic.label("url", env_config.app_base_url)
-
 
 def pytest_sessionstart(session):
     """会话启动时写入 Allure environment.properties"""
@@ -189,47 +204,58 @@ def pytest_sessionstart(session):
         with open(Path(allure_dir) / "environment.properties", "w", encoding="utf-8") as f:
             for k, v in env_props.items():
                 f.write(f"{k}={v}\n")
-```
+
+```text
 
 ## 报告生成命令（跨平台）
 
 ```bash
+
 # 生成 Allure 静态报告
+
 allure generate workspace/测试报告/{项目名}/allure-results \
     --output workspace/测试报告/{项目名}/allure-report \
     --clean
 
 # 启动本地 Allure 报告服务
+
 allure serve workspace/测试报告/{项目名}/allure-results
 
 # 生成 Word + 通知（跨平台时间戳由 Python 处理）
+
 python -m utils.generate_report \
     --data workspace/测试报告/{项目名}/regression_summary.json \
     --notify
-```
+
+```text
 
 ## 定时触发（GitHub Actions schedule）
 
 参见 `.github/workflows/selftest-weekly.yml`（每周自检，可改为日报 cron）:
 
 ```yaml
+
 # 日报示例：放 .github/workflows/daily-report.yml
+
 on:
   schedule:
+
     - cron: '30 1 * * 1-5'  # 每个工作日 9:30 UTC+8
 jobs:
   daily:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
       - run: pip install -e runtime/
       - run: tagent run --type smoke --notify
-```
+
+```text
 
 ## 协作输出
 
 报告生成完成后：
 
-- 向 **test-lead** 提供：Word 报告路径 + 摘要 JSON
-- 向 **项目组** 发送：多端通知（企业微信/飞书/钉钉/Slack/邮件/Teams，自动跳过未配置项）
+- 向**test-lead**提供：Word 报告路径 + 摘要 JSON
+- 向**项目组**发送：多端通知（企业微信/飞书/钉钉/Slack/邮件/Teams，自动跳过未配置项）
 - 存档：所有报告存入 `workspace/测试报告/{项目名}/` 目录

@@ -1,12 +1,14 @@
 # Deploy — Deployment Materials
 
 ## Purpose
+
 All files that `install.py` copies to the user's project directory at install time.
-These are **templates** and **static assets**, not source code.
-They get deployed to user projects — paths inside these files use **deploy-time paths** (e.g., `agents/` not `ai/agents/`).
+These are**templates**and**static assets**, not source code.
+They get deployed to user projects — paths inside these files use**deploy-time paths**(e.g., `agents/` not `ai/agents/`).
 
 ## Structure
-```
+
+```text
 deploy/
 ├── config/                  ← Config templates (copied to user project root)
 │   .env.example             ← Environment template
@@ -42,27 +44,32 @@ deploy/
     iec-61508.yaml           ← IEC 61508 (industrial)
     do-178c.yaml             ← DO-178C (aviation)
     INDEX.md                 ← Profiles overview
-```
+
+```text
 
 ## Rules
 
 ### What goes here
+
 - Config file templates (copied by install.py)
 - Marketplace registry and policies
 - Compliance profile definitions (.yaml)
 
 ### What does NOT go here
+
 - Business logic or executable code — goes in `runtime/` or `utils/`
 - AI agent/skill definitions — goes in `ai/`
 - Application source code — goes in `apps/`
 - Documentation — goes in `docs/`
 
 ### Path convention
-- Files here use **deploy-time paths**: `agents/`, `skills/`, `workspace/`
+
+- Files here use**deploy-time paths**: `agents/`, `skills/`, `workspace/`
 - install.py copies them to the user's project root
 - The user's deployed project has a flat structure (no `ai/`, `apps/`, `deploy/` directories)
 
 ### Adding a new config template
+
 1. Add file to `deploy/config/`
 2. Update `install.py` copy_config() if needed
 3. Document in `deploy/config/` README

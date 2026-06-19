@@ -9,8 +9,8 @@
 ## 类别 1：核心通用流程 9 Agent（每次测试必经）
 
 | 序号 | Agent 文件 | 角色 | 主要产出 |
-|------|-----------|------|---------|
-| 01 | `01-测试主管.md` | **test-lead**（协调者） | 测试计划 / 路由决策 / 质量门禁 / 最终上线建议 |
+| ------ | ----------- | ------ | --------- |
+| 01 | `01-测试主管.md` |**test-lead**（协调者） | 测试计划 / 路由决策 / 质量门禁 / 最终上线建议 |
 | 02 | `02-需求分析.md` | requirements-analyst | requirements_analysis_*.md + JSON 摘要 |
 | 03 | `03-用例设计.md` | testcase-designer | testcases_*.xlsx（4 Sheet） |
 | 04 | `04-环境管理.md` | env-manager | 环境检查 JSON + Docker 编排 |
@@ -28,41 +28,45 @@ test-lead 协调
 requirements-analyst → testcase-designer → [并行] env-manager + data-preparer →
 automation-engineer → /smoke-test → test-executor 功能 → test-executor 性能 →
 bug-manager → report-generator → test-lead 决策
-```
+
+```text
 
 ---
 
 ## 类别 2：平台专项扩展 5 Agent（按 PRD 形态路由）
 
 | 序号 | Agent 文件 | 角色 | 触发条件（PRD 关键词） |
-|------|-----------|------|----------------------|
-| 10 | `10-移动测试.md` | **mobile-tester** | Android / iOS / .apk / .ipa / 微信小程序 / 支付宝小程序 |
-| 11 | `11-桌面测试.md` | **desktop-tester** | .exe / Windows 桌面 / .app / macOS / Electron / VSCode / 钉钉PC |
-| 12 | `12-视觉游戏测试.md` | **visual-tester** | 游戏 / Canvas / WebGL / Unity / Unreal / OCR / 视觉回归 |
-| 13 | `13-系统集成测试.md` | **system-tester** | IoT / 嵌入式 / 串口 / MQTT / 音视频 / Jaeger / Kafka |
-| 14 | `14-AI模型测试.md` | **ai-tester** | 模型 / AI / LLM / 推理 / 推荐算法 / fairness / 数据漂移 |
+| ------ | ----------- | ------ | ---------------------- |
+| 10 | `10-移动测试.md` |**mobile-tester**| Android / iOS / .apk / .ipa / 微信小程序 / 支付宝小程序 |
+| 11 | `11-桌面测试.md` |**desktop-tester**| .exe / Windows 桌面 / .app / macOS / Electron / VSCode / 钉钉PC |
+| 12 | `12-视觉游戏测试.md` |**visual-tester**| 游戏 / Canvas / WebGL / Unity / Unreal / OCR / 视觉回归 |
+| 13 | `13-系统集成测试.md` |**system-tester**| IoT / 嵌入式 / 串口 / MQTT / 音视频 / Jaeger / Kafka |
+| 14 | `14-AI模型测试.md` |**ai-tester**| 模型 / AI / LLM / 推理 / 推荐算法 / fairness / 数据漂移 |
 
 ---
 
 ## 类别 3：垂直领域扩展 2 Agent
 
 | 序号 | Agent 文件 | 角色 | 触发条件（PRD 关键词） |
-|------|-----------|------|----------------------|
-| 15 | `15-渗透测试.md` | **pentest-tester** | 渗透 / 安全测试 / SQL 注入 / XSS / SSRF / 漏洞扫描 / OWASP / 攻击面 |
-| 16 | `16-车载测试.md` | **automotive-tester** | 车载 / 汽车 / CAN-bus / SOME-IP / DoIP / UDS / ASIL / ISO-26262 / HIL / OTA |
+| ------ | ----------- | ------ | ---------------------- |
+| 15 | `15-渗透测试.md` |**pentest-tester**| 渗透 / 安全测试 / SQL 注入 / XSS / SSRF / 漏洞扫描 / OWASP / 攻击面 |
+| 16 | `16-车载测试.md` |**automotive-tester**| 车载 / 汽车 / CAN-bus / SOME-IP / DoIP / UDS / ASIL / ISO-26262 / HIL / OTA |
 
-⚠️ **运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../../SECURITY.md) 武器化代码使用边界)。16 expert 全部 active (11 production + 5 script)，0 处于 rollout。runtime/router + orchestrator 防 mock 已落地，不会输出 mock 数据。详见 [ROADMAP.md](../../ROADMAP.md)。
+⚠️**运行前提**: pentest-tester 需 `tagent.yml` 显式 `pentest.authorized: true` + 操作者书面授权(见 [SECURITY.md](../../SECURITY.md) 武器化代码使用边界)。16 expert 全部 active (11 production + 5 script)，0 处于 rollout。runtime/router + orchestrator 防 mock 已落地，不会输出 mock 数据。详见 [ROADMAP.md](../../ROADMAP.md)。
 
 ### 路由识别（自动）
 
 `utils/prd_loader.suggest_agents(text)` 输出：
+
 ```json
+
 {
   "platforms": ["mobile_android", "api"],
   "recommended_agents": ["mobile-tester", "automation-engineer"],
   "recommended_skills": ["/mobile-test", "/python-script-gen"]
 }
-```
+
+```text
 
 由 test-lead 接收后编排核心 9 + 选定平台扩展。
 
@@ -73,12 +77,14 @@ bug-manager → report-generator → test-lead 决策
 每个 agent 文件顶部必含：
 
 ```yaml
+
 ---
 name: <agent-id>
 description: <一句话职责描述>
 tools: Read, Write, Bash, Grep, Glob   # 按需添加 Edit
 ---
-```
+
+```text
 
 `name` 是 agent ID，被 test-lead 用 SendMessage 调用 / `.claude/agents/` 加载。
 `description` 决定 AI 工具何时主动调用此 agent（关键词匹配）。

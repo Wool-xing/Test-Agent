@@ -8,6 +8,7 @@ Plugins are discovered automatically at startup via the `tagent` entry point gro
 
 ```python
 # runtime/marketplace/discovery.py
+
 from importlib.metadata import entry_points
 
 def discover_plugins():
@@ -16,35 +17,42 @@ def discover_plugins():
         # ep.name: plugin name
         # ep.value: import path
         ...
-```
+
+```text
 
 ## Creating a Plugin
 
 ### 1. Package Structure
 
-```
+```text
+
 my-tagent-plugin/
   pyproject.toml
   my_plugin/
-    __init__.py
+__init__.py
     agents.py
     skills.py
-```
+
+```text
 
 ### 2. Register Entry Points
 
 In `pyproject.toml`:
 
 ```toml
+
 [project.entry-points.tagent]
 agents = "my_plugin.agents:register"
 skills = "my_plugin.skills:register"
-```
+
+```text
 
 ### 3. Implement Registration
 
 ```python
+
 # my_plugin/agents.py
+
 def register():
     return {
         "my-custom-agent": {
@@ -53,7 +61,8 @@ def register():
             "prompt_path": "my_plugin/prompts/agent.md"
         }
     }
-```
+
+```text
 
 ## Plugin Types
 
@@ -72,8 +81,10 @@ Register custom execution backends (e.g., a Kubernetes runner or a cloud VM laun
 ## Listing Installed Plugins
 
 ```bash
+
 tagent catalog --plugins
-```
+
+```text
 
 Shows all discovered plugins alongside built-in agents and skills.
 

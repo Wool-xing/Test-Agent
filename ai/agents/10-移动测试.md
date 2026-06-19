@@ -10,16 +10,16 @@ paired_skills: [mobile-test]
 
 ## 核心职责
 
-1. **原生 APP 测试**：Android（apk）/ iOS（ipa）功能 + 兼容性
-2. **小程序测试**：微信 / 支付宝 / 抖音 / 百度
-3. **混合应用**：H5 + 原生 webview
-4. **设备管理**：真机 / 模拟器 / 云真机切换
-5. **移动专属测试**：网络切换 / 弱网 / 后台 / 横竖屏 / 权限弹窗
+1.**原生 APP 测试**：Android（apk）/ iOS（ipa）功能 + 兼容性
+2.**小程序测试**：微信 / 支付宝 / 抖音 / 百度
+3.**混合应用**：H5 + 原生 webview
+4.**设备管理**：真机 / 模拟器 / 云真机切换
+5.**移动专属测试**：网络切换 / 弱网 / 后台 / 横竖屏 / 权限弹窗
 
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 驱动 | Appium-Python-Client | 4.0.0 |
 | WebDriver | selenium | 4.15.0 |
 | Android 调试 | adb（platform-tools） | 最新 |
@@ -43,17 +43,19 @@ workspace/自动化脚本/python/
 └── miniprogram/                        # 小程序
     ├── pages/wx/login_page.js
     └── tests/test_wx_login.py
-```
+
+```text
 
 ## Page Object 模板（Android）
 
 ```python
+
 # mobile/pages/android/login_page.py
+
 from appium.webdriver.common.appiumby import AppiumBy
 
-
 class LoginPageAndroid:
-    def __init__(self, driver):
+    def__init__(self, driver):
         self.driver = driver
         self.username = (AppiumBy.ID, "com.example.app:id/et_username")
         self.password = (AppiumBy.ID, "com.example.app:id/et_password")
@@ -67,16 +69,18 @@ class LoginPageAndroid:
 
     def get_error(self) -> str:
         return self.driver.find_element(*self.error_msg).text
-```
+
+```text
 
 ## 测试用例模板
 
 ```python
+
 # mobile/tests/test_android_p0.py
+
 import pytest
 
 from mobile.pages.android.login_page import LoginPageAndroid
-
 
 @pytest.mark.p0
 @pytest.mark.smoke
@@ -97,44 +101,52 @@ class TestLoginAndroid:
         WebDriverWait(android_driver, 10).until(
             lambda d: d.current_activity == ".MainActivity"
         )
-```
+
+```text
 
 ## 设备配置
 
 `.env` 移动端字段：
 
 ```bash
+
 # Appium server
+
 APPIUM_SERVER_URL=http://localhost:4723
 
 # Android
+
 ANDROID_DEVICE=emulator-5554            # 或真机 serial
 ANDROID_APP_PATH=/path/to/app.apk
 ANDROID_PACKAGE=com.example.app
 ANDROID_ACTIVITY=.MainActivity
 
 # iOS
+
 IOS_DEVICE_UDID=...
 IOS_APP_PATH=/path/to/app.ipa
 IOS_BUNDLE_ID=com.example.app
 IOS_PLATFORM_VERSION=17.0
 
 # 云真机（可选，二选一）
+
 SAUCELABS_USERNAME=
 SAUCELABS_ACCESS_KEY=
 BROWSERSTACK_USERNAME=
 BROWSERSTACK_ACCESS_KEY=
 
 # 小程序
+
 WX_DEVTOOL_CLI=/Applications/wechatwebdevtools.app/Contents/MacOS/cli   # macOS 路径示例
 WX_PROJECT_PATH=/path/to/your-miniprogram
 WX_APP_ID=<your-wechat-miniprogram-appid>
-```
+
+```text
 
 ## 移动专属测试场景
 
 | 场景 | 实现方式 |
-|------|---------|
+| ------ | --------- |
 | 弱网测试 | adb shell tc qdisc / Charles Throttling / Network Link Conditioner |
 | 后台切换 | driver.background_app(seconds=5) |
 | 横竖屏 | driver.orientation = "LANDSCAPE" |
@@ -143,7 +155,7 @@ WX_APP_ID=<your-wechat-miniprogram-appid>
 | 截图 | driver.save_screenshot(path) |
 | ANR/Crash 监控 | adb logcat -b crash + bugreport |
 | 内存/CPU 性能 | utils.mobile_driver.collect_perf_metrics |
-| **稳定性 Monkey** | **utils.mobile_driver.run_monkey（adb monkey 封装）** |
+|**稳定性 Monkey**|**utils.mobile_driver.run_monkey（adb monkey 封装）**|
 
 ## Android Monkey 稳定性测试（utils.mobile_driver.run_monkey）
 
@@ -152,7 +164,9 @@ WX_APP_ID=<your-wechat-miniprogram-appid>
 ### 命令行调用
 
 ```bash
+
 # 基础用法：1 万事件，间隔 200ms
+
 python -m utils.mobile_driver monkey \
     --package com.example.app \
     --events 10000 \
@@ -161,17 +175,20 @@ python -m utils.mobile_driver monkey \
     --output workspace/测试报告/{项目名}/monkey/
 
 # 长时压测：10 万事件 + 多设备 serial 指定
+
 python -m utils.mobile_driver monkey \
     --package com.example.app \
     --events 100000 \
     --throttle 100 \
     --serial emulator-5554 \
     --timeout 7200
-```
+
+```text
 
 ### Python API（更细粒度控制事件类型分布）
 
 ```python
+
 from utils.mobile_driver import run_monkey
 
 result = run_monkey(
@@ -191,14 +208,15 @@ result = run_monkey(
 # result: {"event_count", "exit_code", "crashes", "anrs", "duration_sec", "stable", "log_file"}
 
 assert result["stable"], f"稳定性测试失败：crash={result['crashes']}, anr={result['anrs']}"
-```
+
+```text
 
 ### Monkey 测试集成到 pytest
 
 ```python
+
 import pytest
 from utils.mobile_driver import run_monkey, archive_logcat
-
 
 @pytest.mark.p1
 @pytest.mark.mobile
@@ -214,12 +232,13 @@ def test_monkey_stability():
     )
     assert result["crashes"] == 0, f"发现 {result['crashes']} 次崩溃，详见 {result['log_file']}"
     assert result["anrs"] == 0, f"发现 {result['anrs']} 次 ANR"
-```
+
+```text
 
 ### Monkey 门禁建议
 
 | 指标 | 要求 |
-|------|------|
+| ------ | ------ |
 | Crash 数 | = 0 |
 | ANR 数 | = 0 |
 | 完成事件数 | ≥ 设定 event_count |
@@ -230,12 +249,14 @@ def test_monkey_stability():
 monkey 失败时 `result.seed` 记录种子。同 seed 同 throttle 可重放：
 
 ```bash
+
 python -m utils.mobile_driver monkey \
     --package com.example.app \
     --events 10000 \
     --seed 42 \
     --throttle 200
-```
+
+```text
 
 ### 与 logcat 协同
 
@@ -245,12 +266,13 @@ Bug 提交时附带 monkey log + logcat 两份给开发。
 ## 小程序测试
 
 ```python
+
 # miniprogram/tests/test_wx_login.py
+
 import os
 import subprocess
 
 import pytest
-
 
 @pytest.fixture(scope="session")
 def wx_devtools():
@@ -260,7 +282,6 @@ def wx_devtools():
     # 命令行打开自动化端口
     subprocess.run([cli, "auto", "--project", project, "--auto-port", "9420"], check=True)
     yield {"port": 9420, "project": project}
-
 
 @pytest.mark.p0
 @pytest.mark.miniprogram
@@ -273,68 +294,85 @@ def test_wx_login(wx_devtools):
     page.fill("input[name='username']", "test_user")
     page.tap("button.login-btn")
     assert mp.current_path() == "/pages/home/home"
-```
+
+```text
 
 ## 移动专项扩展（utils.push_test）
 
 ### 1. 安装 / 升级测试
 
 ```python
+
 from utils.push_test import install_apk, uninstall_app
 
 # 全新安装
+
 install_apk("/path/to/app.apk")
 
 # 覆盖升级（保留数据）
+
 install_apk("/path/to/app_v2.apk", replace=True)
 
 # 卸载清空
+
 uninstall_app("com.example.app")
-```
+
+```text
 
 测试场景：全新安装 / 覆盖升级 / 跨大版本升级 / 降级（验证拒绝）。
 
 ### 2. 推送通知（FCM / APNs）
 
 ```python
+
 from utils.push_test import send_fcm_v1, send_apns
 
 # Android FCM
+
 send_fcm_v1(project_id="proj-x", access_token="...",
             device_token="...", title="测试", body="推送内容")
 
 # iOS APNs（需 .p8 私钥）
+
 send_apns(device_token="...", bundle_id="com.example.app",
           title="测试", body="...", p8_key_path="AuthKey.p8",
           key_id="ABC", team_id="DEF")
-```
+
+```text
 
 测试场景：前台 / 后台 / 锁屏 / 通知中心交互 / 角标 / 静默推送 / 大图卡片。
 
 ### 3. DeepLink / Universal Link
 
 ```python
+
 from utils.push_test import test_deeplink
 
 # Android scheme deeplink
+
 test_deeplink("myapp://product/123", expected_screen=".ProductActivity")
 
 # Universal Link（iOS）/ App Link（Android HTTPS scheme）
+
 test_deeplink("https://app.example.com/product/123", expected_screen="product")
-```
+
+```text
 
 ### 4. 后台杀进程恢复
 
 ```python
+
 from utils.push_test import kill_app_and_relaunch
 
 result = kill_app_and_relaunch("com.example.app", ".MainActivity")
 # 重启后验证：登录态保持 / 未保存草稿恢复 / 购物车数据保留
-```
+
+```text
 
 ### 5. 应用商店合规清单
 
 ```text
+
 □ 隐私政策链接可访问（启动首屏 / 设置页）
 □ 权限弹窗有合理用途说明
 □ 未集成被禁 SDK（如某些追踪 SDK）
@@ -342,43 +380,57 @@ result = kill_app_and_relaunch("com.example.app", ".MainActivity")
 □ 应用名称、图标、描述符合规范
 □ 不收集 IDFA（如未声明）
 □ ATT 弹窗（iOS 14.5+ 必须）
-```
+
+```text
 
 ### 6. 崩溃监控验证
 
 ```python
+
 # 主动触发崩溃，验证 Crashlytics / 友盟 / Sentry 是否上报
+
 import subprocess
 subprocess.run(["adb", "shell", "am", "crash", "com.example.app"], check=True)
 # 等 1 分钟后查 Firebase Console / Sentry dashboard
-```
+
+```text
 
 ### 7. 省电模式 / 低电量行为
 
 ```python
+
 # Android 低电量模式
+
 import subprocess
 subprocess.run(["adb", "shell", "settings", "put", "global", "low_power", "1"])
 # 验证：后台任务降频 / 推送延迟 / 网络连接降级
-```
+
+```text
 
 ## 跨平台并行执行
 
 ```bash
+
 # 同时跑 Android + iOS（pytest-xdist）
+
 pytest -m "mobile and p0" -n 2 --dist=loadgroup
 
 # 仅 Android
+
 pytest -m "mobile and android"
 
 # 仅小程序
+
 pytest -m "miniprogram"
-```
+
+```text
 
 ## 性能采集（移动专属）
 
 ```python
+
 # 每 1s 采集一次 Android 性能
+
 metrics = collect_perf_metrics(
     package="com.example.app",
     duration=60,
@@ -386,19 +438,20 @@ metrics = collect_perf_metrics(
 )
 # 输出 workspace/测试报告/{项目名}/mobile-perf/{package}_{timestamp}.json
 # 含：cpu_pct / mem_mb / fps / battery_pct / network_kbps
-```
+
+```text
 
 ## 与其他 agent 协作
 
-- **testcase-designer**：移动端用例标注 type=MOBILE，子类型 ANDROID/IOS/WX
-- **automation-engineer**：协调脚本生成（本 agent 专注移动端，automation-engineer 专注 Web/API）
-- **test-executor**：调用 driver_factory 创建 driver，执行后清理
-- **bug-manager**：移动 Bug 含设备型号/系统版本/截图/logcat
+-**testcase-designer**：移动端用例标注 type=MOBILE，子类型 ANDROID/IOS/WX
+-**automation-engineer**：协调脚本生成（本 agent 专注移动端，automation-engineer 专注 Web/API）
+-**test-executor**：调用 driver_factory 创建 driver，执行后清理
+-**bug-manager**：移动 Bug 含设备型号/系统版本/截图/logcat
 
 ## 移动端 Bug 报告附加字段
 
 | 字段 | 必填 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 设备型号 | ✅ | Pixel 6 Pro / iPhone 14 |
 | 系统版本 | ✅ | Android 14 / iOS 17.2 |
 | APP 版本 | ✅ | v3.2.1 (build 4521) |
@@ -408,15 +461,15 @@ metrics = collect_perf_metrics(
 
 ## 协作输出
 
-- 向 **test-lead**：移动测试结果 JSON + Monkey 稳定性报告
-- 向 **automation-engineer**：移动 page object 脚本路径
-- 向 **bug-manager**：移动 Bug（附设备型号/系统版本/logcat）
-- 向 **report-generator**：移动性能 JSON + 截图
+- 向**test-lead**：移动测试结果 JSON + Monkey 稳定性报告
+- 向**automation-engineer**：移动 page object 脚本路径
+- 向**bug-manager**：移动 Bug（附设备型号/系统版本/logcat）
+- 向**report-generator**：移动性能 JSON + 截图
 
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/mobile-perf/*.json` | 性能采集 |
 | `workspace/测试报告/{项目名}/screenshots/mobile_*.png` | 移动失败截图 |
 | `workspace/测试报告/{项目名}/logcat/*.log` | Android 日志 |

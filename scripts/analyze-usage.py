@@ -88,7 +88,7 @@ def render_md(user_stats: dict, cuts: dict, output: Path) -> None:
         "1. **keep_core**:文档加强 + demo gif + 教学视频\n"
         "2. **keep_mid**:不主推,留\n"
         "3. **deprecate**:30 天观察期;再无人用 → 转 archive\n"
-        "4. **archive**:`marketplace/.archive/` 归档(不可逆禁止)\n"
+        "4. **archive**:`marketplace/.archive/` 归档(不可恢复)\n"
     )
     output.write_text("\n".join(lines), encoding="utf-8")
 

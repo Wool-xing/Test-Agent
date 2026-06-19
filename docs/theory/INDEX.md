@@ -1,7 +1,7 @@
-# Theory KB 索引(主宪章 §23 教学层准则)
+# Theory KB 索引
 
 > Test-Agent 部署后的**学习知识库**。用户进入学习模式时,Agent 依此 KB 提供权威解释。
-> 主宪章 §23 铁律:**LLM 不得编造 KB 外的引用**(防幻觉 L1 层)。
+>。
 
 ## 双语支持
 
@@ -9,10 +9,10 @@
 - `--lang zh-en` 双栏对照(学英文用)
 - UI i18n 独立(`runtime/web/src/locales/`)
 
-## 12 大类(主宪章 §23)
+## 12 大类
 
 | # | 分类 | 目录 | 主题示例 |
-|---|------|------|---------|
+| --- | ------ | ------ | --------- |
 | 1 | 工具使用 | [`01-tools/`](01-tools/INDEX.md) | pytest / Playwright / JMeter / Appium / Burp / Allure / k6 |
 | 2 | 代码编程 | [`02-coding/`](02-coding/INDEX.md) | pytest fixture / async / typing / mock / Page Object / 设计模式 |
 | 3 | 测试基础理论 | [`03-foundation/`](03-foundation/INDEX.md) | ISTQB / V 模型 / 金字塔 / Boehm 法则 / 七原则 |
@@ -29,6 +29,7 @@
 ## 权威源
 
 详见 [`_authority_sources.yaml`](_authority_sources.yaml) 白名单:
+
 - 国际:ISTQB / IEEE / ISO/IEC / NIST / OWASP / MITRE / Google / Microsoft / Martin Fowler / arXiv / ICSE / ISSTA
 - 中国:GB/T 25000 / 等保 2.0 / 阿里 / 腾讯 / 美团 / 字节 / CCF / 软件学报
 - AI:Hugging Face / Anthropic / OpenAI Evals / DeepEval
@@ -37,29 +38,31 @@
 ## 卡片 schema
 
 详见 [`_schema.yaml`](_schema.yaml)。每卡含:
+
 - `id` `category` `level`(基础/中级/高级)
 - `name_zh` `name_en` + `one_liner_zh`(≤30 字,执行模式只输出此字段)
 - `authority`(白名单中选 + 章节号)
 - `confidence`(high/medium/low/**llm-draft-unreviewed**)
 - `last_reviewed` + `reviewer`
 
-## 反幻觉 3 层(主宪章 §23)
+## 反幻觉 3 层
 
 | 层 | 机制 |
-|----|------|
-| **L1 引用约束** | LLM 在 learn mode 只能引用 KB 中存在的 `id`;否则输出"该领域未收录,慎用" |
-| **L2 自检循环** | LLM 生解释后,二次校验"引用的章节是否真存在 KB" |
-| **L3 用户回报** | learn mode 末尾"👎 标记错误"→ 落 `workspace/learning/feedback/` |
+| ---- | ------ |
+|**L1 引用约束**| LLM 在 learn mode 只能引用 KB 中存在的 `id`;否则输出"该领域未收录,慎用" |
+|**L2 自检循环**| LLM 生解释后,二次校验"引用的章节是否真存在 KB" |
+|**L3 用户回报**| learn mode 末尾"👎 标记错误"→ 落 `workspace/learning/feedback/` |
 
 ## 累积规则(Q2 持续累积)
 
-- **初始种子**:按项目用到的工具 / 协议 / 理论自动派生(M4-2)
-- **执行新工具**:用户首次 `tagent run "测 X 协议"` 触发未收录 → 自动产 `llm-draft-unreviewed` 卡 → 待审
-- **darwin-skill 联动**:darwin 周期扫 KB,优化卡内容
-- **用户贡献**:PR 入库 → 自动加 `reviewer: community-PR-#xxx`
+-**初始种子**:按项目用到的工具 / 协议 / 理论自动派生(M4-2)
+-**执行新工具**:用户首次 `tagent run "测 X 协议"` 触发未收录 → 自动产 `llm-draft-unreviewed` 卡 → 待审
+-**darwin-skill 联动**:darwin 周期扫 KB,优化卡内容
+-**用户贡献**:PR 入库 → 自动加 `reviewer: community-PR-#xxx`
 
 ## 卡片产出策略(Q1-C+D)
 
-1. **C 路径**:从 `_authority_sources.yaml` 白名单材料压缩
-2. **D 路径**:LLM 生草稿 + 标 `confidence: llm-draft-unreviewed` 待审
-3. 用户审完 → 改 `high/medium/low` + 填 `reviewer/last_reviewed`
+1.**C 路径**:从 `_authority_sources.yaml` 白名单材料压缩
+2.**D 路径**:LLM 生草稿 + 标 `confidence: llm-draft-unreviewed` 待审
+
+1. 用户审完 → 改 `high/medium/low` + 填 `reviewer/last_reviewed`

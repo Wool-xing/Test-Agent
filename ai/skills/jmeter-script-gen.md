@@ -5,7 +5,7 @@ tools: Read, Write, Edit, Grep, Glob
 SKILL_IMPL_STATUS: production
 ---
 
-> **JMeter 版本兼容**: 本模板不硬编码 `saveConfig`，结果保存配置走 `jmeter.properties` 默认值，兼容 JMeter 5.0 ~ 5.6.3。ThreadGroup 含 `${变量}` 的属性统一用 `stringProp`，避免跨版本参数化失效。
+>**JMeter 版本兼容**: 本模板不硬编码 `saveConfig`，结果保存配置走 `jmeter.properties` 默认值，兼容 JMeter 5.0 ~ 5.6.3。ThreadGroup 含 `${变量}` 的属性统一用 `stringProp`，避免跨版本参数化失效。
 
 # JMeter 性能脚本生成
 
@@ -13,11 +13,13 @@ SKILL_IMPL_STATUS: production
 
 ```text
 /jmeter-script-gen [接口信息 或 业务流程描述]
-```
+
+```text
 
 ## 🔔 调用前置准备
 
 ```text
+
 □ Java JRE 17+ 已装（java -version）
 □ JMeter 5.6.3 已装（jmeter --version 可执行，PATH 配好）
 □ data-preparer 已生成 workspace/测试数据/jmeter_users.csv
@@ -25,11 +27,13 @@ SKILL_IMPL_STATUS: production
 □ 性能目标：目标 TPS / P95 / 并发数（决定 PERF_MODE）
 □ workspace/自动化脚本/jmeter/ 目录已存在（conftest 自动建）
 □ workspace/测试报告/{项目名}/baselines/perf_baseline.json（基线对比，可选）
-```
+
+```text
 
 ## 数据流（与其他 Agent 闭环）
 
 ```text
+
 data-preparer
   → workspace/测试数据/jmeter_users.csv（参数化数据，由 utils/jmeter_csv_exporter）
        ↓
@@ -41,13 +45,15 @@ test-executor
        ↓
        ├─→ report-generator     : HTML 报告 + 通知
        └─→ bug-manager          : 性能 Bug 工单（TPS低 / P95超限 / 错误率高）
-```
+
+```text
 
 ## 执行流程
 
 ### Step 1：分析性能需求
 
 从需求 JSON 摘要 `requirements_summary_*.json` 的 `performance_requirements` 字段提取：
+
 - 目标接口列表（URL / Method / Header / Body）
 - 性能目标（目标 TPS / 响应时间上限 / 并发用户数）
 - 测试模式（接口级压测 / 业务流程并发 / 阶梯加压）
@@ -55,25 +61,29 @@ test-executor
 ### Step 2：调用 data-preparer 准备 CSV
 
 ```python
+
 from utils.jmeter_csv_exporter import generate_jmeter_dataset
 
 generate_jmeter_dataset(count=50, output_path="workspace/测试数据/jmeter_users.csv")
-```
+
+```text
 
 CSV 格式：
 
 ```csv
+
 username,password,user_id
 test_user_a3f2,Test@123456,xxxx-xxxx-xxxx-xxxx
 test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
-```
+
+```text
 
 ### Step 3：生成 JMX 测试计划
 
 #### 关键变量（命令行 -J 注入）
 
 | 变量 | 含义 | 默认 |
-|------|------|------|
+| ------ | ------ | ------ |
 | `target_host` | 目标主机（**不含协议前缀**） | test-api.example.com |
 | `target_protocol` | http / https | http |
 | `target_port` | 端口 | 80 |
@@ -84,6 +94,7 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
 #### 模板A：标准接口压测（最常用）
 
 ```xml
+
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
@@ -260,13 +271,15 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
     </hashTree>
   </hashTree>
 </jmeterTestPlan>
-```
+
+```text
 
 #### 模板B：阶梯加压（10 → 50 → 100 用户）
 
 用三个串行 ThreadGroup 模拟阶梯：
 
 ```xml
+
 <!-- 阶梯1：10 用户 / 30s 加压 / 持续 120s -->
 <ThreadGroup testname="Step1_10用户" enabled="true">
   <intProp name="ThreadGroup.num_threads">10</intProp>
@@ -292,12 +305,15 @@ test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
   <boolProp name="ThreadGroup.scheduler">true</boolProp>
   <longProp name="ThreadGroup.delay">240</longProp>
 </ThreadGroup>
-```
+
+```text
 
 ## 执行命令
 
 ```bash
+
 # CI 默认：ci_quick
+
 jmeter -n \
   -t workspace/自动化脚本/jmeter/test_plan.jmx \
   -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
@@ -308,6 +324,7 @@ jmeter -n \
   -Jthreads=5 -Jrampup=10 -Jduration=60
 
 # 完整压测：full（手动 / release）
+
 jmeter -n \
   -t workspace/自动化脚本/jmeter/test_plan.jmx \
   -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
@@ -318,18 +335,20 @@ jmeter -n \
   -Jthreads=50 -Jrampup=60 -Jduration=300
 
 # 阶梯加压
+
 jmeter -n \
   -t workspace/自动化脚本/jmeter/stepped_load.jmx \
   -l workspace/测试报告/{项目名}/jmeter-results/stepped_result.jtl \
   -Jtarget_host="${TARGET_HOST}"
-```
+
+```text
 
 > 部署前 .env 中需解析 TEST_API_URL → TARGET_HOST/PROTOCOL/PORT。可用 conftest 或独立脚本完成。
 
 ## 性能质量门禁（双模式）
 
 | 指标 | full（50并发） | ci_quick（5并发） | 不达标处置 |
-|------|--------------|------------------|---------|
+| ------ | -------------- | ------------------ | --------- |
 | TPS | ≥100 | ≥20 | 性能 Bug → bug-manager |
 | P95 响应 | ≤500ms | ≤800ms | 性能 Bug，标注慢接口 |
 | 平均响应 | ≤200ms | ≤400ms | 告警 + 性能分析 |
@@ -339,22 +358,27 @@ jmeter -n \
 ## JTL 解析与门禁（实现位于 utils/jmeter_result_parser.py）
 
 ```bash
+
 # CI quick
+
 python -m utils.jmeter_result_parser \
     workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode ci_quick
 
 # Full + 基线对比 + 通过则更新基线
+
 python -m utils.jmeter_result_parser \
     workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode full \
     --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json \
     --update-baseline
-```
+
+```text
 
 ## 向 report-generator 输出格式
 
 ```json
+
 {
   "type": "performance",
   "tool": "JMeter 5.6.3",
@@ -386,11 +410,13 @@ python -m utils.jmeter_result_parser \
   "html_report": "workspace/测试报告/{项目名}/jmeter-report/index.html",
   "jtl_file": "workspace/测试报告/{项目名}/jmeter-results/result.jtl"
 }
-```
+
+```text
 
 ## 输出文件结构
 
 ```text
+
 workspace/自动化脚本/jmeter/
 ├── test_plan.jmx              # 标准接口压测计划
 ├── business_flow.jmx          # 业务流程并发计划（按需）
@@ -403,11 +429,13 @@ workspace/测试报告/{项目名}/
 ├── jmeter-results/result.jtl  # 原始结果（CSV）
 ├── jmeter-report/index.html   # JMeter HTML 可视化
 └── baselines/perf_baseline.json
-```
+
+```text
 
 ## 代码质量要求
 
 ```text
+
 ✅ JMX 中 host/protocol/port 全变量化（${TARGET_HOST/PROTOCOL/PORT}）
 ✅ TARGET_HOST 不含协议前缀
 ✅ CSV 由 data-preparer 生成，不在 JMX 中手写数据
@@ -417,4 +445,5 @@ workspace/测试报告/{项目名}/
 ✅ 结果保存到 workspace/测试报告/{项目名}/jmeter-results/
 ✅ 解析与门禁统一调 utils/jmeter_result_parser.py
 ✅ 性能 Bug 提交给 bug-manager（标题：[性能]-[接口名]-[指标超标]）
-```
+
+```text

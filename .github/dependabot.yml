@@ -76,7 +76,7 @@ updates:
           - "faker"
           - "factory-boy"
     ignore:
-      # 锁死的核心库不允许 dependabot 升 major（手动评估）
+      # 锁定的核心库不允许 dependabot 升 major（手动评估）
       - dependency-name: "pytest"
         update-types: ["version-update:semver-major"]
         # pytest 9.x < 9.0.3 blocked for CVE-2025-71176 (TMPDIR handling).
