@@ -18,9 +18,13 @@ import time
 from pathlib import Path as _Path
 
 from prompt_toolkit import PromptSession
+from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
+
+# Rich Markup → prompt_toolkit FormattedText converter
+from rich.text import Text as RichText
 
 from runtime.cli._shared import console
 from runtime.cli.completer import _PROVIDERS, SlashCompleter
@@ -827,6 +831,75 @@ def _set_terminal_title(proj: str, model: str) -> None:
         pass
 
 
+def _rich_to_pt(markup: str) -> FormattedText:
+    """Convert Rich markup string to prompt_toolkit FormattedText.
+
+    This is the bridge that lets us use Rich markup throughout the codebase
+    while rendering output through prompt_toolkit's print_formatted_text().
+    """
+    rt = RichText.from_markup(markup)
+    segments = []
+    for span in rt.spans:
+        start = span.start
+        end = span.end
+        text = rt.plain[start:end]
+        style_str = str(span.style) if span.style else ""
+        # Map Rich style names → prompt_toolkit style names
+        pt_style = _rich_style_to_pt(style_str)
+        segments.append((pt_style, text))
+    return FormattedText(segments)
+
+
+def _rich_style_to_pt(rich_style: str) -> str:
+    """Map a Rich style string to a prompt_toolkit style string."""
+    mapping = {
+        "bold": "bold",
+        "dim": "ansigray",
+        "italic": "italic",
+        "cyan": "ansicyan",
+        "bright_cyan": "ansicyan",
+        "green": "ansigreen",
+        "bright_green": "ansigreen",
+        "red": "ansired",
+        "bright_red": "ansired",
+        "yellow": "ansiyellow",
+        "bright_yellow": "ansiyellow",
+        "blue": "ansiblue",
+        "magenta": "ansimagenta",
+        "white": "",
+        "bright_white": "bold",
+        "black": "ansigray",
+        "default": "",
+    }
+    parts = []
+    for token in rich_style.split():
+        token = token.strip()
+        if not token:
+            continue
+        # Handle 'bold dim' → ['bold', 'ansigray']
+        mapped = mapping.get(token, "")
+        if mapped:
+            parts.append(mapped)
+    return " ".join(parts)
+
+
+def _repl_print(markup: str = "", **kwargs: object) -> None:
+    """Print to TUI via prompt_toolkit — does NOT corrupt terminal layout.
+
+    Converts Rich markup to prompt_toolkit FormattedText, then uses
+    print_formatted_text() which inserts output cleanly above the prompt.
+    """
+    from prompt_toolkit import print_formatted_text as pt_print
+    try:
+        ft = _rich_to_pt(markup)
+        pt_print(ft)
+    except Exception:
+        # Fallback: print plain text
+        import re as _re
+        plain = _re.sub(r'\[[^\]]*\]', '', markup)
+        pt_print(FormattedText([("", plain)]))
+
+
 def _create_session() -> PromptSession | None:
     """Create prompt_toolkit session — dynamic style from skin, CC layout."""
     try:
@@ -1027,9 +1100,24 @@ def start() -> None:
     if parts:
         console.print("  " + " · ".join(parts) + "\n")
 
+    # ── Redirect Rich → prompt_toolkit for clean TUI ──
+    _original_console_print = console.print
+
+    def _tui_print(markup: str = "", **kwargs: object) -> None:
+        """Bridge: route Rich markup through prompt_toolkit when session active."""
+        if session is not None:
+            try:
+                _repl_print(markup, **kwargs)
+            except Exception:
+                _original_console_print(markup, **kwargs)
+        else:
+            _original_console_print(markup, **kwargs)
+
+    console.print = _tui_print  # type: ignore[method-assign]
+
     session = _create_session()
     if session is None:
-        console.print(
+        _original_console_print(
             "[dim](Tab completion not available in Git Bash / mintty. "
             "Use cmd.exe, Windows Terminal, or PowerShell for full features.)[/]\n"
         )
@@ -1039,12 +1127,14 @@ def start() -> None:
             result = _read_input(session)
             if result is None:
                 _save_session()
-                console.print("\n[dim]Session saved. Goodbye.[/]")
+                _original_console_print("\n[dim]Session saved. Goodbye.[/]")
+                console.print = _original_console_print  # restore
                 break
             user_input = result
         except (EOFError, KeyboardInterrupt):
             _save_session()
-            console.print("\n[dim]Session saved. Goodbye.[/]")
+            _original_console_print("\n[dim]Session saved. Goodbye.[/]")
+            console.print = _original_console_print  # restore
             break
 
         if not user_input:
