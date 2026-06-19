@@ -78,7 +78,8 @@ app.include_router(marketplace_router)
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next: Any) -> Any:
     token = _settings.api_auth_token
-    if token and request.url.path not in ("/health", "/health/deep", "/docs", "/openapi.json"):
+    _public_paths = ("/health", "/health/deep", "/docs", "/openapi.json")
+    if token and not request.url.path.startswith("/api/marketplace") and request.url.path not in _public_paths:
         auth = request.headers.get("Authorization", "")
         if not auth or not secrets.compare_digest(auth.removeprefix("Bearer "), token):
             return JSONResponse(status_code=401, content={"detail": "unauthorized"})
