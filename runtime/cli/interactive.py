@@ -34,8 +34,7 @@ _SHEEP = r"""
          ▐▌ ▐▌
 
   ૮₍˶ᵔ ᗜ ᵔ˶₎ა  Test-Agent v{version}
-  AI Router · {experts} Experts · {skills} Skills
-  Type !help for commands, or describe your test task."""
+  AI Router · {experts} Experts · {skills} Skills"""
 
 _SESSION_DIR = get_settings().gateway_dir
 _SESSION_FILE = _SESSION_DIR / "active_session.json"
@@ -237,21 +236,6 @@ def _context_pct() -> int:
     return min(99, chars // 500)
 
 
-def _render_rprompt() -> str:
-    """Right side of prompt — inline health warnings (dynamic, like CC)."""
-    try:
-        issues = _cached_health()
-        errors = [i for i in issues if i["level"] == "error"]
-        warnings = [i for i in issues if i["level"] == "warning"]
-        if errors:
-            return f" ⚠ {len(errors)} errors · /doctor"
-        if warnings:
-            return f" ⚠ {len(warnings)} warnings · /doctor"
-    except Exception:
-        pass
-    return ""
-
-
 def _render_prompt_message() -> list[tuple[str, str]]:
     """Render prompt with top separator line (CC style)."""
     sep = "─" * _term_width()
@@ -262,52 +246,75 @@ def _render_prompt_message() -> list[tuple[str, str]]:
     ]
 
 
-def _render_bottom_toolbar() -> str:
-    """Render separator + dynamic status bar (updates every keystroke)."""
+def _render_bottom_toolbar() -> "HTML":
+    """Render separator + 2-line status bar (CC style, dynamic)."""
     from prompt_toolkit.formatted_text import HTML
 
-    sep = "─" * _term_width()
+    w = _term_width()
+    sep = "─" * w
     provider = _current_provider()
     model = _current_model()
     branch = _git_branch()
     pct = _context_pct()
     proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
 
-    parts = []
-    # Provider / model
-    parts.append(f" <b>{provider}</b>")
+    # ── Line 1: model info + project + git + health ──
+    parts1 = []
+    parts1.append(f"[{provider}]")
     if model and model != provider:
-        parts.append(f"·<b>{model}</b>")
-
-    # Project
-    parts.append(f"│ <cyan>{proj}</cyan>")
-
-    # Git branch
+        parts1.append(f"[{model}]")
+    parts1.append(f"│ <cyan>{proj}</cyan>")
     if branch:
-        parts.append(f"│ git:<b>{branch}</b>")
+        parts1.append(f"│ git:<ansigreen>{branch}</ansigreen>")
 
-    # Health (dynamic, cached 30s)
     try:
         issues = _cached_health()
         errors = [i for i in issues if i["level"] == "error"]
         warnings = [i for i in issues if i["level"] == "warning"]
         if errors:
-            parts.append(f"│ <red>⚠ {len(errors)}</red>")
+            parts1.append(f"│ <ansired>⚠ {len(errors)} errors</ansired>")
         elif warnings:
-            parts.append(f"│ <yellow>⚠ {len(warnings)}</yellow>")
+            parts1.append(f"│ <ansiyellow>⚠ {len(warnings)} warnings</ansiyellow>")
         else:
-            parts.append("│ <green>✓</green>")
+            parts1.append("│ <ansigreen>✓</ansigreen>")
     except Exception:
         pass
 
-    # Context
+    # ── Line 2: context + stats + tips ──
+    parts2 = []
     bar_len = 10
     filled = min(bar_len, pct * bar_len // 100)
     bar = "█" * filled + "░" * (bar_len - filled)
-    parts.append(f"│ Context <dim>{bar}</dim> {pct}%")
+    parts2.append(f"Context <dim>{bar}</dim> {pct}%")
 
-    status = "  ".join(parts)
-    return f"{sep}\n  {status}"
+    # Agent/skill counts
+    try:
+        from runtime.config.settings import get_settings as _gs
+        agents_n = _count_md_files("agents")
+        skills_n = _count_md_files("skills")
+        if agents_n:
+            parts2.append(f"│ {agents_n} agents")
+        if skills_n:
+            parts2.append(f"│ {skills_n} skills")
+    except Exception:
+        pass
+
+    # CLAUDE.md / .env presence
+    root = get_settings().project_root
+    files_found = []
+    if (root / "CLAUDE.md").is_file():
+        files_found.append("CLAUDE.md")
+    if (root / ".env").is_file():
+        files_found.append(".env")
+    if files_found:
+        parts2.append(f"│ {', '.join(files_found)}")
+
+    # Quick tips
+    parts2.append("│ <dim>!help · !doctor · !model</dim>")
+
+    line1 = "  " + " ".join(parts1)
+    line2 = "  " + " ".join(parts2)
+    return HTML(f"{sep}\n{line1}\n{line2}")
 
 
 # ── Banner & Help ─────────────────────────────────────────────────
@@ -346,22 +353,12 @@ def _print_banner() -> None:
         # Fallback: plain print if terminal doesn't support Live
         console.print(banner)
 
-    # Provider + model + project info line (dynamic: updates on !model switch)
+    # Provider + model + project path (CC-style header)
     provider = _current_provider()
     model = _current_model()
     proj_root = get_settings().project_root
     console.print(f"  [bold cyan]{provider}[/] · [dim]{model}[/]")
     console.print(f"  [dim]{proj_root}[/]")
-
-    # Health summary (cached 30s, same as prompt area)
-    issues = _cached_health()
-    errors = [i for i in issues if i["level"] == "error"]
-    warnings = [i for i in issues if i["level"] == "warning"]
-    if errors:
-        console.print(f"  ⚠ [red]{len(errors)} errors[/] · [dim]!doctor[/]")
-    elif warnings:
-        console.print(f"  ⚠ [yellow]{len(warnings)} warnings[/] · [dim]!doctor[/]")
-
     console.print()
 
 
@@ -732,7 +729,6 @@ def _create_session() -> PromptSession | None:
             style=_PROMPT_STYLE,
             key_bindings=_kb,
             message=_render_prompt_message,
-            rprompt=_render_rprompt,
             bottom_toolbar=_render_bottom_toolbar,
         )
     except Exception:
@@ -808,10 +804,8 @@ def start() -> None:
     try:
         from runtime.cli.user_profile import learn_from_usage
         prefs = learn_from_usage()
-        if prefs:
-            console.print(f"[dim]👤 Profile: {', '.join(f'{k}={v}' for k,v in prefs.items())}[/]")
     except Exception:
-        pass
+        prefs = None
 
     # Load plugins (P3 #22)
     try:
@@ -828,37 +822,40 @@ def start() -> None:
                         )
                 except Exception:
                     pass
-            console.print(f"[dim]🔌 {len(plugins)} plugin(s) loaded[/]")
     except Exception:
-        pass
+        plugins = {}
 
     # Load project context (CLAUDE.md / AGENTS.md auto-discovered)
     try:
         from runtime.cli.conversation import _discover_project_context
         proj_ctx = _discover_project_context()
-        if proj_ctx:
-            console.print("[dim]📋 Project context loaded[/]")
     except Exception:
-        pass
+        proj_ctx = None
 
     # Start background scheduler for cron jobs
     try:
         from runtime.scheduler.scheduler import start_background
         thread, stop = start_background()
-        console.print(f"[dim]⏰ Scheduler started (tick={60}s)[/]")
     except Exception:
         pass  # scheduler is optional — croniter may not be installed
 
     # Show cross-session memory status
     from runtime.cli.conversation import load_memory_md
     mem_md = load_memory_md()
-    if mem_md:
-        facts = mem_md.count("\n") + 1
-        console.print(f"[dim]🧠 {facts} fact(s) loaded from MEMORY.md[/]\n")
+    facts = mem_md.count("\n") + 1 if mem_md else 0
 
     mem = _get_memory()
-    if mem.messages:
-        console.print(f"[dim]Resumed {mem.session_id} ({len(mem.messages)} turns)[/]\n")
+    resumed = f" · {len(mem.messages)} turns" if mem.messages else ""
+
+    # Condensed startup line (CC-style: one line, dim)
+    parts = []
+    if proj_ctx:
+        parts.append("[dim]📋 CLAUDE.md[/]")
+    parts.append(f"[dim]🧠 {facts}f[/]")
+    if resumed:
+        parts.append(f"[dim]{resumed}[/]")
+    if parts:
+        console.print("  " + " · ".join(parts) + "\n")
 
     session = _create_session()
     if session is None:

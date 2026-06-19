@@ -19,6 +19,7 @@ PROVIDER_MODEL_MAP: dict[str, str] = {
     "gemini": "gemini/gemini-1.5-pro",
     "qwen": "dashscope/qwen-plus",
     "deepseek": "deepseek/deepseek-chat",
+    "zhipu": "zhipu/glm-4-plus",
     "ollama": "ollama/qwen2.5:7b",
 }
 

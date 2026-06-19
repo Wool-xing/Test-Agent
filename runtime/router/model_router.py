@@ -31,9 +31,10 @@ class ModelTier:
 # These are FALLBACKS — any provider works.
 # Unknown providers require TAGENT_LLM_MODEL in .env.
 
+# LiteLLM provider → (light_model, heavy_model)
+# Model names are bare — _prefixed() adds the correct LiteLLM prefix.
 _DEFAULT_MODELS: dict[str, tuple[str, str]] = {
     "claude":    ("claude-haiku-4-5",       "claude-sonnet-4-6"),
-    "anthropic": ("claude-haiku-4-5",       "claude-sonnet-4-6"),
     "openai":    ("gpt-4o-mini",            "gpt-4o"),
     "gemini":    ("gemini-2.5-flash",       "gemini-2.5-pro"),
     "deepseek":  ("deepseek-chat",          "deepseek-reasoner"),
@@ -43,12 +44,34 @@ _DEFAULT_MODELS: dict[str, tuple[str, str]] = {
     "stub":      ("stub",                   "stub"),
 }
 
+# Map user-facing provider name → LiteLLM provider prefix
+# LiteLLM expects {prefix}/{model}, e.g. "anthropic/claude-sonnet-4-6"
+_LITELLM_PREFIX: dict[str, str] = {
+    "claude":    "anthropic",
+    "anthropic": "anthropic",
+    "deepseek":  "deepseek",
+    "openai":    "openai",
+    "gemini":    "gemini",
+    "qwen":      "dashscope",
+    "zhipu":     "zhipu",
+    "ollama":    "ollama",
+}
+
 
 def _prefixed(provider: str, model: str) -> str:
-    """Auto-prefix model with provider if not already prefixed."""
-    if "/" in model or provider in ("stub", "ollama"):
+    """Auto-prefix model with correct LiteLLM provider prefix.
+
+    E.g. provider='claude', model='claude-sonnet-4-6'
+      → 'anthropic/claude-sonnet-4-6'
+    """
+    if "/" in model:
+        return model  # already fully qualified
+    if provider in ("stub",):
         return model
-    return f"{provider}/{model}"
+    prefix = _LITELLM_PREFIX.get(provider, provider)
+    if provider == "ollama":
+        return model  # ollama models don't need prefix
+    return f"{prefix}/{model}"
 
 
 def get_current_provider() -> str:
