@@ -481,6 +481,7 @@ def copy_config(template_dir, project_root):
     files = [
         "conftest.py", "pytest.ini", ".mcp.json", "requirements.txt",
         "check_version.py", "quality_gates.yaml",
+        "llm-providers.md", ".env.minimal.example",
     ]
     for f in files:
         src = os.path.join(config_dir, f)
