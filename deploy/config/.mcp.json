@@ -3,7 +3,7 @@
   "mcpServers": {
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./workspace"],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${PROJECT_ROOT:-./workspace}"],
       "description": "文件系统访问 - 读写 workspace 目录中的测试文件"
     },
     "test-orchestrator": {
