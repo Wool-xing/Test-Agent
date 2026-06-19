@@ -141,7 +141,9 @@ def stress_disk(file_path: Optional[str] = None, size_mb: int = 100, iterations:
 
 # ===== 进程杀死 =====
 
-def kill_process(pid: int, sig: int = signal.SIGKILL):
+_SIGKILL = getattr(signal, "SIGKILL", signal.SIGTERM)  # Windows compat
+
+def kill_process(pid: int, sig: int = _SIGKILL):
     """杀指定 PID · 拒绝 PID<100 / 非当前 user owner 的进程"""
     _require_authorized("kill_process")
     if not isinstance(pid, int) or pid < 100:

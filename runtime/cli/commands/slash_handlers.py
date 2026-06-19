@@ -3,7 +3,7 @@ from __future__ import annotations
 import os, sys, time
 from pathlib import Path
 from runtime.cli._shared import console
-from runtime.cli.completer import _PROVIDERS
+from runtime.cli.slash_commands import _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
 from runtime.config.settings import get_settings
 _SESSION_FILE = get_settings().gateway_dir / "active_session.json"

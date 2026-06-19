@@ -28,15 +28,20 @@ def _version_callback(
     if version:
         console.print(f"Test-Agent Runtime v{runtime.__version__}")
         raise typer.Exit(0)
+
+    # Startup validation — runs for all invocations except --version
+    from runtime.config.settings import get_settings as _gs
+    _issues = _gs().validate_startup()
+    for _i in _issues:
+        _lvl = _i["level"]
+        _style = {"error": "red", "warning": "yellow"}.get(_lvl, "dim")
+        _prefix = {"error": "✗", "warning": "⚠"}.get(_lvl, "•")
+        console.print(f"[{_style}]{_prefix} {_i['message']}[/]")
+    if any(_i["level"] == "error" for _i in _issues):
+        console.print("[red]Startup check failed — run [cyan]!doctor[/] for details.[/]")
+
     # bare `tagent` (no subcommand, no --version) → interactive REPL
     if len(_sys.argv) == 1:
-        from runtime.config.settings import get_settings
-        issues = get_settings().validate_startup()
-        critical = [i for i in issues if i["level"] == "error"]
-        if critical:
-            for i in critical:
-                console.print(f"[red]FATAL:[/] {i['message']}")
-            raise typer.Exit(1)
         from runtime.cli.interactive import start
         start()
         raise typer.Exit(0)

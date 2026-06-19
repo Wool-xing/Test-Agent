@@ -11,7 +11,7 @@ import logging
 from prompt_toolkit.completion import Completer, Completion, PathCompleter
 from prompt_toolkit.document import Document
 
-from runtime.cli.slash_commands import COMMAND_REGISTRY
+from runtime.cli.slash_commands import COMMAND_REGISTRY, _PROVIDERS
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,6 @@ _BUILTINS = [
     ("plugins", "List loaded plugins"),
 ]
 
-_PROVIDERS = ["claude", "openai", "gemini", "deepseek", "qwen", "ollama"]
 
 
 class SlashCompleter(Completer):

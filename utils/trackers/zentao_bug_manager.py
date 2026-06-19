@@ -8,7 +8,6 @@ import os
 from typing import Dict, List, Optional
 
 import requests
-from dotenv import load_dotenv
 from runtime.config.settings import get_settings
 
 # 同包 import（部署后 utils/ 在 sys.path 中）
@@ -18,7 +17,6 @@ except ImportError:
     # CI/test 环境 sys.path 含 utils/ 但不含项目根
     from protocols.api_retry_util import call_with_retry
 
-load_dotenv()
 logger = logging.getLogger(__name__)
 
 

@@ -19,7 +19,6 @@ _PATTERNS: list[tuple[str, str]] = [
     (r"every\s+day\s+(?:at\s+)?(\d+)", "0 {h} * * *"),
     (r"every\s+night\s+(?:at\s+)?(\d+)", "0 {h} * * *"),
     (r"daily\s+(?:at\s+)?(\d+)", "0 {h} * * *"),
-    (r"at\s+(\d+)\s*(am|pm|:?\d*)\s*(?:every\s*day)?", None),  # handled above
     # Daily with time (before plain daily)
     (r"(?:daily|every\s+day)\s+(?:at\s+)?(\d+)", "0 {h} * * *"),
 

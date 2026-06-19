@@ -14,14 +14,12 @@ import os
 from typing import Any
 
 import requests
-from dotenv import load_dotenv
 
 try:
     from bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY
 except ImportError:
     from utils.trackers.bug_tracker_base import BugTrackerBase, TRACKER_REGISTRY
 
-load_dotenv()
 logger = logging.getLogger(__name__)
 
 SEVERITY_PRIORITY: dict[int, int] = {

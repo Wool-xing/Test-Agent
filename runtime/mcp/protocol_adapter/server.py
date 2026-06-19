@@ -1,7 +1,7 @@
 """mcp-protocol-adapter MCP server.
 
-Tools (per protocol): http_ping / grpc_ping / ws_ping / mqtt_ping / kafka_ping
-Plus generic: send / recv / list_protocols.
+Tools: ping (multi-protocol: http/grpc/ws/mqtt/kafka via adapter dispatch),
+list_protocols.
 """
 
 from __future__ import annotations
