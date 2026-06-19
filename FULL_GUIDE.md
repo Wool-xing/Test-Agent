@@ -1,12 +1,12 @@
-# Test-Agent 完整指南（FULL_GUIDE）· 项目永久宪章
+# Test-Agent 完整指南（FULL_GUIDE）
 
-> **本文档定位**：`test-agent-team` 项目的**永久记忆宪章** —— 跨会话、跨人员、跨工具的唯一权威来源。
+> **本文档定位**：`test-agent-team` 项目的**永久记忆** —— 跨会话、跨人员、跨工具的唯一权威来源。
 > 简明入口 → [README.md](README.md) ；按职责分类速查 → [00-项目导航.md](00-项目导航.md)。
 > **维护原则**：决策入档、开放问题入档、不打脸的承诺才写。重大决策须更新「📋 开放问题」与「🗺️ 项目当前状态」两节。
 
 **项目名称**：`Test-Agent`（内部代号 `test-agent-team`）
-**当前阶段**：16 expert · 32/32 skill active (25 production + 7 script-backed) · MASTER_PLAN 38/38 complete · V2.0 TBD
-**版本**：V1.0.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
+**当前阶段**：V2.0.0 · 16 expert · 32/32 skill · ManifestV2 单源真理架构
+**版本**：V2.0.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-06-04
 **模型**：Claude 4.x 系列（Opus 4.7 / Sonnet 4.6 / Haiku 4.5，由 Claude Code 默认管理）
 
@@ -20,7 +20,7 @@
 
 | # | 子文件 | 含节 |
 |---|---|---|
-| 01 | [vision-dimensions](docs/charter/01-vision-dimensions.md) | 项目宪章 + 文档导航 + 维度全图（9 簇）+ 关键模块清单 + 核心特性 |
+| 01 | [vision-dimensions](docs/charter/01-vision-dimensions.md) | 项目愿景 + 文档导航 + 维度全图（9 簇）+ 关键模块清单 + 核心特性 |
 | 02 | [coverage-matrix](docs/charter/02-coverage-matrix.md) | 全链路覆盖矩阵（产品 / 协议 / 输入 三视角） |
 | 03 | [agentchat-protocol](docs/charter/03-agentchat-protocol.md) | AgentChat 协作协议 + 关键决议摘要 + 放行决议 |
 | 04 | [skills-bugtracker](docs/charter/04-skills-bugtracker.md) | Skills 自进化机制 + Bug Tracker 多适配器 |
