@@ -1,7 +1,7 @@
 # Test-Agent 启动指南(由 `tagent init` 生成)
 
 > 配置:**Web 系统测试** · Linux(Ubuntu/Debian/CentOS) · LLM=ollama · BugTracker=webhook · 通知=SMTP 邮件
-> 生成于 2026-05-17 12:25:29 · Test-Agent 1.32.5
+> 生成于 2026-06-19 14:36:38 · Test-Agent V1.0.0
 
 ## 1. 填占位(必做)
 
@@ -20,7 +20,7 @@
 ## 2. 装依赖(按需)
 
 ```bash
-pip install -r config/requirements.txt
+pip install -r 04-配置文件/requirements.txt
 # 大部分依赖 apt-get 已装
 ```
 
@@ -63,7 +63,7 @@ tagent run "https://example.com" --mode learn
 ## 7. 下一步
 
 - 看 `examples/web-demo/` 5 分钟跑通最小例
-- 看 `docs/getting-started/INDEX.md` 完整流程
+- 看 `01-快速开始/INDEX.md` 完整流程
 - 看 `docs/INDEX.md` 找样式 / 理论 KB
 
 ---
