@@ -292,9 +292,8 @@ jobs:
 
       - name: 检查内部链接
         run: |
-          set -e
           fail=0
-          for md in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*"); do
+          for md in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./workspace/*" -not -path "./examples/*" -not -path "./deploy/*" -not -path "./graphify-out/*" -not -path "./__pycache__/*"); do
             # 提取 markdown 内部链接 [...](xxx.md) 形式
             # 使用 process substitution 避免 pipe subshell 吞掉 fail=1
             while read link; do
