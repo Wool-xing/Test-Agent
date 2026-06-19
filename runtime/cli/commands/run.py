@@ -8,7 +8,7 @@ from pathlib import Path
 import typer
 
 from runtime.cli._shared import _kernel, build_artifact, console, print_dag
-from runtime.tutor.i18n import Lang, set_lang
+from runtime.tutor.i18n import set_lang
 from runtime.tutor.verbosity import Mode, set_mode
 
 
@@ -22,7 +22,7 @@ def register(app: typer.Typer) -> None:
         mode: Mode | None = typer.Option(  # noqa: B008
             None, "--mode", help="exec | learn | silent (default: $TAGENT_MODE or exec)"
         ),
-        lang: Lang | None = typer.Option(  # noqa: B008
+        lang: str | None = typer.Option(  # noqa: B008
             None, "--lang", help="zh | en | zh-en (default: $TAGENT_LANG or zh)"
         ),
     ):

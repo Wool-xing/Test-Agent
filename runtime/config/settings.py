@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     minio_bucket: str = Field(default="tagent-evidence")
     minio_secure: bool = Field(default=False)
 
-    prefect_api_url: str = Field(default="http://localhost:4200/api")
+    prefect_api_url: str = Field(default="http://127.0.0.1:8831/api")
     otel_endpoint: str = Field(default="http://localhost:4317")
     otel_enabled: bool = Field(default=False)
 
@@ -132,15 +132,35 @@ class Settings(BaseSettings):
                 "message": "No LLM API key found — LLM calls will fail. Set TAGENT_LLM_API_KEY in .env or environment.",
             })
 
-        # Critical dirs exist
+        # Critical dirs exist (already resolved in model_post_init)
         for attr, label in [("experts_dir", "experts"), ("skills_dir", "skills"), ("scripts_dir", "scripts")]:
-            p = self.resolve(getattr(self, attr))
+            p = getattr(self, attr)
             if not p.is_dir():
                 issues.append({
                     "level": "error",
                     "key": attr,
                     "message": f"{label} directory not found: {p}",
                 })
+
+        # Workspace writability
+        ws = self.workspace_dir
+        if ws.is_dir():
+            try:
+                test_file = ws / ".tagent_write_test"
+                test_file.touch()
+                test_file.unlink()
+            except Exception:
+                issues.append({
+                    "level": "warning",
+                    "key": "workspace_dir",
+                    "message": f"workspace directory not writable: {ws}",
+                })
+        else:
+            issues.append({
+                "level": "warning",
+                "key": "workspace_dir",
+                "message": f"workspace directory not found: {ws}",
+            })
 
         # DB URL: warn if postgres and no psycopg
         if self.db_url and "postgres" in self.db_url:
