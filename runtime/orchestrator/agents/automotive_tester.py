@@ -5,7 +5,7 @@ minimum viable:
 - 仅生成 ASIL 评估 + test_cases + bus_test_plan + adas_scenarios + ota_plan
   + compliance_matrix 结构化 JSON
 - 不实装 16-车载测试.md 全部职责 (Vector CANoe 真跑 / HIL 台架真接 / VTD/CarMaker/CARLA
-  仿真真跑 / OTA A/B 分区真切 / SocketCAN 真嗅探 等留 V1.x 深化)
+  仿真真跑 / OTA A/B 分区真切 / SocketCAN 真嗅探 留后续深化)
 - 覆盖 ECU + ADAS 域控 + IVI + V2X 4 大子系统
 - 覆盖 CAN / CAN-FD / LIN / FlexRay / Automotive Ethernet / DoIP/UDS / SOME-IP / V2X
   8 协议

@@ -42,7 +42,7 @@ def _validate_against_catalog(decision: RoutingDecision, catalog: Catalog) -> li
             continue
         if entry.impl_status in ("rollout", "vision"):
             issues.append(
-                f"{n.kind} '{n.name}' 处于 V1.x {entry.impl_status} (id={n.id}); "
+                f"{n.kind} '{n.name}' 处于 {entry.impl_status} (id={n.id}); "
                 f"test-lead 决策应降级 conditional 或 no-go"
             )
         elif entry.impl_status == "unknown":

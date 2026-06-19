@@ -279,7 +279,7 @@ def execute_node(
                 returncode=2,  # 明确非 0,标记 "未实装" 而非 no-op 兜底
                 stdout="",
                 stderr=(
-                    f"[V1.x {status}] {kind} '{name}' 未实装 (ROADMAP.md);"
+                    f"[unimplemented] {kind} '{name}' 未实装;"
                     f" router/test-lead 应跳过此 {kind},不输出 mock 数据"
                 ),
                 duration_ms=0,
