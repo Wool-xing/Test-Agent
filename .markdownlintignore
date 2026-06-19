@@ -1,0 +1,8 @@
+workspace/
+node_modules/
+engine/target/
+graphify-out/
+apps/desktop-v2/node_modules/
+docs/site/node_modules/
+runtime/web/node_modules/
+runtime/web/marketplace/node_modules/
