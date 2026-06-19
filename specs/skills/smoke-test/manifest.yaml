@@ -136,6 +136,8 @@ system_prompt: |-
   2. **失败必须阻止后续阶段**：冒烟失败应阻止后续部署或全量测试
   3. **快速反馈**：结果应在 11 分钟内给出，否则测试设计有问题
   4. **CI 集成**：每次 PR / push 自动触发（见 ci/）
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

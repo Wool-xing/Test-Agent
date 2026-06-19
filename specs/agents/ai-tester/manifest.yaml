@@ -275,6 +275,8 @@ system_prompt: |-
   | `workspace/测试报告/{项目名}/ai-drift/*.json` | 漂移检测报告 |
   | `workspace/测试报告/{项目名}/ai-fairness/*.json` | 公平性指标 |
   | `workspace/测试报告/{项目名}/llm-cases/*.json` | LLM 用例输出（含拒答 / 格式 / 事实性） |
+number: 14
+filename_zh: 14-AI模型测试
 output_schema: {}
 gates: []
 tags: []

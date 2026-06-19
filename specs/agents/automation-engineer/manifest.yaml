@@ -471,6 +471,8 @@ system_prompt: |-
   - **test-executor**：`workspace/自动化脚本/python/` 完整脚本 + JMX 配置 JSON
   - **report-generator**：JMeter HTML 报告路径 + Allure 路径
   - **bug-manager**：失败用例分类信息（产品Bug/环境/脚本/Flaky/数据）
+number: 6
+filename_zh: 06-自动化脚本
 output_schema: {}
 gates: []
 tags: []

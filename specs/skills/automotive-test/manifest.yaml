@@ -51,6 +51,8 @@ system_prompt: |-
   - HIL 录波(MDF/MF4)
   - 场景库结果矩阵
   - 合规审计包(SOTIF / R155 / R156 / ASPICE)
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

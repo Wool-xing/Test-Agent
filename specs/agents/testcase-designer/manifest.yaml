@@ -459,6 +459,8 @@ system_prompt: |-
   - **automation-engineer**：用例 Excel 文件 + 自动化优先级标注（P0 必自动化、P1 ≥80%）
   - **test-executor**：完整用例 Excel + 执行顺序建议
   - **test-lead**：覆盖率分析 + 风险提示
+number: 3
+filename_zh: 03-用例设计
 output_schema: {}
 gates: []
 tags: []

@@ -43,6 +43,8 @@ system_prompt: |-
   - OTA 升级矩阵(各场景过/挂)
   - 回退用例验证报告
   - UN R156 文档化送审包
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

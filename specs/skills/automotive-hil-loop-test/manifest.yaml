@@ -54,6 +54,8 @@ system_prompt: |-
   - HIL 测试矩阵
   - 录波 MDF4 → `mcp-evidence-vault`
   - 故障注入恢复时间统计
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

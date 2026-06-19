@@ -189,6 +189,8 @@ system_prompt: |-
   - 测试完成后必须清理：pytest fixture autouse + atexit 双保险
   - 敏感字段（密码、手机号、邮箱、身份证、银行卡、token）日志输出前必须经 `DataMasker.mask_dict` 脱敏
   - 数据创建失败时降级使用 `data_factory.LOGIN_TEST_DATA` 预设
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

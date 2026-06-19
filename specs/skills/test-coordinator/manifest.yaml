@@ -332,6 +332,8 @@ system_prompt: |-
   4. 每个步骤的输出保存到 workspace/ 对应目录
   5. 所有 API 调用使用 `utils/api_retry_util.call_with_retry`（10s/20s/40s）
   6. 通知通过 webhook 直连（utils/generate_report.send_*），未配置 webhook 自动跳过
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

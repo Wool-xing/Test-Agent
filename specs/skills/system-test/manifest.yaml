@@ -105,6 +105,8 @@ system_prompt: |-
   ├── tracing/
   └── mq-logs/
   ```
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

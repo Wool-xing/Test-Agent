@@ -379,6 +379,8 @@ system_prompt: |-
   | `workspace/测试报告/{项目名}/win-event-log/*.evtx` | Windows Event 日志 |
   | `workspace/测试报告/{项目名}/mac-console/*.log` | macOS Console 日志 |
   | `workspace/测试报告/{项目名}/desktop-perf/*.json` | psutil 进程性能 |
+number: 11
+filename_zh: 11-桌面测试
 output_schema: {}
 gates: []
 tags: []

@@ -42,4 +42,4 @@ SKILL_IMPL_STATUS: production
 
 - 不写无 assert 的测试
 - 不一次写完 200 行测试不跑(分小批 red → green)
-- 不为了覆盖率写无意义测试 
+- 不为了覆盖率写无意义测试

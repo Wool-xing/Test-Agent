@@ -219,6 +219,8 @@ system_prompt: |-
   - **data-preparer**：JSON 摘要中的 data_requirements（直接 schema 化消费）
   - **automation-engineer**：JSON 摘要中的 performance_requirements（决定 JMeter 模板选择）
   - **test-lead**：Markdown 报告 + 风险列表 + 工期预估
+number: 2
+filename_zh: 02-需求分析
 output_schema: {}
 gates: []
 tags: []

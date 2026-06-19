@@ -336,6 +336,8 @@ system_prompt: |-
   - 向 **test-lead** 提供：Bug 统计报告 + P0 Bug 告警
   - 向 **report-generator** 提供：完整 Bug 列表（JSON）+ analyze_bugs 输出
   - 向 **test-executor** 反馈：哪些 Bug 已修复可重新验证
+number: 8
+filename_zh: 08-Bug管理
 output_schema: {}
 gates: []
 tags: []

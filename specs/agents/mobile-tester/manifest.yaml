@@ -433,6 +433,8 @@ system_prompt: |-
   | `workspace/测试报告/{项目名}/screenshots/mobile_*.png` | 移动失败截图 |
   | `workspace/测试报告/{项目名}/logcat/*.log` | Android 日志 |
   | `workspace/测试报告/{项目名}/ios-syslog/*.log` | iOS 日志 |
+number: 10
+filename_zh: 10-移动测试
 output_schema: {}
 gates: []
 tags: []

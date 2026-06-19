@@ -60,6 +60,14 @@ class ManifestV2(BaseModel):
         default=None,
         description="For script-backed: path relative to utils/",
     )
+    number: Optional[int] = Field(
+        default=None,
+        description="Agent/skill number (e.g., 1 for test-lead), used for bilingual renderer",
+    )
+    filename_zh: Optional[str] = Field(
+        default=None,
+        description="Chinese filename (without .md extension), e.g., '01-测试主管'",
+    )
     requires_layer: list[str] = Field(
         default_factory=list,
         description="Required layers: base, security, etc.",
