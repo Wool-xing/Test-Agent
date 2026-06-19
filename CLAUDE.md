@@ -20,7 +20,8 @@ graphify explain "ConceptName"
 
 ## ⚠️ READ THIS FIRST
 
-This project has a **dual-mode architecture**. Two independent paths converge at `utils/`.
+This project has a **dual-mode architecture**.
+Two independent paths converge at `utils/`.
 
 ### 🔵 AI Mode — `ai/`
 AI agents read skill docs and agent definitions to orchestrate testing.
