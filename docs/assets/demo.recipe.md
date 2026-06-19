@@ -44,7 +44,7 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 
 [6s]   Step 1/8: requirements-analyst
          ↳ 原因: 任何测试必先理解被测物;Web 系统先解析需求
-         ↳ 理论: ISTQB Foundation §1.4 七原则·测试早介入
+         ↳ 理论: ISTQB Foundation.4 七原则·测试早介入
 
 [10s]  Step 2/8: testcase-designer
          ↳ 原因: 等价类划分 + 边界值;输入字段:URL/Header/Action

@@ -255,7 +255,7 @@ cursor                   # Cursor
 
 ## 🔐 闭环约定（设计原则）
 
-> 18 条全栈闭环约定（数据/cov/重试/severity/error_rate/基线/门禁/MCP/prod禁/Flaky/铭文/决策追溯/三筐/修改四关/工具兼容/纪要不可删/自进化棘轮/依赖补装）— 已迁入主宪章 §19，FULL_GUIDE 不再重复维护。
+> 18 条全栈闭环约定（数据/cov/重试/severity/error_rate/基线/门禁/MCP/prod禁/Flaky/原则/决策追溯/三层分类/修改四关/工具兼容/纪要不可删/自进化机制/依赖补装）— 已迁入，FULL_GUIDE 不再重复维护。
 
 ---
 

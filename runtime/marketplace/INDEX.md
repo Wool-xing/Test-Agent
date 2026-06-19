@@ -6,7 +6,7 @@
 | ------ | ------ |
 | `catalog.py` | 加载 `marketplace/registry.json` + 索引 |
 | `client.py` | 查询(local + 远程 registry mirror) |
-| `verifier.py` | 4 关安全门(sig + scan + sandbox + darwin) |
+| `verifier.py` | 四重安全验证(sig + scan + sandbox + darwin) |
 | `installer.py` | 装 / 卸 / 归档 |
 | `cli.py` | tagent CLI 子命令绑定(install/search/verify/list/uninstall) |
 
@@ -45,7 +45,7 @@
 
 ## 融合原则
 
-- 决策不可逆禁止:卸载只归档(`marketplace/.archive/`)
+- 决策严格禁止:卸载只归档(`marketplace/.archive/`)
 - safe-by-default:`tagent.yml marketplace.enabled` 默认 false
 - Karpathy 原则 3 Surgical:卸载只动安装时建的文件,不动相邻
 - Essence watcher:可关联 marketplace 远程 registry 自动同步

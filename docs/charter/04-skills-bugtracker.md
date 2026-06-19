@@ -57,7 +57,7 @@ V1.0.0 darwin-skill**不消费**项目运行数据（`discussions/` / `decisions
 
 1. 自学习难界定何时停止学习"坏样本"（如一段时期的高 flaky 反而被学进 skill 形成自我固化）
 2. 数据驱动的 skill 改动违反"棘轮 + 人在回路"哲学——人类失去 review 节点
-3. 第三公理"不可测之物必须被命名"——我们不假装能让 skill 自动学会"质量直觉"
+3. 第三条核心原则"不可测之物必须被命名"——我们不假装能让 skill 自动学会"质量直觉"
 
 **未来开案条件**：若需要开放自学习能力，须由 test-lead + 独立伦理责任人**双签**立项，且必须包含：(a) 数据筛选规则 (b) 学习棘轮阈值 (c) 人类否决通道。**当前路线图不承诺。**
 
@@ -91,7 +91,7 @@ JIRA_PROJECT_KEY=QA
 
 ```text
 
-`utils/bug_manager.create_bug_manager()` 工厂函数读取 `BUG_TRACKER` 实例化对应 adapter，bug-manager agent 代码不变。
+`utils/bug_manager.create_bug_manager` 工厂函数读取 `BUG_TRACKER` 实例化对应 adapter，bug-manager agent 代码不变。
 
 ### 3. 统一契约（所有 adapter 必须实现）
 

@@ -25,7 +25,7 @@ example: |
   ```python
   import requests
 
-  resp = requests.post(
+  resp = requests.post
       "https://api.example.com/v1/orders",
       json={"sku": "X1", "qty": 1},
       headers={"Idempotency-Key": "uuid-xxx"},
@@ -57,7 +57,7 @@ Web/API 测试**必经协议**。Test-Agent `utils/api_retry_util.py` 提供 10/
 | 性能 | TTFB / P95 / TPS(JMeter / k6) |
 | 安全 | OWASP API Top 10 / TLS 配置 |
 | 幂等性 | Idempotency-Key 重复提交 |
-| 重试 | 指数退避(主宪章 §18-3 全栈 10/20/40s) |
+| 重试 | 指数退避 |
 
 ## 为什么 Agent 默认调 HTTP?
 

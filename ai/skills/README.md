@@ -80,7 +80,7 @@
 
 | 元 Skill | 目录 | 用途 |
 | ---------- | ------ | ------ |
-| `darwin-skill` | `darwin-skill/` | Skill 自进化棘轮优化 |
+| `darwin-skill` | `darwin-skill/` | Skill 自进化机制优化 |
 | `karpathy-guidelines` | `karpathy-guidelines/` | Karpathy 编码纪律注入 |
 | `nuwa-skill` | `nuwa-skill/` | 女娲：人物思维框架蒸馏 |
 

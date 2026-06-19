@@ -52,11 +52,11 @@ paired_skills: [pentest-coordinator]
 
 **Static-Dynamic Correlation**(shannon 差异化):SAST 发现的不报为"理论风险",必须 exploit agent 真打成功 + 关联源码才入报告。
 
-## 铁律(必遵守)
+## 规则(必遵守)
 
 -**safe-by-default**:`tagent.yml` `pentest.authorized: true` + `pentest.scope: [list]` 显式才允许;否则拒绝运行
 -**PII scrub**:报告含敏感数据自动脱敏(email/phone/SSN/card)
--**决策不可逆禁止**:不真删数据;不真破坏文件;不 force-push;PoC 仅生成不执行不可逆操作
+-**决策严格禁止**:不真删数据;不真破坏文件;不 force-push;PoC 仅生成不执行不可逆操作
 -**隔离 client**:子 agent 用 `subagent.aux_client`,不污染主 session
 -**沙箱**:危险 exploit 必须在 Docker/VM 内跑,不在 host
 -**横切可复现性**:每个 PoC 必带 seed + recordings(Burp HAR / 截图)

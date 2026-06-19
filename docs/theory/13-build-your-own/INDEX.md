@@ -19,10 +19,10 @@
 
 ## 横切准则
 
-- 每卡 `estimated_time_hours` 必填(防 §27 原则 4 时间陷阱)
+- 每卡 `estimated_time_hours` 必填(防 原则 4 时间陷阱)
 - confidence 默认 `medium`(tutorial 质量参差,§23 KB)
 - 引用 URL 必带 1 句摘要(防链接失效)
-- `essence_only` 标:不自动提议入 Test-Agent(§29 policy)
+- `essence_only` 标:不自动提议入 Test-Agent(policy)
 
 ## 不收录
 

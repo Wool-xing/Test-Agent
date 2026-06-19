@@ -1,6 +1,6 @@
 # Smoke PRD · 登录模块(fixture)
 
-> Test-Agent 自检 fixture · 主宪章 §33 · 改了请同步更新 `selftest` 期望产出。
+> Test-Agent 自检 fixture ·
 >**此文件不代表任何真实项目**,纯为 e2e 流程验证。
 
 ## 1. 背景

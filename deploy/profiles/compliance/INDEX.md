@@ -36,5 +36,5 @@ checks:
 
 ## 接入方式
 
-L4 级被测项(charter §21 深度准则 L4)必须通过 `mcp-compliance-checker.check_compliance(profile, run_id)` 验证。
-真规则文件由领域专家+test-lead 双签签字后入库(charter §10 五条铭文 + §15 AgentChat 协议)。
+L4 级被测项( 深度准则 L4)必须通过 `mcp-compliance-checker.check_compliance(profile, run_id)` 验证。
+真规则文件由领域专家+test-lead 双签签字后入库( 五条原则 + AgentChat 协议)。

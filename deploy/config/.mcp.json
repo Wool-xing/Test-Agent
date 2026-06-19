@@ -1,5 +1,5 @@
 {
-  "_comment": "MCP 服务配置 — V1.2.0 6 件套 (主宪章 §16)。P2 #12 MCP client 完善后全部启用。",
+  "_comment": "MCP 服务配置 — V1.2.0 6 件套 。P2 #12 MCP client 完善后全部启用。",
   "mcpServers": {
     "filesystem": {
       "command": "npx",

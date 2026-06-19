@@ -57,7 +57,7 @@ tagent run "https://example.com" --mode learn
 | ------ | ------ |
 | `LLM 调用 raise` | 检查 API key + 网络;切 `TAGENT_LLM_PROVIDER=ollama` 离线兜底 |
 | `BugTracker 提交失败` | 占位没填或网络 / 权限错;不阻塞,但日报会少 |
-| `通知没发出` | 至少配 1 个渠道(主宪章 §36);未配自动跳过 |
+| `通知没发出` | 至少配 1 个渠道;未配自动跳过 |
 | `selftest n7 失败` | 装 python-docx:`pip install python-docx` |
 
 ## 7. 下一步

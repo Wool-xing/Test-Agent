@@ -6,7 +6,7 @@
 
 ## 🧠 V1.36.0 运行时层(`runtime/`)
 
-> 已有 16 专家 / 32 Skill / 79 utils**不动**(宪章铁律),`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
+> 已有 16 专家 / 32 Skill / 79 utils**不动**,`runtime/` 作可执行调度层 + 真 LLM-driven agent/skill runner。
 > 让"文档+脚本工具箱"升级为"可被 API/CLI/CI 直接调用的运行时"。
 
 ### 模块拓扑
@@ -123,7 +123,7 @@ uvicorn runtime.api.main:app --port 8800
 | 79 utils `.py` |**不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |
 | `utils/` 通知/Bug | 复用 `generate_report.py` / `zentao_bug_manager.py` |
 
-任何专家/Skill/脚本**新增**或**修改**仍按宪章 §1 同步铁律走;`runtime/` 是新增**调度**层,不重复实现专家逻辑。
+任何专家/Skill/脚本**新增**或**修改**仍按宪章 联动规则走;`runtime/` 是新增**调度**层,不重复实现专家逻辑。
 V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增执行能力,详见 [ROADMAP.md](../../ROADMAP.md)。
 
 ---
@@ -133,7 +133,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 -**LICENSE**：MIT（详见 [`LICENSE`](../../LICENSE)）
 -**CHANGELOG**：详见 [`../../CHANGELOG.md`](../../CHANGELOG.md)（V1.43.0 / Phase 3+4+5 落版 + 32/32 skill active 全 production）
 -**VERSION**：详见 [`VERSION`](../../VERSION)
--**CONTRIBUTING**：详见 [`CONTRIBUTING.md`](../../CONTRIBUTING.md)（含同步铁律 + RACI 矩阵）
+-**CONTRIBUTING**：详见 [`CONTRIBUTING.md`](../../CONTRIBUTING.md)（含联动规则 + RACI 矩阵）
 -**SECURITY**：详见 [`SECURITY.md`](../../SECURITY.md)（漏洞报告流程 + GitHub Security Advisories 入口）
 -**CODE_OF_CONDUCT**：详见 [`CODE_OF_CONDUCT.md`](../../CODE_OF_CONDUCT.md)（基于 Contributor Covenant 2.1）
 
@@ -149,7 +149,7 @@ V1.14+ 真 LLM-driven agent runner + V1.21+ SkillRunner 系统为 runtime 新增
 
 ### 历史关键决议
 
-- 2026-05-11：宪章四章 + 三公理 + 五铭文起草完成
+- 2026-05-11：宪章四章 + 三条核心原则 + 五原则起草完成
 - 2026-05-11：FULL_GUIDE.md 确立永久宪章地位
 - 2026-05-11：darwin-skill 不消费运行数据（Via Negativa）；反问 KB 不进 V1.0.0
 - 2026-05-12 ~ 2026-05-14：V1.1-V1.14 runtime 层 + 教学层 + Marketplace + 渗透/车载 + Hermes + GBrain + Karpathy + ECC

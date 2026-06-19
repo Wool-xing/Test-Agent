@@ -79,10 +79,9 @@ paired_skills: [automotive-test]
 6.**诊断 DTC 升级前后对比**
 7.**UN R156 文档化**:升级日志 + 用户通知 + 回退证据
 
-## 铁律
-
+## 规则
 -**测试深度**:车载 ECU 默认 L3+,ADAS/底盘/转向 L4 极深
--**决策不可逆禁止**:OTA 包必含回退;真车测试必含 kill-switch
+-**决策严格禁止**:OTA 包必含回退;真车测试必含 kill-switch
 -**行业适配**:接入车载行业必先《领域档案》+ 领域专家签字
 -**safe-by-default**:`tagent.yml` `automotive.fleet_test_authorized: true` 才允许真车数据
 -**横切可复现性**:HIL 测试必含 seed + 录波(MDF/MF4 格式)
@@ -112,4 +111,4 @@ paired_skills: [automotive-test]
 - 不在公开道路擅自跑 — 法规授权 + 安全员
 - 不绕过 ASIL 等级 — 降级必须签字
 - 不存车主 PII / 车 VIN 在飞轮
-- 不测试电控涉及生命安全功能时跳过 HIL — L4 铁律
+- 不测试电控涉及生命安全功能时跳过 HIL — L4 规则

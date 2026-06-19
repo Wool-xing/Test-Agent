@@ -1,4 +1,4 @@
-"""4 关安全门.
+"""四重安全验证.
 
 关 1: signature_check  (sha256 + ed25519 可选)
 关 2: injection_scan   (prompt 注入扫,复用 scheduler 模块)
@@ -25,7 +25,7 @@ class GateResult:
 
 def gate_signature(content: bytes, expected_sha256: str = "", signature: str = "") -> GateResult:
     """Gate 1: SHA256 + 可选 ed25519."""
-    actual = hashlib.sha256(content).hexdigest()
+    actual = hashlib.sha256(content).hexdigest
     if expected_sha256 and actual != expected_sha256:
         return GateResult("signature", False, f"sha256 mismatch: {actual} vs {expected_sha256}")
     # ed25519 略,可加 cryptography lib 实现
@@ -50,7 +50,7 @@ def gate_sandbox_dry_run(file_path: Path, *, timeout_seconds: int = 60) -> GateR
 
     Production 应跑 24h;本简化版只 syntax check + 短 dry-run.
     """
-    if not file_path.exists():
+    if not file_path.exists:
         return GateResult("sandbox_dry_run", False, f"file not found: {file_path}")
     # 简化:markdown skill 文件只 syntax check;.py 文件 ast.parse
     text = file_path.read_text(encoding="utf-8", errors="replace")
@@ -68,7 +68,7 @@ def gate_sandbox_dry_run(file_path: Path, *, timeout_seconds: int = 60) -> GateR
 def gate_darwin_score(file_path: Path, *, min_score: int = 75) -> GateResult:
     """Gate 4: darwin-skill 评分(≥75)."""
     # 简化:取文件长度 + frontmatter 完整性当代理
-    if not file_path.exists():
+    if not file_path.exists:
         return GateResult("darwin_score", False, "file not found")
     text = file_path.read_text(encoding="utf-8", errors="replace")
     score = 50
@@ -80,7 +80,7 @@ def gate_darwin_score(file_path: Path, *, min_score: int = 75) -> GateResult:
         score += 5
     if len(text) > 500:
         score += 10
-    if "trigger" in text or "when to use" in text.lower():
+    if "trigger" in text or "when to use" in text.lower:
         score += 10
     if score >= min_score:
         return GateResult("darwin_score", True, score=score)
@@ -91,7 +91,7 @@ def run_all_gates(file_path: Path, *, expected_sha256: str = "", signature: str 
                    skip_sandbox: bool = False, skip_darwin: bool = False,
                    min_darwin: int = 75) -> list[GateResult]:
     """Run all 4 gates in order; stop at first failure."""
-    content = file_path.read_bytes() if file_path.exists() else b""
+    content = file_path.read_bytes if file_path.exists else b""
     results: list[GateResult] = []
 
     g1 = gate_signature(content, expected_sha256=expected_sha256, signature=signature)

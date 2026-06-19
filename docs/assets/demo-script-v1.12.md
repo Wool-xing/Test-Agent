@@ -125,6 +125,6 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 
 ## 相关
 
-- 项目宪章 §1 一键部署 · §38 配置自动组装 canon · §5 多格式 I/O
+- 项目宪章 一键部署 · 配置自动组装 canon · 多格式 I/O
 - Terminalizer 配置:[`terminalizer-config.yml`](terminalizer-config.yml)
 - 录制原 recipe:[`demo.recipe.md`](demo.recipe.md)(V1.7 起占位)

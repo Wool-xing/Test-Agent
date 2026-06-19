@@ -26,7 +26,7 @@ example: |
                                   └→ Deferred
   reopen: Closed → Open(失败回归触发)
 
-  严重度(技术影响):1=P0 / 2=P1 / 3=P2 / 4=P3(主宪章 §18-4)
+  严重度(技术影响):1=P0 / 2=P1 / 3=P2 / 4=P3
   优先级(业务紧急):同样四级,但**与严重度独立**
 related_to: [rca-5why-8d-fishbone, bug-tracker-adapters]
 ---
@@ -41,7 +41,7 @@ Test-Agent**统一权威**:`utils/bug_severity_map.py` 跨 5 adapter(zentao/jira
 -**优先级**:修复紧急度(老板用 vs 客户偶遇)
 -**两者独立**:可能"P3 优先级 + P0 严重度"(数据丢失但只影响 1% 用户)
 
-## RCA 标准方法(主宪章 §21 流程阶段 6)
+## RCA 标准方法
 
 - 5Why:连问 5 个为什么
 - 8D:8 步纪律(团队+护栏+遏制+根因+永久解+预防)

@@ -20,19 +20,19 @@ from runtime.marketplace.catalog import Entry, find, load_local, save_local
 from runtime.marketplace.verifier import run_all_gates
 
 
-def _market_dir() -> Path:
-    s = get_settings()
+def _market_dir -> Path:
+    s = get_settings
     return s.project_root / "marketplace"
 
 
-def _archive_dir() -> Path:
-    d = _market_dir() / ".archive"
+def _archive_dir -> Path:
+    d = _market_dir / ".archive"
     d.mkdir(parents=True, exist_ok=True)
     return d
 
 
 def _decisions_log(action: str, name: str, payload: dict) -> Path:
-    s = get_settings()
+    s = get_settings
     d = s.resolve(s.workspace_dir) / "测试报告" / "decisions"
     d.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -61,13 +61,13 @@ def install(entry: Entry, content_path: Path) -> dict:
         return {"ok": False, "name": entry.name, "blocked_by": [g.gate for g in failed], "reasons": [g.reason for g in failed]}
 
     # All gates passed: copy to marketplace/{lane}/{name}/
-    target_dir = _market_dir() / entry.lane / entry.name
+    target_dir = _market_dir / entry.lane / entry.name
     target_dir.mkdir(parents=True, exist_ok=True)
     target_file = target_dir / content_path.name
     shutil.copy2(content_path, target_file)
 
-    entry.installed_at = datetime.now(timezone.utc).isoformat()
-    entries = load_local()
+    entry.installed_at = datetime.now(timezone.utc).isoformat
+    entries = load_local
     # remove existing same-name entry if any (upgrade)
     entries = [e for e in entries if e.name != entry.name]
     entries.append(entry)
@@ -79,7 +79,7 @@ def install(entry: Entry, content_path: Path) -> dict:
 
 
 def uninstall(name: str) -> dict:
-    """Uninstall by archiving (不可逆禁止)."""
+    """Uninstall by archiving (严格禁止)."""
     if not is_allowed("marketplace.enabled"):
         raise SafeByDefaultBlocked(op="marketplace.uninstall", key_path="marketplace.enabled")
 
@@ -87,15 +87,15 @@ def uninstall(name: str) -> dict:
     if entry is None:
         return {"ok": False, "name": name, "error": "not installed"}
 
-    src_dir = _market_dir() / entry.lane / entry.name
-    if not src_dir.is_dir():
+    src_dir = _market_dir / entry.lane / entry.name
+    if not src_dir.is_dir:
         return {"ok": False, "name": name, "error": "files missing"}
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    archive = _archive_dir() / f"{entry.lane}_{entry.name}_{ts}"
+    archive = _archive_dir / f"{entry.lane}_{entry.name}_{ts}"
     shutil.move(str(src_dir), str(archive))
 
-    entries = [e for e in load_local() if e.name != name]
+    entries = [e for e in load_local if e.name != name]
     save_local(entries)
 
     _decisions_log("uninstall", name, {"archived_to": str(archive), "entry": asdict(entry)})

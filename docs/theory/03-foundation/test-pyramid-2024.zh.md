@@ -14,7 +14,7 @@ authority:
 confidence: high
 last_reviewed: 2026-05-12
 reviewer: agent-curator
-when_to_use: 任何项目测试架构设计前;主宪章 §17 落点
+when_to_use: 任何项目测试架构设计前;
 common_pitfall:
   - "70/20/10 一刀切——按变更频率+阻塞代价重新分布才合理"
   - "把视觉回归当成独立层——它属 E2E"
@@ -58,4 +58,4 @@ reading_en:
 - 单元最便宜最快 → 多写
 - E2E 最贵最脆 → 少写
 - 契约层填补微服务断点 → 必有
-- 变异分数 ≠ 覆盖率(主宪章 §21 横切准则)→ 用例质量反验
+- 变异分数 ≠ 覆盖率→ 用例质量反验

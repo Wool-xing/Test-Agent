@@ -1,7 +1,7 @@
-# Theory KB 索引(主宪章 §23 教学层准则)
+# Theory KB 索引
 
 > Test-Agent 部署后的**学习知识库**。用户进入学习模式时,Agent 依此 KB 提供权威解释。
-> 主宪章 §23 铁律:**LLM 不得编造 KB 外的引用**(防幻觉 L1 层)。
+>。
 
 ## 双语支持
 
@@ -9,7 +9,7 @@
 - `--lang zh-en` 双栏对照(学英文用)
 - UI i18n 独立(`runtime/web/src/locales/`)
 
-## 12 大类(主宪章 §23)
+## 12 大类
 
 | # | 分类 | 目录 | 主题示例 |
 | --- | ------ | ------ | --------- |
@@ -45,7 +45,7 @@
 - `confidence`(high/medium/low/**llm-draft-unreviewed**)
 - `last_reviewed` + `reviewer`
 
-## 反幻觉 3 层(主宪章 §23)
+## 反幻觉 3 层
 
 | 层 | 机制 |
 | ---- | ------ |
