@@ -57,7 +57,7 @@ reading_en:
 - E2E:Playwright(Web/Electron)+ Appium(移动)+ Airtest(视觉)
 - 变异:`utils/mutation_runner.py`(mutmut)
 
-## 为什么 Agent 这么分配?
+## 为什么 Agent 这么分配
 
 - 单元最便宜最快 → 多写
 - E2E 最贵最脆 → 少写

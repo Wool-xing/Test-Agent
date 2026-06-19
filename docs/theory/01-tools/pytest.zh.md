@@ -63,6 +63,6 @@ Python 测试事实标准。本项目 `runtime/` 全栈 pytest;`config/pytest.in
 -**conftest.py**:自动加载的 fixture 文件
 -**plugin 生态**:`pytest-xdist`(并行)/`pytest-cov`(覆盖率)/`pytest-bdd`(BDD)/`allure-pytest`(报告)
 
-## 为什么 Agent 调用 pytest?
+## 为什么 Agent 调用 pytest
 
 被测物是 Python 项目 → 单元+集成层首选 pytest;输出 junit-xml 喂 Allure;并行用 xdist;失败重试用 rerunfailures。

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-## AI AGENT — STOP. READ THIS FIRST.
+## AI AGENT — STOP. READ THIS FIRST
 
 **This is a Test-Agent project. It has a defined execution framework. You MUST follow it.**
 

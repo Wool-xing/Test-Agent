@@ -29,7 +29,7 @@ reading_en: ["https://build-your-own.org/database/"]
 
 # 从零写一个数据库
 
-## 对测试工作有什么用?
+## 对测试工作有什么用
 
 -**性能测试**:理解 query plan / 索引选择 / IO 模型 → 设计真实负载
 -**SQL 注入**:理解 parser → 知道哪里能注入

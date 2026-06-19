@@ -2,7 +2,7 @@
 
 This is a Test-Agent project with a defined Skill → Agent → Utils execution framework.
 
-## When generating code or answering questions:
+## When generating code or answering questions
 
 1.**Read Skill docs first**— Check `skills/<task>.md` to understand the workflow before generating any test code or calling agents.
 2.**Follow the framework**— Do not skip the Skill workflow layer. Agent definitions are in `ai/agents/`, utils in `utils/`.

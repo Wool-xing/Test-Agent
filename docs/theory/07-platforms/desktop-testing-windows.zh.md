@@ -54,7 +54,7 @@ reading_en:
 
 被测物 PE32 → `desktop-tester` 专家(agents/11-桌面测试.md)→ `utils/desktop_driver.py` 调用 pywinauto。
 
-## 为什么 Agent 选 pywinauto 而非 Playwright?
+## 为什么 Agent 选 pywinauto 而非 Playwright
 
 - Playwright**只支持 Web/Electron**,不能直接驱动 Win32 进程
 - pywinauto 基于微软标准 UIA(IAccessible2),与系统辅助技术兼容

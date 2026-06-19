@@ -16,6 +16,7 @@
 -**pre-push / pre-commit**:`.pre-commit-config.yaml` 已 wire `agent_smoke`
 
 -**CLI**:
+
   ```bash
   tagent doctor --agents      # L1 + L3 真 LLM 16 agent
   tagent selftest --e2e       # L3 全 e2e 闭环

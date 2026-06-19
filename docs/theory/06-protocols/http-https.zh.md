@@ -63,6 +63,6 @@ Web/API 测试**必经协议**。Test-Agent `utils/api_retry_util.py` 提供 10/
 | 幂等性 | Idempotency-Key 重复提交 |
 | 重试 | 指数退避 |
 
-## 为什么 Agent 默认调 HTTP?
+## 为什么 Agent 默认调 HTTP
 
 被测物 = Web/REST/GraphQL/Webhook/SOAP → 全部跑在 HTTP 之上;Agent 用 `runtime/mcp/protocol_adapter` 的 HTTP adapter 做协议层抽象。
