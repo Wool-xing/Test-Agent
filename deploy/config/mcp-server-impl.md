@@ -32,7 +32,7 @@ MCP server 通常通过 stdio 与 client 通信，对外暴露 tools / resources
 
 ```python
 # zentao_mcp_server/__main__.py
-"""禅道 MCP Server 骨架（默认 BugTracker 实现示例;Jira/GitHub/GitLab/Linear/Webhook 同骨架,主宪章 §12）"""
+"""禅道 MCP Server 骨架（默认 BugTracker 实现示例;Jira/GitHub/GitLab/Linear/Webhook 同骨架）"""
 import asyncio
 import json
 import logging

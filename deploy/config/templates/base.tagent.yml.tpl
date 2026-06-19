@@ -15,7 +15,7 @@ skills:
 
 bug_tracker:
   primary: {{BUG_TRACKER}}
-  # 多 tracker 并存(主宪章 §37):写成 [zentao, github],按 Bug label 路由
+  # 多 tracker 并存:写成 [zentao, github],按 Bug label 路由
   # extra: [github]
 
 notifiers:
@@ -28,15 +28,14 @@ quality_gates:
   perf_p99_ms_max: 300
 
 selftest:
-  # 主宪章 §33 自检铁律
   pre_tag_required: true
   pass_threshold: 0.80
   strict_on_release: true
 
 marketplace:
-  enabled: false        # 默认关 · 主宪章 §30 safe-by-default
+  enabled: false        # 默认关 · safe-by-default
 
-# ============== SAFETY GATES · safe-by-default(主宪章 §22 / §35 + W5 sprint v2) ==============
+# ============== SAFETY GATES · safe-by-default ==============
 # 危险操作 / 自动化 / 影响生产 的功能 必须显式开启, 否则 destructive-guard 拒绝运行。
 # 详见 SECURITY.md 武器化代码使用边界 + 测试工具准入控制 节。
 
@@ -62,7 +61,7 @@ gateway:
   # 例: enabled_platforms: [telegram, feishu]
 
 pentest:
-  # 法律契约(default refuse · charter §35); rollout 阶段 yml gate 占位, V1.x 激活后接入真实路由
+  # 法律授权确认 — 默认拒绝，须显式开启
   authorized: false                    # 法律授权确认
   scope_in_targets: []                 # IP/domain/URL 白名单(IN)
   scope_out_targets: []                # 强制黑名单(覆盖 IN)
