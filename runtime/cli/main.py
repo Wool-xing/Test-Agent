@@ -30,6 +30,13 @@ def _version_callback(
         raise typer.Exit(0)
     # bare `tagent` (no subcommand, no --version) → interactive REPL
     if len(_sys.argv) == 1:
+        from runtime.config.settings import get_settings
+        issues = get_settings().validate_startup()
+        critical = [i for i in issues if i["level"] == "error"]
+        if critical:
+            for i in critical:
+                console.print(f"[red]FATAL:[/] {i['message']}")
+            raise typer.Exit(1)
         from runtime.cli.interactive import start
         start()
         raise typer.Exit(0)

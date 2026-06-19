@@ -464,6 +464,26 @@ def _print_banner() -> None:
     console.print()
 
 
+def _print_banner_transcript(tui: object) -> None:
+    """Seed transcript TUI with banner + startup info."""
+    try:
+        from runtime.cli.skins import apply_skin_to_banner
+        banner = apply_skin_to_banner()
+    except Exception:
+        banner = _SHEEP
+    tui.append_output(banner)
+    tui.append_output(f"  [bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
+    tui.append_output(f"  [dim]{get_settings().project_root}[/]")
+
+    issues = _cached_health()
+    errors = [i for i in issues if i["level"] == "error"]
+    warnings = [i for i in issues if i["level"] == "warning"]
+    if errors:
+        tui.append_output(f"  [red]⚠ {len(errors)} errors[/] · [dim]!doctor[/]")
+    elif warnings:
+        tui.append_output(f"  [yellow]⚠ {len(warnings)} warnings[/] · [dim]!doctor[/]")
+
+
 def _print_help() -> None:
     from rich.panel import Panel
 
@@ -1100,76 +1120,65 @@ def start() -> None:
     if parts:
         console.print("  " + " · ".join(parts) + "\n")
 
-    # ── Redirect Rich → prompt_toolkit for clean TUI ──
+    # ── Full-screen TUI (Application + transcript + pinned input) ──
+    from runtime.cli.transcript_tui import TranscriptTUI
+
     _original_console_print = console.print
 
-    def _tui_print(markup: str = "", **kwargs: object) -> None:
-        """Bridge: route Rich markup through prompt_toolkit when session active."""
-        if session is not None:
+    def _tui_input_handler(text: str) -> None:
+        """Route user input → slash dispatch or natural language."""
+        if text.startswith("!"):
             try:
-                _repl_print(markup, **kwargs)
-            except Exception:
-                _original_console_print(markup, **kwargs)
+                _handle_slash(text)
+            except SystemExit:
+                tui.exit()
+            except Exception as exc:
+                tui.append_output(f"[red]Error: {exc}[/]")
+        else:
+            try:
+                _handle_natural_language(text)
+            except Exception as exc:
+                tui.append_output(f"[red]Error: {exc}[/]")
+
+    def _tui_print(markup: str = "", **kwargs: object) -> None:
+        """Route Rich markup → transcript append + pt print."""
+        import re as _re2
+        plain = _re2.sub(r'\[[^\]]*\]', '', markup) if markup else ""
+        if plain.strip():
+            tui.append_output(markup)
         else:
             _original_console_print(markup, **kwargs)
 
     console.print = _tui_print  # type: ignore[method-assign]
 
-    session = _create_session()
-    if session is None:
-        _original_console_print(
-            "[dim](Tab completion not available in Git Bash / mintty. "
-            "Use cmd.exe, Windows Terminal, or PowerShell for full features.)[/]\n"
-        )
+    style = _get_prompt_style()
+    tui = TranscriptTUI(
+        input_handler=_tui_input_handler,
+        status_bar=_render_bottom_toolbar,
+        rprompt=lambda: _current_model()[:14] + (".." if len(_current_model()) > 14 else ""),
+        style=style,
+        history=FileHistory(str(_HISTORY_FILE)),
+        completer=SlashCompleter(),
+    )
 
-    while True:
-        try:
-            result = _read_input(session)
-            if result is None:
-                _save_session()
-                _original_console_print("\n[dim]Session saved. Goodbye.[/]")
-                console.print = _original_console_print  # restore
-                break
-            user_input = result
-        except (EOFError, KeyboardInterrupt):
-            _save_session()
-            _original_console_print("\n[dim]Session saved. Goodbye.[/]")
-            console.print = _original_console_print  # restore
-            break
+    # Seed transcript with startup info
+    _print_banner_transcript(tui)
 
-        if not user_input:
-            continue
+    # Version check thread — output to transcript
+    try:
+        import subprocess, threading
+        def _check_version():
+            from runtime.config.settings import get_settings
+            checker = get_settings().config_dir / "check_version.py"
+            if checker.is_file():
+                r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
+                if r.stdout.strip():
+                    tui.append_output(r.stdout.strip())
+        threading.Thread(target=_check_version, daemon=True).start()
+    except Exception:
+        pass
 
-        # Multi-line detection: code blocks + !ml command
-        if user_input.strip() == "!ml" or user_input.strip() == "!multiline":
-            user_input = _read_multiline(session)
-            if not user_input:
-                continue
-        elif _is_multiline_candidate(user_input):
-            # Already contains newlines from paste — process as-is
-            pass
-
-        # Alias expansion: check non-slash input against aliases
-        if not user_input.startswith("!"):
-            from runtime.cli.aliases import expand_alias
-            expanded = expand_alias(user_input)
-            if expanded:
-                console.print(f"[dim]→ {expanded}[/]")
-                user_input = expanded
-
-        # Record in command history (non-slash only)
-        if not user_input.startswith("!"):
-            _cmd_history.append(user_input)
-            if len(_cmd_history) > 10:
-                _cmd_history.pop(0)
-
-        try:
-            if user_input.startswith("!"):
-                _handle_slash(user_input)
-            else:
-                _handle_natural_language(user_input)
-        except SystemExit:
-            break
-        except Exception as exc:
-            console.print(f"[red]Error: {exc}[/]")
-            console.print("[dim]REPL continuing — !help for commands.[/]")
+    tui.run()
+    _save_session()
+    console.print = _original_console_print  # restore
+    _original_console_print("[dim]Session saved. Goodbye.[/]")
