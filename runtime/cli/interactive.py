@@ -777,10 +777,64 @@ def _check_first_run() -> None:
         )
 
 
+def _suppress_noise() -> None:
+    """Suppress third-party log noise (LiteLLM, Prefect, loguru) in interactive mode."""
+    # Must be set BEFORE any litellm import — suppress cost-map fetch + debug
+    os.environ["LITELLM_SUPPRESS_DEBUG_INFO"] = "1"
+    os.environ.setdefault("LITELLM_LOCAL_MODEL_COST_MAP", "True")
+
+    # LiteLLM — aggressive suppression
+    try:
+        import litellm
+        litellm.set_verbose = False
+        litellm.suppress_debug_info = True
+        # Silence litellm's own logger
+        import logging as _logging
+        for _name in ("litellm", "LiteLLM"):
+            _logging.getLogger(_name).setLevel(_logging.ERROR)
+    except Exception:
+        pass
+
+    # Prefect — silence task engine noise
+    os.environ.setdefault("PREFECT_LOGGING_LEVEL", "ERROR")
+    try:
+        import prefect.logging
+        prefect.logging.get_logger().setLevel("ERROR")
+    except Exception:
+        pass
+    try:
+        import prefect
+        if hasattr(prefect, "settings"):
+            prefect.settings.PREFECT_LOGGING_LEVEL = "ERROR"
+    except Exception:
+        pass
+    # Silence prefect's own loggers
+    try:
+        import logging as _logging
+        for _name in ("prefect", "prefect.task_engine", "prefect.client"):
+            _logging.getLogger(_name).setLevel(_logging.ERROR)
+    except Exception:
+        pass
+
+    # loguru — route to stderr, ERROR only (WARNING during dev)
+    try:
+        from loguru import logger as _loguru
+        _loguru.remove()
+        _loguru.add(
+            sys.stderr,
+            level="ERROR",
+            format="<dim>{time:HH:mm:ss}</dim> | <level>{level: <8}</level> | {message}",
+            colorize=True,
+        )
+    except Exception:
+        pass
+
+
 def start() -> None:
     global _start_time
     _start_time = time.time()
 
+    _suppress_noise()
     _print_banner()
     _check_first_run()
 

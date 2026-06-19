@@ -22,7 +22,7 @@ SKINS: dict[str, dict[str, Any]] = {
 
   ૮₍˶ᵔ ᗜ ᵔ˶₎ა  Test-Agent v{version}
   AI Router · {experts} Experts · {skills} Skills
-  Type /help for commands, or describe your test task.""",
+  """,
         "prompt_style": {
             "prompt": "bold cyan",
             "prompt.dim": "dim",
@@ -49,7 +49,7 @@ SKINS: dict[str, dict[str, Any]] = {
     ║  🧪 Test-Agent {version}  ║
     ╚══════════════════════╝
 
-    {experts} Experts · {skills} Skills · /help for commands""",
+    {experts} Experts · {skills} Skills""",
         "prompt_style": {
             "prompt": "bold bright_cyan",
             "prompt.dim": "bright_black",
@@ -71,7 +71,7 @@ SKINS: dict[str, dict[str, Any]] = {
     "minimal": {
         "name": "minimal",
         "description": "Clean, no-emoji, log-friendly output",
-        "banner": "Test-Agent v{version}  |  {experts} experts  |  {skills} skills  |  /help",
+        "banner": "Test-Agent v{version}  |  {experts} experts  |  {skills} skills",
         "prompt_style": {
             "prompt": "",
             "prompt.dim": "dim",
@@ -98,7 +98,7 @@ SKINS: dict[str, dict[str, Any]] = {
 |  TEST-AGENT v{version}           |
 |  {experts} agents · {skills} skills      |
 +----------------------------------+
-  READY.  Type /help for commands.""",
+  READY.""",
         "prompt_style": {
             "prompt": "bold green",
             "prompt.dim": "dim",
