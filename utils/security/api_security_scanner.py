@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use api_security_scanner_v2 instead. This file will be removed in V1.2.
+# NOTE: api_security_scanner_v2.py is the enhanced version (comprehensive scan, shadow APIs).
+# This v1 provides simpler single-endpoint scans (CORS, CSRF, JWT, rate_limit).
 """
 API 安全测试 - OWASP API Top 10 覆盖
 - API1: BOLA（越权访问对象）

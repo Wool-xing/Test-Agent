@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use state_machine_tester_v2 instead. This file will be removed in V1.2.
+# NOTE: state_machine_tester_v2.py is the enhanced version (FSM with guards, weights, random walk).
+# This v1 provides simpler 0/1-switch + negative test generation.
 """
 状态迁移测试（State Transition Testing）
 被引用方：03-用例设计 agent / testcase-design skill

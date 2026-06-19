@@ -2,6 +2,22 @@
 
 > **AI 编程助理必须先读 [`ai/CLAUDE.md`](ai/CLAUDE.md)** — 包含强制开发约束（禁止硬编码、文件放置规则、防污染机制等）。
 
+## 🧠 代码库知识图谱（graphify）
+
+**`graphify-out/graph.json`** 包含全项目结构图谱（5,388 节点，8,902 边，387 社区）。收到代码库问题时，**优先查询图谱而非遍历文件**：
+
+```bash
+graphify query "How does X work?"
+graphify query "What calls Y?"
+graphify path "ModuleA" "ModuleB"
+graphify explain "ConceptName"
+```
+
+无 `graphify` CLI 时，直接读 `graphify-out/graph.json` 用 NetworkX 遍历。
+
+**图谱覆盖**: `runtime/` (328 files) + `utils/` (93 files) + `ai/` (90 files)
+**重建**: `/graphify --update` 或 `python -m graphify.cli update`
+
 ## ⚠️ READ THIS FIRST
 
 This project has a **dual-mode architecture**. Two independent paths converge at `utils/`.

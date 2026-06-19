@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use a11y_scanner_v2 instead. This file will be removed in V1.2.
+# NOTE: a11y_scanner_v2.py is the enhanced version (WCAG 2.2, 78 criteria, programmatic evaluation).
+# This v1 remains because v2 has a different API (SuccessCriterion dataclass vs plain functions).
+# Both are actively used. See a11y_scanner_v2.py for new development.
 """
 无障碍 / Accessibility 测试（WCAG 2.1）
 被引用方：UX / 易用性 / 合规

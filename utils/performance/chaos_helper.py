@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use chaos_helper_v2 instead. This file will be removed in V1.2.
+# NOTE: chaos_helper_v2.py is the enhanced version (blast radius, steady-state, ramping).
+# This v1 provides simpler process-level chaos (stress_cpu/memory/disk, kill_pod).
 """
 混沌工程：故障注入（CPU/内存/磁盘/网络/进程杀死）
 被引用方：16-可靠性稳定性 agent / chaos-test skill

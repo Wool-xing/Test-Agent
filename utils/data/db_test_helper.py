@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use db_test_helper_v2 instead. This file will be removed in V1.2.
+# NOTE: db_test_helper_v2.py is the enhanced version (multi-DB, isolation levels, integrity).
+# This v1 remains because v2 has a different API (constraint testing vs PostgreSQL-specific ops).
+# Both serve different use cases. See db_test_helper_v2.py for multi-DB scenarios.
 """
 数据库测试工具：CRUD / 事务 ACID / 迁移 / 备份恢复 / 慢查询 / 死锁
 被引用方：05-数据准备 + 安全/可靠性测试

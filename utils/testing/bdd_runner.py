@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use bdd_runner_v2 instead. This file will be removed in V1.2.
+# NOTE: bdd_runner_v2.py is the enhanced version (Gherkin parser, step coverage scanner).
+# This v1 provides simpler cucumber-style feature/step file creation.
 """
 BDD（Behavior-Driven Development）/ 验收测试 - pytest-bdd 包装
 被引用方：03-用例设计 + 06-自动化脚本（验收测试场景）
