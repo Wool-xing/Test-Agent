@@ -2,7 +2,7 @@
   "MD004": { "style": "dash" },
   "MD007": false,
   "MD013": false,
-  "MD024": { "allow_different_nesting": true },
+  "MD024": false,
   "MD026": { "punctuation": ".,;:!?" },
   "MD033": { "allowed_elements": ["details", "summary", "br", "kbd", "sub", "sup"] },
   "MD034": false,
@@ -10,5 +10,5 @@
   "MD041": false,
   "MD046": { "style": "fenced" },
   "MD050": { "style": "asterisk" },
-  "MD060": { "style": "spaced" }
+  "MD060": false
 }
