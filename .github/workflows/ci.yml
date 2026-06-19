@@ -498,6 +498,7 @@ jobs:
         env:
           TAGENT_LLM_PROVIDER: stub
           TAGENT_LLM_PROVIDER_FALLBACK: stub
+          TAGENT_API_AUTH_TOKEN: ""
         # Prefect ephemeral mode not available on Windows — skip if env var fails
         run: |
           python -m pytest runtime/tests/ \
