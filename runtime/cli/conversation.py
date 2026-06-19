@@ -17,8 +17,10 @@ from pathlib import Path
 
 from loguru import logger
 
+from runtime.config.settings import get_settings
+
 # MEMORY.md path — shared across all sessions
-_MEMORY_FILE = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "MEMORY.md"
+_MEMORY_FILE = get_settings().gateway_dir / "MEMORY.md"
 _MEMORY_LOCK = threading.Lock()
 _MEMORY_MAX_CHARS = 2000  # cap injected memory to prevent prompt injection / context bloat
 
@@ -33,7 +35,7 @@ def _discover_project_context() -> str | None:
     global _PROJECT_CONTEXT_CACHE
     if _PROJECT_CONTEXT_CACHE is not None:
         return _PROJECT_CONTEXT_CACHE or None
-    cwd = Path.cwd()
+    cwd = get_settings().project_root
     for d in [cwd, *cwd.parents]:
         for name in _PROJECT_CONTEXT_FILES:
             cf = d / name
@@ -332,7 +334,6 @@ class ConversationMemory:
 
 def list_personalities() -> list[dict[str, str]]:
     """List available personalities from agents/ directory."""
-    from runtime.config.settings import get_settings
     agents_dir = get_settings().experts_dir
     result: list[dict[str, str]] = []
     for f in sorted(agents_dir.glob("*.md")):
@@ -358,7 +359,6 @@ def list_personalities() -> list[dict[str, str]]:
 
 def load_personality(name: str) -> str | None:
     """Load the body (after frontmatter) of an agent .md as personality prompt."""
-    from runtime.config.settings import get_settings
     agents_dir = get_settings().experts_dir
     for f in sorted(agents_dir.glob("*.md")):
         text = f.read_text(encoding="utf-8", errors="replace")

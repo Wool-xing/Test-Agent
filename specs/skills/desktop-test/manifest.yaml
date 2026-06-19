@@ -132,6 +132,8 @@ system_prompt: |-
       ├── win-event-log/
       └── mac-console/
   ```
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

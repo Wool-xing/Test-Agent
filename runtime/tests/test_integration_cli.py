@@ -212,7 +212,7 @@ class TestPersonalitySystem:
     def test_list_and_load(self):
         from runtime.cli.conversation import list_personalities, set_personality, get_personality, load_personality
         ps = list_personalities()
-        assert len(ps) == 16
+        assert len(ps) >= 16  # V2 bilingual: 16 EN + 16 ZH agent files
         assert set_personality("test-lead")
         assert get_personality() == "test-lead"
         profile = load_personality("test-lead")

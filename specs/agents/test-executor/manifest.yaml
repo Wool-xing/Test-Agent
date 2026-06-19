@@ -351,6 +351,8 @@ system_prompt: |-
     }
   }
   ```
+number: 7
+filename_zh: 07-测试执行
 output_schema: {}
 gates: []
 tags: []

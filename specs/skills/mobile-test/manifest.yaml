@@ -199,6 +199,8 @@ system_prompt: |-
       ├── ios-syslog/                      # iOS 日志
       └── 截图/mobile_*.png
   ```
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

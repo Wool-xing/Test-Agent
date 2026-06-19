@@ -69,6 +69,8 @@ system_prompt: |-
   - 不测试每个像素(用 SSIM,留容差)
   - 不在 E2E 跑业务单元验证(留 unit/integration 层)
   - 不无头不录屏(失败必有录屏证据)
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

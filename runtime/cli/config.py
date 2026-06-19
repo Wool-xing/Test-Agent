@@ -17,6 +17,8 @@ from pathlib import Path
 
 import typer
 
+from runtime.config.settings import get_settings
+
 config_app = typer.Typer(add_completion=False, help="LLM provider config (path A: 6 built-in + path B: any OpenAI-compatible vendor)")
 
 BUILTIN_PROVIDERS: dict[str, dict[str, str | None]] = {

@@ -48,6 +48,8 @@ system_prompt: |-
   - 场景结果矩阵(过/挂/未跑 + 触发条件)
   - 录波 MDF/MF4
   - SOTIF 残余风险报告
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

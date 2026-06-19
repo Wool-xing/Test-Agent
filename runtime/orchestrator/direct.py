@@ -245,7 +245,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     # L2-C: rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
-        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+        if not r.get("ok") and "[unimplemented]" in (r.get("stderr_tail") or "")
     ] + skipped
 
     summary = {

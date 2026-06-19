@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from specs.manifest import Kind
+from runtime.config.settings import get_settings
 
 # ── System prompt ────────────────────────────────────────────────────────────
 
@@ -123,7 +124,7 @@ def build_catalog_summary(specs_root: Path | None = None) -> dict[str, Any]:
     Returns a dict with 'agents' and 'skills' lists suitable for the LLM prompt.
     """
     if specs_root is None:
-        specs_root = Path(__file__).resolve().parents[2] / "specs"
+        specs_root = get_settings().project_root / "specs"
 
     agents: list[dict[str, Any]] = []
     skills: list[dict[str, Any]] = []
@@ -204,7 +205,7 @@ def _load_kg_context(graph_path: Path, target_text: str, top_k: int = 5) -> dict
 
 def build_kg_block(target_text: str) -> str:
     """Build a KG context block for the prompt, or empty string if unavailable."""
-    graph_path = Path(__file__).resolve().parents[2] / "graphify-out" / "graph.json"
+    graph_path = get_settings().project_root / "graphify-out" / "graph.json"
     if not graph_path.is_file():
         return ""
 

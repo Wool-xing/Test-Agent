@@ -5,7 +5,8 @@ from pathlib import Path
 from runtime.cli._shared import console
 from runtime.cli.completer import _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
-_SESSION_FILE = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "active_session.json"
+from runtime.config.settings import get_settings
+_SESSION_FILE = get_settings().gateway_dir / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
 _command_history_list = []
 _last_fix = None
@@ -1232,7 +1233,7 @@ def _cmd_ws(args: str) -> None:
     elif action == "add":
         sub = rest.strip().split(maxsplit=1)
         name = sub[0] if sub else ""
-        path = sub[1] if len(sub) > 1 else str(_Path.cwd())
+        path = sub[1] if len(sub) > 1 else str(get_settings().project_root)
         if not name:
             console.print("[dim]Usage: !ws add <name> [path][/]")
             return

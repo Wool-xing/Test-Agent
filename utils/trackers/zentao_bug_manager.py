@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 
 import requests
 from dotenv import load_dotenv
+from runtime.config.settings import get_settings
 
 # 同包 import（部署后 utils/ 在 sys.path 中）
 try:
@@ -208,8 +209,7 @@ class ZentaoBugManager:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    from pathlib import Path as _ZPath
-    _zv = _ZPath(__file__).resolve().parents[2] / "VERSION"
+    _zv = get_settings().project_root / "VERSION"
     _zv_ver = _zv.read_text(encoding="utf-8").strip() if _zv.is_file() else "0.0.0"
     manager = ZentaoBugManager()
 

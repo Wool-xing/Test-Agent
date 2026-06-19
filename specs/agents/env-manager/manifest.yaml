@@ -301,6 +301,8 @@ system_prompt: |-
   - `EnvConfig` / `get_current_env()` 在 `conftest.py` 内定义（权威）
   - 本 agent 调用：`from conftest import get_current_env, EnvConfig`（pytest 收集时可用）
   - prod 环境直接 raise（防误测生产）
+number: 4
+filename_zh: 04-环境管理
 output_schema: {}
 gates: []
 tags: []

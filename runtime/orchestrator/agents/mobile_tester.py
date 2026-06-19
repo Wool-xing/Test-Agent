@@ -3,7 +3,7 @@
 minimum viable:
 - 仅生成 mobile test cases + device commands + test_environment 结构化 JSON
 - 不实装 10-移动测试.md 全部职责 (Appium driver 真跑 / 云真机集成 / 弱网 / 权限弹窗
-  等留 V1.x 深化)
+  等留后续深化)
 - 覆盖 Android / iOS 原生 + 微信/支付宝/抖音 小程序
 """
 

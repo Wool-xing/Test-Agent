@@ -600,6 +600,8 @@ system_prompt: |-
   - `/jmeter-script-gen` → 生成 JMeter 性能测试 JMX 计划
   - `/data-preparation` → 仅准备测试数据（含 JMeter CSV）
   - `/zentao-bug-submission` → 提交 Bug 到禅道
+number: 1
+filename_zh: 01-测试主管
 output_schema: {}
 gates: []
 tags: []

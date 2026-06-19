@@ -160,6 +160,8 @@ system_prompt: |-
   - **automation-engineer**：`workspace/测试数据/test_data.json`（conftest fixture 自动加载）
   - **jmeter-script-gen**：`workspace/测试数据/jmeter_users.csv`
   - **test-executor**：清理报告
+number: 5
+filename_zh: 05-数据准备
 output_schema: {}
 gates: []
 tags: []

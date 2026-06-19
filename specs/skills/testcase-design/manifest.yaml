@@ -2,8 +2,8 @@ name: testcase-design
 version: 1.0.0
 kind: skill
 description: >-
-  快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选：默认 Excel（4 Sheet），可选 xmind / markmap / opml 思维导图，或
-  --format all 一键产全部。适用于用例评审、快速梳理测试点。
+  快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选：默认 Excel（4 Sheet），可选 xmind / markmap / opml 思维导图，或 --format
+  all 一键产全部。适用于用例评审、快速梳理测试点。
 description_zh: 快速生成测试用例技能。输入需求描述，调用 testcase-designer 专家生成结构化测试用例，输出格式由用户自选
 backend: llm
 tools:
@@ -161,6 +161,8 @@ system_prompt: |-
   | TC-LOGIN-UI-002  | P0     | UI   | 空账号提交   | 1.账号留空 2.点击登录              | 提示"请输入账号"       |
   | TC-LOGIN-UI-003  | P1     | UI   | 连续失败锁定 | 1.输错密码 5 次                    | 账号锁定提示           |
   ```
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

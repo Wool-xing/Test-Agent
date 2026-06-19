@@ -42,6 +42,8 @@ system_prompt: |-
   - 帧时序统计
   - 故障注入恢复时间
   - 诊断 DTC 验证
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

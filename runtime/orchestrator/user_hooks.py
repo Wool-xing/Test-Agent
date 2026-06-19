@@ -18,6 +18,8 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -57,7 +59,7 @@ PREBUILT_HOOKS = [
 
 
 def _hooks_file() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+    d = get_settings().gateway_dir
     d.mkdir(parents=True, exist_ok=True)
     return d / "hooks.json"
 

@@ -14,6 +14,8 @@ from typing import Any
 
 from loguru import logger
 
+from runtime.config.settings import get_settings
+
 Checks = list[dict[str, Any]]
 
 
@@ -44,14 +46,14 @@ def check_catalog() -> Checks:
 def check_config() -> Checks:
     """Check .env and VERSION files."""
     results: Checks = []
-    from runtime.config.settings import get_settings
-    env_file = Path.cwd() / ".env"
+    s = get_settings()
+    env_file = s.project_root / ".env"
     if env_file.is_file():
         results.append(_ok(".env file", "found"))
     else:
-        example = get_settings().config_dir / ".env.example"
+        example = s.config_dir / ".env.example"
         results.append(_warn(".env file", f"not found; copy from {example}"))
-    version_file = Path.cwd() / "VERSION"
+    version_file = s.project_root / "VERSION"
     if version_file.is_file():
         ver = version_file.read_text().strip()
         results.append(_ok("VERSION file", ver))
@@ -114,7 +116,7 @@ def check_llm() -> Checks:
 
 def check_workspace() -> Checks:
     """Verify workspace directory is writable."""
-    ws = Path.cwd() / "workspace"
+    ws = get_settings().workspace_dir
     results: Checks = []
     if ws.is_dir():
         results.append(_ok("workspace/", "exists"))

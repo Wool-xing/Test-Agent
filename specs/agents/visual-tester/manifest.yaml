@@ -171,6 +171,8 @@ system_prompt: |-
   | `workspace/自动化脚本/python/visual/baselines/` | 视觉回归基线（Git 提交） |
   | `workspace/测试报告/{项目名}/screenshots/visual-diff/*.png` | 视觉差异高亮图 |
   | `workspace/测试报告/{项目名}/screenshots/airtest-report/*.html` | Airtest HTML 报告 |
+number: 12
+filename_zh: 12-视觉游戏测试
 output_schema: {}
 gates: []
 tags: []

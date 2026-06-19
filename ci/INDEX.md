@@ -58,7 +58,7 @@
 | 性能基线何时更新 | 仅 `release/*` 分支 + `PERF_MODE=full` + 当次门禁全 PASS |
 | 多端通知未发出 | `.env` / Secrets 未配 `WECHAT_WEBHOOK_URL` / `FEISHU_WEBHOOK` / `DINGTALK_WEBHOOK` / `SLACK_WEBHOOK_URL` / `EMAIL_SMTP_*` / `TEAMS_WEBHOOK_URL` 等；未配自动跳过不阻塞 |
 
-## 同步链路（宪章§1 同步铁律）
+## 同步链路
 
 修改本目录任一文件时，**必须**联动检查：
 

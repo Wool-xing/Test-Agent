@@ -92,7 +92,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
     # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
-        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+        if not r.get("ok") and "[unimplemented]" in (r.get("stderr_tail") or "")
     ] + skipped
 
     summary = {

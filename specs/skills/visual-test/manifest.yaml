@@ -114,6 +114,8 @@ system_prompt: |-
       ├── screenshots/visual-diff/         # diff 高亮图
       └── screenshots/airtest-report/      # Airtest HTML
   ```
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

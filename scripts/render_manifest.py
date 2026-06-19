@@ -131,8 +131,13 @@ def _discover_all() -> list[tuple[str, str]]:
 # ---------------------------------------------------------------------------
 
 
-def _render_one(kind: str, name: str, dry_run: bool = False) -> Path:
-    """Render one manifest to .md. Returns the target file path."""
+def _render_one(kind: str, name: str, dry_run: bool = False) -> tuple[Path, Path | None]:
+    """Render one manifest to .md. Returns (en_path, zh_path_or_none).
+
+    Generates bilingual output:
+    - Always: <name>.md (English filename)
+    - Additionally: <filename_zh>.md (Chinese filename, if manifest has filename_zh)
+    """
     manifest = _load_manifest(kind, name)
     md_text = _render_md(manifest)
 
@@ -140,12 +145,20 @@ def _render_one(kind: str, name: str, dry_run: bool = False) -> Path:
     target_file = target_dir / f"{name}.md"
 
     if not dry_run:
-        # Normalize to LF line endings to match V1 originals
         md_text = md_text.replace("\r\n", "\n")
         with open(target_file, "w", encoding="utf-8", newline="\n") as f:
             f.write(md_text)
 
-    return target_file
+    zh_file: Path | None = None
+    filename_zh = manifest.get("filename_zh")
+    if filename_zh:
+        zh_file = target_dir / f"{filename_zh}.md"
+        if not dry_run:
+            md_text = md_text.replace("\r\n", "\n")
+            with open(zh_file, "w", encoding="utf-8", newline="\n") as f:
+                f.write(md_text)
+
+    return target_file, zh_file
 
 
 def _run(dry_run: bool = False, names: list[str] | None = None) -> int:
@@ -169,18 +182,23 @@ def _run(dry_run: bool = False, names: list[str] | None = None) -> int:
     ok = 0
     fail = 0
 
+    zh_count = 0
     for kind, name in manifests:
         label = "AGENT" if kind == "agent" else "SKILL"
         try:
-            target = _render_one(kind, name, dry_run=dry_run)
+            en_target, zh_target = _render_one(kind, name, dry_run=dry_run)
             status = "(dry-run)" if dry_run else "OK"
-            print(f"  [{label}] {name:30s} -> {target} {status}")
+            parts = [f"  [{label}] {name:30s} -> {en_target}"]
+            if zh_target:
+                parts.append(f"+ {zh_target.name}")
+                zh_count += 1
+            print(f"{' '.join(parts)} {status}")
             ok += 1
         except Exception as e:
             print(f"  [{label}] {name:30s} FAIL: {e}")
             fail += 1
 
-    print(f"\nDone. {ok} succeeded, {fail} failed.")
+    print(f"\nDone. {ok} succeeded ({zh_count} bilingual), {fail} failed.")
 
     return 0 if fail == 0 else 1
 

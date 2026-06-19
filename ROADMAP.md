@@ -1,7 +1,7 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.0.0 (**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
+> 当前状态:V2.0.0 (**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 32/32 active**(23 production + 7 script + 2 vision→production);0 rollout;0 vision。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
@@ -218,4 +218,4 @@ V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 | V1.41.0 | 2026-05-19 | Phase 4 证据链可采信性: evidence_chain.py (SHA-256 hash chain + multi-source collection + ISO 27001/SOC2/NIST 800-53/GDPR compliance mapping + JSON/Markdown export + integrity verification) + 39 tests + ai_validator evidence chain audit pipeline | 16 expert + 30/32 active · PHASE 4 DELIVERED |
 | V1.42.0 | 2026-05-19 | Phase 5 神圣性与跨文化禁忌: taboo_matrix.py (135 entries × 16 locales × 5 dimensions: words/colors/numbers/holidays/sacred_contexts) + i18n_checker taboo audit extension (6 functions) + 84 tests | 16 expert + 30/32 active · PHASE 5 DELIVERED |
 | V1.43.0 | 2026-05-19 | Release cut: Phase 3.1+3.2+3.3+4+5 落版 (fairness_auditor / silent_failure_detector / absentee_scenario_injector / evidence_chain / taboo_matrix · 共 184 tests) + **2 ex-vision skill 实装** (agent-introspection-debugging + build-your-own-x-explorer · LLM-driven minimum viable · 中央 ALL_SKILL_RUNNERS 同步) | **16 expert + 32/32 active** (25 production + 7 script · V1.x SKILL ROLLOUT 完整收尾) |
-| V2.0.0 | TBD | V2.x 路线图启动 | 16/16 + V2 |
+| V2.0.0 | 2026-06-19 | ManifestV2 单源真理 · ExecutionContext · Router v2 · 6 Gates · Plugin SDK · Session学习循环 · Impact分析 · SSO+RBAC+审计 · Tauri桌面 · 详见 [CHANGELOG.md](CHANGELOG.md) | 16 expert + 32/32 + V2 |

@@ -1,0 +1,14 @@
+# ===== dev — 开发/CI 辅助依赖（不进入用户安装路径） =====
+# 被 CI 流水线引用，独立于 base.txt 用户运行时依赖。
+
+# 测试框架
+pytest>=8.0
+pytest-cov>=5.0
+
+# 代码质量
+ruff>=0.5
+mypy>=1.10
+
+# Manifest 校验
+pydantic>=2.0
+pyyaml>=6.0

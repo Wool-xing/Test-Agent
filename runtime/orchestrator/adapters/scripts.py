@@ -43,7 +43,7 @@ def run_script(script_filename: str, args: list[str] | None = None, *, timeout: 
     scripts_dir: Path = s.resolve(s.scripts_dir)
     script_path = scripts_dir / script_filename
     if not script_path.is_file():
-        # utils-reorg (V1.x): scripts moved into subdirs (utils/reporting/, utils/data/, ...).
+        # scripts are organized into subdirs (utils/reporting/, utils/data/, ...).
         # Recursively look up by basename when not at top-level.
         matches = [p for p in scripts_dir.rglob(script_filename) if p.is_file()]
         if len(matches) == 1:
@@ -84,7 +84,7 @@ def run_script(script_filename: str, args: list[str] | None = None, *, timeout: 
 def list_available_scripts() -> list[str]:
     s = get_settings()
     scripts_dir: Path = s.resolve(s.scripts_dir)
-    # utils-reorg (V1.x): scripts in subdirs (utils/reporting/, utils/data/, ...).
+    # scripts are organized in subdirs (utils/reporting/, utils/data/, ...).
     # Return basenames so callers can run_script("excel_generator.py") regardless of subdir.
     seen: set[str] = set()
     for p in scripts_dir.rglob("*.py"):

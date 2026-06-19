@@ -16,6 +16,8 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_CHAIN = ["test", "staging"]
@@ -47,7 +49,7 @@ class CrossEnvReport:
 
 
 def _last_baseline_dir() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "测试报告" / "cross_env"
+    d = get_settings().reports_dir / "cross_env"
     d.mkdir(parents=True, exist_ok=True)
     return d
 

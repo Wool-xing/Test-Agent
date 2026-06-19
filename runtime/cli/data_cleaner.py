@@ -13,9 +13,11 @@ import time
 from pathlib import Path
 from typing import Any
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
-WORKSPACE = Path(__file__).resolve().parents[2] / "workspace"
+WORKSPACE = get_settings().workspace_dir
 
 # Preserve: test deliverables (never cleaned)
 PRESERVE_DIRS = {

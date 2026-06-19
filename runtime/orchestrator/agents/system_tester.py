@@ -4,7 +4,7 @@
 minimum viable:
 - 仅生成 test_cases + device_commands + protocol_specific 结构化 JSON
 - 不实装 13-系统集成测试.md 全部职责 (paramiko/pyserial/paho-mqtt 真跑 / FFmpeg
-  解码 / Jaeger 查询执行 / Kafka consumer 真起 等留 V1.x 深化)
+  解码 / Jaeger 查询执行 / Kafka consumer 真起 等留后续深化)
 - 覆盖 IoT (SSH/串口/MQTT/Modbus) + 音视频 (FFmpeg) + 链路追踪 (Jaeger/OpenTelemetry)
   + 消息队列 (Kafka/RabbitMQ) + 跨服务集成
 """

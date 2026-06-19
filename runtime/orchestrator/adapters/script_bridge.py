@@ -15,10 +15,11 @@ from pathlib import Path
 from typing import Callable
 
 from loguru import logger
+from runtime.config.settings import get_settings
 
 
 def _scripts_dir() -> Path:
-    return Path(__file__).resolve().parents[3] / "utils"
+    return get_settings().scripts_dir
 
 
 def _run_script(script_name: str, args: list[str] | None = None,

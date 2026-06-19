@@ -126,6 +126,8 @@ system_prompt: |-
   - 不绕过 ASIL 等级 — 降级必须签字
   - 不存车主 PII / 车 VIN 在飞轮
   - 不测试电控涉及生命安全功能时跳过 HIL — L4 铁律
+number: 16
+filename_zh: 16-车载测试
 output_schema: {}
 gates: []
 tags: []

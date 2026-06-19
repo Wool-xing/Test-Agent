@@ -243,6 +243,8 @@ system_prompt: |-
   - 向 **test-lead** 提供：Word 报告路径 + 摘要 JSON
   - 向 **项目组** 发送：多端通知（企业微信/飞书/钉钉/Slack/邮件/Teams，自动跳过未配置项）
   - 存档：所有报告存入 `workspace/测试报告/{项目名}/` 目录
+number: 9
+filename_zh: 09-报告生成
 output_schema: {}
 gates: []
 tags: []

@@ -142,6 +142,15 @@ def _extract_requires_layer(body: str) -> list[str]:
     return []
 
 
+def _extract_number_and_zh_filename(source_filename: str, kind: str) -> tuple[int | None, str | None]:
+    """Parse '01-测试主管.md' → (1, '01-测试主管') or return None for unmatched."""
+    import re
+    m = re.match(r"(\d+)-(.+)\.md$", source_filename)
+    if m:
+        return int(m.group(1)), f"{m.group(1)}-{m.group(2)}"
+    return None, None
+
+
 def _build_v2_manifest(
     name: str,
     kind: str,
@@ -151,6 +160,7 @@ def _build_v2_manifest(
     paired_skills: list[str] | None,
     body: str,
     requires_layer_from_meta: list[str] | None = None,
+    source_filename: str | None = None,
 ) -> dict:
     """Assemble a V2 manifest dict from parsed V1 fields."""
     # requires_layer from frontmatter takes priority; fall back to body extraction
@@ -171,11 +181,19 @@ def _build_v2_manifest(
         "script_path": _resolve_script_path(name, kind),
         "requires_layer": requires_layer,
         "system_prompt": body.strip(),
+        "number": None,
+        "filename_zh": None,
         "output_schema": {},
         "gates": [],
         "tags": [],
         "deprecated": False,
     }
+    if source_filename:
+        num, fn_zh = _extract_number_and_zh_filename(source_filename, kind)
+        if num is not None:
+            manifest["number"] = num
+        if fn_zh is not None:
+            manifest["filename_zh"] = fn_zh
     return manifest
 
 
@@ -185,11 +203,18 @@ def _build_v2_manifest(
 
 
 def discover_files(directory: Path, kind: str) -> list[tuple[Path, str]]:
-    """Return sorted list of (path, kind) for non-skip .md files."""
+    """Return sorted list of (path, kind) for non-skip .md files.
+
+    For agents: only process numbered files (NN-*.md) to skip
+    already-rendered English-name versions like test-lead.md.
+    """
+    import re
     results: list[tuple[Path, str]] = []
     for md in sorted(directory.glob("*.md")):
         if md.name.upper() in SKIP_FILES:
             continue
+        if kind == "agent" and not re.match(r"\d+-", md.name):
+            continue  # skip rendered English-name files
         results.append((md, kind))
     return results
 
@@ -238,6 +263,7 @@ def migrate_one(file_path: Path, kind: str) -> dict | None:
         paired_skills=paired,
         requires_layer_from_meta=requires_layer,
         body=body,
+        source_filename=file_path.name,
     )
     return manifest
 

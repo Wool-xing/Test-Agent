@@ -34,14 +34,14 @@ class TestLead(AgentRunner):
         if degraded_upstream:
             degraded_block = (
                 f"\n## ⚠ 上游 degraded 警示 (强制约束)\n"
-                f"以下上游 expert 输出降级 (mock 兜底 / LLM 失败 fallback / 未实装 V1.x rollout):\n"
+                f"以下上游 expert 输出降级 (mock 兜底 / LLM 失败 fallback / 未实装 unimplemented):\n"
                 f"{degraded_upstream}\n\n"
                 f"**强制要求**:\n"
                 f"1. `verdict` **绝不能输出 'go'** — 因为本次测试数据不完整\n"
                 f"2. `verdict` 应输出 `conditional`(部分数据可信) 或 `no-go`(P0 缺失维度过多)\n"
                 f"3. `known_risks` **必须列出每个 degraded expert 名**及对应未覆盖维度\n"
                 f"4. `rationale` 必须包含「测试数据不完整,基于 {len(degraded_upstream)} 个降级 expert 无法做发版决策」\n"
-                f"5. `fallback_plan` 必须包含「等 V1.x rollout 完成后重跑」\n"
+                f"5. `fallback_plan` 必须包含「等 unimplemented 完成后重跑」\n"
             )
 
         return (
@@ -88,7 +88,7 @@ class TestLead(AgentRunner):
             )
             rationale = (
                 f"防 mock 闭环触发: 上游 expert {degraded_upstream} 输出 degraded "
-                f"(mock 兜底 / LLM 失败 / 未实装 V1.x rollout)。"
+                f"(mock 兜底 / LLM 失败 / 未实装 unimplemented)。"
                 f"不能基于不完整数据输出 GO,降级 conditional 等人审。"
             )
             known_risks = [

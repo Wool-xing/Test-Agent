@@ -15,10 +15,10 @@ TAGENT_LLM_PROVIDER_FALLBACK=ollama
 # ===== 平台 extras =====
 {{PLATFORM_EXTRAS_BLOCK}}
 
-# ===== BugTracker(主宪章 §37,默认 zentao,可换) =====
+# ===== BugTracker(默认 zentao,可换) =====
 {{BUG_TRACKER_ENV_BLOCK}}
 
-# ===== 多端通知(主宪章 §36,任意 1 个生效即可) =====
+# ===== 多端通知(任意 1 个生效即可) =====
 {{NOTIFIER_ENV_BLOCK}}
 
 # ===== Test-Agent 运行时(通常不需改) =====

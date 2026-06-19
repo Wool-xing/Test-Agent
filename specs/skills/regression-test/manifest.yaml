@@ -197,6 +197,8 @@ system_prompt: |-
   | 平均响应 | ≤200ms | ≤400ms |
   | 错误率 (pct) | <1% | <1% |
   | 基线回归 | <20% | 不强制 |
+number: null
+filename_zh: null
 output_schema: {}
 gates: []
 tags: []

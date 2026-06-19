@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from loguru import logger
+from runtime.config.settings import get_settings
 
 
 @dataclass
@@ -31,15 +32,15 @@ class SkillScore:
 
 def _workspace_output_dir() -> Path:
     """Find the workspace output directory with test results."""
+    s = get_settings()
     candidates = [
-        Path("workspace/测试报告"),
-        Path("workspace/_demo"),
+        s.reports_dir,
+        s.workspace_dir / "_demo",
     ]
     for p in candidates:
-        resolved = Path(__file__).resolve().parents[2] / p
-        if resolved.exists():
-            return resolved
-    return Path(__file__).resolve().parents[2] / "workspace"
+        if p.exists():
+            return p
+    return s.workspace_dir
 
 
 def collect_execution_stats(limit: int = 200) -> list[dict]:

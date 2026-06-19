@@ -428,6 +428,32 @@ def copy_ai_support(template_dir, project_root):
     print("  已部署 ai/ 目录")
 
 
+def copy_specs(template_dir, project_root):
+    """拷贝 specs/ 目录到部署项目 — ManifestV2 单源真理。"""
+    specs_src = os.path.join(template_dir, "specs")
+    if not os.path.isdir(specs_src):
+        return
+    specs_dst = os.path.join(project_root, "specs")
+    print("→ 拷贝 specs/ 目录...")
+    if os.path.exists(specs_dst):
+        shutil.rmtree(specs_dst)
+    shutil.copytree(specs_src, specs_dst)
+    print("  已部署 specs/ 目录（ManifestV2 单源真理）")
+
+
+def copy_graphify(template_dir, project_root):
+    """拷贝 graphify-out/ 知识图谱 — ImpactEngine 需要。"""
+    graphify_src = os.path.join(template_dir, "graphify-out")
+    if not os.path.isdir(graphify_src):
+        return
+    graphify_dst = os.path.join(project_root, "graphify-out")
+    print("-> 拷贝 graphify-out/ ...")
+    if os.path.exists(graphify_dst):
+        shutil.rmtree(graphify_dst)
+    shutil.copytree(graphify_src, graphify_dst, ignore=shutil.ignore_patterns("cache"))
+    print("  已部署知识图谱（ImpactEngine 冲击分析）")
+
+
 def _ensure_env_overrides(env_path: str) -> None:
     """确保 .env 中包含部署后路径覆盖。"""
     overrides = {
@@ -505,6 +531,19 @@ def copy_utils(template_dir, project_root):
                 shutil.copy2(src, dst)
                 count += 1
     print(f"  ✓ {count} 个 .py 文件已拷贝")
+
+
+def copy_sdk(template_dir, project_root):
+    """拷贝 Plugin SDK 到部署项目 — CLI plugin 命令依赖。"""
+    sdk_src = os.path.join(template_dir, "sdk")
+    if not os.path.isdir(sdk_src):
+        return
+    sdk_dst = os.path.join(project_root, "sdk")
+    print("→ 拷贝 sdk/ ...")
+    if os.path.exists(sdk_dst):
+        shutil.rmtree(sdk_dst)
+    shutil.copytree(sdk_src, sdk_dst)
+    print("  已部署 Plugin SDK")
 
 
 def copy_runtime(template_dir, project_root):
@@ -800,8 +839,11 @@ def do_update():
         copy_agents(template_dir, PROJECT_ROOT)
         copy_skills(template_dir, PROJECT_ROOT)
         copy_ai_support(template_dir, PROJECT_ROOT)
+        copy_specs(template_dir, PROJECT_ROOT)
+        copy_graphify(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_sdk(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
@@ -922,8 +964,11 @@ def main():
         copy_agents(template_dir, PROJECT_ROOT)
         copy_skills(template_dir, PROJECT_ROOT)
         copy_ai_support(template_dir, PROJECT_ROOT)
+        copy_specs(template_dir, PROJECT_ROOT)
+        copy_graphify(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_sdk(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)

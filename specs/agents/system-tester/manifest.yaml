@@ -235,6 +235,8 @@ system_prompt: |-
   | `workspace/测试报告/{项目名}/media-frames/*.png` | 视频抽帧对比 |
   | `workspace/测试报告/{项目名}/tracing/*.json` | Jaeger trace 数据 |
   | `workspace/测试报告/{项目名}/mq-logs/*.log` | MQ 投递/消费日志 |
+number: 13
+filename_zh: 13-系统集成测试
 output_schema: {}
 gates: []
 tags: []
