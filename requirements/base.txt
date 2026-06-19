@@ -34,7 +34,7 @@ PyYAML==6.0.3
 openpyxl==3.1.5
 python-docx==1.2.0
 pdfplumber==0.11.9
-pypdf==6.12.2
+pypdf==6.13.3
 beautifulsoup4==4.14.3
 
 # 工具
