@@ -237,83 +237,69 @@ def _context_pct() -> int:
 
 
 def _render_prompt_message() -> list[tuple[str, str]]:
-    """Render prompt with top separator line (CC style)."""
+    """Top separator + prompt — compact, no blank lines."""
     sep = "─" * _term_width()
     return [
-        ("class:separator", f"\n{sep}"),
-        ("", "\n"),
+        ("class:separator", f"{sep}\n"),
         ("class:prompt", "❯ "),
     ]
 
 
 def _render_bottom_toolbar() -> "HTML":
-    """Render separator + 2-line status bar (CC style, dynamic)."""
+    """Bottom separator + status bar. Uses prompt_toolkit-compatible HTML tags only.
+
+    Supported tags: <b>, <i>, <u>, <s>, <ansired>, <ansigreen>, <ansiyellow>,
+    <ansiblue>, <ansimagenta>, <ansicyan>, <ansigray>, <style fg='...' bg='...'>
+    """
     from prompt_toolkit.formatted_text import HTML
 
-    w = _term_width()
-    sep = "─" * w
-    provider = _current_provider()
-    model = _current_model()
-    branch = _git_branch()
+    sep = "─" * _term_width()
+    p = _current_provider()
+    m = _current_model()
+    b = _git_branch()
     pct = _context_pct()
     proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
 
-    # ── Line 1: model info + project + git + health ──
-    parts1 = []
-    parts1.append(f"[{provider}]")
-    if model and model != provider:
-        parts1.append(f"[{model}]")
-    parts1.append(f"│ <cyan>{proj}</cyan>")
-    if branch:
-        parts1.append(f"│ git:<ansigreen>{branch}</ansigreen>")
+    # Model block
+    line1 = f"  <b>[{p}]</b>"
+    if m and m != p:
+        line1 += f" <b>[{m}]</b>"
 
-    try:
-        issues = _cached_health()
-        errors = [i for i in issues if i["level"] == "error"]
-        warnings = [i for i in issues if i["level"] == "warning"]
-        if errors:
-            parts1.append(f"│ <ansired>⚠ {len(errors)} errors</ansired>")
-        elif warnings:
-            parts1.append(f"│ <ansiyellow>⚠ {len(warnings)} warnings</ansiyellow>")
-        else:
-            parts1.append("│ <ansigreen>✓</ansigreen>")
-    except Exception:
-        pass
+    # Project & git
+    line1 += f" │ <ansicyan>{proj}</ansicyan>"
+    if b:
+        line1 += f" │ <ansigreen>git:{b}</ansigreen>"
 
-    # ── Line 2: context + stats + tips ──
-    parts2 = []
+    # Health
+    issues = _cached_health()
+    errs = [i for i in issues if i["level"] == "error"]
+    warns = [i for i in issues if i["level"] == "warning"]
+    if errs:
+        line1 += f" │ <ansired>⚠ {len(errs)}</ansired>"
+    elif warns:
+        line1 += f" │ <ansiyellow>⚠ {len(warns)}</ansiyellow>"
+    else:
+        line1 += " │ <ansigreen>✓</ansigreen>"
+
+    # Line 2: context bar + counts + tips
     bar_len = 10
     filled = min(bar_len, pct * bar_len // 100)
     bar = "█" * filled + "░" * (bar_len - filled)
-    parts2.append(f"Context <dim>{bar}</dim> {pct}%")
+    line2 = f"  Context {bar} {pct}%"
 
-    # Agent/skill counts
-    try:
-        from runtime.config.settings import get_settings as _gs
-        agents_n = _count_md_files("agents")
-        skills_n = _count_md_files("skills")
-        if agents_n:
-            parts2.append(f"│ {agents_n} agents")
-        if skills_n:
-            parts2.append(f"│ {skills_n} skills")
-    except Exception:
-        pass
+    agents_n = _count_md_files("agents")
+    skills_n = _count_md_files("skills")
+    if agents_n:
+        line2 += f" │ {agents_n} agents"
+    if skills_n:
+        line2 += f" │ {skills_n} skills"
 
-    # CLAUDE.md / .env presence
     root = get_settings().project_root
-    files_found = []
     if (root / "CLAUDE.md").is_file():
-        files_found.append("CLAUDE.md")
-    if (root / ".env").is_file():
-        files_found.append(".env")
-    if files_found:
-        parts2.append(f"│ {', '.join(files_found)}")
+        line2 += " │ CLAUDE.md"
 
-    # Quick tips
-    parts2.append("│ <dim>!help · !doctor · !model</dim>")
+    line2 += " │ <ansigray>!help · !doctor · !model</ansigray>"
 
-    line1 = "  " + " ".join(parts1)
-    line2 = "  " + " ".join(parts2)
     return HTML(f"{sep}\n{line1}\n{line2}")
 
 
@@ -321,44 +307,24 @@ def _render_bottom_toolbar() -> "HTML":
 
 
 def _print_banner() -> None:
-    from rich.live import Live
-    from rich.text import Text
-
-    banner = _SHEEP  # fallback
+    """Compact banner: sheep + version + model + project (CC-style header)."""
     try:
         from runtime.cli.skins import apply_skin_to_banner
         banner = apply_skin_to_banner()
     except Exception:
-        pass  # use default _SHEEP
+        banner = _SHEEP
+    console.print(banner)
+    console.print(f"  [bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
+    console.print(f"  [dim]{get_settings().project_root}[/]")
 
-    # Animated typewriter reveal — speed from skin config
-    try:
-        from runtime.cli.skins import get_skin, get_current_skin_name
-        skin = get_skin(get_current_skin_name())
-        animation_speed = skin.get("animation_speed", 0.0005)
-        text_style = skin.get("panel_style", {}).get("text", "bold white")
-    except Exception:
-        animation_speed = 0.0005
-        text_style = "bold white"
-    try:
-        from rich.markup import render as _render_markup
-        accumulated = Text("")
-        with Live(accumulated, console=console, refresh_per_second=120, transient=False) as live:
-            for ch in banner:
-                accumulated.append(ch)
-                # Re-render with markup so colors appear inline
-                live.update(Text.from_markup(str(accumulated)))
-                time.sleep(animation_speed)
-    except Exception:
-        # Fallback: plain print if terminal doesn't support Live
-        console.print(banner)
+    issues = _cached_health()
+    errors = [i for i in issues if i["level"] == "error"]
+    warnings = [i for i in issues if i["level"] == "warning"]
+    if errors:
+        console.print(f"  [red]⚠ {len(errors)} errors[/] · [dim]!doctor[/]")
+    elif warnings:
+        console.print(f"  [yellow]⚠ {len(warnings)} warnings[/] · [dim]!doctor[/]")
 
-    # Provider + model + project path (CC-style header)
-    provider = _current_provider()
-    model = _current_model()
-    proj_root = get_settings().project_root
-    console.print(f"  [bold cyan]{provider}[/] · [dim]{model}[/]")
-    console.print(f"  [dim]{proj_root}[/]")
     console.print()
 
 
