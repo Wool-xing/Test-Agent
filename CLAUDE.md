@@ -24,6 +24,7 @@ This project has a **dual-mode architecture**.
 Two independent paths converge at `utils/`.
 
 ### 🔵 AI Mode — `ai/`
+
 AI agents read skill docs and agent definitions to orchestrate testing.
 
 - `ai/agents/` — 16 agent prompt definitions (.md)
@@ -31,6 +32,7 @@ AI agents read skill docs and agent definitions to orchestrate testing.
 - These are READ-ONLY for AI agents. Do NOT modify unless explicitly asked.
 
 **Correct flow:**
+
 1. Read `ai/skills/<task>.md` to understand the workflow
 2. Follow the Skill doc's step-by-step agent call sequence
 3. Call `Agent(subagent_type="xxx")` ONLY when and how the Skill doc says
@@ -38,6 +40,7 @@ AI agents read skill docs and agent definitions to orchestrate testing.
 **If no Skill doc matches the task:** fall back to `ai/skills/test-coordinator.md`.
 
 ### 🟢 CLI Mode — `runtime/` + `utils/`
+
 Standalone CLI that works without AI.
 
 ```bash
@@ -48,13 +51,14 @@ tagent doctor                    # health check
 ```
 
 ### 🟡 Deployment — `deploy/`
+
 Files copied by `install.py` to user projects. Do NOT put source code here.
 
 ---
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │  ai/          AI Mode Interface          │
 │  agents/ + skills/   .md only           │
@@ -98,11 +102,13 @@ Both paths converge at utils/ execution layer.
 1. **No new files in root.** Root has only entry points + project metadata.
 2. **New agent?** → `ai/agents/NN-name.md`
 3. **New skill?** → `ai/skills/name.md` (+ optional `runtime/orchestrator/skills/name.py`)
-4. **New CLI command?** → `runtime/cli/commands/name.py` + register in `main.py`
+4. **New CLI command?** → `runtime/cli/commands/name.py`
+   and register in `main.py`
 5. **New utility?** → appropriate subdirectory under `utils/`
 6. **New app?** → `apps/name/` (self-contained)
 7. **New deploy template?** → `deploy/config/` or `deploy/profiles/`
-8. **Never commit:** build artifacts, caches, logs, node_modules, .coverage, workspace data
+8. **Never commit:** build artifacts, caches, logs,
+   node_modules, .coverage, workspace data
 9. **Read `ai/INDEX.md`** before touching ai/ files
 10. **Read `deploy/INDEX.md`** before touching deploy/ files
 
@@ -121,9 +127,11 @@ Both paths converge at utils/ execution layer.
 
 ## Design Notes
 
-- Slash commands like `/smoke-test` are Skill workflow documents, not registered commands.
+- Slash commands like `/smoke-test` are Skill workflow documents,
+  not registered commands.
 - Agent definitions contain Python import hints as prompts — not executable code.
-- `test-lead` cannot recursively spawn sub-agents (AI tool limitation). Main thread orchestrates.
+- `test-lead` cannot recursively spawn sub-agents (AI tool limitation).
+  Main thread orchestrates.
 - Pentest workflows require `tagent.yml` with `pentest.authorized: true` — see `tagent.yml.example`.
 - MCP server: `python -m runtime.mcp.test_orchestrator.server` (catalog/plan/run/status/report).
 - LLM providers: edit `.env` → `TAGENT_LLM_PROVIDER`. Built-in: claude/openai/gemini/deepseek/qwen/ollama.
