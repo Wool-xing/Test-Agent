@@ -52,8 +52,6 @@ tagent install skill <name> # 装(必过 4 关)
 tagent verify <name>        # 单独跑沙箱验证
 tagent uninstall <name>     # 卸(归档不删)
 
-```text
-
 ## 四重安全验证
 
 1.**签名校验**:SHA256 + 可选 GPG/ed25519
@@ -65,9 +63,8 @@ tagent uninstall <name>     # 卸(归档不删)
 
 ## 注意
 
--**不复制 Anthropic / OpenAI 源码**(品牌+协议红线)
--**仅镜像 metadata + 链接**到上游
-
+- **不复制 Anthropic / OpenAI 源码**(品牌+协议红线)
+- **仅镜像 metadata + 链接**到上游
 - 卸载只**归档**到 `marketplace/.archive/`
 
 ## 配置
