@@ -441,6 +441,19 @@ def copy_specs(template_dir, project_root):
     print("  已部署 specs/ 目录（ManifestV2 单源真理）")
 
 
+def copy_graphify(template_dir, project_root):
+    """拷贝 graphify-out/ 知识图谱 — ImpactEngine 需要。"""
+    graphify_src = os.path.join(template_dir, "graphify-out")
+    if not os.path.isdir(graphify_src):
+        return
+    graphify_dst = os.path.join(project_root, "graphify-out")
+    print("-> 拷贝 graphify-out/ ...")
+    if os.path.exists(graphify_dst):
+        shutil.rmtree(graphify_dst)
+    shutil.copytree(graphify_src, graphify_dst, ignore=shutil.ignore_patterns("cache"))
+    print("  已部署知识图谱（ImpactEngine 冲击分析）")
+
+
 def _ensure_env_overrides(env_path: str) -> None:
     """确保 .env 中包含部署后路径覆盖。"""
     overrides = {
@@ -827,6 +840,7 @@ def do_update():
         copy_skills(template_dir, PROJECT_ROOT)
         copy_ai_support(template_dir, PROJECT_ROOT)
         copy_specs(template_dir, PROJECT_ROOT)
+        copy_graphify(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
         copy_sdk(template_dir, PROJECT_ROOT)
@@ -951,6 +965,7 @@ def main():
         copy_skills(template_dir, PROJECT_ROOT)
         copy_ai_support(template_dir, PROJECT_ROOT)
         copy_specs(template_dir, PROJECT_ROOT)
+        copy_graphify(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
         copy_sdk(template_dir, PROJECT_ROOT)
