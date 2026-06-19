@@ -205,11 +205,12 @@ class IntentRouterV2:
         """Keyword-based routing fallback. No LLM required."""
         target_lower = target.lower()
 
-        # Check if target is a PRD file path
+        # Check if target is a PRD file path (sanitized against path traversal)
         if target.endswith((".md", ".pdf", ".docx", ".xlsx", ".txt")):
             try:
-                path = Path(target)
-                if path.is_file():
+                path = Path(target).resolve()
+                # Reject paths outside the current working directory
+                if path.is_relative_to(Path.cwd()) and path.is_file():
                     target_lower += " " + path.read_text(encoding="utf-8", errors="ignore")[:2000].lower()
             except Exception:
                 pass

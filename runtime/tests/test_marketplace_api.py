@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 from fastapi.testclient import TestClient
 
@@ -47,7 +48,9 @@ def _seed_registry(entries: list[Entry], monkeypatch) -> None:
     }
 
     # Write to temp file, then monkeypatch _registry_path
-    tmp = Path(tempfile.mktemp(suffix=".json"))
+    tmp_fd, tmp_name = tempfile.mkstemp(suffix=".json")
+    os.close(tmp_fd)
+    tmp = Path(tmp_name)
     tmp.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
     import runtime.marketplace.catalog as cat
