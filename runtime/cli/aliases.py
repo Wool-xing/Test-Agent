@@ -12,6 +12,8 @@ import logging
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,7 +25,7 @@ class Alias:
 
 
 def _file() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+    d = get_settings().gateway_dir
     d.mkdir(parents=True, exist_ok=True)
     return d / "aliases.json"
 

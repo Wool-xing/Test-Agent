@@ -17,6 +17,8 @@ from pathlib import Path
 
 import typer
 
+from runtime.config.settings import get_settings
+
 config_app = typer.Typer(add_completion=False, help="LLM provider config (path A: 6 built-in + path B: any OpenAI-compatible vendor)")
 
 BUILTIN_PROVIDERS: dict[str, dict[str, str | None]] = {
@@ -77,7 +79,7 @@ VENDOR_KEYS = (
 
 def _find_env_file(cwd: Path | None = None) -> Path:
     """优先 CWD/.env. 不存仍返回此路径 (调用者据存在性决定写/读)."""
-    base = cwd or Path.cwd()
+    base = cwd or get_settings().project_root
     return base / ".env"
 
 

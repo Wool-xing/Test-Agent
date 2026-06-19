@@ -16,6 +16,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 FLAKY_THRESHOLD = 0.3     # <30% pass rate = flaky
@@ -32,7 +34,7 @@ class FlakyEntry:
 
 
 def _file() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "测试报告" / "baselines"
+    d = get_settings().reports_dir / "baselines"
     d.mkdir(parents=True, exist_ok=True)
     return d / "flaky_tracker.json"
 

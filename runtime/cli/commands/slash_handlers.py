@@ -5,7 +5,8 @@ from pathlib import Path
 from runtime.cli._shared import console
 from runtime.cli.completer import _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
-_SESSION_FILE = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "active_session.json"
+from runtime.config.settings import get_settings
+_SESSION_FILE = get_settings().gateway_dir / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
 _command_history_list = []
 _last_fix = None
