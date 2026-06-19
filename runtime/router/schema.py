@@ -19,7 +19,7 @@ class DAGNode(BaseModel):
     on_failure: Literal["retry", "skip", "abort"] = "retry"
     timeout_seconds: int = Field(default=1800, ge=1, description="node timeout in seconds")
 
-    # Charter §23 教学层字段(可选;LLM 在 learn mode 应填,exec mode 仅 one_liner)
+    # 教学层字段(可选;LLM 在 learn mode 应填,exec mode 仅 one_liner)
     one_liner_zh: str = Field(default="", description="≤30 字 why,执行模式输出此字段")
     one_liner_en: str = Field(default="", description="≤120 chars why for English")
     why: str = Field(default="", description="long-form rationale (learn mode)")

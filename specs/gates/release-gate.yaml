@@ -1,0 +1,27 @@
+# Release Gate — Meta-gate requiring ALL sub-gates to pass
+# This is the final gate before production deployment.
+# All constituent gates (smoke, regression, performance, security)
+# must pass before the release gate can pass.
+
+name: release-gate
+description: Release meta-gate — all sub-gates (smoke + regression + performance + security) must pass
+severity: blocker
+checks:
+  - metric: smoke_gate_pass
+    operator: eq
+    threshold: 1
+    description: "Smoke gate must pass"
+  - metric: regression_gate_pass
+    operator: eq
+    threshold: 1
+    description: "Regression gate must pass"
+  - metric: performance_gate_pass
+    operator: eq
+    threshold: 1
+    description: "Performance gate must pass"
+  - metric: security_gate_pass
+    operator: eq
+    threshold: 1
+    description: "Security gate must pass"
+timeout_minutes: 120
+auto_apply: false

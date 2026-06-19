@@ -1,0 +1,26 @@
+# Smoke Gate — P0 smoke test quality gate
+# Referenced by manifest entries that require smoke-test validation.
+#
+# This gate defines the minimum quality bar a system must meet
+# before it can be considered "passing" in a smoke test run.
+
+name: smoke-gate
+description: P0 smoke test gate — must pass before any further testing
+severity: blocker  # blocker | critical | warning
+checks:
+  - metric: p0_pass_rate
+    operator: gte
+    threshold: 95
+    unit: percent
+    description: "P0 test case pass rate must be at least 95%"
+  - metric: new_p0_bugs
+    operator: eq
+    threshold: 0
+    description: "Zero new P0 bugs allowed"
+  - metric: core_api_response_time
+    operator: lt
+    threshold: 3000
+    unit: ms
+    description: "Core API p95 latency must stay below 3000ms"
+timeout_minutes: 10
+auto_apply: true

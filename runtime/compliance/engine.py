@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from runtime.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +69,7 @@ class ComplianceReport:
 
 def _profiles_dir() -> Path:
     """Resolve profiles/compliance/ relative to project root."""
-    return Path(__file__).resolve().parents[2] / "profiles" / "compliance"
+    return get_settings().project_root / "deploy" / "profiles" / "compliance"
 
 
 def load_profile(standard: str) -> dict[str, Any] | None:

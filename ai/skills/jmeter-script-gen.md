@@ -2,7 +2,7 @@
 name: jmeter-script-gen
 description: JMeter 性能脚本生成技能。输入接口信息或业务流程描述，生成可直接运行的 JMeter JMX 测试计划，支持接口压测/业务流程并发/阶梯加压三种模式。数据由 data-preparer 提供 CSV，结果输出给 test-executor / report-generator / bug-manager。
 tools: Read, Write, Edit, Grep, Glob
-SKILL_IMPL_STATUS: script
+SKILL_IMPL_STATUS: production
 ---
 
 > **JMeter 版本兼容**: 本模板不硬编码 `saveConfig`，结果保存配置走 `jmeter.properties` 默认值，兼容 JMeter 5.0 ~ 5.6.3。ThreadGroup 含 `${变量}` 的属性统一用 `stringProp`，避免跨版本参数化失效。

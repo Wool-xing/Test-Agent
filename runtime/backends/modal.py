@@ -1,4 +1,4 @@
-"""Modal serverless backend (hermes §1.4 经济模型 — hibernate when idle).
+"""Modal serverless backend (hibernate when idle).
 
 Modal client SDK must be installed and authenticated:
     pip install modal
@@ -20,7 +20,7 @@ from runtime.backends.base import BaseExecutionEnv, ExecResult, register
 class ModalBackend(BaseExecutionEnv):
     """Wrap a Modal Function/App; commands run inside a hibernated container.
 
-    Hermes §1.4 经济模型: ground-state nearly zero cost when idle.
+    Ground-state nearly zero cost when idle.
     """
 
     def __init__(self, app_name: str, *, image: str | None = None) -> None:

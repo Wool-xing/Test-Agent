@@ -1,4 +1,4 @@
-"""Scheduler tick loop (hermes §1.2).
+"""Scheduler tick loop.
 
 - 60s tick from a background thread
 - Cross-platform file lock (fcntl/msvcrt) prevents double-run
@@ -111,7 +111,7 @@ def run_job(job: dict, *, runner: Callable[[str], dict] | None = None) -> dict:
     out_file = out_dir / f"{ts}.md"
 
     try:
-        # Charter §22 rule: runtime full-prompt injection scan
+        # runtime full-prompt injection scan
         scan(prompt)
     except PromptInjectionBlocked as e:
         out_file.write_text(f"# Job {job_id} blocked\n\nreason: {e.reason}\nsnippet: {e.snippet}\n", encoding="utf-8")

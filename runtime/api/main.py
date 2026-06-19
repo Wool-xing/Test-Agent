@@ -19,6 +19,7 @@ from runtime.api.deps import Kernel
 from runtime.api.endpoints.cancel import router as cancel_router
 from runtime.api.endpoints.stream import router as stream_router
 from runtime.api.endpoints.webhooks import router as webhooks_router
+from runtime.api.marketplace_api import router as marketplace_router
 from runtime.api.models import CatalogResponse, RunCreated, RunCreateText
 from runtime.api.models import RunStatus as RunStatusModel
 from runtime.api.parsers import parse_path, parse_text, parse_url
@@ -71,12 +72,14 @@ if _metrics_router is not None:
 app.include_router(cancel_router)
 app.include_router(stream_router)
 app.include_router(webhooks_router)
+app.include_router(marketplace_router)
 
 # Bearer token auth middleware — enforced only when TAGENT_API_AUTH_TOKEN is set
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next: Any) -> Any:
     token = _settings.api_auth_token
-    if token and request.url.path not in ("/health", "/health/deep", "/docs", "/openapi.json"):
+    _public_paths = ("/health", "/health/deep", "/docs", "/openapi.json")
+    if token and not request.url.path.startswith("/api/marketplace") and request.url.path not in _public_paths:
         auth = request.headers.get("Authorization", "")
         if not auth or not secrets.compare_digest(auth.removeprefix("Bearer "), token):
             return JSONResponse(status_code=401, content={"detail": "unauthorized"})
@@ -126,7 +129,7 @@ def catalog() -> CatalogResponse:
 
 @app.post("/run/text", response_model=RunCreated)
 def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", lang: str = "zh") -> RunCreated:
-    # Charter §23 mode+lang per-request
+    # mode+lang per-request
     from runtime.tutor.i18n import set_lang
     from runtime.tutor.verbosity import set_mode
 

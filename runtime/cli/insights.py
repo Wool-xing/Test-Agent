@@ -16,6 +16,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +32,7 @@ class SessionStats:
 
 
 def _session_dir() -> Path:
-    return Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+    return get_settings().gateway_dir
 
 
 def collect_stats(days: int = 30) -> list[SessionStats]:

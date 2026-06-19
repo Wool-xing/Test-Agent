@@ -1,6 +1,6 @@
-"""Runtime prompt injection scan (hermes §1.2 critical).
+"""Runtime prompt injection scan.
 
-Charter §22 rule: 非交互自动批准模式下,assembled prompt(含动态加载的 skill 内容)
+非交互自动批准模式下,assembled prompt(含动态加载的 skill 内容)
 必须全扫,不止 create-time。
 """
 
@@ -33,7 +33,7 @@ class PromptInjectionBlocked(Exception):
 def scan(text: str) -> None:
     """Raise PromptInjectionBlocked when any pattern hits.
 
-    Charter §22 rule: scan FULL assembled prompt (system + user + tools + skill contents).
+    Scan FULL assembled prompt (system + user + tools + skill contents).
     """
     for pat in SUSPICIOUS:
         m = pat.search(text)

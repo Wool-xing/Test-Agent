@@ -13,13 +13,13 @@
 
 ---
 
-Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports, powered by 16 AI agents.
+Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports, powered by 16 AI agents with a ManifestV2 single-source architecture.
 
 - **All-platform** — Web · API · Android · iOS · WeChat Mini Program · Windows · macOS · Linux · Automotive · IoT · AI/LLM · Blockchain
 - **All-protocol** — HTTP(S) · gRPC · WebSocket · TCP/UDP · GraphQL · MQTT · CAN-bus · Kafka · Modbus · …
 - **Multi-LLM no lock-in** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + OpenAI-compatible fallback for any provider, 3 env vars, zero code
 - **Learn while using** — `--mode learn` outputs theory references at every step (22 KB cards across 13 domains)
-- **Safe-by-default** — sandboxed exec · PII scrub · prompt-injection scan · decisions audit trail
+- **Safe-by-default** — sandboxed exec · PII scrub · prompt-injection scan · hash-chain audit trail · SSO + RBAC
 
 ---
 
@@ -48,13 +48,13 @@ python install.py ~/test-agent-project       # macOS / Linux example, any folder
 
 After deployment, outputs under `workspace/`: test cases (Excel + xmind + markmap + opml) + Word report + decision logs.
 
-**Next**: `cp config/.env.example .env` → edit `.env` → `cd project-dir && claude` → read `skills/smoke-test.md` workflow, run agents per the flow
+**Next**: `cp config/.env.example .env` → edit `.env` → run with any AI tool supporting AGENTS.md/SKILL.md standard, or `tagent run "your PRD"`
 
-## 🖥 Desktop App
+## 🖥 Desktop App (V2 — Tauri)
 
 [![Download](https://img.shields.io/badge/Download-Latest%20Release-blue)](https://github.com/Wool-xing/Test-Agent/releases)
 
-No Python / Node / Docker required. Download and run.
+No Python / Node / Docker required. Tauri 2 desktop — ~10MB binary, Windows/macOS/Linux.
 
 ## 📸 Screenshots
 
@@ -77,22 +77,30 @@ No Python / Node / Docker required. Download and run.
 
 - **Product types**: Web · API · Mobile · Desktop · IoT · AI · Blockchain · Automotive · Embedded · Serverless
 - **Test types**: functional / performance / security / compatibility / weak-network / stability / accessibility / visual / i18n / chaos / mutation / AI-specific / compliance
-- **Quality gates**: smoke → regression → performance_ci_quick → performance_full → release (5-layer)
+- **Quality gates**: 6 centralized gates (smoke / regression / performance / security / CI / release) with automated evaluation
 
 ## 📂 Project Structure
 
 ```text
 Test-Agent/
-├── agents/             ← 16 expert agents
-├── skills/             ← 32 business skills + 3 meta-skills
-├── utils/              ← 79 production utils (pytest · Playwright · JMeter · Appium · …)
-├── config/             ← conftest / pytest.ini / .mcp.json
-├── runtime/            ← V1.x runtime (router · orchestrator · MCP · …)
-├── ci/                 ← GitHub Actions + Jenkins
-├── docs/               ← user manual / architecture / theory / compliance
-├── marketplace/        ← community skills / agents / mcp / hooks
-├── install.py          ← one-command cross-platform deploy
-└── README.md / README.zh-CN.md
+├── specs/              ← ManifestV2 单源真理（16 agents + 32 skills）
+├── ai/                 ← AI 模式界面层（agents/ + skills/ .md 定义）
+├── runtime/            ← Python 运行时引擎（router · orchestrator · MCP · learning · intelligence）
+├── engine/             ← Rust 核心（DAG executor · sandbox · PyO3 bridge）
+├── utils/              ← 92 共享工具（12 子目录，双模式共用）
+├── sdk/                ← Plugin SDK（scaffold · validate · install）
+├── apps/               ← 分发应用（desktop-v2: Tauri, desktop: Electron, mobile: Capacitor）
+├── deploy/             ← 部署物料（config 模板 · profiles 合规 · marketplace）
+├── docs/               ← 文档（getting-started · charter · theory · site: VitePress）
+├── ci/                 ← CI/CD（GitHub Actions 18 jobs · Jenkins）
+├── scripts/            ← 开发脚本（迁移 · 渲染 · 一致性检查）
+├── examples/           ← 示例 PRD + demo 项目
+├── graphify-out/       ← 知识图谱输出（5,388 节点 · 8,902 边）
+├── requirements/       ← Python 依赖
+├── workspace/          ← 运行时产出（测试报告 · 决策日志）
+├── install.py          ← 跨平台一键部署
+├── VERSION             ← 版本号单源
+└── README.md
 ```
 
 See [FULL_GUIDE.md](FULL_GUIDE.md) and [CHANGELOG.md](CHANGELOG.md) for details.

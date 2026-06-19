@@ -1,4 +1,4 @@
-"""Verbosity mode · 主宪章 §23.
+"""Verbosity mode.
 
 exec  = 默认,每节点仅 one_liner(≤30 字);可 --silent 关
 learn = 全套教学:why + theory_ref + alternatives + reading + L3 反馈

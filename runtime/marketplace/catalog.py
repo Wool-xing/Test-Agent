@@ -1,4 +1,4 @@
-"""Marketplace local + remote catalog · §30.
+"""Marketplace local + remote catalog.
 
 读 marketplace/registry.json,可选拉远程 mirror,合并查询.
 """

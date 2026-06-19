@@ -10,7 +10,7 @@
 | `scheduler.py` | tick() 每 60s,跨平台文件锁(fcntl/msvcrt) |
 | `injection_scan.py` | 运行时 prompt 注入扫描(防 skill 加载注入) |
 
-## 规则(主宪章 §22 落地)
+## 规则
 
 - **运行时全 prompt 扫描**(非仅 create-time):skill 在 runtime 加载,恶意 skill 可携带注入
 - **文件锁防重入**:`workspace/cron/.tick.lock` 双栈实现

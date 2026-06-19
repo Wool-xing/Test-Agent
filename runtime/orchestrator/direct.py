@@ -17,6 +17,7 @@ from typing import Any
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
 from runtime.orchestrator.adapters.experts import execute_node, reset_upstream_cache
+from runtime.orchestrator.context import ExecutionContext
 from runtime.router.schema import DAGNode, RoutingDecision
 from runtime.self_healing.retry import with_retry
 
@@ -31,7 +32,7 @@ def _is_hard(node: DAGNode) -> bool:
     return getattr(node, "dep_mode", "hard") == "hard"
 
 
-def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
+def _run_node_with_retry(node: DAGNode, results: dict, log, ctx: ExecutionContext) -> None:
     """Execute a node with retries, respecting on_failure policy.
 
     on_failure modes:
@@ -41,7 +42,7 @@ def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
     """
     nid = node.id
     try:
-        results[nid] = _run_node(node)
+        results[nid] = _run_node(node, ctx)
     except Exception as exc:
         log.warning("node {} attempt failed: {}", nid, exc)
         if node.on_failure == "skip":
@@ -54,7 +55,7 @@ def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
         for attempt in range(2):
             time.sleep(2 ** attempt)
             try:
-                results[nid] = _run_node(node)
+                results[nid] = _run_node(node, ctx)
                 return
             except Exception as retry_exc:
                 log.warning("node {} retry {}/2 failed", nid, attempt + 1)
@@ -65,18 +66,24 @@ def _run_node_with_retry(node: DAGNode, results: dict, log) -> None:
                     results[nid] = {"id": nid, "ok": False, "error": str(retry_exc)}
 
 
-def _run_node(node: DAGNode) -> dict[str, Any]:
+def _run_node(node: DAGNode, exec_ctx: ExecutionContext) -> dict[str, Any]:
     from runtime.orchestrator.hooks import get_hook_registry
 
     hooks = get_hook_registry()
-    ctx = {"name": node.name, "kind": node.kind, "inputs": node.inputs, "timeout": node.timeout_seconds}
-    hooks.fire_before(node.id, ctx)
+    hook_ctx = {"name": node.name, "kind": node.kind, "inputs": node.inputs, "timeout": node.timeout_seconds}
+    hooks.fire_before(node.id, hook_ctx)
 
     try:
         with span(f"node.{node.kind}.{node.name}", node_id=node.id):
 
             def _execute() -> Any:
-                return execute_node(name=node.name, kind=node.kind, inputs=node.inputs, timeout=node.timeout_seconds)
+                return execute_node(
+                    name=node.name,
+                    kind=node.kind,
+                    inputs=node.inputs,
+                    timeout=node.timeout_seconds,
+                    ctx=exec_ctx,
+                )
 
             outcome = with_retry(_execute)()
         summary = {
@@ -90,13 +97,13 @@ def _run_node(node: DAGNode) -> dict[str, Any]:
             "stdout_tail": outcome.stdout[-2000:] if outcome.stdout else "",
             "stderr_tail": outcome.stderr[-2000:] if outcome.stderr else "",
         }
-        ctx["results"] = summary
-        hooks.fire_after(node.id, ctx)
+        hook_ctx["results"] = summary
+        hooks.fire_after(node.id, hook_ctx)
         if not outcome.ok and node.on_failure == "abort":
             raise RuntimeError(f"node {node.id} aborted: rc={outcome.returncode}")
     except Exception as exc:
-        ctx["error"] = str(exc)
-        hooks.fire_error(node.id, ctx)
+        hook_ctx["error"] = str(exc)
+        hooks.fire_error(node.id, hook_ctx)
         raise
     return summary
 
@@ -113,7 +120,8 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
-    reset_upstream_cache()  # V1.14 主宪章 §40
+    exec_ctx = ExecutionContext(run_id=run_id)
+    log.info("execution context created: run_id={}", run_id)
     decision = RoutingDecision.model_validate(decision_dict)
     ordered: list[DAGNode] = decision.topological()
     log.info("direct flow start: run_id={} nodes={}", run_id, len(ordered))
@@ -164,7 +172,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                             node.inputs["degraded_by"] = soft_failed
                         ready.append(nid)
                 for nid in ready:
-                    futures[nid] = pool.submit(_run_node, by_id[nid])
+                    futures[nid] = pool.submit(_run_node, by_id[nid], exec_ctx)
                 # wait for at least one to finish
                 done_now = [nid for nid, f in futures.items() if f.done() and nid in pending]
                 if not done_now:
@@ -174,7 +182,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
                         results[next_id] = futures[next_id].result()
                     except Exception as exc:
                         log.warning("node {} attempt failed: {}", next_id, exc)
-                        _run_node_with_retry(by_id[next_id], results, log)
+                        _run_node_with_retry(by_id[next_id], results, log, exec_ctx)
                     r = results.get(next_id)
                     if r:
                         if r.get("skipped"):
@@ -237,7 +245,7 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     # L2-C: rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
-        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+        if not r.get("ok") and "[unimplemented]" in (r.get("stderr_tail") or "")
     ] + skipped
 
     summary = {

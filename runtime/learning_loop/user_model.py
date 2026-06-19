@@ -1,4 +1,4 @@
-"""Dialectic user modeling · hermes §1.1 (inspired by Honcho).
+"""Dialectic user modeling (inspired by Honcho).
 
 Cross-session profile of user preferences / vocabulary / working style.
 Stored as JSON facts under `workspace/learning/user_models/{user_id}.json`.

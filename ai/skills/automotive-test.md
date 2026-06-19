@@ -2,7 +2,6 @@
 name: automotive-test
 description: 车载主编排 Skill。整车 ECU + ADAS + IVI + V2X 测试流程编排。ISO 26262 ASIL + SOTIF + UN R155/R156 合规驱动。HIL/SIL/MIL/PIL 环路在路。
 tools: Read, Write, Bash, Grep, Glob
-requires_layer: [base, system]
 SKILL_IMPL_STATUS: production
 ---
 
@@ -29,12 +28,12 @@ SKILL_IMPL_STATUS: production
 | 9 合规审计 | `compliance/engine.py` + 行业规则库（ISO 26262/SOTIF/R155/R156 Phase 2） |
 | 10 报告 + Bug 单 | `report-generator` |
 
-## 主宪章铁律
+## 铁律
 
-- §21 L4 极深:ADAS/底盘/转向必 HIL + 形式化验证
-- §24 safe-by-default:`automotive.fleet_test_authorized: true` + `automotive.test_lab: <id>` 才允许真车数据
-- §22 不可逆禁止:OTA 必含回退;真车 kill-switch 必有
-- §19 行业适配:接入车载行业必《领域档案》+ 主机厂签字
+- L4 极深:ADAS/底盘/转向必 HIL + 形式化验证
+- safe-by-default:`automotive.fleet_test_authorized: true` + `automotive.test_lab: <id>` 才允许真车数据
+- 不可逆禁止:OTA 必含回退;真车 kill-switch 必有
+- 行业适配:接入车载行业必《领域档案》+ 主机厂签字
 
 ## 输出
 

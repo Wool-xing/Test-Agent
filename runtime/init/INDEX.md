@@ -1,6 +1,6 @@
-# runtime/init/ 索引(V1.12.0)
+# runtime/init/ 索引
 
-> `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 主宪章 §1 一键部署。
+> `tagent init` 配置自动组装 · 5 分钟从 0 到可跑 · 一键部署。
 
 ## 模块
 
@@ -40,8 +40,8 @@ tagent init --overwrite
 
 不改 wizard / renderer 代码,改 matrix.yaml 即可:
 - 新 LLM provider → `llm_providers:` 加节
-- 新 BugTracker → `bug_trackers:` 加节(主宪章 §37 6 adapter 之外加)
-- 新通知渠道 → `notifiers:` 加节(主宪章 §36 6 渠道之外加)
+- 新 BugTracker → `bug_trackers:` 加节(6 adapter 之外加)
+- 新通知渠道 → `notifiers:` 加节(6 渠道之外加)
 - 新测试类型 → `test_types:` 加节 + 同步 `agents/` 加平台 expert(如需)
 
 ## 矩阵规模
@@ -50,6 +50,6 @@ tagent init --overwrite
 
 ## 相关
 
-- 主宪章 §1(同步铁律)+ §5(多格式 I/O)+ §7(一键部署)+ §36(多端)+ §37(BugTracker)
+- 多格式 I/O + 一键部署 + 多端 + BugTracker
 - 模板:[`config/templates/`](../../deploy/config/templates/INDEX.md)
 - 集成 CLI:`runtime/cli/main.py` `init` 子命令

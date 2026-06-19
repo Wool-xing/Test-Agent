@@ -22,7 +22,7 @@ except ImportError:
 
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
-from runtime.orchestrator.adapters.experts import reset_upstream_cache
+from runtime.orchestrator.context import ExecutionContext
 from runtime.orchestrator.tasks import execute_dag_node
 from runtime.router.schema import DAGNode, RoutingDecision
 
@@ -39,7 +39,8 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
     configure_logging()
     init_tracing()
     log = bind_run(run_id)
-    reset_upstream_cache()  # V1.14 主宪章 §40 — 每 run 清 runner 间产物缓存
+    exec_ctx = ExecutionContext(run_id=run_id)
+    log.info("execution context created: run_id={}", run_id)
     decision = RoutingDecision.model_validate(decision_dict)
     ordered: list[DAGNode] = decision.topological()
     log.info("flow start: run_id={} nodes={}", run_id, len(ordered))
@@ -53,7 +54,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
         futures: dict[str, Any] = {}
         for node in ordered:
             wait_for = [futures[d] for d in node.depends_on if d in futures]
-            futures[node.id] = execute_dag_node.submit(node, wait_for=wait_for)
+            futures[node.id] = execute_dag_node.submit(node, ctx=exec_ctx, wait_for=wait_for)
         total = len(futures)
         for i, (nid, fut) in enumerate(futures.items(), 1):
             try:
@@ -91,7 +92,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
     # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [
         nid for nid, r in results.items()
-        if not r.get("ok") and "[V1.x rollout]" in (r.get("stderr_tail") or "")
+        if not r.get("ok") and "[unimplemented]" in (r.get("stderr_tail") or "")
     ] + skipped
 
     summary = {

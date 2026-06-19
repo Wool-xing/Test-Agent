@@ -1,6 +1,6 @@
 {
   "name": "test-agent-mobile",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Test-Agent Mobile — AI Testing Framework for iOS & Android",
   "scripts": {
     "build": "cd ../runtime/web && npm run build",

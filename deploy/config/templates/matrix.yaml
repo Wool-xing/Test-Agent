@@ -1,4 +1,4 @@
-# tagent init 单源真理矩阵(V1.12.0)
+# tagent init 单源真理矩阵
 #
 # 测试类型 × 平台 × LLM provider × BugTracker × 通知渠道 → 生成 .env + tagent.yml + STARTUP.md
 # 加新选项:补这里 + 看 wizard 自动列出。
@@ -118,7 +118,7 @@ llm_providers:
       OLLAMA_HOST: "http://localhost:11434"
     model_hint: qwen2.5:7b
 
-# 4. BugTracker(6 选,主宪章 §37)
+# 4. BugTracker(6 选)
 bug_trackers:
   zentao:
     label: 禅道(默认)
@@ -160,7 +160,7 @@ bug_trackers:
       BUG_TRACKER: webhook
       BUG_WEBHOOK_URL: "<your_webhook_endpoint>"
 
-# 5. 通知渠道(6 选,可多选,主宪章 §36)
+# 5. 通知渠道(6 选,可多选)
 notifiers:
   wechat:
     label: 企业微信群机器人

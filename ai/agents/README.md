@@ -17,7 +17,7 @@
 | 05 | `05-数据准备.md` | data-preparer | test_data.json + jmeter_users.csv |
 | 06 | `06-自动化脚本.md` | automation-engineer | pytest UI/API 脚本 + 协调 JMeter |
 | 07 | `07-测试执行.md` | test-executor | 执行结果 JSON + Allure + JMeter |
-| 08 | `08-Bug管理.md` | bug-manager | BugTracker Bug ID 列表 + 日报（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook,主宪章 §12） |
+| 08 | `08-Bug管理.md` | bug-manager | BugTracker Bug ID 列表 + 日报（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook） |
 | 09 | `09-报告生成.md` | report-generator | Word 报告 + 多端通知（企微/飞书/钉钉/Slack/邮件/Teams） |
 
 ### 流程依赖关系
@@ -81,7 +81,7 @@ tools: Read, Write, Bash, Grep, Glob   # 按需添加 Edit
 ```
 
 `name` 是 agent ID，被 test-lead 用 SendMessage 调用 / `.claude/agents/` 加载。
-`description` 决定 Claude Code 何时主动调用此 agent（关键词匹配）。
+`description` 决定 AI 工具何时主动调用此 agent（关键词匹配）。
 
 ---
 

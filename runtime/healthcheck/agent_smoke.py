@@ -86,9 +86,14 @@ def check_experts(experts_dir: Path) -> tuple[list[Issue], int]:
     for p in files:
         m = EXPERT_FNAME_RE.match(p.name)
         if not m:
-            issues.append(Issue(path=str(p), field="filename", reason="expected NN-name.md (NN=01..16)"))
-            continue
-        seen_nums.append(int(m.group(1)))
+            # V2 bilingual: also accept lowercase English names (test-lead.md etc.)
+            if re.match(r"^[a-z][a-z0-9-]*\.md$", p.name):
+                pass  # English-named file: validate frontmatter only (no numbering)
+            else:
+                issues.append(Issue(path=str(p), field="filename", reason="expected NN-name.md or lowercase-en.md"))
+                continue
+        else:
+            seen_nums.append(int(m.group(1)))
         meta = _read_meta(p)
         issues.extend(_check_frontmatter_present(meta, REQUIRED_EXPERT, p))
 

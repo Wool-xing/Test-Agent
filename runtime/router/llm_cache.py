@@ -13,11 +13,13 @@ import os
 import time
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 
 def _cache_dir() -> Path:
-    d = Path.cwd() / "workspace" / "cache" / "llm"
+    d = get_settings().workspace_dir / "cache" / "llm"
     d.mkdir(parents=True, exist_ok=True)
     return d
 

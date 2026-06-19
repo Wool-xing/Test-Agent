@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     workspace_dir: Path = Field(default=Path("workspace"))
     config_dir: Path = Field(default=Path("deploy/config"))
     templates_dir: Path = Field(default=Path("deploy/config/templates"))
+    gateway_dir: Path = Field(default=Path("workspace/gateway"))
+    reports_dir: Path = Field(default=Path("workspace/测试报告"))
 
     llm_provider: str = Field(default="claude")
     llm_provider_fallback: str = Field(default="ollama")
@@ -103,7 +105,7 @@ class Settings(BaseSettings):
         """Resolve relative Path fields to absolute after model init."""
         root = self.project_root
         for attr in ("experts_dir", "skills_dir", "scripts_dir", "workspace_dir",
-                     "config_dir", "templates_dir"):
+                     "config_dir", "templates_dir", "gateway_dir", "reports_dir"):
             p = getattr(self, attr)
             if not p.is_absolute():
                 object.__setattr__(self, attr, (root / p).resolve())

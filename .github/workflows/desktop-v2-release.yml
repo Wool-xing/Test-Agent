@@ -1,0 +1,79 @@
+name: Desktop V2 Release (Tauri)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-tauri:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: Test-Agent-Windows
+            ext: .msi
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact: Test-Agent-macOS-Intel
+            ext: .dmg
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: Test-Agent-macOS-ARM
+            ext: .dmg
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: Test-Agent-Linux
+            ext: .AppImage
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Build Tauri desktop
+        working-directory: apps/desktop-v2
+        run: |
+          npm ci
+          npx tauri build --target ${{ matrix.target }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: apps/desktop-v2/src-tauri/target/${{ matrix.target }}/release/bundle/**/*${{ matrix.ext }}
+
+  release:
+    needs: build-tauri
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            Test-Agent-Windows/*.msi
+            Test-Agent-macOS-Intel/*.dmg
+            Test-Agent-macOS-ARM/*.dmg
+            Test-Agent-Linux/*.AppImage
+          draft: true
+          generate_release_notes: true

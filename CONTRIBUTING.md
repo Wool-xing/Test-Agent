@@ -22,14 +22,12 @@
 
 1. 选定分类（核心通用 9 / 平台扩展 5 / 垂直领域 2）
 2. 文件命名 `15-XXX.md`（按编号递增）
-3. 顶部 YAML frontmatter（必含 `name` / `description` / `tools`；可选 `requires_layer: [base, <layer>]` 标注依赖层，值见 `docs/charter/05-install-deploy.md` 六层定义）
-4. 编写：职责 / 工具栈 / Page Object 或调用模板 / 协作输出
+3. 创建 `specs/agents/<name>/manifest.yaml`（参考已有 manifest 格式，schema 定义在 `specs/manifest.py`）
+4. 编写 system_prompt + output_schema
 5. **同步**：
-   - `ai/agents/README.md` 加一行
-   - `00-项目导航.md` 加一行
-   - `01-测试主管.md` 路由表（如平台扩展）
-   - `utils/prd_loader.PLATFORM_KEYWORDS` 加关键词（如平台扩展）
-   - `install.py` agents 数组加文件名
+   - 运行 `python scripts/render_manifest.py --name <name>` 生成 AI Mode 用的 .md 文件
+   - 更新 `specs/` 对应目录
+   - 如 script-backed，添加 `script_path` 指向 utils/
    - `docs/getting-started/部署说明.md` 拷贝清单加
 
 ---
@@ -134,7 +132,7 @@ pytest --collect-only
 
 ---
 
-## 同步铁律（项目宪章 §1）
+## 同步铁律
 
 任一文档/代码改动 → 必须同步到所有引用方，并加 `CHANGELOG.md` 条目。
 

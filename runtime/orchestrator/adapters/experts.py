@@ -7,22 +7,27 @@ Expert/Skill execution model:
   declarative description and execute its CANONICAL SCRIPT mapping (below).
 - A handful of experts have a strong default script. The rest fall back to
   recording the expert step + producing an empty result placeholder which the
-  report-generator then summarises (matching V1.0.0 manual workflow).
+  report-generator then summarises (matching manual workflow).
 - Scripts with required CLI args(e.g. generate_report.py --data)get default
   inputs auto-injected via SCRIPT_DEFAULT_ARGS;referenced fixtures auto-materialized
-  by _ensure_fixture (V1.11 修 V1.10 n7 selftest bug)。
+  by _ensure_fixture (修 n7 selftest bug)。
 """
 
 from __future__ import annotations
 
 import json
 import os
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from runtime.orchestrator.adapters.scripts import ScriptResult, list_available_scripts, run_script
+
+if TYPE_CHECKING:
+    from runtime.orchestrator.context import ExecutionContext
 
 # Canonical script mapping. Names without a script run as a no-op step (logged only).
 # Mapping derived from existing utils filenames; missing scripts degrade gracefully.
@@ -41,9 +46,9 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "visual-tester": None,
     "system-tester": None,
     "ai-tester": "ai_validator.py",
-    "pentest-tester": None,        # V1.19 production (V1.x rollout 收尾)
-    "automotive-tester": None,     # V1.20 production (V1.x rollout 收尾)
-    # V1.34 bridge: standalone scripts wired into orchestrator
+    "pentest-tester": None,        # production
+    "automotive-tester": None,     # production
+    # bridge: standalone scripts wired into orchestrator
     "mutation-test": "mutation_runner.py",
     "chaos-test": "chaos_helper.py",
     "fuzz-test": "fuzzer.py",
@@ -51,15 +56,15 @@ EXPERT_SCRIPT_MAP: dict[str, str | None] = {
     "suite-minimize": "suite_minimizer.py",
 }
 
-# V1.14 防 mock 单源 (ROADMAP V1.15 Day 0 承诺):
+# 防 mock 单源:
 # 实装状态读 registry catalog (agents/skills *.md frontmatter
 # EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS),避免 hardcoded dict 与 .md 双源漂移。
 #
 # 合法值 (registry._VALID_IMPL_STATUS 同步):
 #   - production: 真 LLM-driven runner (orchestrator/agents/*.py) 已实装
 #   - script: 真 script-backed (utils/*.py) 已实装
-#   - rollout: V1.x rollout 待实装 → execute_node 拒绝路由,不输出 mock
-#   - vision: V2.x 方法论参考 → 同 rollout 处理
+#   - rollout: 待实装 → execute_node 拒绝路由,不输出 mock
+#   - vision: 方法论参考 → 同 rollout 处理
 #   - unknown: frontmatter 缺失/非法值 → 同 rollout 处理 (fail closed)
 
 
@@ -86,7 +91,7 @@ SKILL_SCRIPT_MAP: dict[str, str | None] = {
     "visual-test": None,
     "system-test": None,
     "ai-test": "ai_validator.py",
-    # V1.34 bridge: standalone scripts wired into orchestrator
+    # bridge: standalone scripts wired into orchestrator
     "mutation-testing": "mutation_runner.py",
     "chaos-engineering": "chaos_helper.py",
     "api-fuzzing": "fuzzer.py",
@@ -205,23 +210,64 @@ def _resolve_script(name: str, kind: str) -> str | None:
 
 import threading as _threading  # noqa: E402
 
-_upstream_outputs: dict[str, dict] = {}  # 流水线内每 expert 产物缓存,供下游 RunnerContext.upstream
-_upstream_meta: dict[str, dict] = {}     # 流水线内每 expert 元信息 (ok/degraded/error),供下游 RunnerContext.upstream_meta
-                                          # 防 mock 闭环: test-lead 看到任一 degraded → 决策降级
-_upstream_lock = _threading.Lock()        # 防御性锁: 拓扑排序保证依赖顺序,锁仅防未来并行分支
+# ---------------------------------------------------------------------------
+# Deprecated globals — kept for backward compatibility only.
+# New code MUST use ExecutionContext (runtime.orchestrator.context).
+# ---------------------------------------------------------------------------
+_upstream_outputs: dict[str, dict] = {}
+_upstream_meta: dict[str, dict] = {}
+_upstream_lock = _threading.Lock()
 
 
 def reset_upstream_cache() -> None:
-    """每次新 run 开始前由 flow 调,清空上游产物缓存."""
+    """Deprecated: use ExecutionContext per-run instead."""
+    warnings.warn(
+        "reset_upstream_cache is deprecated. Use ExecutionContext instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     with _upstream_lock:
         _upstream_outputs.clear()
         _upstream_meta.clear()
 
 
-def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: int = 1800) -> StepOutcome:
+def _get_upstream_state(
+    ctx: ExecutionContext | None,
+) -> tuple[dict[str, dict], dict[str, dict]]:
+    """Resolve upstream state from ExecutionContext or deprecated globals."""
+    if ctx is not None:
+        return ctx.snapshot()
+    # Backward compat: use deprecated globals
+    with _upstream_lock:
+        return dict(_upstream_outputs), dict(_upstream_meta)
+
+
+def _store_upstream_result(
+    ctx: ExecutionContext | None,
+    name: str,
+    output: dict,
+    meta: dict,
+) -> None:
+    """Store node result in ExecutionContext or deprecated globals."""
+    if ctx is not None:
+        ctx.set_output(name, output, meta)
+    else:
+        with _upstream_lock:
+            _upstream_outputs[name] = output
+            _upstream_meta[name] = meta
+
+
+def execute_node(
+    name: str,
+    kind: str,
+    *,
+    inputs: dict | None = None,
+    timeout: int = 1800,
+    ctx: ExecutionContext | None = None,
+) -> StepOutcome:
     inputs = inputs or {}
 
-    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 拒绝路由未实装 expert/skill,不输出 mock 数据
+    # 防 mock: 拒绝路由未实装 expert/skill,不输出 mock 数据
     # 单源 = agents/skills .md frontmatter (registry catalog)
     if kind in ("expert", "skill"):
         status = _get_impl_status(name, kind)
@@ -233,7 +279,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 returncode=2,  # 明确非 0,标记 "未实装" 而非 no-op 兜底
                 stdout="",
                 stderr=(
-                    f"[V1.x {status}] {kind} '{name}' 未实装 (ROADMAP.md);"
+                    f"[unimplemented] {kind} '{name}' 未实装;"
                     f" router/test-lead 应跳过此 {kind},不输出 mock 数据"
                 ),
                 duration_ms=0,
@@ -252,7 +298,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 duration_ms=0,
             )
 
-    # V1.14 真 agent runner 优先(主宪章 §40,5 核心 expert 落地)
+    # 真 agent runner 优先
     if kind == "expert":
         try:
             from runtime.config.settings import get_settings
@@ -262,10 +308,11 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
             runner = get_runner(name)
             if runner is not None:
                 s = get_settings()
-                ctx = RunnerContext(
+                upstream, upstream_meta = _get_upstream_state(ctx)
+                runner_ctx = RunnerContext(
                     artifact_text=inputs.get("artifact_text", ""),
-                    upstream=dict(_upstream_outputs),
-                    upstream_meta=dict(_upstream_meta),
+                    upstream=upstream,
+                    upstream_meta=upstream_meta,
                     settings_provider=s.llm_provider,
                     workspace=s.project_root / "workspace",
                     lang=inputs.get("lang", "zh"),
@@ -273,14 +320,13 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 )
                 import time as _t
                 t0 = _t.time()
-                res = runner.run(ctx)
-                with _upstream_lock:
-                    _upstream_outputs[name] = res.output
-                    _upstream_meta[name] = {
-                    "ok": res.ok,
-                    "degraded": res.degraded,
-                    "error": res.error,
-                }
+                res = runner.run(runner_ctx)
+                _store_upstream_result(
+                    ctx,
+                    name,
+                    res.output,
+                    {"ok": res.ok, "degraded": res.degraded, "error": res.error},
+                )
                 stdout = res.summary or "[agent runner ok]"
                 if res.artifact_path:
                     stdout += f"\n→ {res.artifact_path}"
@@ -297,7 +343,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
         except Exception as e:  # noqa: BLE001
             logger.warning("agent runner {} unavailable, fallback to script map: {}", name, e)
 
-    # V1.21 真 skill runner 优先 (ROADMAP skill rollout 起点)
+    # 真 skill runner 优先
     # 与 expert runner 接口同, 仅 registry 独立 SKILL_RUNNERS
     if kind == "skill":
         try:
@@ -308,10 +354,11 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
             runner = get_skill_runner(name)
             if runner is not None:
                 s = get_settings()
-                ctx = RunnerContext(
+                upstream, upstream_meta = _get_upstream_state(ctx)
+                runner_ctx = RunnerContext(
                     artifact_text=inputs.get("artifact_text", ""),
-                    upstream=dict(_upstream_outputs),
-                    upstream_meta=dict(_upstream_meta),
+                    upstream=upstream,
+                    upstream_meta=upstream_meta,
                     settings_provider=s.llm_provider,
                     workspace=s.project_root / "workspace",
                     lang=inputs.get("lang", "zh"),
@@ -319,14 +366,13 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
                 )
                 import time as _t
                 t0 = _t.time()
-                res = runner.run(ctx)
-                with _upstream_lock:
-                    _upstream_outputs[name] = res.output
-                    _upstream_meta[name] = {
-                    "ok": res.ok,
-                    "degraded": res.degraded,
-                    "error": res.error,
-                }
+                res = runner.run(runner_ctx)
+                _store_upstream_result(
+                    ctx,
+                    name,
+                    res.output,
+                    {"ok": res.ok, "degraded": res.degraded, "error": res.error},
+                )
                 stdout = res.summary or "[skill runner ok]"
                 if res.artifact_path:
                     stdout += f"\n→ {res.artifact_path}"
@@ -343,7 +389,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
         except Exception as e:  # noqa: BLE001
             logger.warning("skill runner {} unavailable, fallback to script map: {}", name, e)
 
-    # Fallback: SCRIPT_MAP(主宪章 §9 已有实现保留)
+    # Fallback: SCRIPT_MAP(已有实现保留)
     script = _resolve_script(name, kind)
     if script is None:
         return StepOutcome(
@@ -370,10 +416,11 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
         )
     defaults = SCRIPT_DEFAULT_ARGS.get(script, {})
     # When upstream agent outputs exist, build real summary for report generation
-    if script == "generate_report.py" and _upstream_outputs:
+    upstream_outputs, upstream_meta = _get_upstream_state(ctx)
+    if script == "generate_report.py" and upstream_outputs:
         import tempfile as _tmp
         import json as _json
-        summary = _build_report_summary_from_upstream(_upstream_outputs, _upstream_meta)
+        summary = _build_report_summary_from_upstream(upstream_outputs, upstream_meta)
         if summary:
             _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8")
             try:
@@ -388,7 +435,7 @@ def execute_node(name: str, kind: str, *, inputs: dict | None = None, timeout: i
     for k, v in defaults.items():
         if k not in inputs:  # only materialize fixture for auto-injected defaults
             _ensure_fixture(str(v))
-    # V1.14:`artifact_text` 给 AgentRunner 用,不当 CLI arg(多行文本会炸 argparse)
+    # `artifact_text` 给 AgentRunner 用,不当 CLI arg(多行文本会炸 argparse)
     _CLI_EXCLUDE = {"artifact_text", "lang", "mode"}
     args = [f"--{k}={v}" for k, v in merged.items() if k not in _CLI_EXCLUDE]
     res: ScriptResult = run_script(script, args=args, timeout=timeout)

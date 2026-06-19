@@ -2,7 +2,7 @@
 name: python-script-gen
 description: pytest 自动化脚本生成技能。输入测试用例 Excel 或功能描述，生成可直接运行的 pytest 自动化测试脚本，支持 UI（Playwright）+ API（requests）。性能脚本主用 JMeter（见 /jmeter-script-gen），Locust 仅作开发期备用。
 tools: Read, Write, Edit, Grep, Glob
-SKILL_IMPL_STATUS: script
+SKILL_IMPL_STATUS: production
 ---
 
 # Python 自动化脚本生成

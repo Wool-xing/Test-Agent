@@ -15,7 +15,7 @@ from runtime.config.settings import get_settings
 class ObjectStore:
     """Thin facade. Imports MinIO lazily so tests without infra still pass.
 
-    Charter §21 横切准则: lazy init is thread-safe (防止并发 caller 重复建桶).
+    横切准则: lazy init is thread-safe (防止并发 caller 重复建桶).
     """
 
     _lock = threading.Lock()

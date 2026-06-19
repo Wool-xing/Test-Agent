@@ -1,4 +1,4 @@
-"""Safe-by-default destructive guard · gbrain §1.9 派生.
+"""Safe-by-default destructive guard (derived from safety patterns).
 
 危险/自动化/生产影响 操作必须 tagent.yml 显式开启.
 """
@@ -74,7 +74,7 @@ def get_setting(key_path: str, default: Any = None) -> Any:
     return _resolve(key_path.split("."), default=default)
 
 
-# Common gates (charter §24)
+# Common gates
 def gate_scheduler_tick() -> None:
     assert_allowed("scheduler.tick", "scheduler.enabled")
 

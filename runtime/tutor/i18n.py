@@ -1,4 +1,4 @@
-"""Language switching · 主宪章 §23.
+"""Language switching.
 
 zh / en / zh-en(double-column comparison)
 """

@@ -1,4 +1,4 @@
-"""SSH backend (hermes §1.4). Uses asyncssh for persistent connection."""
+"""SSH backend. Uses asyncssh for persistent connection."""
 
 from __future__ import annotations
 

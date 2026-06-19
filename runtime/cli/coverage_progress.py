@@ -14,6 +14,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 TEST_TYPES = ["unit", "integration", "e2e", "security", "performance", "visual", "api", "accessibility"]
@@ -32,7 +34,7 @@ class CoverageEntry:
 
 
 def _file() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+    d = get_settings().gateway_dir
     d.mkdir(parents=True, exist_ok=True)
     return d / "coverage_progress.json"
 

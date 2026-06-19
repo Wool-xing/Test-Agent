@@ -7,11 +7,14 @@ import json
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
 from runtime.router.llm_client import _strip_json_fences
+
+if TYPE_CHECKING:
+    from runtime.orchestrator.context import ExecutionContext
 
 
 @dataclass(slots=True)
@@ -28,6 +31,7 @@ class RunnerContext:
     workspace: Path = field(default_factory=lambda: Path("workspace"))
     lang: str = "zh"
     mode: str = "exec"             # exec | learn | mock
+    exec_context: ExecutionContext | None = None  # per-run context (replaces globals)
 
 
 @dataclass(slots=True)
@@ -80,7 +84,7 @@ class AgentRunner(abc.ABC):
     def run(self, ctx: RunnerContext) -> RunnerResult:
         """
         执行 LLM-driven agent。ok/degraded 语义:
-        - stub/mock 模式: ok=True + degraded=True (mock 兜底,主宪章 §33 selftest 允许)
+        - stub/mock 模式: ok=True + degraded=True (mock 兜底,selftest 允许)
         - 真 LLM 成功 + JSON 解析 OK: ok=True + degraded=False (真输出)
         - 真 LLM 成功但 JSON 解析错: ok=False + degraded=True (LLM 回了但不合规)
         - exec 模式 LLM 失败 fallback: ok=False + degraded=True (不再假绿)
@@ -94,7 +98,7 @@ class AgentRunner(abc.ABC):
         if ctx.settings_provider == "stub" or ctx.mode == "mock":
             # stub/mock 模式: 输出 mock,标 degraded
             output = self.mock_output(ctx)
-            raw = "[stub] mock output(主宪章 §33 selftest 兜底)"
+            raw = "[stub] mock output(selftest 兜底)"
             ok = True
             degraded = True
         else:
@@ -176,7 +180,7 @@ def get_runner(name: str) -> AgentRunner | None:
     return cls() if cls else None
 
 
-# Skill runner registry (V1.21.0 — skill LLM-driven rollout 基础设施).
+# Skill runner registry.
 # SkillRunner 接口与 AgentRunner 100% 一致 (system_prompt / user_prompt /
 # mock_output / summary / output_file / run), 仅 registry 独立, 避免 expert/skill
 # 同名冲突,且让 catalog / router / orchestrator 按 kind 路由清晰。

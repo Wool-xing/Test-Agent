@@ -1,4 +1,4 @@
-"""User feedback · 主宪章 §23 反幻觉 L3.
+"""User feedback · 反幻觉 L3.
 
 Users flag wrong explanations → workspace/learning/feedback/{date}.jsonl
 curator periodically reviews & downgrades card confidence.

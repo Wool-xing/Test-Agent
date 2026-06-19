@@ -1,0 +1,34 @@
+name: agent-introspection-debugging
+version: 1.0.0
+kind: skill
+description: >-
+  Agent 自省调试 Skill。LLM 决策 / 工具调用 / 上下文 / token / 状态机透明化。失败用例分析 + 决策回放。派生自 ECC 同名 skill 。
+description_zh: Agent 自省调试 Skill
+backend: llm
+tools:
+- Read
+- Write
+- Bash
+- Grep
+- Glob
+paired_skills: []
+script_path: null
+requires_layer: []
+system_prompt: "# agent-introspection-debugging\n\n## 触发\n\n- Agent 行为奇怪(过度调用 / 卡死 / 输出乱)\n- 路由决策错误调试(对应 §M2-7 router 真模型测试失败)\n\
+  - token 消耗异常\n- 上下文丢失 / 污染\n\n## 5 维度自省\n\n| 维 | 工具 |\n|----|------|\n| **决策回放** | `workspace/测试报告/{项目名}/decisions/` JSON\
+  \ 时间序 |\n| **工具调用** | OTel span(`runtime/observability/otel.py`)+ Loguru |\n| **token 消耗** | LLM provider header + LiteLLM\
+  \ 记账 |\n| **上下文** | prompt 长度 + 截断点 + 主-子 session 隔离审查 |\n| **状态机** | Prefect flow run state(`runtime/orchestrator/flows.py`)|\n\
+  \n## 决策回放 \n\n每次 routing / curator / scheduler 决策已自动落 `decisions/{date}_{tool}_{run_id}.json`。\n含:输入快照 + 模型版本 + 阈值 + 判断结论\
+  \ + 理由。\n\n调试流:\n1. 找 run_id\n2. cat `decisions/*_<run_id>.json`\n3. 看 LLM 看到的输入(input snapshot)+ 给的输出(decision)\n4. 对比是否符合预期\n\
+  \n## 工具调用 trace\n\nOTel 启用时:\n```\nflow.run                      # api.request 总 span\n├─ router.decide              # LLM\
+  \ 决策\n│  ├─ llm.call provider=claude\n│  └─ catalog.lookup\n└─ orchestrator.flow_run\n   ├─ task.requirements-analyst\n\
+  \   └─ task.testcase-designer ...\n```\n\n## token 异常诊断\n\n- 单 LLM call > 10k tokens → 输入太大(catalog 没裁?)\n- 主-子 session\
+  \ 共享 cache → 子代理 aux_client 隔离失效\n- 重复调相同 LLM(无 cache)→ Anthropic prompt cache 没设 ttl\n\n## 融合\n\n- 决策可追溯(本 skill 直接消费)\n\
+  - 隔离 client(本 skill 检测违反)\n- 横切可复现性(本 skill 必带 seed + snapshot)\n\n## 不做\n\n- 不只看 LLM 输出(必看输入 + token + 上下文)\n- 不靠 print\
+  \ 调试(必走 OTel + Loguru 结构化)\n- 不删 decisions/"
+number: null
+filename_zh: null
+output_schema: {}
+gates: []
+tags: []
+deprecated: false

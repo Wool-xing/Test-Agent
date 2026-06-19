@@ -1,7 +1,7 @@
 """ProtocolAdapter abstract base.
 
 All concrete adapters must implement this contract to register.
-Honors charter §21:
+Honors:
   - 协议调用即测,不裸跑
   - 失败必带 seed+snapshot(可复现性横切准则)
 """

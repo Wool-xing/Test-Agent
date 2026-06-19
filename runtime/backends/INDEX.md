@@ -27,7 +27,7 @@ class BaseExecutionEnv(abc.ABC):
     async def close(self) -> None
 ```
 
-## 经济模型(主宪章 §22 落地)
+## 经济模型
 
 - $5 VPS = local/docker 后端跑得起
 - Serverless hibernate = modal/daytona 闲置零成本

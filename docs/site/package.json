@@ -1,0 +1,14 @@
+{
+  "name": "test-agent-docs",
+  "version": "2.0.0",
+  "description": "Test-Agent V2 Documentation Site",
+  "private": true,
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.5.0"
+  }
+}

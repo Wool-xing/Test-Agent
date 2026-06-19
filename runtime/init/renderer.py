@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from runtime import __version__
 from runtime.init.matrix import Matrix, load_matrix
 from runtime.init.wizard import InitAnswers
 
@@ -14,13 +15,6 @@ def _templates_dir() -> Path:
     from runtime.config.settings import get_settings
 
     return get_settings().templates_dir
-
-
-def _read_version() -> str:
-    from runtime.config.settings import get_settings
-
-    p = get_settings().project_root / "VERSION"
-    return p.read_text(encoding="utf-8").strip() if p.exists() else "0.0.0"
 
 
 def _env_kv(key: str, value: str) -> str:
@@ -88,7 +82,7 @@ def _build_tpl_vars(ans: InitAnswers, m: Matrix) -> dict[str, str]:
     }.get(ans.test_type, "(填一个被测对象)")
 
     return {
-        "TAGENT_VERSION": _read_version(),
+        "TAGENT_VERSION": __version__,
         "GENERATED_AT": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "TEST_TYPE": ans.test_type,
         "TEST_TYPE_LABEL": t.label,

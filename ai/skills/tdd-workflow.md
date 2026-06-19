@@ -1,6 +1,6 @@
 ---
 name: tdd-workflow
-description: "TDD 测试驱动开发 Skill。Tests BEFORE code,80%+ 覆盖(unit+integration+E2E),边界+异常+错误场景必覆盖。派生自 ECC 同名 skill(主宪章 §28)。"
+description: TDD 测试驱动开发 Skill。Tests BEFORE code,80%+ 覆盖(unit+integration+E2E),边界+异常+错误场景必覆盖。派生自 ECC 同名 skill 。
 tools: Read, Write, Bash, Grep, Glob
 SKILL_IMPL_STATUS: production
 ---
@@ -32,14 +32,14 @@ SKILL_IMPL_STATUS: production
 3. **重构**保持测试过(refactor)
 4. 移到下一个测试 case
 
-## 与主宪章融合
+## 融合
 
-- §21 测试深度横切准则:"用例本身用变异测试反向验证"(覆盖率 ≠ 用例质量)
-- §27 Karpathy 原则 4 Goal-Driven:每任务转为 "写复现测试 → 让它过"
-- §18-14 修改四关:测试套件全过才许 commit
+- 测试深度横切准则:"用例本身用变异测试反向验证"(覆盖率 ≠ 用例质量)
+- Karpathy 原则 4 Goal-Driven:每任务转为 "写复现测试 → 让它过"
+- 修改四关:测试套件全过才许 commit
 
 ## 不做
 
 - 不写无 assert 的测试
 - 不一次写完 200 行测试不跑(分小批 red → green)
-- 不为了覆盖率写无意义测试(主宪章 §21 测试热寂检测)
+- 不为了覆盖率写无意义测试

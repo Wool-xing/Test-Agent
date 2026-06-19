@@ -162,7 +162,7 @@ python -c "from runtime.registry.registry import build_catalog; c=build_catalog(
 每次提交前问自己：
 
 1. 有没有硬编码路径？→ 应该全部走 settings
-2. 新文件放对目录了吗？→ 对照 §3.1
+2. 新文件放对目录了吗？→ 对照 3.1
 3. 有没有不该提交的文件？→ `git status` 确认
 4. 核心功能实测通过了吗？→ 至少 registry catalog 能构建
 5. 改 `utils/` 了吗？→ 如果改了，要测双模式都正常

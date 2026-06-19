@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/config.schema.json",
+  "productName": "Test-Agent",
+  "version": "2.0.0",
+  "identifier": "dev.tagant.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "title": "Test-Agent V2",
+    "windows": [
+      {
+        "title": "Test-Agent",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "dmg", "deb", "appimage"],
+    "icon": ["icons/icon.png"]
+  }
+}

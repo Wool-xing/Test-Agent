@@ -122,7 +122,7 @@ Both paths converge at utils/ execution layer.
 
 - Slash commands like `/smoke-test` are Skill workflow documents, not registered commands.
 - Agent definitions contain Python import hints as prompts — not executable code.
-- `test-lead` cannot recursively spawn sub-agents (Claude Code limitation). Main thread orchestrates.
+- `test-lead` cannot recursively spawn sub-agents (AI tool limitation). Main thread orchestrates.
 - Pentest workflows require `tagent.yml` with `pentest.authorized: true` — see `tagent.yml.example`.
 - MCP server: `python -m runtime.mcp.test_orchestrator.server` (catalog/plan/run/status/report).
 - LLM providers: edit `.env` → `TAGENT_LLM_PROVIDER`. Built-in: claude/openai/gemini/deepseek/qwen/ollama.

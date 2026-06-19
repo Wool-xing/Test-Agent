@@ -41,7 +41,7 @@ class CatalogEntry:
     tools: list[str] = field(default_factory=list)
     source_path: str = ""
     raw_body: str = ""
-    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺):
+    # 防 mock:
     # 从 frontmatter EXPERT_IMPL_STATUS / SKILL_IMPL_STATUS 解析,执行层据此拒绝路由未实装项。
     # 合法值: production / script / rollout / vision / unknown(frontmatter 缺失或值非法时)。
     impl_status: str = "unknown"
@@ -114,7 +114,7 @@ def _entry_from_file(path: Path, kind: EntryKind) -> CatalogEntry | None:
         tools = [t.strip() for t in tools_raw.split(",") if t.strip()]
     else:
         tools = []
-    # V1.14 防 mock: 按 kind 选对应 frontmatter key,缺失或非法值降级 unknown
+    # 防 mock: 按 kind 选对应 frontmatter key,缺失或非法值降级 unknown
     status_key = "EXPERT_IMPL_STATUS" if kind == "expert" else "SKILL_IMPL_STATUS"
     status_raw = meta.get(status_key, "")
     impl_status = str(status_raw).strip().lower() if status_raw else ""
