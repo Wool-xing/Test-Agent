@@ -7,6 +7,7 @@ Produces RoutingDecision (same type as V1) for both modes.
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -205,14 +206,18 @@ class IntentRouterV2:
         """Keyword-based routing fallback. No LLM required."""
         target_lower = target.lower()
 
-        # Check if target is a PRD file path
+        # Check if target is a PRD file path (sanitized: only read within CWD)
         if target.endswith((".md", ".pdf", ".docx", ".xlsx", ".txt")):
-            try:
-                path = Path(target)
-                if path.is_file():
-                    target_lower += " " + path.read_text(encoding="utf-8", errors="ignore")[:2000].lower()
-            except Exception:
-                pass
+            # String-level sanitization before any filesystem access
+            if "\0" not in target and ".." not in target and not target.startswith("~"):
+                try:
+                    safe = os.path.abspath(target)
+                    cwd = os.path.abspath(os.getcwd()) + os.sep
+                    if safe.startswith(cwd) and os.path.isfile(safe):
+                        with open(safe, encoding="utf-8", errors="ignore") as _f:
+                            target_lower += " " + _f.read()[:2000].lower()
+                except Exception:
+                    pass
 
         # Match against keyword tables
         detected_type, expert_names, skill_names = _DEFAULT_KEYWORD
