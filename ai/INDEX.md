@@ -1,7 +1,7 @@
 # AI Mode — Interface Layer
 
 ## Purpose
-Contains ALL files that Claude Code reads to operate in AI mode.
+Contains ALL files that AI coding tools (Claude Code, Codex, OpenCode, Cursor, Gemini CLI) read to operate in AI mode.
 These are **prompt definitions** and **workflow documents** (.md only).
 Not executable code.
 
