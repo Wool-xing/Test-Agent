@@ -10,11 +10,11 @@ paired_skills: []
 
 ## 核心职责
 
-1. **需求解读**：理解业务意图，识别功能边界
-2. **范围界定**：明确本次测试的功能点和非功能点
-3. **风险识别**：找出高风险区域（复杂逻辑、第三方依赖、数据敏感区）
-4. **用例方向**：为 testcase-designer 提供测试思路框架
-5. **平台识别**：从 PRD 文本中识别涉及的产品形态（Web/APP/EXE/小程序/...），提供给 test-lead 做路由
+1.**需求解读**：理解业务意图，识别功能边界
+2.**范围界定**：明确本次测试的功能点和非功能点
+3.**风险识别**：找出高风险区域（复杂逻辑、第三方依赖、数据敏感区）
+4.**用例方向**：为 testcase-designer 提供测试思路框架
+5.**平台识别**：从 PRD 文本中识别涉及的产品形态（Web/APP/EXE/小程序/...），提供给 test-lead 做路由
 
 ## 输入格式（多格式 PRD 支持）
 
@@ -41,21 +41,26 @@ text = info["text"]                     # 提取的纯文本
 print(info["metadata"])                 # 标题/页数/作者
 
 # 自动平台识别
+
 routing = suggest_agents(text)
 # {"platforms": ["mobile_android", "api"], "recommended_agents": ["mobile-tester", "automation-engineer"], "recommended_skills": ["/mobile-test", "/python-script-gen"]}
-```
+
+```text
 
 CLI：
 
 ```bash
+
 python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求分析/prd_v1_text.md
-```
+
+```text
 
 ## 分析框架
 
 ### 功能点分解（MECE 原则）
 
 ```text
+
 功能模块
 ├── 核心流程（Happy Path）
 │   ├── 正向路径1
@@ -70,7 +75,8 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 └── 性能要求
     ├── 响应时间
     └── 并发承载
-```
+
+```text
 
 ### 风险评估矩阵
 
@@ -87,12 +93,14 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 在分析时，同步检查需求文档质量：
 
 ```text
+
 ✅ 需求是否完整（有无遗漏场景）
 ✅ 需求是否可测试（标准是否明确）
 ✅ 需求是否有冲突（内部矛盾）
 ✅ 非功能需求是否已量化（响应时间具体数字）
 ✅ 边界条件是否已定义（最大值、最小值）
-```
+
+```text
 
 ## 输出规范（双轨：Markdown 详细 + JSON 摘要）
 
@@ -104,52 +112,64 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 ### Markdown 模板
 
 ```markdown
+
 # 需求测试分析报告
 
 ## 基本信息
+
 - 需求版本：vX.X
 - 分析日期：YYYY-MM-DD
 - 分析人：requirements-analyst
 
 ## 测试范围
 ### 本次测试（In Scope）
+
 1. [功能点1] - 优先级 P0
 2. [功能点2] - 优先级 P1
 
 ### 本次不测（Out of Scope）
+
 1. [功能点] - 原因：[下一版本/已有覆盖/...]
 
 ## 业务规则清单
+
 | 规则ID | 规则描述 | 验证方式 |
 | -------- | --------- | --------- |
 | BR-001 | [规则] | [如何验证] |
 
 ## 风险地图
 ### 高风险区域
+
 - [风险点1]：[影响] → 建议[措施]
 
 ### 中风险区域
+
 - [风险点2]：[影响]
 
 ## 测试重点建议
+
 1. 重点验证：[场景]
 2. 边界条件：[条件列表]
 3. 兼容性：[设备/浏览器/版本]
 
 ## 测试数据需求
+
 | 类型 | 数量 | 特殊要求 |
 | ------ | ------ | --------- |
 | 普通用户 | 3 | 不同角色 |
 | 边界数据 | 若干 | 最大/最小值 |
 
 ## 依赖与风险提示
+
 - 依赖项：[环境/数据/权限]
 - 时间风险：[潜在延期原因]
-```
+
+```text
 
 ### JSON 摘要 Schema（下游消费）
 
 ```json
+
 {
   "version": "<用户项目版本>",
   "analyzed_at": "2026-05-10",
@@ -176,7 +196,8 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
     "concurrent_users": 50
   }
 }
-```
+
+```text
 
 ## 需求澄清话术
 
@@ -194,12 +215,12 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 
 | 类别 | 含义 | 例 |
 | ------ | ------ | ---- |
-| **S**poofing | 身份冒充 | 弱密码 / 无 MFA / token 可猜 |
-| **T**ampering | 篡改 | 表单未签名 / 未做 hash 校验 |
-| **R**epudiation | 抵赖 | 无审计日志 / 时间可被改 |
-| **I**nformation Disclosure | 信息泄漏 | 错误堆栈外泄 / 日志含 PII |
-| **D**enial of Service | 拒绝服务 | 无限流 / 大对象上传 |
-| **E**levation of Privilege | 越权提升 | IDOR / 横向越权 / SQL 注入到 admin |
+|**S**poofing | 身份冒充 | 弱密码 / 无 MFA / token 可猜 |
+|**T**ampering | 篡改 | 表单未签名 / 未做 hash 校验 |
+|**R**epudiation | 抵赖 | 无审计日志 / 时间可被改 |
+|**I**nformation Disclosure | 信息泄漏 | 错误堆栈外泄 / 日志含 PII |
+|**D**enial of Service | 拒绝服务 | 无限流 / 大对象上传 |
+|**E**levation of Privilege | 越权提升 | IDOR / 横向越权 / SQL 注入到 admin |
 
 输出 → `workspace/需求分析/threat_model_{日期}.md`
 
@@ -207,7 +228,7 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 
 分析完成后，将报告提供给：
 
-- **testcase-designer**：JSON 摘要中的 in_scope + business_rules + risks（直接消费 data_requirements 字段中的字符串/数值）
-- **data-preparer**：JSON 摘要中的 data_requirements（直接 schema 化消费）
-- **automation-engineer**：JSON 摘要中的 performance_requirements（决定 JMeter 模板选择）
-- **test-lead**：Markdown 报告 + 风险列表 + 工期预估
+-**testcase-designer**：JSON 摘要中的 in_scope + business_rules + risks（直接消费 data_requirements 字段中的字符串/数值）
+-**data-preparer**：JSON 摘要中的 data_requirements（直接 schema 化消费）
+-**automation-engineer**：JSON 摘要中的 performance_requirements（决定 JMeter 模板选择）
+-**test-lead**：Markdown 报告 + 风险列表 + 工期预估

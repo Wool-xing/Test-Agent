@@ -39,12 +39,14 @@ reading_en:
 经典金字塔(Mike Cohn 2009):单元 70 / 集成 20 / E2E 10。
 
 **2024 调整**(Google/Microsoft/Fowler 综合):按"变更频率+阻塞代价"分配,**不再一刀切**:
+
 - 单元 40 / 集成 30 / 契约+系统 20 / E2E+视觉回归 10
 - 单元层叠加**变异测试**反向验证用例有效性
 - 契约层独立成层(微服务时代必备)
 - 视觉回归归 E2E,不另设层
 
 ## Test-Agent 落点
+
 - 单元:`pytest + pytest-mock`(utils 自测,Phase 2 补齐)
 - 集成:pytest 内嵌 + WireMock
 - 契约:`utils/contract_test.py`(Pact + jsonschema)+ `utils/openapi_test_gen.py`
@@ -52,6 +54,7 @@ reading_en:
 - 变异:`utils/mutation_runner.py`(mutmut)
 
 ## 为什么 Agent 这么分配?
+
 - 单元最便宜最快 → 多写
 - E2E 最贵最脆 → 少写
 - 契约层填补微服务断点 → 必有

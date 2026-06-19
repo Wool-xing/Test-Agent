@@ -10,17 +10,17 @@
 
 ### 1. 依赖六层划分（Phase 2 规划）
 
-> **当前状态**：`install.py` 通过 `pip install -r requirements.txt` 统一安装。分层按需安装（按产品形态选择性装依赖）为 Phase 2 路线图项。`requirements/` 目录含规划文档。
+>**当前状态**：`install.py` 通过 `pip install -r requirements.txt` 统一安装。分层按需安装（按产品形态选择性装依赖）为 Phase 2 路线图项。`requirements/` 目录含规划文档。
 
 | 层 | requirements 文件 | 触发条件 | 关键包 |
 | ---- | ---------------- | --------- | -------- |
-| **base**（必装） | `requirements/base.txt` | 永远装 | pytest / requests / playwright / faker / openpyxl / python-docx / allure-pytest |
-| **mobile** | `requirements/mobile.txt` | 选择 mobile / mini-program | Appium-Python-Client / 微信开发者 CLI（外部） |
-| **desktop** | `requirements/desktop.txt` | 选择 desktop | pywinauto / uiautomation / PyAutoGUI |
-| **visual** | `requirements/visual.txt` | 选择 game / visual-regression | airtest / opencv-python / pytesseract |
-| **system** | `requirements/system.txt` | 选择 IoT / 音视频 / blockchain | paho-mqtt / pyserial / web3 / kafka-python / ffmpeg-python |
-| **ai** | `requirements/ai.txt` | 选择 AI / LLM 测试 | scikit-learn / scipy + LLM eval lib |
-| **perf**（推荐装） | `requirements/perf.txt` | 选择性能测试 | locust（JMeter 走外部 Java，不进 pip） |
+|**base**（必装） | `requirements/base.txt` | 永远装 | pytest / requests / playwright / faker / openpyxl / python-docx / allure-pytest |
+|**mobile**| `requirements/mobile.txt` | 选择 mobile / mini-program | Appium-Python-Client / 微信开发者 CLI（外部） |
+|**desktop**| `requirements/desktop.txt` | 选择 desktop | pywinauto / uiautomation / PyAutoGUI |
+|**visual**| `requirements/visual.txt` | 选择 game / visual-regression | airtest / opencv-python / pytesseract |
+|**system**| `requirements/system.txt` | 选择 IoT / 音视频 / blockchain | paho-mqtt / pyserial / web3 / kafka-python / ffmpeg-python |
+|**ai**| `requirements/ai.txt` | 选择 AI / LLM 测试 | scikit-learn / scipy + LLM eval lib |
+|**perf**（推荐装） | `requirements/perf.txt` | 选择性能测试 | locust（JMeter 走外部 Java，不进 pip） |
 
 ### 2. install.py 交互流程
 
@@ -42,27 +42,32 @@ $ python install.py /path/to/your-test-project
 [4/5] 装 Python 依赖...（仅装上述三层）
 [5/5] 装 Playwright browsers / Appium（按选择装）
 完成。可用 skills：core 8 + mobile-test（其他平台 skill 不装）
-```
+
+```text
 
 ### 3. agent / skill 级依赖元数据
 
 每个 agent .md / skill .md 头部 frontmatter 声明依赖层：
 
 ```yaml
+
 ---
 name: mobile-tester
 requires_layer: [base, mobile]
 optional_layer: [visual]   # 跨平台时按需
 ---
-```
+
+```text
 
 install.py 反向计算：用户选了哪些 skill / agent → 自动算出最小必装层并集。
 
 ### 4. 后期补装
 
 ```bash
+
 $ python install.py --add visual,ai
-```
+
+```text
 
 不重装 base，只增量补 visual / ai。dependency 冲突走 `pip install --upgrade-strategy only-if-needed` 防止已稳定包被改版本。
 
@@ -74,17 +79,18 @@ $ python install.py --add visual,ai
 
 ### 6. 运行时按需补装（agent / skill 入口自检）
 
-> 装机时未选的层，**运行时仍可触发** —— 不强迫用户重新跑 install.py，但也不静默自动装。
+> 装机时未选的层，**运行时仍可触发**—— 不强迫用户重新跑 install.py，但也不静默自动装。
 
 **自检与补装回路**（5 步）：
 
-1. **依赖自检**：agent / skill 启动时读取自身 frontmatter `requires_layer`，与已装层并集对比
-2. **缺则反问**：缺失则停下反问，列层级 + 关键包 + 预估安装时间 + 影响范围
+1.**依赖自检**：agent / skill 启动时读取自身 frontmatter `requires_layer`，与已装层并集对比
+2.**缺则反问**：缺失则停下反问，列层级 + 关键包 + 预估安装时间 + 影响范围
 
    > 示例："`/visual-test` 需要 visual 层（airtest + opencv-python + pytesseract，约 80MB / 2-5 分钟）。现在补装？(Y/n)"
-3. **触发补装**：用户同意 → 调 `install.py --add visual` → 增量补装
-4. **落档**：补装请求 + 用户决定 + 时间戳 → `workspace/测试报告/{项目名}/discussions/{date}_dependency-asks.md`
-5. **拒绝处置**：用户拒绝 → agent / skill 降级（如可降级，例如 `/visual-test` 退化为纯 pytest）或拒绝执行并落 `decisions/`，**不静默继续假装能跑**
+
+3.**触发补装**：用户同意 → 调 `install.py --add visual` → 增量补装
+4.**落档**：补装请求 + 用户决定 + 时间戳 → `workspace/测试报告/{项目名}/discussions/{date}_dependency-asks.md`
+5.**拒绝处置**：用户拒绝 → agent / skill 降级（如可降级，例如 `/visual-test` 退化为纯 pytest）或拒绝执行并落 `decisions/`，**不静默继续假装能跑**
 
 **为什么不静默自动装**：跨平台环境差异大（特别是 system 层涉及系统级工具 Java / Node / FFmpeg），强行装可能污染用户环境。符合「Agent 能力越强谦卑义务越重」公理。
 
@@ -105,6 +111,7 @@ $ python install.py --add visual,ai
 ## 🏗️ 架构图（运行时）
 
 ```text
+
 ┌────────────────────────────────────────────────────────────────┐
 │                     test-lead（协调者）                         │
 │       全局调度 / 质量门禁 / 风险决策 / 基线管理                  │
@@ -137,7 +144,8 @@ $ python install.py --add visual,ai
                   Allure + JMeter HTML + Word + 多端通知
                                 ↓
                         test-lead 最终决策
-```
+
+```text
 
 ---
 
@@ -146,10 +154,13 @@ $ python install.py --add visual,ai
 ### 1. GitHub 一键部署（最快）
 
 ```bash
+
 # clone 后本地部署（跨平台：Windows / macOS / Linux）
+
 git clone https://github.com/Wool-xing/Test-Agent.git
 python Test-Agent/install.py /path/to/your-test-project
-```
+
+```text
 
 > 默认仓库为 `Wool-xing/Test-Agent`。fork 后将路径替换为你自己用户名（或用 `TEST_AGENT_REPO_URL` 环境变量覆盖）。Windows / 手动方式见 `docs/getting-started/部署说明.md`。
 
@@ -158,23 +169,28 @@ python Test-Agent/install.py /path/to/your-test-project
 ### 2. 配置 .env（敏感信息）
 
 ```bash
+
 cd your-test-project
 cp .env.example .env
 # 编辑 .env，填入 TEST_APP_URL / TEST_DB_* / BUG_TRACKER + 对应字段 / WECHAT_WEBHOOK_URL 等
-```
+
+```text
 
 ### 3. 启动 AI 工具
 
 ```bash
+
 cd your-test-project
 claude                   # Claude Code（推荐）
 cursor                   # Cursor
 # 或 GitHub Copilot / Windsurf / CodeBuddy 等
-```
+
+```text
 
 ### 4. 在 AI 提示符使用斜杠技能
 
 ```text
+
 > /smoke-test                          # 10 分钟 P0 冒烟
 > /test-coordinator                    # 完整流程
 > /regression-test                     # 回归 + JMeter
@@ -183,14 +199,17 @@ cursor                   # Cursor
 > /jmeter-script-gen                   # 生成 JMeter JMX
 > /data-preparation                    # 测试数据 + JMeter CSV
 > /bug-submission                      # 按 BUG_TRACKER 路由提交 Bug
-```
+
+```text
 
 或自然语言：
 
 ```text
+
 > 帮我对用户登录功能进行完整测试。需求：手机号+密码登录，记住密码，
 > 连续失败 5 次锁定 30 分钟。
-```
+
+```text
 
 > 注：`>` 后面是 AI 工具的提示符输入，**不是 shell 命令**。LLM Provider 配置见 `.env`（内置 6 家 + OpenAI 兼容端点）。
 
@@ -243,13 +262,14 @@ cursor                   # Cursor
 ## 📂 部署后目录速览
 
 ```text
+
 your-test-project/
 ├── .claude/{agents,skills}/           ← 16 agent + 32 skill（业务） + 3 元 skill
 ├── .github/workflows/test.yml
 ├── Jenkinsfile
 ├── CLAUDE.md                          ← AI Agent 行为指令（Claude Code 必读）
 ├── AGENTS.md                          ← Agent 目录（16 专家）
-├── utils/                             ← 79 个 .py + __init__
+├── utils/                             ← 79 个 .py +__init__
 ├── src/                               ← 被测系统源码（cov 指向）
 ├── workspace/
 │   ├── 测试计划/  需求分析/  测试用例/  测试数据/
@@ -268,7 +288,8 @@ your-test-project/
 ├── conftest.py / pytest.ini / requirements.txt
 ├── .mcp.json / .env / quality_gates.yaml
 ├── templates/                         ← tagent init 模板
-```
+
+```text
 
 ---
 
@@ -306,9 +327,9 @@ your-test-project/
 
 ### 迁移成本
 
-- **工程链零改动**：utils + pytest + JMeter + CI 完全跨工具
-- **agent / skill 文档需重写**：迁移到 Cursor / Continue / 其他工具的对应格式
-- **失去**：Claude Code skill 自动加载、Agent tool 子专家协调、`.claude/` 目录约定
+-**工程链零改动**：utils + pytest + JMeter + CI 完全跨工具
+-**agent / skill 文档需重写**：迁移到 Cursor / Continue / 其他工具的对应格式
+-**失去**：Claude Code skill 自动加载、Agent tool 子专家协调、`.claude/` 目录约定
 
 ### 模型选择
 

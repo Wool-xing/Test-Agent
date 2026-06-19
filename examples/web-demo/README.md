@@ -1,6 +1,6 @@
 # Web Demo · 最小可跑示例（5 分钟）
 
-> 本目录是 **Test-Agent 工作流的最小可运行 Web 测试示例**。无需部署完整模板，无需配 .env，无需 BugTracker/Allure，**纯 pytest + Playwright 跑通 1 个 P0 冒烟用例**。
+> 本目录是**Test-Agent 工作流的最小可运行 Web 测试示例**。无需部署完整模板，无需配 .env，无需 BugTracker/Allure，**纯 pytest + Playwright 跑通 1 个 P0 冒烟用例**。
 >
 > 验证目标：让首次接触 Test-Agent 的用户在 5 分钟内看到"Page Object 模式 + pytest fixture 复用 + Playwright 浏览器自动化"完整链路。
 
@@ -8,7 +8,7 @@
 
 ## 5 分钟跑通
 
-> **⚠️ Python 版本要求**：推荐 **Python 3.11 或 3.12**。
+>**⚠️ Python 版本要求**：推荐**Python 3.11 或 3.12**。
 > Python 3.13/3.14 上 `greenlet`（playwright 依赖）尚无预编译 wheel，pip install 会触发本地编译失败。
 > Python 3.10 也可（与项目主依赖兼容），但 3.11/3.12 是推荐路径。
 
@@ -16,34 +16,42 @@
 cd examples/web-demo
 
 # 0. 确认 Python 版本（应为 3.11 或 3.12）
+
 python --version
 # 期望：Python 3.11.x 或 3.12.x
 
 # 1. 建独立 venv（避免污染系统 Python）
+
 python -m venv .venv
 source .venv/Scripts/activate    # Windows Git Bash
 # 或 .venv\Scripts\activate.bat     # Windows CMD
 # 或 source .venv/bin/activate      # macOS/Linux
 
 # 2. 装依赖
+
 pip install --upgrade pip
 pip install -r requirements.txt
 
 # 3. 装 Playwright 浏览器（首次必跑，~150MB chromium 下载）
+
 playwright install chromium --with-deps
 
 # 4. 跑用例
+
 pytest -v
-```
+
+```text
 
 **预期输出**：
 
 ```text
+
 tests/test_smoke.py::test_homepage_title PASSED
 tests/test_smoke.py::test_get_started_link_present PASSED
 
 ============== 2 passed in 2-5s ==============
-```
+
+```text
 
 跑过即说明：✅ Python 环境 OK ✅ Playwright OK ✅ Page Object 模式跑通 ✅ pytest fixture 链路跑通
 
@@ -52,18 +60,20 @@ tests/test_smoke.py::test_get_started_link_present PASSED
 ## 文件结构
 
 ```text
+
 examples/web-demo/
 ├── README.md                   ← 本文件
 ├── requirements.txt            ← 最小依赖（pytest + playwright）
 ├── pytest.ini                  ← markers + addopts
 ├── conftest.py                 ← Playwright browser/page fixture
 ├── pages/
-│   ├── __init__.py
+│   ├──__init__.py
 │   └── playwright_page.py      ← Page Object 示例
 └── tests/
-    ├── __init__.py
+    ├──__init__.py
     └── test_smoke.py           ← 1 个 P0 冒烟用例
-```
+
+```text
 
 ---
 
@@ -83,7 +93,8 @@ examples/web-demo/
 
 ## 演示对象
 
-本 demo 测试 **`https://playwright.dev`** 官方网站（公开稳定，开发者熟悉）：
+本 demo 测试**`https://playwright.dev`**官方网站（公开稳定，开发者熟悉）：
+
 - 测试 1：首页标题包含 "Playwright"
 - 测试 2：首页存在 "Get started" 链接（hero CTA，稳定多年）
 
@@ -94,10 +105,13 @@ examples/web-demo/
 复制本目录到你的测试项目：
 
 ```bash
+
 cp -r examples/web-demo /path/to/your-test-project/tests
-```
+
+```text
 
 然后修改：
+
 1. `pages/playwright_page.py` → 改成你的页面对象
 2. `tests/test_smoke.py` → 改成你的核心路径用例
 3. `pytest.ini` markers → 加你需要的标记（`@p0` / `@smoke` / `@login` 等）

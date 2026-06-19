@@ -17,7 +17,7 @@
 
 ## 高级用法
 
-- 加新脚本前问:**这个能进 runtime CLI 子命令吗?** 能 → 放 `runtime/cli/`;不能(一次性 / SQL / 运维)→ 放本目录
+- 加新脚本前问:**这个能进 runtime CLI 子命令吗?**能 → 放 `runtime/cli/`;不能(一次性 / SQL / 运维)→ 放本目录
 - 脚本必带 `--dry-run` 选项(防生产误操作)
 - 涉及真实数据的脚本输出**禁止入 repo**(用 `workspace/` 临时存放,加 `.gitignore`)
 

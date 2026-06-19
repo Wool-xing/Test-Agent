@@ -9,7 +9,7 @@
 
 ## span 链
 
-```
+```text
 api.request                              # API 入口
 └─ router.decide                         # LLM 决策
    ├─ llm.call (provider=claude|qwen)    # 模型调用
@@ -19,7 +19,8 @@ api.request                              # API 入口
    ├─ task.testcase-designer
    └─ ...
 └─ storage.write                          # 飞轮入库
-```
+
+```text
 
 ## 导出
 

@@ -11,10 +11,10 @@ SKILL_IMPL_STATUS: production
 
 | 缩写 | 含义 | 何时 |
 | ------ | ------ | ------ |
-| **MIL** | Model-in-the-Loop | 算法早期(Simulink/Matlab)|
-| **SIL** | Software-in-the-Loop | 编译后软件 + 主机仿真 |
-| **PIL** | Processor-in-the-Loop | 真 ECU + 仿真环境 |
-| **HIL** | Hardware-in-the-Loop | **真 ECU + 真 I/O**(模拟外设)|
+|**MIL**| Model-in-the-Loop | 算法早期(Simulink/Matlab)|
+|**SIL**| Software-in-the-Loop | 编译后软件 + 主机仿真 |
+|**PIL**| Processor-in-the-Loop | 真 ECU + 仿真环境 |
+|**HIL**| Hardware-in-the-Loop |**真 ECU + 真 I/O**(模拟外设)|
 
 **ASIL C / D 必经 HIL**(L4 极深);ASIL A/B 可 PIL 替代。
 
@@ -36,7 +36,7 @@ SKILL_IMPL_STATUS: production
 
 ## 录波
 
-- 格式:**MDF 4.x** / MF4(AUTOSAR 标准)
+- 格式:**MDF 4.x**/ MF4(AUTOSAR 标准)
 - 工具:Vector CANape / ASAM ODS
 - 必含 seed + 算法版本 + ECU 固件 hash + 仿真版本(可复现性)
 

@@ -7,7 +7,7 @@
 | Windows 11 | 21H2+ | x64 | 完整支持 |
 | Windows 10 | 21H2+ | x64 | 完整支持 |
 | Windows 10 | 1809-21H1 | x64 | 支持 (无 WebView2 需系统自带) |
-| Windows 7/8/8.1 | — | — | **不支持** |
+| Windows 7/8/8.1 | — | — |**不支持**|
 | macOS 15 Sequoia | 15.0+ | arm64, x64 | 完整支持 |
 | macOS 14 Sonoma | 14.0+ | arm64, x64 | 完整支持 |
 | macOS 13 Ventura | 13.0+ | arm64, x64 | 支持 |

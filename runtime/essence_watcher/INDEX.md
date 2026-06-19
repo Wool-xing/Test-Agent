@@ -15,7 +15,8 @@
 
 ## 流程
 
-```
+```text
+
 1. 读 upstream INDEX           → list of (name, repo_url)
 2. 读 state.json             → 上次记录 commit hash
 3. gh API 查 upstream HEAD   → 新 commit?
@@ -24,27 +25,34 @@
    b. LLM(aux) 萃取 delta
    c. 写 upstream update 文件
    d. 标 confidence: llm-draft-unreviewed
+
 5. 应用 policy.yaml:
    - skill-related delta → 提议入 skills/
    - rule-related delta → 提议入规则待审
    - 其他 → 仅入 upstream 不动 Test-Agent
-```
+
+```text
 
 ## 启用
 
 `tagent.yml`:
+
 ```yaml
+
 essence_watcher:
   enabled: true             # safe-by-default,默认 false
   cron: "0 3 * * 1"         # 每周一凌晨 3 点
   apply_policy: default     # upstream apply_policy.yaml
   delta_min_lines: 20       # README 改动 < 20 行不触发萃取
-```
+
+```text
 
 ## 选择性应用 policy
 
 ```yaml
+
 # 哪些 delta 自动提议入 Test-Agent
+
 auto_propose:
   - skill_definitions          # 新 skill 名字 / 描述 / 元数据 → 提议 skills/
   - charter_rules             # 规则更新 → 提议规则
@@ -52,6 +60,7 @@ auto_propose:
   - test_methodology          # 测试方法论新增
 
 # 仅入精髓库,不动 Test-Agent
+
 essence_only:
   - branding
   - business_lane             # 商业版细节
@@ -59,7 +68,9 @@ essence_only:
   - unrelated_features
 
 # 永不入
+
 never:
   - source_code_blocks > 100_lines  # 大段源码不抄
   - vendor_specific_apis             # 厂商锁定 API
-```
+
+```text

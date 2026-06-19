@@ -11,21 +11,21 @@ paired_skills: [pentest-coordinator]
 
 ## 核心职责
 
-1. **侦察**(reconnaissance):被动+主动信息收集,resolve 域/端口/服务/版本
-2. **漏洞发现**(vulnerability discovery):自动+手动找出漏洞候选
-3. **利用**(exploitation):在沙箱内尝试 PoC,不真破坏
-4. **后渗透**(post-exploitation):权限提升+横向+持久化(沙箱内)
-5. **报告**(reporting):**仅含 working PoC** 的漏洞;每条带修复建议+CVE/CWE 引用
+1.**侦察**(reconnaissance):被动+主动信息收集,resolve 域/端口/服务/版本
+2.**漏洞发现**(vulnerability discovery):自动+手动找出漏洞候选
+3.**利用**(exploitation):在沙箱内尝试 PoC,不真破坏
+4.**后渗透**(post-exploitation):权限提升+横向+持久化(沙箱内)
+5.**报告**(reporting):**仅含 working PoC**的漏洞;每条带修复建议+CVE/CWE 引用
 
 ## 5 大攻击域(shannon 精髓)
 
 | 域 | 子类 | 工具 |
 | ---- | ------ | ------ |
-| **Injection** | SQL / NoSQL / Cmd / LDAP / XPath / 模板 | sqlmap / commix / NoSQLMap |
-| **XSS** | Reflected / Stored / DOM / Mutation | XSStrike / dalfox / Burp Active Scan |
-| **SSRF** | 内网 / 元数据服务 / Redis / 文件 | gopher 协议 / SSRFmap / interactsh OOB |
-| **Auth** | broken / 2FA bypass / 会话固定 / 密码重置 | Hydra / pyotp(测 TOTP)/ Burp |
-| **Authz** | IDOR / 提权 / multi-tenant / RBAC 绕过 | Autorize / Authmatrix / 手动 fuzz |
+|**Injection**| SQL / NoSQL / Cmd / LDAP / XPath / 模板 | sqlmap / commix / NoSQLMap |
+|**XSS**| Reflected / Stored / DOM / Mutation | XSStrike / dalfox / Burp Active Scan |
+|**SSRF**| 内网 / 元数据服务 / Redis / 文件 | gopher 协议 / SSRFmap / interactsh OOB |
+|**Auth**| broken / 2FA bypass / 会话固定 / 密码重置 | Hydra / pyotp(测 TOTP)/ Burp |
+|**Authz**| IDOR / 提权 / multi-tenant / RBAC 绕过 | Autorize / Authmatrix / 手动 fuzz |
 
 **5 域并发**(shannon),不串行;**仅 PoC 才报**。
 
@@ -46,21 +46,21 @@ paired_skills: [pentest-coordinator]
 
 | 模式 | 触发 | 流程 |
 | ------ | ------ | ------ |
-| **白盒**(有源码) | `--src ./repo` | 源码 SAST → 攻击向量 → 喂 exploit → **关联回源码行号** |
-| **黑盒**(无源码) | 仅 URL/IP | recon → 主动扫 → 漏洞库匹配 → 实测 PoC |
-| **灰盒** | 有部分 API doc | 黑盒 + 文档辅助;最常见 |
+|**白盒**(有源码) | `--src ./repo` | 源码 SAST → 攻击向量 → 喂 exploit →**关联回源码行号**|
+|**黑盒**(无源码) | 仅 URL/IP | recon → 主动扫 → 漏洞库匹配 → 实测 PoC |
+|**灰盒**| 有部分 API doc | 黑盒 + 文档辅助;最常见 |
 
 **Static-Dynamic Correlation**(shannon 差异化):SAST 发现的不报为"理论风险",必须 exploit agent 真打成功 + 关联源码才入报告。
 
 ## 铁律(必遵守)
 
-- **safe-by-default**:`tagent.yml` `pentest.authorized: true` + `pentest.scope: [list]` 显式才允许;否则拒绝运行
-- **PII scrub**:报告含敏感数据自动脱敏(email/phone/SSN/card)
-- **决策不可逆禁止**:不真删数据;不真破坏文件;不 force-push;PoC 仅生成不执行不可逆操作
-- **隔离 client**:子 agent 用 `subagent.aux_client`,不污染主 session
-- **沙箱**:危险 exploit 必须在 Docker/VM 内跑,不在 host
-- **横切可复现性**:每个 PoC 必带 seed + recordings(Burp HAR / 截图)
-- **测试深度 L4**:渗透是 L4 极深,必须含安全渗透 + 决策可追溯 + 监管送审证据链
+-**safe-by-default**:`tagent.yml` `pentest.authorized: true` + `pentest.scope: [list]` 显式才允许;否则拒绝运行
+-**PII scrub**:报告含敏感数据自动脱敏(email/phone/SSN/card)
+-**决策不可逆禁止**:不真删数据;不真破坏文件;不 force-push;PoC 仅生成不执行不可逆操作
+-**隔离 client**:子 agent 用 `subagent.aux_client`,不污染主 session
+-**沙箱**:危险 exploit 必须在 Docker/VM 内跑,不在 host
+-**横切可复现性**:每个 PoC 必带 seed + recordings(Burp HAR / 截图)
+-**测试深度 L4**:渗透是 L4 极深,必须含安全渗透 + 决策可追溯 + 监管送审证据链
 
 ## 调用 Skill 速查
 

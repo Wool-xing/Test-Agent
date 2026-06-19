@@ -15,7 +15,8 @@ name: <id>
 description: <一句话职责>
 tools: <逗号分隔工具列表,可选>
 ---
-```
+
+```text
 
 ## 用途
 

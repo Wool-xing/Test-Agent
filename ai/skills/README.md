@@ -89,13 +89,13 @@
 
 每个 skill 文件统一包含以下章节：
 
-1. **YAML frontmatter**（name / description / tools）
-2. **🔔 开测前准备清单**（平台 skill 含此段，列必备 + 可选项）
-3. **触发方式**（`/skill-name`）
-4. **适用场景**
-5. **执行流程**（Step 1, 2, 3...）
-6. **质量门禁**
-7. **输出文件**
+1.**YAML frontmatter**（name / description / tools）
+2.**🔔 开测前准备清单**（平台 skill 含此段，列必备 + 可选项）
+3.**触发方式**（`/skill-name`）
+4.**适用场景**
+5.**执行流程**（Step 1, 2, 3...）
+6.**质量门禁**
+7.**输出文件**
 
 ---
 

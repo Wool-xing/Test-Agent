@@ -7,7 +7,7 @@ SKILL_IMPL_STATUS: script
 
 # 测试数据准备 Skill
 
-> **目标**：测试执行前自动准备所有必要数据，测试结束后自动清理。
+>**目标**：测试执行前自动准备所有必要数据，测试结束后自动清理。
 
 ## 🔔 调用前置准备
 
@@ -19,7 +19,8 @@ SKILL_IMPL_STATUS: script
 □ 业务表 schema 已就绪（DB 写入需要）
 □ 用例 Excel（用于分析数据需求，可选）
 □ 性能场景需指定并发数（CSV 行数 = 并发数）
-```
+
+```text
 
 ## 📋 执行流程
 
@@ -28,14 +29,17 @@ SKILL_IMPL_STATUS: script
 读取测试用例 Excel，提取数据需求。**注意：使用 03-用例设计 标准 Excel 16 列布局**：
 
 ```text
+
 列索引（1-based）：
 1.用例ID  2.模块  3.类型  4.优先级  5.用例名称  6.前置条件
 7.测试步骤  8.测试数据  9.预期结果  ...
-```
+
+```text
 
 实现：
 
 ```python
+
 import logging
 import re
 
@@ -81,11 +85,13 @@ def analyze_data_requirements(test_cases_file: str) -> dict:
 
     logger.info(f"数据需求分析完成: {requirements}")
     return requirements
-```
+
+```text
 
 ### 步骤2：执行数据准备
 
 ```python
+
 import json
 from pathlib import Path
 
@@ -93,12 +99,14 @@ from data_factory import TestDataManager
 from data_masking import DataMasker
 
 # conftest 中的 EnvConfig（运行时由 pytest fixture 注入；独立运行时手动构造）
+
 from conftest import get_current_env
 
 env_config = get_current_env()
 manager = TestDataManager(env_config)
 
 # 准备基础测试账号
+
 test_users = {
     "normal_user":   manager.create_test_user(status="active", role="user"),
     "admin_user":    manager.create_test_user(status="active", role="admin"),
@@ -107,31 +115,38 @@ test_users = {
 }
 
 # 落盘到权威路径（conftest test_data fixture 直接消费此文件）
+
 out = Path("workspace/测试数据/test_data.json")
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps(test_users, ensure_ascii=False, indent=2), encoding="utf-8")
 
 # 日志中脱敏输出
+
 logger.info(f"测试数据已生成: {DataMasker.mask_dict(test_users)}")
-```
+
+```text
 
 > 注：`_insert_to_db` / `_delete_from_db` 由 `utils/data_factory.py` 提供 SQLAlchemy 默认实现；项目可继承覆写。
 
 ### 步骤3：JMeter 参数化数据（性能场景）
 
 ```python
+
 from jmeter_csv_exporter import generate_jmeter_dataset
 
 # count 与 JMeter 并发数对齐
+
 generate_jmeter_dataset(
     count=50,
     output_path="workspace/测试数据/jmeter_users.csv",
 )
-```
+
+```text
 
 ### 步骤4：数据验证
 
 ```python
+
 def validate_test_data(test_data: dict) -> bool:
     """验证测试数据有效性（严格模式）"""
     required_keys = ["normal_user", "admin_user"]
@@ -152,18 +167,22 @@ def validate_test_data(test_data: dict) -> bool:
         return False
     logger.info("✅ 测试数据验证通过")
     return True
-```
+
+```text
 
 ### 步骤5：清理钩子（双保险）
 
 ```python
+
 import atexit
 
 # atexit：进程正常退出时触发
+
 atexit.register(manager.cleanup)
 
 # pytest fixture：每个测试函数级 register_cleanup（已在 conftest.cleanup_tracker 提供）
-```
+
+```text
 
 ## 📋 输出文件
 

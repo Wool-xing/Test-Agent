@@ -11,11 +11,13 @@ SKILL_IMPL_STATUS: production
 
 ```text
 /test-coordinator [需求描述或文档路径]
-```
+
+```text
 
 ## 流程总览
 
 ```text
+
 需求输入（任意格式：md/pdf/docx/xlsx/zip/截图/URL）
    ↓
 utils.prd_loader.load_prd() ─→ 提取文本 + metadata
@@ -45,7 +47,8 @@ bug-manager（功能 Bug + 性能 Bug 提交追踪）
 report-generator（Allure + JMeter HTML + Word + 多端通知:企微/飞书/钉钉/Slack/邮件/Teams）
    ↓
 test-lead（最终决策：功能+性能双门禁）
-```
+
+```text
 
 > 注：env-manager 与 data-preparer 严格上不是无依赖并行 —— data-preparer 需要 env 基础 connectivity 通过后才能写 DB；流程改为 env 完成后启动 data-preparer。
 
@@ -58,6 +61,7 @@ test-lead（最终决策：功能+性能双门禁）
 清单按检测到的平台拼装。例：
 
 ```text
+
 > /test-coordinator
 > 帮我测试这个 Windows EXE 程序
 
@@ -77,13 +81,15 @@ test-lead（最终决策：功能+性能双门禁）
 □ 配套服务（Web 后端、DB）已就绪
 
 请确认是否准备好。准备好回复"继续"，缺项告诉我哪一项。
-```
+
+```text
 
 用户确认或补齐后才进入 Step 1。
 
 ### Step 1：PRD 加载 + 平台识别 + 任务分析（test-lead）
 
 ```text
+
 input: 用户提供的需求文档（任意格式）或自然语言描述
 处理:
   1. 调 utils.prd_loader.load_prd(source) → 文本 + metadata
@@ -96,11 +102,13 @@ output:
   - 风险评估
   - 预估工时
   - 团队分工（核心 8 + 平台扩展按需）
-```
+
+```text
 
 ### 路由分支（按平台识别结果动态编排）
 
 ```text
+
 通用核心链路（8 必经）：
   requirements-analyst → testcase-designer → env-manager → data-preparer
                                                           ↓
@@ -121,62 +129,76 @@ output:
                                     test-executor 统一执行
                                             ↓
                                     bug-manager → report-generator → test-lead 决策
-```
+
+```text
 
 ### Step 2：需求分析（requirements-analyst）
 
 ```text
+
 input: 需求文档 / PRD / 用户故事
 output:
   - workspace/需求分析/requirements_analysis_{日期}.md
   - workspace/需求分析/requirements_summary_{日期}.json
-```
+
+```text
 
 ### Step 3：用例设计（testcase-designer）
 
 ```text
+
 input: 需求 JSON 摘要
 output:
   - workspace/测试用例/testcases_[模块]_[日期].xlsx（4 Sheet）
   - 用例 ID 含 TYPE：TC-{MODULE}-{UI|API|PERF|SEC}-{NUM}
   - 自动化优先级标注
-```
+
+```text
 
 ### Step 4：环境健康（env-manager）
 
 ```text
+
 output: workspace/测试报告/{项目名}/环境检查_{时间戳}.json
 失败 → 重试 10/20/40s → 仍失败则阻止后续步骤
-```
+
+```text
 
 ### Step 5：数据准备（data-preparer，env 通过后启动）
 
 ```text
+
 output:
   - workspace/测试数据/test_data.json（pytest 功能测试，conftest fixture 直接消费）
   - workspace/测试数据/jmeter_users.csv（JMeter 参数化）
-```
+
+```text
 
 ### Step 6：脚本开发（automation-engineer）
 
 ```text
+
 output:
   6a. pytest 功能脚本：workspace/自动化脚本/python/
   6b. JMeter JMX：workspace/自动化脚本/jmeter/test_plan.jmx（调用 /jmeter-script-gen）
 依赖：workspace/测试数据/jmeter_users.csv
-```
+
+```text
 
 ### Step 7：冒烟门禁
 
 ```text
+
 执行: /smoke-test
 条件: P0 通过率 ≥95% 且 无新增 P0 Bug
 失败 → 停止，通知 test-lead，等待修复
-```
+
+```text
 
 ### Step 8a：功能回归执行
 
 ```bash
+
 pytest -m "p0 or p1" \
     -n 4 --reruns=2 --reruns-delay=5 --timeout=120 \
     --cov="${APP_SRC_PATH:-./src}" \
@@ -184,14 +206,17 @@ pytest -m "p0 or p1" \
     --cov-fail-under=80 \
     --alluredir=workspace/测试报告/{项目名}/allure-results \
     --junitxml=workspace/测试报告/{项目名}/regression-results.xml
-```
+
+```text
 
 阻塞条件：通过率 < 90% 时停止，不执行性能测试。
 
 ### Step 8b：JMeter 性能测试（功能回归通过后触发，分模式）
 
 ```bash
+
 # 模式由 PERF_MODE 控制（默认 ci_quick；release/手动可设 full）
+
 PERF_MODE="${PERF_MODE:-ci_quick}"
 
 if [ "$PERF_MODE" = "full" ]; then
@@ -201,6 +226,7 @@ else
 fi
 
 # TARGET_HOST/PROTOCOL/PORT 由 conftest 或 .env 解析（不含协议前缀）
+
 jmeter -n \
     -t workspace/自动化脚本/jmeter/test_plan.jmx \
     -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
@@ -211,26 +237,31 @@ jmeter -n \
     -Jthreads=${THREADS} -Jrampup=${RAMPUP} -Jduration=${DURATION}
 
 # 解析 + 门禁
+
 python -m utils.jmeter_result_parser \
     workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode "${PERF_MODE}" \
     --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json
-```
+
+```text
 
 ### Step 9：Bug 管理（bug-manager）
 
 ```text
+
 input:
   - 功能失败列表（failure_type=product_bug）
   - 性能门禁失败项
 output:
   - 禅道 Bug ID 列表
   - 性能 Bug 标题：[性能]-[接口名]-[指标超标]
-```
+
+```text
 
 ### Step 10：报告生成（report-generator）
 
 ```text
+
 output:
   - Allure 交互式报告（功能）
   - JMeter HTML 报告（性能）
@@ -238,11 +269,13 @@ output:
   - Excel 数据报告
   - 多端通知:企业微信/飞书/钉钉/Slack/邮件/Teams（自动跳过未配置）
 保存：workspace/测试报告/{项目名}/
-```
+
+```text
 
 ### Step 11：最终决策（test-lead）
 
 ```text
+
 output:
   - 功能门禁判定
   - 性能门禁判定（按 mode 选择 full / ci_quick 阈值）
@@ -250,7 +283,8 @@ output:
   - 遗留风险
   - 下次迭代建议
   - 仅当 release 分支 + full 模式 + 全 PASS → 更新基线
-```
+
+```text
 
 ## 质量门禁分层
 
@@ -286,6 +320,7 @@ output:
 ## 输出文件清单
 
 ```text
+
 workspace/
 ├── 测试计划/
 │   └── test_plan_[项目]_[日期].md         # test-lead 输出（IEEE 829 风格）
@@ -312,7 +347,8 @@ workspace/
     ├── history/                        # junit-xml 归档（flaky_detector 用）
     ├── 截图/
     └── 报告/测试报告_[日期].docx
-```
+
+```text
 
 ## 注意事项
 

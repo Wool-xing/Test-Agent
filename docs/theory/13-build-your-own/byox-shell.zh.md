@@ -23,8 +23,8 @@ reading_en: ["https://brennan.io/2015/01/16/write-a-shell-in-c/"]
 
 # 对测试工作
 
-- **subprocess 测试**:`runtime/orchestrator/adapters/scripts.py` 用 subprocess 包 73 utils;懂 shell = 懂边界
-- **信号**:测试中 SIGTERM/SIGINT 优雅退出
-- **pipe**:测试命令链(`cmd1 | cmd2`)各自 stderr 独立
-- **后台 / nohup**:测试持久化进程 / Daemon
-- **环境变量**:测试 .env 注入 / PATH 安全
+-**subprocess 测试**:`runtime/orchestrator/adapters/scripts.py` 用 subprocess 包 73 utils;懂 shell = 懂边界
+-**信号**:测试中 SIGTERM/SIGINT 优雅退出
+-**pipe**:测试命令链(`cmd1 | cmd2`)各自 stderr 独立
+-**后台 / nohup**:测试持久化进程 / Daemon
+-**环境变量**:测试 .env 注入 / PATH 安全

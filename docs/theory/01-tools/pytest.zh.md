@@ -46,16 +46,19 @@ reading_en:
 Python 测试事实标准。本项目 `runtime/` 全栈 pytest;`config/pytest.ini` 已配齐。
 
 ## 在本项目调用
+
 - 任何 `runtime/tests/test_*.py` 文件 → `pytest runtime/tests/`
 - E2E smoke:`runtime/tests/test_smoke_e2e.py`
 - Router 准确率:`runtime/tests/test_router_real.py`
 
 ## 核心概念
-- **fixture**:测试前后置;`@pytest.fixture(scope="session"|"module"|"class"|"function")`
-- **参数化**:`@pytest.mark.parametrize` 一组用例多组数据
-- **marker**:`@pytest.mark.smoke / regression / slow` 分类筛选
-- **conftest.py**:自动加载的 fixture 文件
-- **plugin 生态**:`pytest-xdist`(并行)/`pytest-cov`(覆盖率)/`pytest-bdd`(BDD)/`allure-pytest`(报告)
+
+-**fixture**:测试前后置;`@pytest.fixture(scope="session"|"module"|"class"|"function")`
+-**参数化**:`@pytest.mark.parametrize` 一组用例多组数据
+-**marker**:`@pytest.mark.smoke / regression / slow` 分类筛选
+-**conftest.py**:自动加载的 fixture 文件
+-**plugin 生态**:`pytest-xdist`(并行)/`pytest-cov`(覆盖率)/`pytest-bdd`(BDD)/`allure-pytest`(报告)
 
 ## 为什么 Agent 调用 pytest?
+
 被测物是 Python 项目 → 单元+集成层首选 pytest;输出 junit-xml 喂 Allure;并行用 xdist;失败重试用 rerunfailures。

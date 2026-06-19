@@ -5,18 +5,18 @@
 ## 战略判断
 
 - "全平台/全协议/全测试类型/全行业全覆盖" = 项目死亡信号。Selenium/Postman/k6/JMeter 均单点打透赢
-- 已有 16 专家+32 Skill 编排骨架 = 真护城河,真正稀缺是 **智能编排层 + 数据飞轮**
+- 已有 16 专家+32 Skill 编排骨架 = 真护城河,真正稀缺是**智能编排层 + 数据飞轮**
 - 三阶段串行打通,门槛守严:
-  - **B(M1-M6) QA 团队编排平台** — 摘已有资产最低果实
-  - **A(M7-M12) 开发者自测**(IDE 插件) — 需 B 飞轮数据喂养再打
-  - **C(M13-M18) CI 中间件**(原生集成 Jenkins/GitLab/Argo/Tekton/K8s Operator) — 需 A+B 背书
+  -**B(M1-M6) QA 团队编排平台**— 摘已有资产最低果实
+  -**A(M7-M12) 开发者自测**(IDE 插件) — 需 B 飞轮数据喂养再打
+  -**C(M13-M18) CI 中间件**(原生集成 Jenkins/GitLab/Argo/Tekton/K8s Operator) — 需 A+B 背书
 
 ## 双层架构
 
 | 层 | 内容 | 谁维护 |
 | ---- | ------ | -------- |
-| **L1 核心闭包** | 测试编排引擎 / 14 专家+调度器 / 输入解析器 / 输出渲染器 / MCP 协议层 / 飞轮 / AI 路由 | 自己 |
-| **L2 扩展面** | 协议适配器市场 / 测试类型 Skill 包 / 行业 Profile / 工具桥 / 报告模板 | 社区/插件/AI 生成 |
+|**L1 核心闭包**| 测试编排引擎 / 14 专家+调度器 / 输入解析器 / 输出渲染器 / MCP 协议层 / 飞轮 / AI 路由 | 自己 |
+|**L2 扩展面**| 协议适配器市场 / 测试类型 Skill 包 / 行业 Profile / 工具桥 / 报告模板 | 社区/插件/AI 生成 |
 
 ## 八维测试矩阵
 
@@ -48,17 +48,17 @@
 
 | 项 | 选型 |
 | ---- | ------ |
-| LLM 抽象 | **LiteLLM** 多厂商 + Ollama 兜底 + stub(测试) |
-| 编排引擎 | **Prefect 2.x** + 自研 Direct 降级执行器(无 Prefect 也能跑) |
+| LLM 抽象 |**LiteLLM**多厂商 + Ollama 兜底 + stub(测试) |
+| 编排引擎 |**Prefect 2.x**+ 自研 Direct 降级执行器(无 Prefect 也能跑) |
 | 执行器底层 | Pytest 复用(79 脚本本就是 pytest 生态) |
-| DB | Postgres + **pgvector** |
+| DB | Postgres +**pgvector**|
 | 对象存储 | MinIO |
 | 报表 OLAP | ClickHouse(M3 上,M1 不急) |
 | API | FastAPI + Pydantic v2 |
 | CLI | Typer + Rich |
 | 观测 | OpenTelemetry + Loguru |
 | UI | M3 上,M1 仅 CLI |
-| 开源时机 | **M3 上运行时再开源** |
+| 开源时机 |**M3 上运行时再开源**|
 
 ## M1 交付清单
 
@@ -103,6 +103,6 @@
 - W1 末:骨架+注册没完成 → 慢一周接受
 - W3 末:路由+编排没贯通 → 砍 OTel+ClickHouse,优先打通
 - W5 末:E2E demo 跑不通 → 砍移动/AI 专家,只跑 Web+API
-- W6 末:文档没同步 → **不准 bump 版本**
+- W6 末:文档没同步 →**不准 bump 版本**
 - 客户 <2 → 砍 A,固守 B
 - DAU < 1000(A 阶段) → 加固 B,不进 C

@@ -42,14 +42,16 @@ reading_en:
 
 | 层 | 工具 | 稳定性 | 何时用 |
 | ---- | ------ | -------- | -------- |
-| **API 层** | 直接调 DLL / COM / IPC | 最稳 | 业务逻辑测试 |
-| **UI Automation 层** | pywinauto + UIA / WinAppDriver | 稳定 | 大多数场景默认 |
-| **Visual 层** | PyAutoGUI + OpenCV / Airtest OCR | 最脆,易碎 | 无 UIA 树时兜底(游戏/Canvas) |
+|**API 层**| 直接调 DLL / COM / IPC | 最稳 | 业务逻辑测试 |
+|**UI Automation 层**| pywinauto + UIA / WinAppDriver | 稳定 | 大多数场景默认 |
+|**Visual 层**| PyAutoGUI + OpenCV / Airtest OCR | 最脆,易碎 | 无 UIA 树时兜底(游戏/Canvas) |
 
 ## Test-Agent 路由逻辑
+
 被测物 PE32 → `desktop-tester` 专家(agents/11-桌面测试.md)→ `utils/desktop_driver.py` 调用 pywinauto。
 
 ## 为什么 Agent 选 pywinauto 而非 Playwright?
-- Playwright **只支持 Web/Electron**,不能直接驱动 Win32 进程
+
+- Playwright**只支持 Web/Electron**,不能直接驱动 Win32 进程
 - pywinauto 基于微软标准 UIA(IAccessible2),与系统辅助技术兼容
 - Visual 层用 Airtest 仅作"找不到 UIA 元素时"兜底

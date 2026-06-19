@@ -21,22 +21,24 @@ paired_skills: [smoke-test, regression-test]
 □ 性能阶段：JMeter 5.6.3 + Java JRE 已装；workspace/自动化脚本/jmeter/test_plan.jmx 存在
 □ Allure CLI 已装（如需报告）
 □ HEADLESS=true（CI）/ false（本地调试）
-```
+
+```text
 
 ## 协作输出
 
-- 向 **test-lead**：执行结果 JSON（含 pass_rate / 失败分类 / 性能门禁状态）
-- 向 **bug-manager**：failure_type=product_bug 列表（自动批量提交 BugTracker,默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook）
-- 向 **report-generator**：完整结果 JSON + Allure results + JMeter HTML
-- 向 **automation-engineer**：test_code_bug 反馈（脚本错误）
-- 向 **env-manager**：environment_issue 反馈（环境异常）
-- 向 **data-preparer**：data_issue 反馈（数据状态异常）
+- 向**test-lead**：执行结果 JSON（含 pass_rate / 失败分类 / 性能门禁状态）
+- 向**bug-manager**：failure_type=product_bug 列表（自动批量提交 BugTracker,默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook）
+- 向**report-generator**：完整结果 JSON + Allure results + JMeter HTML
+- 向**automation-engineer**：test_code_bug 反馈（脚本错误）
+- 向**env-manager**：environment_issue 反馈（环境异常）
+- 向**data-preparer**：data_issue 反馈（数据状态异常）
 
 ## 执行策略
 
 ### 四阶段执行模型
 
 ```text
+
 阶段1：冒烟测试（10分钟）
   → 仅执行 P0 用例
   → smoke 门禁：通过率 ≥95% 且 无新增 P0 Bug
@@ -55,12 +57,15 @@ paired_skills: [smoke-test, regression-test]
   → CI 默认 ci_quick 模式（5并发/1分钟，门禁 TPS≥20 / P95≤800ms）
   → release/手动触发 full 模式（50并发/5分钟，门禁 TPS≥100 / P95≤500ms）
   → 基线对比：与 baselines/perf_baseline.json 对比，回归>20% 阻断
-```
+
+```text
 
 ### 并行执行配置
 
 ```bash
+
 # 标准回归（推荐）
+
 pytest -m "p0 or p1" \
     -n 4 \
     --reruns=2 \
@@ -71,13 +76,15 @@ pytest -m "p0 or p1" \
     -v
 
 # 冒烟（不开启 reruns，配合 flaky_detector）
+
 pytest -m "p0" \
     -n 2 \
     --timeout=60 \
     --alluredir=workspace/测试报告/{项目名}/allure-results \
     --junitxml=workspace/测试报告/{项目名}/smoke-results.xml \
     --tb=short
-```
+
+```text
 
 > 注：reruns 与 flaky 检测策略冲突。冒烟阶段不开 reruns；回归阶段开 reruns 是为快速反馈，flaky 由 history 归档后离线检测。
 
@@ -98,6 +105,7 @@ pytest -m "p0" \
 遇到失败时，必须先分类再处理（写入 `workspace/测试报告/{项目名}/failure_classification.json`）：
 
 ```python
+
 FAILURE_CATEGORIES = {
     "product_bug": {
         "signals": ["断言失败", "功能不符预期", "数据异常"],
@@ -120,13 +128,15 @@ FAILURE_CATEGORIES = {
         "action": "通知 data-preparer + 重新准备数据",
     },
 }
-```
+
+```text
 
 > 自动判定示例：从 `pytest --tb=short` 输出 + traceback 类型用关键字匹配，落地 `failure_classification.json`，bug-manager 按此 JSON 自动批量提交。
 
 ## 测试报告格式
 
 ```text
+
 === 测试测试报告 ===
 开始：2026-05-10 14:30:00
 环境：test (http://test.example.com)
@@ -148,23 +158,27 @@ P0：100% ✅  P1：95.6% ✅
 失败明细：
   - TC-LOGIN-API-012：产品Bug，Bug#1024
   - TC-ORDER-API-023：flaky 候选，归档至 history
-```
+
+```text
 
 ## 异常处理策略
 
 ### smoke 阶段处置（与 test-lead 门禁对齐：95% 通过率）
 
 ```text
+
 1. smoke 通过率 < 95% → 立即停止，通知 test-lead
 2. 截图 + Allure 步骤
 3. 失败用例按 FAILURE_CATEGORIES 分类
 4. product_bug 自动提交 → bug-manager
 5. 等待修复，不进入回归阶段
-```
+
+```text
 
 ### 环境不稳定（指数退避：10/20/40s 与全栈对齐）
 
 ```python
+
 import time
 
 ENV_ERROR_RATE_THRESHOLD = 0.05  # 5%
@@ -180,37 +194,46 @@ def handle_environment_instability(env_error_rate: float, env_config) -> bool:
 
     from env_manager import health_check  # env-manager 提供
     for attempt in range(3):
-        wait = min(10 * (2 ** attempt), 60)
+        wait = min(10 * (2**attempt), 60)
         time.sleep(wait)
         report = health_check(env_config)
         if report["status"] == "ready":
             return True
     return False
-```
+
+```text
 
 ### Flaky 用例处理（与 utils/flaky_detector 协作）
 
 ```bash
+
 # 每次执行后归档 junit-xml 到 history（供 flaky_detector 后续分析）
+
 python -m utils.flaky_detector \
     --archive workspace/测试报告/{项目名}/regression-results.xml \
     --history workspace/测试报告/{项目名}/history \
     --limit 5
-```
+
+```text
 
 ```python
+
 # Flaky 用例标记
+
 @pytest.mark.flaky
 def test_something_unstable():
     pass  # 此用例被隔离，不计入质量门禁
-```
+
+```text
 
 ## JMeter 性能测试执行
 
 ### 执行命令（双模式）
 
 ```bash
+
 # CI 默认：ci_quick
+
 jmeter -n \
   -t workspace/自动化脚本/jmeter/test_plan.jmx \
   -l workspace/测试报告/{项目名}/jmeter-results/result.jtl \
@@ -221,6 +244,7 @@ jmeter -n \
   -Jthreads=5 -Jrampup=10 -Jduration=60
 
 # 完整压测：full（手动/release）
+
 jmeter -n \
   -t workspace/自动化脚本/jmeter/test_plan.jmx \
   -l workspace/测试报告/{项目名}/jmeter-results/full_result.jtl \
@@ -229,26 +253,31 @@ jmeter -n \
   -Jtarget_protocol="${TARGET_PROTOCOL:-http}" \
   -Jtarget_port="${TARGET_PORT:-80}" \
   -Jthreads=50 -Jrampup=60 -Jduration=300
-```
+
+```text
 
 > ⚠ TARGET_HOST 不含协议前缀。从 `TEST_API_URL` 解析 host/port/protocol。
 
 ### 性能结果解析与门禁
 
 ```bash
+
 # CI quick 模式
+
 python -m utils.jmeter_result_parser \
     workspace/测试报告/{项目名}/jmeter-results/result.jtl \
     --mode ci_quick
 
 # Full 模式 + 基线对比 + 通过则更新基线
+
 python -m utils.jmeter_result_parser \
     workspace/测试报告/{项目名}/jmeter-results/full_result.jtl \
     --mode full \
     --baseline workspace/测试报告/{项目名}/baselines/perf_baseline.json \
     --update-baseline \
     --regression-max-pct 20
-```
+
+```text
 
 ### 性能失败分类
 
@@ -263,7 +292,9 @@ python -m utils.jmeter_result_parser \
 ## 非功能维度执行模式
 
 ```bash
+
 # 安全（SAST + 依赖 + Header + DAST）
+
 python -m utils.security_scanner bandit ./src
 python -m utils.security_scanner safety
 python -m utils.security_scanner headers https://your-app
@@ -271,28 +302,35 @@ python -m utils.security_scanner zap https://your-app   # 需先启 ZAP daemon
 python -m utils.security_scanner burp https://your-app  # Burp Pro REST API（启 Burp Pro + REST API + .env BURP_API_KEY）
 
 # 兼容（矩阵）
+
 pytest -m "compat and (p0 or p1)" -n 4
 
 # 弱网
+
 python -m utils.network_throttle apply 3g --mode tc       # 设置弱网
 pytest -m "weak_network" -v
 python -m utils.network_throttle clear                    # 清除
 
 # 稳定（Monkey）
+
 python -m utils.mobile_driver monkey --package <pkg> --events 10000
 
 # Soak（长时 24h）
+
 python -m utils.soak_runner --url https://api/health --hours 24 --pid <PID>
 
 # 混沌
+
 python -m utils.chaos_helper cpu --cores 4 --duration 60
 python -m utils.chaos_helper kill-pod payment-svc-xxx --ns prod-test
 python -m utils.chaos_helper block <TARGET_IP> --duration 30
-```
+
+```text
 
 ## 执行报告输出（向 test-lead 和 report-generator）
 
 ```json
+
 {
   "execution_summary": {
     "start_time": "2026-05-10T14:30:00",
@@ -340,4 +378,5 @@ python -m utils.chaos_helper block <TARGET_IP> --duration 30
     "html_report": "workspace/测试报告/{项目名}/jmeter-report/index.html"
   }
 }
-```
+
+```text

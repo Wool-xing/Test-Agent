@@ -13,12 +13,12 @@
 
 ### 推荐流程
 
-1. **GitHub Security Advisories**（推荐）
+1.**GitHub Security Advisories**（推荐）
    - 访问：[Security Advisories](https://github.com/Wool-xing/Test-Agent/security/advisories/new)
    - 私有提交，仅维护者可见
    - 修复后协调披露
 
-2. **邮件**（暂未公开专用邮箱）
+2.**邮件**（暂未公开专用邮箱）
    - 优先使用上方 GitHub Security Advisories 私密通道
    - 如需另行联系，请通过仓库 Issue 留言索取邮件地址（不要在 Issue 中粘贴漏洞细节）
    - 标题约定：`[SECURITY] 漏洞简述`
@@ -37,16 +37,17 @@
 
 本项目已内建：
 
-- ✅ **依赖 CVE 扫描**：`pip-audit` + `safety` 在 CI 自动跑
-- ✅ **Dependabot 周扫描**：每周一自动检测 + PR 升级
-- ✅ **敏感文档隔离**：`.gitignore` 排除归属源文档
-- ✅ **凭证保护**：
+- ✅**依赖 CVE 扫描**：`pip-audit` + `safety` 在 CI 自动跑
+- ✅**Dependabot 周扫描**：每周一自动检测 + PR 升级
+- ✅**敏感文档隔离**：`.gitignore` 排除归属源文档
+- ✅**凭证保护**：
   - `.env` 严禁提交（`.gitignore` 排除）
   - GitHub Secrets 加密存储
   - utils 中无硬编码凭证
-- ✅ **HTTPS-only**：所有 API 调用强制 TLS（utils.api_retry_util）
-- ✅ **SQL 注入防护**：utils.data_factory 用 SQLAlchemy ORM，禁拼字符串
-- ✅ **依赖 SAST**：bandit 扫 utils/ 自身代码
+
+- ✅**HTTPS-only**：所有 API 调用强制 TLS（utils.api_retry_util）
+- ✅**SQL 注入防护**：utils.data_factory 用 SQLAlchemy ORM，禁拼字符串
+- ✅**依赖 SAST**：bandit 扫 utils/ 自身代码
 
 ## 用户责任
 
@@ -77,9 +78,9 @@
 - [ ] 仅在**自己拥有 / 经书面授权**的系统上运行上述工具
 - [ ] 在 `tagent.yml` 显式设置 `pentest.authorized: true`(此为操作者自证授权,不构成第三方授权证明)
 - [ ] 遵守所在司法管辖区法律:
-  - **中国**:《刑法》§285-§287(非法侵入 / 破坏 / 非法控制计算机信息系统罪);《网络安全法》§27 / §63
-  - **美国**:Computer Fraud and Abuse Act(CFAA, 18 U.S.C. § 1030)
-  - **欧盟**:NIS2 Directive(EU 2022/2555)
+  -**中国**:《刑法》§285-§287(非法侵入 / 破坏 / 非法控制计算机信息系统罪);《网络安全法》§27 / §63
+  -**美国**:Computer Fraud and Abuse Act(CFAA, 18 U.S.C. § 1030)
+  -**欧盟**:NIS2 Directive(EU 2022/2555)
 
 **项目维护者免责**:本项目以 MIT License 提供"原样"代码。误用即攻击;由操作者承担**全部**法律责任,项目维护者不承担连带责任。
 

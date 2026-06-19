@@ -15,22 +15,24 @@ SKILL_IMPL_STATUS: production
 
 ## 流程
 
-1. **识别用户场景**:从最近 run / 当前 query 提取关键概念(`SQL injection` / `flaky test` / `slow regex` 等)
-2. **查 KB 13-build-your-own**:`tutor.theory_kb` 找匹配卡
-3. **筛选**:
+1.**识别用户场景**:从最近 run / 当前 query 提取关键概念(`SQL injection` / `flaky test` / `slow regex` 等)
+2.**查 KB 13-build-your-own**:`tutor.theory_kb` 找匹配卡
+3.**筛选**:
    - 若用户预算 `time_hours < 5` → 仅推荐 ≤10h 短卡
    - 若 ≥20h → 推荐 P0 深度卡
-4. **输出推荐 + 警告**:
+
+4.**输出推荐 + 警告**:
    ```
    🎓 你测的是 SQL injection,推荐 deep-dive:
-   
+
    ⭐ byox-database (30h) — 懂 parser → 知道注入点
    ⭐ byox-regex-engine (15h) — 懂 sanitize 边界
    ⚠️  时间投入 ≥30 小时;不是必经,但理解后**测得更狠**
-   
+
    要开始吗? (y/N)
    ```
-5. **跟进**:用户开始 → 记 `workspace/learning/byox_progress/{user}.json` 跟进度
+
+5.**跟进**:用户开始 → 记 `workspace/learning/byox_progress/{user}.json` 跟进度
 
 ## 场景 → 推荐速查表
 

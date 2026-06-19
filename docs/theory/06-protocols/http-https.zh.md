@@ -48,6 +48,7 @@ reading_en:
 Web/API 测试**必经协议**。Test-Agent `utils/api_retry_util.py` 提供 10/20/40s 指数退避;`runtime/mcp/protocol_adapter/adapters.py` 的 `HTTPAdapter` 直接可用。
 
 ## 必测维度
+
 | 维度 | 工具 |
 | ------ | ------ |
 | 状态码 | requests + assert |
@@ -59,4 +60,5 @@ Web/API 测试**必经协议**。Test-Agent `utils/api_retry_util.py` 提供 10/
 | 重试 | 指数退避(主宪章 §18-3 全栈 10/20/40s) |
 
 ## 为什么 Agent 默认调 HTTP?
+
 被测物 = Web/REST/GraphQL/Webhook/SOAP → 全部跑在 HTTP 之上;Agent 用 `runtime/mcp/protocol_adapter` 的 HTTP adapter 做协议层抽象。

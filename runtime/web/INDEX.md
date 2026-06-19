@@ -1,7 +1,7 @@
 # runtime/web 索引
 
 > Web UI for `runtime/api`. 4 页:Upload / Run Status / Report / Catalog。
-> 被测项级别 **L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。
+> 被测项级别**L2**(用户可见,必含功能+边界+异常+兼容+可访问性测试)。
 
 ## 技术栈
 
@@ -35,7 +35,8 @@ npm run build        # 产出 dist/
 npm run test         # Vitest
 npm run test:e2e     # Playwright
 npm run test:a11y    # axe-core 可访问性扫
-```
+
+```text
 
 ## API 端点对接
 

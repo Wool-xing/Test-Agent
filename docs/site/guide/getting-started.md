@@ -4,50 +4,63 @@ Test-Agent V2 is an AI-native testing framework that combines 16 specialized AI 
 
 ## Prerequisites
 
-- **Python** 3.10 or later
-- **Git** 2.30 or later
-- **pip** 23.0 or later
+-**Python**3.10 or later
+-**Git**2.30 or later
+-**pip**23.0 or later
 - An LLM API key (Claude, OpenAI, Gemini, DeepSeek, Qwen, or Ollama)
 
 ## Quick Install
 
 ```bash
 # Clone and bootstrap in one step
+
 git clone https://github.com/test-agent/test-agent.git
 cd test-agent
 python install.py
 
 # One-command bootstrap (Phase 6, #24)
+
 tagent bootstrap
-```
+
+```text
 
 The `tagent bootstrap` command checks your Python/Git/pip versions, generates a `.env` template, and validates your LLM key — collapsing what was a 15-step process into 3.
 
 ## Verify Installation
 
 ```bash
+
 # Health check
+
 tagent doctor
 
 # List available experts and skills
+
 tagent catalog
 
 # Run a self-test
+
 tagent selftest
-```
+
+```text
 
 ## Your First Test
 
 ```bash
+
 # Run the built-in demo workflow
+
 tagent demo
 
 # Plan a test from a PRD
+
 tagent plan "path/to/prd.md"
 
 # Execute the full pipeline
+
 tagent run "path/to/prd.md"
-```
+
+```text
 
 ## What's New in V2
 
@@ -71,10 +84,12 @@ A Tauri 2 desktop shell is available in `apps/desktop-v2/`. It provides:
 - API proxy to the local backend on port 8000
 
 ```bash
+
 cd apps/desktop-v2
 npm install
 npm run tauri:dev
-```
+
+```text
 
 ## Next Steps
 

@@ -23,7 +23,7 @@ reading_en: ["http://aosabook.org/en/500L/a-simple-web-server.html"]
 
 # 对测试工作
 
-- **并发测试**:懂事件循环 / 线程池 / async → 设计负载
-- **keep-alive**:测试 long-polling / SSE / 连接复用
-- **反向代理 / WAF**:理解 nginx 转发头 X-Forwarded-* 测注入
-- **TCP 半关闭**:理解 close vs shutdown → 测优雅关闭
+-**并发测试**:懂事件循环 / 线程池 / async → 设计负载
+-**keep-alive**:测试 long-polling / SSE / 连接复用
+-**反向代理 / WAF**:理解 nginx 转发头 X-Forwarded-* 测注入
+-**TCP 半关闭**:理解 close vs shutdown → 测优雅关闭

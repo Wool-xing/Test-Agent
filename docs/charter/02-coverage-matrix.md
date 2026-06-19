@@ -6,7 +6,7 @@
 
 ## 🌐 全链路覆盖矩阵（三视角）
 
-> ⚠️ **状态标记释义**：✅ = 定义/工具链已存在（含 utils + agent .md + skill .md），不保证已端到端真 LLM 验证。
+> ⚠️**状态标记释义**：✅ = 定义/工具链已存在（含 utils + agent .md + skill .md），不保证已端到端真 LLM 验证。
 > 完整实装状态见 [ROADMAP.md](../../ROADMAP.md) frontmatter `IMPL_STATUS`。
 
 ### 矩阵 A：产品形态覆盖
@@ -95,7 +95,8 @@
         E2E（10%）         ← Playwright/Appium，慢但必要
        /集成（20%）/        ← API + 服务间 + Mock
       /单元（70%）/         ← pytest + pytest-mock，秒级反馈
-```
+
+```text
 
 **总覆盖率 ~90%**（含闭环：Bug 多适配 + 多端通知 + CI/CD GitHub Actions/Jenkins + Dependabot）
 

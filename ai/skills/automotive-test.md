@@ -11,7 +11,8 @@ SKILL_IMPL_STATUS: production
 
 ```text
 /automotive-test [target] [--ecu <name>] [--asil A|B|C|D] [--scenarios <list>]
-```
+
+```text
 
 ## 流程
 

@@ -31,7 +31,8 @@ checks:
     rule: <自然语言 + 可机器化条件>
     evidence_required: [list of evidence types]
     references: [URLs / 标准条款]
-```
+
+```text
 
 ## 接入方式
 

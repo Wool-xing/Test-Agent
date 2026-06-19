@@ -24,7 +24,7 @@ reading_en: ["https://nlp.stanford.edu/IR-book/"]
 
 # 对测试工作
 
-- **RAG 测试**:理解检索召回率/精度 → 设计 Jaccard@k / nDCG eval
-- **混合检索**(本项目 §24):懂 BM25 + vector 才能融合 fork
-- **KB 测试**:本项目 docs/theory KB 检索质量评测
-- **gbrain 精髓** § 1.3 混合检索 4 路落地的理论基础
+-**RAG 测试**:理解检索召回率/精度 → 设计 Jaccard@k / nDCG eval
+-**混合检索**(本项目 §24):懂 BM25 + vector 才能融合 fork
+-**KB 测试**:本项目 docs/theory KB 检索质量评测
+-**gbrain 精髓**§ 1.3 混合检索 4 路落地的理论基础

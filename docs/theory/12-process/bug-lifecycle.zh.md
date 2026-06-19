@@ -33,14 +33,16 @@ related_to: [rca-5why-8d-fishbone, bug-tracker-adapters]
 
 # 缺陷生命周期
 
-Test-Agent **统一权威**:`utils/bug_severity_map.py` 跨 5 adapter(zentao/jira/github/linear/webhook)一致 1=P0/2=P1/3=P2/4=P3。
+Test-Agent**统一权威**:`utils/bug_severity_map.py` 跨 5 adapter(zentao/jira/github/linear/webhook)一致 1=P0/2=P1/3=P2/4=P3。
 
 ## 严重度 vs 优先级(必懂)
-- **严重度**:bug 技术影响(崩溃 vs 显示错位)
-- **优先级**:修复紧急度(老板用 vs 客户偶遇)
-- **两者独立**:可能"P3 优先级 + P0 严重度"(数据丢失但只影响 1% 用户)
+
+-**严重度**:bug 技术影响(崩溃 vs 显示错位)
+-**优先级**:修复紧急度(老板用 vs 客户偶遇)
+-**两者独立**:可能"P3 优先级 + P0 严重度"(数据丢失但只影响 1% 用户)
 
 ## RCA 标准方法(主宪章 §21 流程阶段 6)
+
 - 5Why:连问 5 个为什么
 - 8D:8 步纪律(团队+护栏+遏制+根因+永久解+预防)
 - Fishbone:鱼骨图分类(人/机/料/法/环/测)

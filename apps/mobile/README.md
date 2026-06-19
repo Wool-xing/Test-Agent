@@ -4,11 +4,12 @@ PWA + Capacitor mobile app for iOS and Android. Connects to a Test-Agent backend
 
 ## Architecture
 
-```
+```text
 Mobile App (Capacitor)
   └── Web UI (React PWA — runtime/web/)
         └── HTTP → Test-Agent Backend (FastAPI :8800)
-```
+
+```text
 
 ## Quick Start (Browser PWA)
 
@@ -19,25 +20,31 @@ Mobile App (Capacitor)
 ## Build for App Stores
 
 ```bash
+
 # 1. Install Capacitor
+
 cd mobile && npm install
 
 # 2. Build web UI
+
 npm run build
 
 # 3. Add platforms
+
 npx cap add ios
 npx cap add android
 
 # 4. Open in Xcode / Android Studio
+
 npx cap open ios      # → Xcode → Archive → App Store
 npx cap open android  # → Android Studio → Build → Play Store
-```
+
+```text
 
 ## App Store Requirements
 
-- **iOS**: Apple Developer account ($99/yr), Xcode 16+, macOS
-- **Android**: Google Play Console ($25 one-time), Android Studio
+-**iOS**: Apple Developer account ($99/yr), Xcode 16+, macOS
+-**Android**: Google Play Console ($25 one-time), Android Studio
 
 ## Compatibility
 

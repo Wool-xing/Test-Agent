@@ -25,7 +25,7 @@ reading_en: ["https://wyag.thb.lt/"]
 
 # 对测试工作
 
-- **测试基线对比**:懂 git tree / blob → 解析 diff 算回归影响
-- **CI 流水线**:懂 packfile / ref → 解决"checkout 慢"性能问题
-- **Flaky 追溯**:`git log -p` 配合 `git bisect` 找首次失败 commit
-- **测试报告归档**:用 git as KV store(存 history 报告)
+-**测试基线对比**:懂 git tree / blob → 解析 diff 算回归影响
+-**CI 流水线**:懂 packfile / ref → 解决"checkout 慢"性能问题
+-**Flaky 追溯**:`git log -p` 配合 `git bisect` 找首次失败 commit
+-**测试报告归档**:用 git as KV store(存 history 报告)

@@ -11,11 +11,13 @@ SKILL_IMPL_STATUS: script
 
 ```text
 /ai-test [子场景：model|drift|perf|fairness|llm]
-```
+
+```text
 
 ## 🔔 开测前准备清单（必看）
 
 ```text
+
 □ 推理服务 endpoint → AI_INFERENCE_URL
 □ LLM API URL + key → LLM_API_URL / LLM_API_KEY
 □ 黄金测试集 CSV（含 input + label 列）→ AI_GOLDEN_TEST_SET
@@ -23,7 +25,8 @@ SKILL_IMPL_STATUS: script
 □ 漂移基线数据（可选）→ AI_DRIFT_BASELINE
 □ 公平性测试集（含敏感属性列，如 gender / race）+ fairness_auditor.py 偏见审计
 □ LLM 测试用例 yaml → workspace/自动化脚本/python/ai/prompts/llm_eval_cases.yaml
-```
+
+```text
 
 ## 适用场景
 
@@ -35,21 +38,28 @@ SKILL_IMPL_STATUS: script
 ## 执行流程
 
 ```bash
+
 # 模型质量
+
 pytest -m "ai and model and p0" -v
 
 # 数据漂移
+
 pytest -m "ai and drift" -v
 
 # 推理性能
+
 pytest -m "ai and performance" -v
 
 # 公平性
+
 pytest -m "ai and fairness" -v
 
 # LLM 应用
+
 pytest -m "ai and llm" -v
-```
+
+```text
 
 ## 质量门禁（项目自定，默认参考）
 
@@ -65,9 +75,11 @@ pytest -m "ai and llm" -v
 ## 输出文件
 
 ```text
+
 workspace/测试报告/{项目名}/
 ├── ai-eval/
 ├── ai-drift/
 ├── ai-fairness/
 └── llm-cases/
-```
+
+```text

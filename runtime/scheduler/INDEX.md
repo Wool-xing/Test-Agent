@@ -12,10 +12,10 @@
 
 ## 规则
 
-- **运行时全 prompt 扫描**(非仅 create-time):skill 在 runtime 加载,恶意 skill 可携带注入
-- **文件锁防重入**:`workspace/cron/.tick.lock` 双栈实现
-- **输出可追溯**:`workspace/cron/output/{job_id}/{ts}.md`
-- **不静默崩**:扫描失败 → 落 `decisions/` + 输出 "job blocked"
+-**运行时全 prompt 扫描**(非仅 create-time):skill 在 runtime 加载,恶意 skill 可携带注入
+-**文件锁防重入**:`workspace/cron/.tick.lock` 双栈实现
+-**输出可追溯**:`workspace/cron/output/{job_id}/{ts}.md`
+-**不静默崩**:扫描失败 → 落 `decisions/` + 输出 "job blocked"
 
 ## 与现有运行时关系
 

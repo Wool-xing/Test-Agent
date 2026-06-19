@@ -34,24 +34,28 @@ class TestCaseTree:
     root: TestCaseNode
     version: str
     author: str
-```
+
+```text
 
 `testcase-designer` 专家 / `/testcase-design` skill 产此 IR,再 dispatch 到具体 exporter.
 
 ## CLI
 
 ```bash
+
 tagent export <plan.json> --format xmind --out workspace/测试用例/login.xmind
 tagent export <plan.json> --format markmap --out workspace/测试用例/login.md
 tagent export <plan.json> --format opml --out workspace/测试用例/login.opml
 tagent export <plan.json> --format all --out-dir workspace/测试用例/
-```
+
+```text
 
 `<plan.json>` 是 TestCaseTree 的 JSON 序列化(testcase-designer 输出).
 
 ## 扩展点(P1 / P2 留位)
 
 未来加(若用户需求):
+
 - `freemind`(.mm 老牌开源)
 - `plantuml`(文本驱动 mindmap)
 - `mermaid-mindmap`(Markdown 嵌入,GitHub 渲染)

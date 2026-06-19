@@ -11,18 +11,23 @@ npm install -g terminalizer
 terminalizer config            # 一次性,生成 ~/.terminalizer
 terminalizer record demo       # 开始录,Ctrl+D 停
 terminalizer render demo -o docs/assets/demo.gif --quality 60
-```
+
+```text
 
 ### B · asciinema + svg-term-cli(更轻量,SVG 嵌入更小)
 
 ```bash
+
 # 录
+
 asciinema rec docs/assets/demo.cast
 
 # 转 SVG(SVG 不是 GIF,但 GitHub README 也能渲染)
+
 npm install -g svg-term-cli
 cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
-```
+
+```text
 
 ### C · OBS + ffmpeg(最通用,体积大)
 
@@ -30,12 +35,13 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 
 ## 30 秒脚本(按此演)
 
-```
+```text
+
 [0s]   tagent --version
        v1.8.0
 
 [3s]   tagent run "测试 https://playwright.dev 首页+导航 → 验证标题+CTA 按钮" --mode learn
-       
+
 [6s]   Step 1/8: requirements-analyst
          ↳ 原因: 任何测试必先理解被测物;Web 系统先解析需求
          ↳ 理论: ISTQB Foundation §1.4 七原则·测试早介入
@@ -53,11 +59,12 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
          ↳ 生成 Allure 报告 → workspace/测试报告/{项目名}/
 
 [22s]  done: 8/8 ok · 报告 → http://localhost:5050
-       
+
 [25s]  打开 Allure 报告页面快闪一下
 
 [30s]  end
-```
+
+```text
 
 ## 风险
 
@@ -71,13 +78,18 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 ## 嵌入 README
 
 ```html
+
 <img src="docs/assets/demo.gif" alt="demo">
-```
+
+```text
 
 或 SVG(终端动画体积更小):
+
 ```html
+
 <img src="docs/assets/demo.svg" alt="demo">
-```
+
+```text
 
 ## Checkpoint
 

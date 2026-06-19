@@ -29,14 +29,15 @@ SKILL_IMPL_STATUS: production
 
 ```python
 class LoginPage:
-    def __init__(self, page):
+    def__init__(self, page):
         self.page = page
 
     def login(self, user, pwd):
         self.page.fill('input[name=email]', user)
         self.page.fill('input[name=password]', pwd)
         self.page.click('button[type=submit]')
-```
+
+```text
 
 ## 关键用户流必测(模板)
 

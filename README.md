@@ -1,6 +1,6 @@
 # 🤖 Test-Agent
 
-> **AI Testing Agent Framework · Open-Source · Multi-LLM · One-command deploy**
+>**AI Testing Agent Framework · Open-Source · Multi-LLM · One-command deploy**
 
 [![CI](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Wool-xing/Test-Agent/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org)
@@ -9,17 +9,17 @@
 [![Status: stable](https://img.shields.io/badge/status-brightgreen.svg)](VERSION)
 [![中文](https://img.shields.io/badge/Lang-中文-red.svg)](README.zh-CN.md)
 
-**English** | [简体中文](README.zh-CN.md)
+**English**| [简体中文](README.zh-CN.md)
 
 ---
 
-Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tested project** — autonomous from requirement parsing to PoC-validated bug reports, powered by 16 AI agents with a ManifestV2 single-source architecture.
+Test-Agent turns any software, EXE, APK, Docker image, or API into a**fully tested project**— autonomous from requirement parsing to PoC-validated bug reports, powered by 16 AI agents with a ManifestV2 single-source architecture.
 
-- **All-platform** — Web · API · Android · iOS · WeChat Mini Program · Windows · macOS · Linux · Automotive · IoT · AI/LLM · Blockchain
-- **All-protocol** — HTTP(S) · gRPC · WebSocket · TCP/UDP · GraphQL · MQTT · CAN-bus · Kafka · Modbus · …
-- **Multi-LLM no lock-in** — 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + OpenAI-compatible fallback for any provider, 3 env vars, zero code
-- **Learn while using** — `--mode learn` outputs theory references at every step (22 KB cards across 13 domains)
-- **Safe-by-default** — sandboxed exec · PII scrub · prompt-injection scan · hash-chain audit trail · SSO + RBAC
+-**All-platform**— Web · API · Android · iOS · WeChat Mini Program · Windows · macOS · Linux · Automotive · IoT · AI/LLM · Blockchain
+-**All-protocol**— HTTP(S) · gRPC · WebSocket · TCP/UDP · GraphQL · MQTT · CAN-bus · Kafka · Modbus · …
+-**Multi-LLM no lock-in**— 6 built-in (Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama) + OpenAI-compatible fallback for any provider, 3 env vars, zero code
+-**Learn while using**— `--mode learn` outputs theory references at every step (22 KB cards across 13 domains)
+-**Safe-by-default**— sandboxed exec · PII scrub · prompt-injection scan · hash-chain audit trail · SSO + RBAC
 
 ---
 
@@ -31,14 +31,17 @@ Test-Agent turns any software, EXE, APK, Docker image, or API into a **fully tes
 
 ```bash
 # Download install script
+
 curl -fsSL -o install.py https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py
 
 # Deploy to your project directory (any path works)
+
 python install.py D:\Test-Agent              # Windows example, any drive or folder
 python install.py ~/test-agent-project       # macOS / Linux example, any folder
-```
 
-> **Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell:
+```text
+
+>**Windows users**: if curl fails with `CRYPT_E_NO_REVOCATION_CHECK`, use PowerShell:
 > ```powershell
 > Invoke-WebRequest -Uri https://raw.githubusercontent.com/Wool-xing/Test-Agent/main/install.py -OutFile install.py
 > python install.py D:\Test-Agent   # example, any drive or folder works
@@ -66,22 +69,23 @@ No Python / Node / Docker required. Tauri 2 desktop — ~10MB binary, Windows/ma
 
 | Audience | Read |
 | ---------- | ------ |
-| **First-time user** | [Quick start](docs/getting-started/INDEX.md) → [Deploy](docs/getting-started/部署说明.md) |
-| **QA engineer** | [User manual](docs/getting-started/使用手册.md) → [Skill catalog](ai/skills/) |
-| **Architect / SRE** | [Architecture deep-dive](docs/charter/06-test-architecture.md) → [Runtime modules](runtime/INDEX.md) |
-| **Security researcher** | [Pentest expert](ai/agents/15-渗透测试.md) → [pentest-coordinator](ai/skills/pentest-coordinator.md) |
-| **Automotive tester** | [Automotive expert](ai/agents/16-车载测试.md) → [ASIL workflow](ai/skills/automotive-test.md) |
-| **Contributor** | [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](deploy/marketplace/INDEX.md) |
+|**First-time user**| [Quick start](docs/getting-started/INDEX.md) → [Deploy](docs/getting-started/部署说明.md) |
+|**QA engineer**| [User manual](docs/getting-started/使用手册.md) → [Skill catalog](ai/skills/) |
+|**Architect / SRE**| [Architecture deep-dive](docs/charter/06-test-architecture.md) → [Runtime modules](runtime/INDEX.md) |
+|**Security researcher**| [Pentest expert](ai/agents/15-渗透测试.md) → [pentest-coordinator](ai/skills/pentest-coordinator.md) |
+|**Automotive tester**| [Automotive expert](ai/agents/16-车载测试.md) → [ASIL workflow](ai/skills/automotive-test.md) |
+|**Contributor**| [CONTRIBUTING.md](CONTRIBUTING.md) → [Marketplace](deploy/marketplace/INDEX.md) |
 
 ## 📊 Coverage
 
-- **Product types**: Web · API · Mobile · Desktop · IoT · AI · Blockchain · Automotive · Embedded · Serverless
-- **Test types**: functional / performance / security / compatibility / weak-network / stability / accessibility / visual / i18n / chaos / mutation / AI-specific / compliance
-- **Quality gates**: 6 centralized gates (smoke / regression / performance / security / CI / release) with automated evaluation
+-**Product types**: Web · API · Mobile · Desktop · IoT · AI · Blockchain · Automotive · Embedded · Serverless
+-**Test types**: functional / performance / security / compatibility / weak-network / stability / accessibility / visual / i18n / chaos / mutation / AI-specific / compliance
+-**Quality gates**: 6 centralized gates (smoke / regression / performance / security / CI / release) with automated evaluation
 
 ## 📂 Project Structure
 
 ```text
+
 Test-Agent/
 ├── specs/              ← ManifestV2 单源真理（16 agents + 32 skills）
 ├── ai/                 ← AI 模式界面层（agents/ + skills/ .md 定义）
@@ -101,7 +105,8 @@ Test-Agent/
 ├── install.py          ← 跨平台一键部署
 ├── VERSION             ← 版本号单源
 └── README.md
-```
+
+```text
 
 See [FULL_GUIDE.md](FULL_GUIDE.md) and [CHANGELOG.md](CHANGELOG.md) for details.
 
@@ -119,4 +124,4 @@ MIT License — see [LICENSE](LICENSE). Upstream components retain their own lic
 
 ---
 
-> **Made for testers · Built with testers · Tested by testers**
+>**Made for testers · Built with testers · Tested by testers**

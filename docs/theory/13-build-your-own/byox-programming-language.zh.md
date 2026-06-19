@@ -23,8 +23,8 @@ reading_en: ["https://craftinginterpreters.com/"]
 
 # 对测试工作
 
-- **fuzz 测试**:懂 AST → 生成结构化随机输入(grammar-based fuzz)
-- **DSL 测试**:测试配置语言 / 业务规则引擎
-- **编译器 bug**:测试代码生成正确性(差分测试)
-- **解析器测试**:本项目 `runtime/router/schema.py` 用 Pydantic 解析 LLM JSON,理解 grammar 才能写好 schema
-- **§28 ECC agent-introspection-debugging** 调试 LLM 输出 = 解析 LLM 类自然语言"DSL"
+-**fuzz 测试**:懂 AST → 生成结构化随机输入(grammar-based fuzz)
+-**DSL 测试**:测试配置语言 / 业务规则引擎
+-**编译器 bug**:测试代码生成正确性(差分测试)
+-**解析器测试**:本项目 `runtime/router/schema.py` 用 Pydantic 解析 LLM JSON,理解 grammar 才能写好 schema
+-**§28 ECC agent-introspection-debugging**调试 LLM 输出 = 解析 LLM 类自然语言"DSL"

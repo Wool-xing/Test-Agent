@@ -30,8 +30,8 @@ reading_en: ["https://saminiir.com/lets-code-tcp-ip-stack-1/"]
 
 ## 对测试工作
 
-- **弱网模拟**:tc + netem 是黑盒;懂栈才知道哪里能注入丢包
-- **超时调优**:理解 RTO 计算 / 退避算法 → 调测试 timeout
-- **TIME_WAIT**:大并发后端口耗尽根因
-- **Nagle / Delayed ACK**:小包性能差根因
-- **TLS over TCP**:Handshake 慢的多种原因
+-**弱网模拟**:tc + netem 是黑盒;懂栈才知道哪里能注入丢包
+-**超时调优**:理解 RTO 计算 / 退避算法 → 调测试 timeout
+-**TIME_WAIT**:大并发后端口耗尽根因
+-**Nagle / Delayed ACK**:小包性能差根因
+-**TLS over TCP**:Handshake 慢的多种原因

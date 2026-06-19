@@ -14,7 +14,7 @@
 | `docs/` | 文档 | 知识库, 教程 | 历史快照 |
 | `workspace/` | 运行时产出 | 测试报告(全部gitignored) | 源码 |
 
-**核心规则：新增文件前先问——这属于哪一层？** 找不到答案就在issue里问。
+**核心规则：新增文件前先问——这属于哪一层？**找不到答案就在issue里问。
 
 ---
 
@@ -24,7 +24,7 @@
 2. 文件命名 `15-XXX.md`（按编号递增）
 3. 创建 `specs/agents/<name>/manifest.yaml`（参考已有 manifest 格式，schema 定义在 `specs/manifest.py`）
 4. 编写 system_prompt + output_schema
-5. **同步**：
+5.**同步**：
    - 运行 `python scripts/render_manifest.py --name <name>` 生成 AI Mode 用的 .md 文件
    - 更新 `specs/` 对应目录
    - 如 script-backed，添加 `script_path` 指向 utils/
@@ -44,7 +44,8 @@
    - 执行流程
    - 质量门禁
    - 输出文件
-5. **同步**：
+
+5.**同步**：
    - `ai/skills/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `docs/getting-started/使用手册.md` skill 详解段加描述
@@ -60,7 +61,7 @@
 2. 文件名小写下划线（如 `chaos_helper.py`）
 3. 顶部 docstring 标注被引用方
 4. 必含：公开 API + CLI（argparse）
-5. **同步**：
+5.**同步**：
    - `utils/README.md` 表格加一行
    - `00-项目导航.md` 对应分类加一行
    - `deploy/config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
@@ -75,6 +76,7 @@
 ## 添加新 marker
 
 `pytest.ini` markers 段加一行，**必须**：
+
 - 全小写下划线
 - 注释说明用途
 - 同步到 `00-项目导航.md` 维度表（如适用）
@@ -101,7 +103,8 @@ ci(actions): pip-audit 加 --strict
 refactor(skill): smoke-test 改并行 step
 test(utils): data_factory 加 cleanup 单测
 perf(jmeter): 减少不必要心跳
-```
+
+```text
 
 ---
 
@@ -115,6 +118,7 @@ perf(jmeter): 减少不必要心跳
    ruff check workspace/ utils/
    pip-audit -r requirements.txt --strict
    ```
+
 4. 提 PR → 等 Dependabot / CI 绿灯 → reviewer 审 → merge
 
 ---
@@ -122,13 +126,15 @@ perf(jmeter): 减少不必要心跳
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
+
 ls ai/agents/[0-9]*.md | wc -l   # 16（或 +N）
 ls ai/skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
-ls utils/*.py | wc -l         # 79（或 +N,含 __init__.py）
+ls utils/*.py | wc -l         # 79（或 +N,含__init__.py）
 grep -c "^    [a-z_]+:" deploy/config/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
-```
+
+```text
 
 ---
 
@@ -156,9 +162,11 @@ pytest --collect-only
 ### 提交前自检
 
 ```bash
+
 pre-commit run --all-files
 pytest --collect-only
-```
+
+```text
 
 ---
 
@@ -168,10 +176,10 @@ pytest --collect-only
 
 ### 缩写
 
-- **R** = Responsible（执行者，可多个）
-- **A** = Accountable（最终负责，每行只 1 个）
-- **C** = Consulted（被咨询）
-- **I** = Informed（被通报）
+-**R**= Responsible（执行者，可多个）
+-**A**= Accountable（最终负责，每行只 1 个）
+-**C**= Consulted（被咨询）
+-**I**= Informed（被通报）
 - 空 = 不参与
 
 ### 16 专家代号
@@ -234,7 +242,7 @@ pytest --collect-only
 | Bug 提交 BugTracker | A | I | I | I | I | I | C | R | C | I | I | I | I | I | I | I |
 | 报告生成 | A | I | I | I | I | I | C | C | R | I | I | I | I | I | I | I |
 | 多端通知 | A | I | I | I | I | I | I | I | R | I | I | I | I | I | I | I |
-| **上线决策** | **R/A** | C | C | I | I | C | C | C | C | I | I | I | I | I | I | I |
+|**上线决策**|**R/A**| C | C | I | I | C | C | C | C | I | I | I | I | I | I | I |
 
 ### 责任边界冲突解决
 

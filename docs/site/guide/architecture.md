@@ -4,7 +4,7 @@ Test-Agent V2 follows a dual-mode architecture with two independent execution pa
 
 ## High-Level Structure
 
-```
+```text
 ai/                         AI Mode (read-only agent definitions)
   agents/                   16 agent prompt definitions (.md)
   skills/                   32 skill workflow definitions (.md)
@@ -35,11 +35,13 @@ deploy/                     Install Materials
   config/                   .env templates, pytest.ini
   marketplace/              Entry-point plugin registry
   profiles/                 GDPR, HIPAA, SOC2 compliance templates
-```
+
+```text
 
 ## Execution Flow
 
-```
+```text
+
 User Input (NL / PRD / CLI)
        |
        v
@@ -55,7 +57,8 @@ User Input (NL / PRD / CLI)
        |
        v
    Report Generator + Dashboard
-```
+
+```text
 
 ## Key Modules
 
@@ -63,41 +66,46 @@ User Input (NL / PRD / CLI)
 
 The V2 router (`runtime/router/v2_router.py`) accepts natural language and maps it to the appropriate expert agent and skill workflow. It supports:
 
-- **Stub mode**: Offline matching without LLM calls (set `TAGENT_LLM_PROVIDER=stub`)
-- **Dispatch table**: 8-entry lookup replacing a 77-line if/elif chain
-- **Prompt construction**: `v2_prompt.py` builds context-aware prompts from skill docs
+-**Stub mode**: Offline matching without LLM calls (set `TAGENT_LLM_PROVIDER=stub`)
+-**Dispatch table**: 8-entry lookup replacing a 77-line if/elif chain
+-**Prompt construction**: `v2_prompt.py` builds context-aware prompts from skill docs
 
 ### Self-Healing Engine (Phase 3, #9-#13)
 
-- **Retry**: Exponential backoff (2^n seconds, 3 attempts) via `with_retry()`
-- **Locator**: Multi-attribute element location with fallback chains
-- **Circuit Breaker**: `MAX_FAILURES=3` halts execution to prevent cascading failures
-- **Progress Tracking**: DAG node-level progress with skipped/failed independent tracking
+-**Retry**: Exponential backoff (2^n seconds, 3 attempts) via `with_retry()`
+-**Locator**: Multi-attribute element location with fallback chains
+-**Circuit Breaker**: `MAX_FAILURES=3` halts execution to prevent cascading failures
+-**Progress Tracking**: DAG node-level progress with skipped/failed independent tracking
 
 ### Release Readiness (Phase 4, #15)
 
-```
+```text
+
 Score = smoke(0.4) + regression(0.3) + perf(0.2) + security(0.1)
 
 GREEN  >= 0.85  Ship it
 YELLOW >= 0.60  Review required
 RED    <  0.60  Blocked
-```
+
+```text
 
 ### Enterprise Features (Phase 5, #19-#23)
 
-- **RBAC**: 4 roles (admin/lead/tester/viewer) with `require_role()` decorator
-- **Audit**: JSONL append-only audit log with query interface
-- **Multi-tenancy**: Context-var based tenant propagation
-- **Hooks**: Before/after/on_error lifecycle hooks that don't interrupt execution
+-**RBAC**: 4 roles (admin/lead/tester/viewer) with `require_role()` decorator
+-**Audit**: JSONL append-only audit log with query interface
+-**Multi-tenancy**: Context-var based tenant propagation
+-**Hooks**: Before/after/on_error lifecycle hooks that don't interrupt execution
 
 ### Plugin System (Phase 8, #34)
 
 Third-party packages register via `importlib.metadata` entry points under the `tagent` group:
 
 ```python
+
 # In a plugin's pyproject.toml
+
 [project.entry-points.tagent]
 agents = "my_plugin.agents"
 skills = "my_plugin.skills"
-```
+
+```text

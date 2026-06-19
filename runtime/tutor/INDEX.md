@@ -14,8 +14,8 @@
 
 | 模式 | 输出 |
 | ------ | ------ |
-| **exec**(老手 / CI / 默认) | 每节点仅 `one_liner_zh`(≤30 字);可 `--silent` 完全静默 |
-| **learn**(新手 / 评审 / 教学) | 全套:why + theory_ref(KB 卡 id)+ alternatives + reading + L3 反馈按钮 |
+|**exec**(老手 / CI / 默认) | 每节点仅 `one_liner_zh`(≤30 字);可 `--silent` 完全静默 |
+|**learn**(新手 / 评审 / 教学) | 全套:why + theory_ref(KB 卡 id)+ alternatives + reading + L3 反馈按钮 |
 
 ## 反幻觉 3 层
 

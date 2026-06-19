@@ -45,16 +45,19 @@ reading_en:
 De facto Python testing standard. This project's `runtime/` uses pytest end-to-end; `config/pytest.ini` is preconfigured.
 
 ## Invocation in this project
+
 - Any `runtime/tests/test_*.py` → `pytest runtime/tests/`
 - E2E smoke: `runtime/tests/test_smoke_e2e.py`
 - Router accuracy: `runtime/tests/test_router_real.py`
 
 ## Core concepts
-- **fixture**: setup/teardown; `@pytest.fixture(scope="session"|"module"|"class"|"function")`
-- **parametrize**: one test, many inputs
-- **marker**: classify with `@pytest.mark.smoke / regression / slow`
-- **conftest.py**: auto-loaded fixture file
-- **plugin ecosystem**: `pytest-xdist` (parallel) / `pytest-cov` (coverage) / `pytest-bdd` (BDD) / `allure-pytest` (reports)
+
+-**fixture**: setup/teardown; `@pytest.fixture(scope="session"|"module"|"class"|"function")`
+-**parametrize**: one test, many inputs
+-**marker**: classify with `@pytest.mark.smoke / regression / slow`
+-**conftest.py**: auto-loaded fixture file
+-**plugin ecosystem**: `pytest-xdist` (parallel) / `pytest-cov` (coverage) / `pytest-bdd` (BDD) / `allure-pytest` (reports)
 
 ## Why does the Agent call pytest?
+
 Subject is a Python project → pytest is the first choice for unit+integration; outputs junit-xml feeding Allure; parallelize via xdist; retry flakes via rerunfailures.

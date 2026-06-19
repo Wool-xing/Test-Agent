@@ -18,13 +18,16 @@ paired_skills: [data-preparation]
 from data_factory import UserFactory, OrderFactory, TestDataManager, LOGIN_TEST_DATA
 
 # 单条
+
 user = UserFactory()                # 含 user_id/username/email/phone/real_name/password/role/status
 user = UserFactory(role="admin", status="active")
 
 # 批量
+
 users = [UserFactory() for _ in range(10)]
 
 # 持久化（DB 写入 + 自动追踪 cleanup）
+
 mgr = TestDataManager(env_config)
 user = mgr.create_test_user(role="admin")
 batch = mgr.create_batch_users(count=10)
@@ -32,10 +35,12 @@ order = mgr.create_test_order(user_id=user["user_id"])
 mgr.cleanup()                       # 反向逐条删除
 
 # 边界数据（含 expected_valid 标注）
+
 boundary = mgr.create_boundary_data("email")
 # [{"value": "valid@example.com", "expected_valid": True},
 #  {"value": "invalid-email",       "expected_valid": False}, ...]
-```
+
+```text
 
 > 注：`_insert_to_db` / `_delete_from_db` 默认基于 SQLAlchemy 通用反射实现；项目可继承 `TestDataManager` 覆写为定制 ORM/RAW SQL。
 
@@ -46,13 +51,15 @@ boundary = mgr.create_boundary_data("email")
 ### 3. 数据库快照（实验性）
 
 ```python
+
 # 数据库状态快照与对比（可选，仅适合具备主键 id 列的表）
+
 from sqlalchemy import create_engine, text
 
 ALLOWED_SNAPSHOT_TABLES = {"users", "orders", "payments"}  # 白名单防 SQL 注入
 
 class DBStateManager:
-    def __init__(self, engine):
+    def__init__(self, engine):
         self.engine = engine
         self.snapshots = {}
 
@@ -61,11 +68,13 @@ class DBStateManager:
             if t not in ALLOWED_SNAPSHOT_TABLES:
                 raise ValueError(f"表 {t} 不在快照白名单")
         # 实现略：对每个白名单表执行 count + checksum
-```
+
+```text
 
 ### 4. 敏感数据脱敏（实现位于 utils/data_masking.py）
 
 ```python
+
 from data_masking import DataMasker
 
 DataMasker.mask_phone("13800138000")   # → 138****8000
@@ -74,30 +83,38 @@ DataMasker.mask_id_card("...")
 DataMasker.mask_bank_card("...")
 
 # 字典递归脱敏（用于日志输出）
+
 masked = DataMasker.mask_dict({"username": "alice", "password": "S3cret",
                                 "phone": "13800138000"})
-```
+
+```text
 
 ### 5. JMeter 参数化 CSV（实现位于 utils/jmeter_csv_exporter.py）
 
 ```python
+
 from jmeter_csv_exporter import generate_jmeter_dataset
 
 # 生成 50 条 JMeter 用户数据
+
 generate_jmeter_dataset(count=50, output_path="workspace/测试数据/jmeter_users.csv")
-```
+
+```text
 
 输出 CSV 示例：
 
 ```csv
+
 username,password,user_id
 test_user_a3f2,Test@123456,xxxx-xxxx-xxxx-xxxx
 test_user_b9k7,Test@123456,xxxx-xxxx-xxxx-xxxx
-```
+
+```text
 
 ### 6. 测试数据落盘（供 conftest fixture 消费）
 
 ```python
+
 import json
 from pathlib import Path
 
@@ -109,10 +126,12 @@ data = {
 }
 
 # 路径权威：测试数据/test_data.json（无日期，conftest 直接消费）
+
 out = Path("workspace/测试数据/test_data.json")
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-```
+
+```text
 
 > conftest.py `test_data` fixture 优先读取此文件。无则调用 data_factory 兜底。
 
@@ -137,16 +156,18 @@ out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 调用前确认：
 
 ```text
+
 □ env-manager 已通过基础 connectivity（DB/Redis 可达）
 □ .env 已填 TEST_DB_USER / TEST_DB_PASSWORD / TEST_DB_NAME
 □ utils/data_factory.py 部署到 utils/（install.py 已自动）
 □ 业务表 schema 已就绪（_insert_to_db 默认走 SQLAlchemy 反射）
 □ 性能场景需指定并发数（用于 generate_jmeter_dataset count 参数）
 □ 含敏感数据时启用 DataMasker.mask_dict（.env 配置无）
-```
+
+```text
 
 ## 协作输出
 
-- **automation-engineer**：`workspace/测试数据/test_data.json`（conftest fixture 自动加载）
-- **jmeter-script-gen**：`workspace/测试数据/jmeter_users.csv`
-- **test-executor**：清理报告
+-**automation-engineer**：`workspace/测试数据/test_data.json`（conftest fixture 自动加载）
+-**jmeter-script-gen**：`workspace/测试数据/jmeter_users.csv`
+-**test-executor**：清理报告

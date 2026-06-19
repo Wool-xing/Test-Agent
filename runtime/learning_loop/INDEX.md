@@ -5,11 +5,11 @@
 
 ## 不变量(与 hermes 同源)
 
-- **只动 agent-created skill**(不动 agents/skills已有)
-- **绝不自动删,只归档**(`workspace/learning/archive/`)
-- **Pinned skill 绕过所有自动**
-- **用 auxiliary client**(`runtime/subagent/aux_client`)
-- **不污染主 session prompt cache**
+-**只动 agent-created skill**(不动 agents/skills已有)
+-**绝不自动删,只归档**(`workspace/learning/archive/`)
+-**Pinned skill 绕过所有自动**
+-**用 auxiliary client**(`runtime/subagent/aux_client`)
+-**不污染主 session prompt cache**
 
 ## 文件清单
 
@@ -22,10 +22,11 @@
 
 ## 与 darwin-skill 协作
 
-```
+```text
 learning_loop/curator   (协调:何时跑+谁来跑)
         ↓ 触发
 darwin-skill/SKILL.md   (执行:8 维评分+棘轮)
         ↓ 落
 workspace/测试报告/{项目名}/skill-evolution/results.tsv
-```
+
+```text

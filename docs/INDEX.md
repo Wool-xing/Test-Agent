@@ -8,7 +8,7 @@
 | -------------- | ------ | -------- |
 | `STYLE.md` | 全仓 Markdown 样式约定(标题/加粗/列表/表格/代码块/链接/emoji/命名/中英混排) | 写文档前必看一次 |
 | `SURVEY.md` | 12 题用户调研模板(NPS + skill 使用率) | 想发用户问卷时 |
-| `theory/` | **教学层 KB 13 大类** · `01-tools` ~ `13-build-your-own` | learn mode 推荐路径 |
+| `theory/` |**教学层 KB 13 大类**· `01-tools` ~ `13-build-your-own` | learn mode 推荐路径 |
 | `charter/` | 愿景文档 7 子文件(vision-dimensions / coverage-matrix / agentchat-protocol / skills-bugtracker / install-deploy / test-architecture / runtime-license) | 项目设计原理深读 |
 | `case-studies/` | 实施 case study(timeline + 决策 + metrics + 教训) | 想看真实项目演进决策 |
 | `assets/` | 演示素材 · `demo.recipe.md`(30 秒 demo 录制脚本)+ `terminalizer-config.yml` | 录演示视频时 |

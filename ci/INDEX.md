@@ -7,8 +7,8 @@
 | 文件 | 用途 | 角色 |
 | ------ | ------ | ------ |
 | [CICD集成说明.md](CICD集成说明.md) | GitHub Actions + Jenkins 双流水线说明 + Secrets 清单 + 门禁 + 常见 Q&A | 阅读入口 |
-| [github-actions-test.yml](github-actions-test.yml) | **用户分发模板**：部署到 `<PROJECT_ROOT>/.github/workflows/test.yml` 跑业务测试 | 模板 |
-| [jenkins-pipeline.groovy](jenkins-pipeline.groovy) | **用户分发模板**：部署到 `<PROJECT_ROOT>/Jenkinsfile` 跑业务测试 | 模板 |
+| [github-actions-test.yml](github-actions-test.yml) |**用户分发模板**：部署到 `<PROJECT_ROOT>/.github/workflows/test.yml` 跑业务测试 | 模板 |
+| [jenkins-pipeline.groovy](jenkins-pipeline.groovy) |**用户分发模板**：部署到 `<PROJECT_ROOT>/Jenkinsfile` 跑业务测试 | 模板 |
 
 ## 重要：双轨 CI 区分
 
@@ -16,10 +16,10 @@
 
 | 配置位置 | 用途 | 谁跑 |
 | --------- | ------ | ----- |
-| `.github/workflows/ci.yml` | **本仓库自身 CI**：Ruff / 模板自检 / 文件统计 / 敏感文件防护 / 链接校验 | GitHub Actions（本 repo） |
-| `.github/workflows/codeql.yml` | **本仓库自身 CodeQL**：python + actions 安全扫描 | GitHub Actions（本 repo） |
-| `ci/github-actions-test.yml` | **用户分发模板**：用户 fork/部署后跑业务测试 | 用户自己的 repo |
-| `ci/jenkins-pipeline.groovy` | **用户分发模板**：Jenkins 流水线 | 用户自己的 Jenkins |
+| `.github/workflows/ci.yml` |**本仓库自身 CI**：Ruff / 模板自检 / 文件统计 / 敏感文件防护 / 链接校验 | GitHub Actions（本 repo） |
+| `.github/workflows/codeql.yml` |**本仓库自身 CodeQL**：python + actions 安全扫描 | GitHub Actions（本 repo） |
+| `ci/github-actions-test.yml` |**用户分发模板**：用户 fork/部署后跑业务测试 | 用户自己的 repo |
+| `ci/jenkins-pipeline.groovy` |**用户分发模板**：Jenkins 流水线 | 用户自己的 Jenkins |
 
 > install.py 在部署时把 `ci/github-actions-test.yml` 拷贝到 `<PROJECT_ROOT>/.github/workflows/test.yml`，把 `jenkins-pipeline.groovy` 拷贝到 `<PROJECT_ROOT>/Jenkinsfile`。
 
@@ -36,7 +36,8 @@
 │ 5. performance-test  →  JMeter 双模式（ci_quick / full）  │
 │ 6. publish + quality-gate + notify  →  多端 webhook       │
 └──────────────────────────────────────────────────────────┘
-```
+
+```text
 
 详见 [CICD集成说明.md](CICD集成说明.md)。
 

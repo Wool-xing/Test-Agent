@@ -18,10 +18,10 @@
 | 配置文件 | 部署后落地位置 | 是否覆盖用户修改 |
 | --------- | --------------- | ---------------- |
 | `conftest.py` | `<PROJECT_ROOT>/conftest.py` | 升级时**覆盖**（用户自定义请抽到 `tests/conftest_user.py`） |
-| `pytest.ini` | `<PROJECT_ROOT>/pytest.ini` | 升级时**覆盖** |
-| `.env.example` | `<PROJECT_ROOT>/.env`（首次部署，已存在则跳过） | **不覆盖** |
-| `.mcp.json` | `<PROJECT_ROOT>/.mcp.json` | 升级时**覆盖** |
-| `requirements.txt` | `<PROJECT_ROOT>/requirements.txt` | 升级时**覆盖** |
+| `pytest.ini` | `<PROJECT_ROOT>/pytest.ini` | 升级时**覆盖**|
+| `.env.example` | `<PROJECT_ROOT>/.env`（首次部署，已存在则跳过） |**不覆盖**|
+| `.mcp.json` | `<PROJECT_ROOT>/.mcp.json` | 升级时**覆盖**|
+| `requirements.txt` | `<PROJECT_ROOT>/requirements.txt` | 升级时**覆盖**|
 
 ## 必读：用户责任
 
@@ -44,8 +44,10 @@
 
 ```bash
 # 验证配置完整
+
 test -f .env && echo "✅" || echo "❌ .env 缺失"
 test -f .mcp.json && echo "✅"
 pytest --collect-only         # 应能收集（即使无用例）
 python -c "from conftest import get_current_env; print(get_current_env())"
-```
+
+```text

@@ -23,7 +23,7 @@ reading_en: ["https://swtch.com/~rsc/regexp/regexp1.html"]
 
 # 对测试工作
 
-- **ReDoS 攻击**(OWASP API4):懂 backtracking 才能识别 vulnerable regex
-- **fuzz 用例**:懂 regex → 写更精准的 invalid 输入生成器
-- **log parser 测试**:测大日志解析性能;NFA vs backtracking 差几个数量级
-- **OWASP A03 Injection**:正则参与 sanitize 时不安全的 escape
+-**ReDoS 攻击**(OWASP API4):懂 backtracking 才能识别 vulnerable regex
+-**fuzz 用例**:懂 regex → 写更精准的 invalid 输入生成器
+-**log parser 测试**:测大日志解析性能;NFA vs backtracking 差几个数量级
+-**OWASP A03 Injection**:正则参与 sanitize 时不安全的 escape

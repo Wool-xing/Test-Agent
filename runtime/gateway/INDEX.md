@@ -1,6 +1,6 @@
 # gateway 索引
 
-> 单 gateway 进程多平台,Agent **不绑笔记本**。
+> 单 gateway 进程多平台,Agent**不绑笔记本**。
 
 ## 平台清单(M3-5 起步 8 平台,可扩到 20+)
 
@@ -30,7 +30,7 @@ Webhook 端点: `runtime/api/endpoints/webhooks.py` (Telegram / Discord / 飞书
 
 ## 规则
 
-- **单 session 跨平台**:用户在 Telegram 开话题,Slack 续话不丢上下文
-- **统一 base 抽象**:`Platform` 接口,所有平台实现 `send` / `configure`
-- **运行时 prompt 注入扫**(继承 scheduler 同模块)
-- **delivery 走 scheduler**:cron 任务输出 → 推送对应平台
+-**单 session 跨平台**:用户在 Telegram 开话题,Slack 续话不丢上下文
+-**统一 base 抽象**:`Platform` 接口,所有平台实现 `send` / `configure`
+-**运行时 prompt 注入扫**(继承 scheduler 同模块)
+-**delivery 走 scheduler**:cron 任务输出 → 推送对应平台

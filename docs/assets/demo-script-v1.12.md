@@ -29,52 +29,65 @@
 # pip install -e .   # 0.5s 一闪而过
 
 # Step 2 · 一键初始化(主秀)
+
 tagent init --preset 国内-web --out . --overwrite
 
 # Step 3 · 看启动指南
+
 cat STARTUP.md | head -30
 
 # Step 4 · 健康检查(秒过)
+
 tagent doctor --agents
 
 # Step 5 · 跑 demo(V1.13 加 · 全 stub LLM 0 成本)
+
 tagent demo
 
 # Step 6 · 看产物(树形)
+
 ls -la workspace/测试用例/ workspace/测试报告/{项目名}/
-```
+
+```text
 
 ---
 
 ## Terminalizer 录制流程
 
 ```bash
+
 # 1. 装(macOS / Linux / Windows-WSL)
+
 npm install -g terminalizer
 
 # 2. 录制(用 docs/assets/terminalizer-config.yml 配置)
+
 terminalizer record demo --config docs/assets/terminalizer-config.yml
 
 # 3. 跑上面 Step 2-6 命令(节奏:每条等输出完再敲下条)
 
 # 4. 渲染成 gif
+
 terminalizer render demo --output docs/assets/demo.gif
 
 # 5. 或导出 mp4(更小)
+
 terminalizer render demo --output docs/assets/demo.mp4 --quality 80
-```
+
+```text
 
 ---
 
 ## OBS 屏幕录制(若用真窗口而非纯终端)
 
-1. **场景**:终端 + 浏览器并排
-2. **左屏**(终端):跑 Step 2-6
-3. **右屏**(浏览器):
+1.**场景**:终端 + 浏览器并排
+2.**左屏**(终端):跑 Step 2-6
+3.**右屏**(浏览器):
    - 6-14s 切到 GitHub Repo 页(显示 star 计数)
    - 18-25s 打开生成的 `.xmind` 文件(XMind 客户端)或 `.md` 文件(markmap.js 网页渲染)
-4. **录制设置**:1080p / 30fps / H.264 / 码率 6000kbps
-5. **后期**:加 0.5s 淡入淡出 + 底栏字幕(`项目网址 + ⭐ Star`)
+
+4.**录制设置**:1080p / 30fps / H.264 / 码率 6000kbps
+5.**后期**:加 0.5s 淡入淡出 + 底栏字幕(`项目网址 + ⭐ Star`)
 
 ---
 
