@@ -47,7 +47,7 @@ class BugTrackerBase(ABC):
         ...
 
 
-TRACKER_REGISTRY: dict[str, type[BugTrackerBase]] = {}
+TRACKER_REGISTRY: dict[str, type] = {}
 
 try:
     from utils.trackers.zentao_bug_manager import ZentaoBugManager
