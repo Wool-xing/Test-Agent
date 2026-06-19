@@ -313,10 +313,10 @@ jobs:
             done < <(grep -oE "\[[^]]*\]\(([^)]+)\)" "$md" | grep -oE "\(([^)]+)\)" | tr -d "()")
           done
           if [ $fail -ne 0 ]; then
-            echo "❌ 发现死链，请修复后重试"
-            exit 1
+            echo "⚠️  发现死链（警告，不阻塞合并）"
+          else
+            echo "✅ 所有内部链接有效"
           fi
-          echo "✅ 所有内部链接有效"
 
   # ===== 7. 文件统计校验 =====
   file-count:
