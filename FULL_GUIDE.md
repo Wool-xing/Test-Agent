@@ -8,7 +8,7 @@
 **当前阶段**：V2.0.0 · 16 expert · 32/32 skill · ManifestV2 单源真理架构
 **版本**：V2.0.0（详见 [VERSION](VERSION) + [CHANGELOG.md](CHANGELOG.md)）
 **更新日期**：2026-06-04
-**模型**：支持 Claude / OpenAI / Gemini / Qwen / DeepSeek / Ollama 等 100+ provider（通过 LiteLLM），本地模型可在 Claude Code / Codex / OpenCode / Cursor / Gemini CLI 中运行
+**模型**：100+ LLM provider（通过 LiteLLM），支持本地模型。AI 模式运行在任何支持 AGENTS.md / SKILL.md 标准的工具中
 
 ---
 

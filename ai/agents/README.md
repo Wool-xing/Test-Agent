@@ -81,7 +81,7 @@ tools: Read, Write, Bash, Grep, Glob   # 按需添加 Edit
 ```
 
 `name` 是 agent ID，被 test-lead 用 SendMessage 调用 / `.claude/agents/` 加载。
-`description` 决定 AI 工具（Claude Code / Codex / OpenCode / Cursor）何时主动调用此 agent（关键词匹配）。
+`description` 决定 AI 工具何时主动调用此 agent（关键词匹配）。
 
 ---
 
