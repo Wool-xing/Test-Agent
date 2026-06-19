@@ -7,9 +7,15 @@ import json
 from fastapi.testclient import TestClient
 
 from runtime.api.main import app
+from runtime.config.settings import get_settings
 from runtime.marketplace.catalog import Entry, save_local
 
-client = TestClient(app)
+_settings = get_settings()
+_auth_headers = {}
+if _settings.api_auth_token:
+    _auth_headers["Authorization"] = f"Bearer {_settings.api_auth_token}"
+
+client = TestClient(app, headers=_auth_headers)
 
 
 def _seed_registry(entries: list[Entry], monkeypatch) -> None:
