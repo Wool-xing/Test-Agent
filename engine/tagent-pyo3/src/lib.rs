@@ -1,14 +1,14 @@
 use pyo3::prelude::*;
 
-use tagent_engine::orchestrator::ExecNode;
-use tagent_engine::sandbox::{PlatformSandbox, SandboxConfig};
+use ::tagent_engine::orchestrator::ExecNode;
+use ::tagent_engine::sandbox::{PlatformSandbox, SandboxConfig};
 
 // ---------------------------------------------------------------------------
 // Python-facing sandbox wrappers
 // ---------------------------------------------------------------------------
 
 /// Python-exposed sandbox configuration.
-#[pyclass(name = "SandboxConfig")]
+#[pyclass(name = "SandboxConfig", skip_from_py_object)]
 #[derive(Clone)]
 struct PySandboxConfig {
     inner: SandboxConfig,
@@ -90,7 +90,7 @@ impl PyPlatformSandbox {
 // ---------------------------------------------------------------------------
 
 /// Python-exposed execution node.
-#[pyclass(name = "ExecNode")]
+#[pyclass(name = "ExecNode", skip_from_py_object)]
 #[derive(Clone)]
 struct PyExecNode {
     inner: ExecNode,
