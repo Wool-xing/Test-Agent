@@ -293,7 +293,7 @@ jobs:
       - name: 检查内部链接
         run: |
           fail=0
-          for md in $(find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./workspace/*" -not -path "./examples/*" -not -path "./deploy/*" -not -path "./graphify-out/*" -not -path "./__pycache__/*"); do
+          for md in $(find . -name "*.md" -not -path "*/node_modules/*" -not -path "./.git/*" -not -path "./workspace/*" -not -path "./graphify-out/*" -not -path "./__pycache__/*"); do
             # 提取 markdown 内部链接 [...](xxx.md) 形式
             # 使用 process substitution 避免 pipe subshell 吞掉 fail=1
             while read link; do
@@ -313,10 +313,10 @@ jobs:
             done < <(grep -oE "\[[^]]*\]\(([^)]+)\)" "$md" | grep -oE "\(([^)]+)\)" | tr -d "()")
           done
           if [ $fail -ne 0 ]; then
-            echo "⚠️  发现死链（警告，不阻塞合并）"
-          else
-            echo "✅ 所有内部链接有效"
+            echo "❌ 发现死链，请修复后重试"
+            exit 1
           fi
+          echo "✅ 所有内部链接有效"
 
   # ===== 7. 文件统计校验 =====
   file-count:
