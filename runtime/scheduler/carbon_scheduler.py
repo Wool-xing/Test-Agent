@@ -120,9 +120,16 @@ def get_optimal_windows(region: str = "", hours_ahead: int = 24,
                         level = "moderate"
                     else:
                         level = "high"
+                    # Parse ISO datetime string to float timestamp
+                    dt_str = entry.get("datetime", "")
+                    try:
+                        from datetime import datetime as _dt
+                        ts = _dt.fromisoformat(dt_str.replace("Z", "+00:00")).timestamp()
+                    except (ValueError, TypeError):
+                        ts = now
                     windows.append(CarbonWindow(
-                        start=entry.get("datetime", ""),
-                        end=entry.get("datetime", ""),
+                        start=ts,
+                        end=ts,
                         intensity_gco2_per_kwh=intensity,
                         level=level,
                     ))
