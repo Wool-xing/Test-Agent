@@ -9,6 +9,52 @@
 
 ---
 
+## [2.0.0] — 2026-06-19
+
+### Added
+
+
+- ManifestV2 Pydantic schema — single source of truth for all 16 agents + 32 skills
+- V1→V2 migration script (`scripts/migrate_to_v2.py`)
+- Manifest→Markdown renderer (`scripts/render_manifest.py`, roundtrip verified)
+- Quality gate centralization (6 gates in `specs/gates/`, GateRegistry with evaluate engine)
+- Plugin SDK v1 (`tagent plugin new|validate|install|list|uninstall`)
+- Rust engine scaffold (`engine/`, tagent-engine + tagent-pyo3, 23 tests)
+- ExecutionContext — thread-safe replacement for global `_upstream_outputs`
+- Intent Router v2 — shared AI/CLI routing with ManifestV2 catalog + keyword fallback
+- Rust DAG executor with topological sort + parallel execution
+- Platform sandbox abstraction (Linux Landlock / macOS Seatbelt / Windows Job Object)
+- SessionStore (SQLite+FTS5) with cross-session learning loop
+- PatternExtractor + 7-day Curator agent for automatic skill creation
+- ImpactEngine — KG-driven blast radius analysis (real graph query)
+- Flaky test auto-quarantine with graph-based root cause analysis
+- KG dashboard REST API (5 endpoints: stats, community, path, neighbors, search)
+- SSO integration (OIDC/SAML) + RBAC (4 roles, 7 permissions)
+- Audit trail with SHA-256 hash chain (tamper-evident)
+- Multi-tenant data isolation
+- Marketplace Web UI (React, 4 API endpoints)
+- Tauri 2 desktop shell (replaces Electron)
+- VitePress documentation site (5 pages)
+- 18-job GitHub Actions CI pipeline with 3-platform matrix
+
+### Changed
+- VERSION → V2.0.0 (single source, read via `runtime.__version__`)
+- All agent/skill definitions migrated from .md frontmatter to `specs/*/manifest.yaml`
+- CONTRIBUTING.md updated for V2 manifest-driven workflow
+
+### Removed
+- All charter/§/hermes/gbrain ornamental markers from code comments
+- All V1.x rollout history stamps from docstrings
+- Global `_upstream_outputs` (replaced by ExecutionContext)
+
+### Verified
+- 238 tests passing (179 V2 + 59 existing, 0 regressions)
+- Real E2E pipeline: PRD → Route(5 nodes) → DAG → Execute → Gate → Audit
+- Marketplace UI build: 753ms
+- All 48 manifests load and validate
+
+---
+
 ## [Unreleased]
 
 ### Added
