@@ -33,17 +33,18 @@ deploy/
 │   _safety_policy.yaml      ← Safety policy for marketplace
 │
 └── profiles/                ← Compliance profiles
-    gdpr.yaml                ← GDPR compliance
-    hipaa.yaml               ← HIPAA compliance
-    soc2.yaml                ← SOC 2 compliance
-    pci-dss.yaml             ← PCI DSS compliance
-    ccpa.yaml                ← CCPA compliance
-    pipl.yaml                ← PIPL (China) compliance
-    iso-26262.yaml           ← ISO 26262 (automotive)
-    iec-62304.yaml           ← IEC 62304 (medical)
-    iec-61508.yaml           ← IEC 61508 (industrial)
-    do-178c.yaml             ← DO-178C (aviation)
-    INDEX.md                 ← Profiles overview
+    └── compliance/           ← All profiles live here
+        gdpr.yaml            ← GDPR compliance
+        hipaa.yaml           ← HIPAA compliance
+        soc2.yaml            ← SOC 2 compliance
+        pci-dss.yaml         ← PCI DSS compliance
+        ccpa.yaml            ← CCPA compliance
+        pipl.yaml            ← PIPL (China) compliance
+        iso-26262.yaml       ← ISO 26262 (automotive)
+        iec-62304.yaml       ← IEC 62304 (medical)
+        iec-61508.yaml       ← IEC 61508 (industrial)
+        do-178c.yaml         ← DO-178C (aviation)
+        INDEX.md             ← Profiles overview
 
 ```text
 
@@ -72,4 +73,4 @@ deploy/
 
 1. Add file to `deploy/config/`
 2. Update `install.py` copy_config() if needed
-3. Document in `deploy/config/` README
+3. Document in `deploy/config/INDEX.md`
