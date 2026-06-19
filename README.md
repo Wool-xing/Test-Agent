@@ -83,18 +83,23 @@ No Python / Node / Docker required. Tauri 2 desktop — ~10MB binary, Windows/ma
 
 ```text
 Test-Agent/
-├── specs/              ← ManifestV2 single source of truth (16 agents + 32 skills)
-├── agents/             ← Agent definitions (AI mode)
-├── skills/             ← 32 business skills + 3 meta-skills
-├── utils/              ← 92 production utils (pytest · Playwright · JMeter · Appium · …)
-├── runtime/            ← runtime engine (router · orchestrator · MCP · learning · intelligence)
-├── engine/             ← Rust core (DAG executor · sandbox · PyO3 bridge)
-├── sdk/                ← Plugin SDK (scaffold · validate · install)
-├── apps/desktop-v2/    ← Tauri 2 desktop app
-├── docs/site/          ← VitePress documentation
-├── config/             ← conftest / pytest.ini / .mcp.json
-├── ci/                 ← GitHub Actions (18 jobs, 3-platform matrix)
-├── install.py          ← one-command cross-platform deploy
+├── specs/              ← ManifestV2 单源真理（16 agents + 32 skills）
+├── ai/                 ← AI 模式界面层（agents/ + skills/ .md 定义）
+├── runtime/            ← Python 运行时引擎（router · orchestrator · MCP · learning · intelligence）
+├── engine/             ← Rust 核心（DAG executor · sandbox · PyO3 bridge）
+├── utils/              ← 92 共享工具（12 子目录，双模式共用）
+├── sdk/                ← Plugin SDK（scaffold · validate · install）
+├── apps/               ← 分发应用（desktop-v2: Tauri, desktop: Electron, mobile: Capacitor）
+├── deploy/             ← 部署物料（config 模板 · profiles 合规 · marketplace）
+├── docs/               ← 文档（getting-started · charter · theory · site: VitePress）
+├── ci/                 ← CI/CD（GitHub Actions 18 jobs · Jenkins）
+├── scripts/            ← 开发脚本（迁移 · 渲染 · 一致性检查）
+├── examples/           ← 示例 PRD + demo 项目
+├── graphify-out/       ← 知识图谱输出（5,388 节点 · 8,902 边）
+├── requirements/       ← Python 依赖
+├── workspace/          ← 运行时产出（测试报告 · 决策日志）
+├── install.py          ← 跨平台一键部署
+├── VERSION             ← 版本号单源
 └── README.md
 ```
 
