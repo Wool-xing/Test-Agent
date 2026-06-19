@@ -47,12 +47,19 @@ _start_time: float = 0.0
 _cmd_history: list[str] = []  # last 10 user commands for /N quick re-run
 _BUILTIN_MAP: dict = {}
 
-_PROMPT_STYLE = Style.from_dict({
-    "prompt": "bold cyan",
-    "separator": "#888888",
-    "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
-    "bottom-toolbar.separator": "#444444",
-})
+def _get_prompt_style() -> Style:
+    """Build prompt_toolkit Style from active skin's colors (dynamic, not hardcoded)."""
+    try:
+        from runtime.cli.colorscheme import get_colorscheme
+        return get_colorscheme().pt_style()
+    except Exception:
+        return Style.from_dict({
+            "prompt": "bold cyan",
+            "separator": "#888888",
+            "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
+            "bottom-toolbar.separator": "#444444",
+        })
+
 
 # Key bindings: Ctrl+D exits, Alt+Enter inserts newline for multi-line input
 _kb = KeyBindings()
@@ -68,6 +75,13 @@ def _insert_newline(event):
 def _ctrl_d_exit(event):
     """Ctrl+D: exit REPL."""
     event.app.exit(result=None)
+
+
+@_kb.add("c-l")
+def _redraw_screen(event):
+    """Ctrl+L: clear and redraw screen (standard terminal behavior)."""
+    event.app.renderer.clear()
+    event.app.invalidate()
 
 
 _ML_START_MARKERS = ('"""', "'''", "```")  # triggers for auto multi-line mode
@@ -796,23 +810,35 @@ def _save_session() -> None:
 # ── REPL Entry ────────────────────────────────────────────────────
 
 
-def _create_session() -> PromptSession | None:
-    """Create prompt_toolkit session with CC-style layout.
+def _render_rprompt() -> list[tuple[str, str]]:
+    """Right-aligned prompt info — model + context % (compact, CC style)."""
+    m = _current_model()
+    pct = _context_pct()
+    short = m[:14] + ".." if len(m) > 14 else m
+    return [("class:prompt.dim", f"{short}  ")]
 
-    Layout:
-      ─────────────────────  (top separator, via message)
-      ❯ _                    (prompt + rprompt with health)
-      ─────────────────────  (bottom separator, via bottom_toolbar)
-      provider·model │ ...   (status bar)
-    """
+
+def _set_terminal_title(proj: str, model: str) -> None:
+    """Set terminal title via OSC escape (CC/DeepSeek pattern)."""
+    try:
+        sys.stdout.write(f"\033]0;Test-Agent: {proj} ({model})\007")
+        sys.stdout.flush()
+    except Exception:
+        pass
+
+
+def _create_session() -> PromptSession | None:
+    """Create prompt_toolkit session — dynamic style from skin, CC layout."""
     try:
         _SESSION_DIR.mkdir(parents=True, exist_ok=True)
+        style = _get_prompt_style()
         return PromptSession(
             history=FileHistory(str(_HISTORY_FILE)),
             completer=SlashCompleter(),
-            style=_PROMPT_STYLE,
+            style=style,
             key_bindings=_kb,
             message=_render_prompt_message,
+            rprompt=_render_rprompt,
             bottom_toolbar=_render_bottom_toolbar,
         )
     except Exception:
@@ -823,9 +849,9 @@ def _read_input(session: PromptSession | None) -> str | None:
     """Read user input. Uses prompt_toolkit if available, falls back to Rich."""
     if session is not None:
         try:
-            return session.prompt().strip()
+            return session.prompt(rprompt=_render_rprompt).strip()
         except Exception:
-            pass  # fall through to fallback
+            pass
     try:
         return console.input("[bold cyan]❯ [/]").strip()
     except (EOFError, KeyboardInterrupt):
@@ -921,6 +947,12 @@ def start() -> None:
     _suppress_noise()
     _print_banner()
     _check_first_run()
+
+    # Terminal title (OSC escape — shows project + model in tab/window title)
+    _set_terminal_title(
+        proj=os.environ.get("PROJECT_NAME", get_settings().project_root.name),
+        model=_current_model(),
+    )
 
     # Version check (non-blocking, 24h rate-limited by check_version.py)
     try:
