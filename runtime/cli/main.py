@@ -49,7 +49,9 @@ def _version_callback(
 
 # Auto-discover CLI commands from slash command registry.
 # Commands with cli_module set are exposed as typer CLI commands.
-from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG  # noqa: E402
+# Must init REPL handlers first — gateway, cron, etc. have cli_module set.
+from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG, _init_repl_handlers  # noqa: E402
+_init_repl_handlers()
 
 _seen: set[str] = set()
 for _cmd in _REG:

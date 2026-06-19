@@ -121,10 +121,15 @@ class Settings(BaseSettings):
 
         issues: list[dict[str, str]] = []
 
-        # LLM key check — any *_API_KEY works (openai/deepseek/anthropic/zhipu/...)
+        # LLM key check — explicit provider check, not wildcard *_API_KEY
         llm_key = os.getenv("TAGENT_LLM_API_KEY", "")
         if not llm_key:
-            llm_key = next((v for k, v in os.environ.items() if k.endswith("_API_KEY") and v), "")
+            # Check known provider-specific keys (not wildcard — avoids false positives)
+            for provider_key in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DEEPSEEK_API_KEY",
+                                  "GEMINI_API_KEY", "DASHSCOPE_API_KEY", "ZHIPU_API_KEY"):
+                llm_key = os.getenv(provider_key, "")
+                if llm_key:
+                    break
         if not llm_key:
             issues.append({
                 "level": "warning",
