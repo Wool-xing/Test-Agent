@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import sys
 import time
 from pathlib import Path as _Path
@@ -49,7 +50,9 @@ _BUILTIN_MAP: dict = {}
 
 _PROMPT_STYLE = Style.from_dict({
     "prompt": "bold cyan",
+    "separator": "#888888",
     "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
+    "bottom-toolbar.separator": "#444444",
 })
 
 # Key bindings: Ctrl+D exits, Alt+Enter inserts newline for multi-line input
@@ -83,7 +86,7 @@ def _read_multiline(session: PromptSession | None) -> str:
     lines = []
     try:
         first = session.prompt(
-            message=[("class:prompt", "> "), ("class:prompt.dim", "[…] ")],
+            message=[("class:prompt", "❯ "), ("class:prompt.dim", "[…] ")],
         )
         if first is None:
             return ""
@@ -124,7 +127,7 @@ def _fallback_multiline() -> str:
     """Read multi-line input without prompt_toolkit (Git Bash fallback)."""
     lines = []
     try:
-        first = console.input("[bold cyan]> [/]").strip()
+        first = console.input("[bold cyan]❯ [/]").strip()
         if not first:
             return ""
         lines.append(first)
@@ -187,7 +190,29 @@ def _current_model() -> str:
         return "unknown"
 
 
-# ── Status Bar ──────────────────────────────────────────────────
+# ── Status Bar & Prompt ──────────────────────────────────────────
+
+_health_cache: tuple[float, list[dict]] = (0.0, [])  # (timestamp, issues)
+
+
+def _term_width() -> int:
+    try:
+        return shutil.get_terminal_size().columns
+    except Exception:
+        return 80
+
+
+def _cached_health() -> list[dict]:
+    """Return cached health issues (refresh every 30s)."""
+    global _health_cache
+    now = time.time()
+    if now - _health_cache[0] > 30:
+        try:
+            _health_cache = (now, get_settings().validate_startup())
+        except Exception:
+            _health_cache = (now, [])
+    return _health_cache[1]
+
 
 def _git_branch() -> str:
     """Return current git branch name, or empty string."""
@@ -209,18 +234,44 @@ def _context_pct() -> int:
     if not mem or not mem.messages:
         return 0
     chars = sum(len(m.get("content", "")) for m in mem.messages)
-    # Rough: 200K context ~ 50K chars/turn ≈ usage %
     return min(99, chars // 500)
 
 
-def _render_status_bar() -> str:
-    """Render bottom toolbar — model | project | git | context."""
+def _render_rprompt() -> str:
+    """Right side of prompt — inline health warnings (dynamic, like CC)."""
+    try:
+        issues = _cached_health()
+        errors = [i for i in issues if i["level"] == "error"]
+        warnings = [i for i in issues if i["level"] == "warning"]
+        if errors:
+            return f" ⚠ {len(errors)} errors · /doctor"
+        if warnings:
+            return f" ⚠ {len(warnings)} warnings · /doctor"
+    except Exception:
+        pass
+    return ""
+
+
+def _render_prompt_message() -> list[tuple[str, str]]:
+    """Render prompt with top separator line (CC style)."""
+    sep = "─" * _term_width()
+    return [
+        ("class:separator", f"\n{sep}"),
+        ("", "\n"),
+        ("class:prompt", "❯ "),
+    ]
+
+
+def _render_bottom_toolbar() -> str:
+    """Render separator + dynamic status bar (updates every keystroke)."""
     from prompt_toolkit.formatted_text import HTML
 
+    sep = "─" * _term_width()
     provider = _current_provider()
     model = _current_model()
     branch = _git_branch()
     pct = _context_pct()
+    proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
 
     parts = []
     # Provider / model
@@ -228,33 +279,35 @@ def _render_status_bar() -> str:
     if model and model != provider:
         parts.append(f"·<b>{model}</b>")
 
-    # Project name
-    proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
+    # Project
     parts.append(f"│ <cyan>{proj}</cyan>")
 
     # Git branch
     if branch:
         parts.append(f"│ git:<b>{branch}</b>")
 
-    # Health indicators
+    # Health (dynamic, cached 30s)
     try:
-        issues = get_settings().validate_startup()
-        warnings = [i for i in issues if i["level"] == "warning"]
+        issues = _cached_health()
         errors = [i for i in issues if i["level"] == "error"]
+        warnings = [i for i in issues if i["level"] == "warning"]
         if errors:
             parts.append(f"│ <red>⚠ {len(errors)}</red>")
         elif warnings:
             parts.append(f"│ <yellow>⚠ {len(warnings)}</yellow>")
+        else:
+            parts.append("│ <green>✓</green>")
     except Exception:
         pass
 
-    # Context usage
+    # Context
     bar_len = 10
     filled = min(bar_len, pct * bar_len // 100)
     bar = "█" * filled + "░" * (bar_len - filled)
     parts.append(f"│ Context <dim>{bar}</dim> {pct}%")
 
-    return "  ".join(parts)
+    status = "  ".join(parts)
+    return f"{sep}\n  {status}"
 
 
 # ── Banner & Help ─────────────────────────────────────────────────
@@ -293,28 +346,21 @@ def _print_banner() -> None:
         # Fallback: plain print if terminal doesn't support Live
         console.print(banner)
 
-    # Provider + model + project info line
+    # Provider + model + project info line (dynamic: updates on !model switch)
     provider = _current_provider()
     model = _current_model()
     proj_root = get_settings().project_root
     console.print(f"  [bold cyan]{provider}[/] · [dim]{model}[/]")
     console.print(f"  [dim]{proj_root}[/]")
 
-    # Health summary
-    try:
-        issues = get_settings().validate_startup()
-        if issues:
-            errors = [i for i in issues if i["level"] == "error"]
-            warnings = [i for i in issues if i["level"] == "warning"]
-            parts = []
-            if errors:
-                parts.append(f"[red]{len(errors)} errors[/]")
-            if warnings:
-                parts.append(f"[yellow]{len(warnings)} warnings[/]")
-            if parts:
-                console.print(f"  ⚠ {', '.join(parts)} · [dim]!doctor[/]")
-    except Exception:
-        pass
+    # Health summary (cached 30s, same as prompt area)
+    issues = _cached_health()
+    errors = [i for i in issues if i["level"] == "error"]
+    warnings = [i for i in issues if i["level"] == "warning"]
+    if errors:
+        console.print(f"  ⚠ [red]{len(errors)} errors[/] · [dim]!doctor[/]")
+    elif warnings:
+        console.print(f"  ⚠ [yellow]{len(warnings)} warnings[/] · [dim]!doctor[/]")
 
     console.print()
 
@@ -670,7 +716,14 @@ def _save_session() -> None:
 
 
 def _create_session() -> PromptSession | None:
-    """Create prompt_toolkit session. Returns None if TTY unsupported."""
+    """Create prompt_toolkit session with CC-style layout.
+
+    Layout:
+      ─────────────────────  (top separator, via message)
+      ❯ _                    (prompt + rprompt with health)
+      ─────────────────────  (bottom separator, via bottom_toolbar)
+      provider·model │ ...   (status bar)
+    """
     try:
         _SESSION_DIR.mkdir(parents=True, exist_ok=True)
         return PromptSession(
@@ -678,8 +731,9 @@ def _create_session() -> PromptSession | None:
             completer=SlashCompleter(),
             style=_PROMPT_STYLE,
             key_bindings=_kb,
-            message=[("class:prompt", "❯ ")],
-            bottom_toolbar=_render_status_bar,
+            message=_render_prompt_message,
+            rprompt=_render_rprompt,
+            bottom_toolbar=_render_bottom_toolbar,
         )
     except Exception:
         return None
