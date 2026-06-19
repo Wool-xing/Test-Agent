@@ -49,6 +49,7 @@ _BUILTIN_MAP: dict = {}
 
 _PROMPT_STYLE = Style.from_dict({
     "prompt": "bold cyan",
+    "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
 })
 
 # Key bindings: Ctrl+D exits, Alt+Enter inserts newline for multi-line input
@@ -170,19 +171,90 @@ def _count_md_files(dirname: str) -> int:
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
 
 
-_PROVIDER_MODELS = {
-    "claude": "claude-sonnet-4-6", "openai": "gpt-4o",
-    "gemini": "gemini-1.5-pro", "deepseek": "deepseek-chat",
-    "qwen": "qwen-plus", "ollama": "qwen2.5:7b",
-}
-
-
 def _current_provider() -> str:
     return os.environ.get("TAGENT_LLM_PROVIDER", "claude")
 
 
 def _current_model() -> str:
-    return os.environ.get("TAGENT_LLM_MODEL", _PROVIDER_MODELS.get(_current_provider(), "unknown"))
+    """Resolve current model via model_router (no hardcoded list)."""
+    if os.environ.get("TAGENT_LLM_MODEL"):
+        return os.environ["TAGENT_LLM_MODEL"]
+    try:
+        from runtime.router.model_router import get_model_tier
+        tier = get_model_tier()
+        return tier.heavy_model
+    except Exception:
+        return "unknown"
+
+
+# ── Status Bar ──────────────────────────────────────────────────
+
+def _git_branch() -> str:
+    """Return current git branch name, or empty string."""
+    try:
+        import subprocess
+        r = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True, text=True, timeout=3,
+            cwd=str(get_settings().project_root),
+        )
+        return r.stdout.strip()
+    except Exception:
+        return ""
+
+
+def _context_pct() -> int:
+    """Estimate context window usage percentage (rough)."""
+    mem = _get_memory()
+    if not mem or not mem.messages:
+        return 0
+    chars = sum(len(m.get("content", "")) for m in mem.messages)
+    # Rough: 200K context ~ 50K chars/turn ≈ usage %
+    return min(99, chars // 500)
+
+
+def _render_status_bar() -> str:
+    """Render bottom toolbar — model | project | git | context."""
+    from prompt_toolkit.formatted_text import HTML
+
+    provider = _current_provider()
+    model = _current_model()
+    branch = _git_branch()
+    pct = _context_pct()
+
+    parts = []
+    # Provider / model
+    parts.append(f" <b>{provider}</b>")
+    if model and model != provider:
+        parts.append(f"·<b>{model}</b>")
+
+    # Project name
+    proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
+    parts.append(f"│ <cyan>{proj}</cyan>")
+
+    # Git branch
+    if branch:
+        parts.append(f"│ git:<b>{branch}</b>")
+
+    # Health indicators
+    try:
+        issues = get_settings().validate_startup()
+        warnings = [i for i in issues if i["level"] == "warning"]
+        errors = [i for i in issues if i["level"] == "error"]
+        if errors:
+            parts.append(f"│ <red>⚠ {len(errors)}</red>")
+        elif warnings:
+            parts.append(f"│ <yellow>⚠ {len(warnings)}</yellow>")
+    except Exception:
+        pass
+
+    # Context usage
+    bar_len = 10
+    filled = min(bar_len, pct * bar_len // 100)
+    bar = "█" * filled + "░" * (bar_len - filled)
+    parts.append(f"│ Context <dim>{bar}</dim> {pct}%")
+
+    return "  ".join(parts)
 
 
 # ── Banner & Help ─────────────────────────────────────────────────
@@ -220,6 +292,29 @@ def _print_banner() -> None:
     except Exception:
         # Fallback: plain print if terminal doesn't support Live
         console.print(banner)
+
+    # Provider + model + project info line
+    provider = _current_provider()
+    model = _current_model()
+    proj_root = get_settings().project_root
+    console.print(f"  [bold cyan]{provider}[/] · [dim]{model}[/]")
+    console.print(f"  [dim]{proj_root}[/]")
+
+    # Health summary
+    try:
+        issues = get_settings().validate_startup()
+        if issues:
+            errors = [i for i in issues if i["level"] == "error"]
+            warnings = [i for i in issues if i["level"] == "warning"]
+            parts = []
+            if errors:
+                parts.append(f"[red]{len(errors)} errors[/]")
+            if warnings:
+                parts.append(f"[yellow]{len(warnings)} warnings[/]")
+            if parts:
+                console.print(f"  ⚠ {', '.join(parts)} · [dim]!doctor[/]")
+    except Exception:
+        pass
 
     console.print()
 
@@ -583,7 +678,8 @@ def _create_session() -> PromptSession | None:
             completer=SlashCompleter(),
             style=_PROMPT_STYLE,
             key_bindings=_kb,
-            message=[("class:prompt", "> ")],
+            message=[("class:prompt", "❯ ")],
+            bottom_toolbar=_render_status_bar,
         )
     except Exception:
         return None
@@ -597,7 +693,7 @@ def _read_input(session: PromptSession | None) -> str | None:
         except Exception:
             pass  # fall through to fallback
     try:
-        return console.input("[bold cyan]> [/]").strip()
+        return console.input("[bold cyan]❯ [/]").strip()
     except (EOFError, KeyboardInterrupt):
         return None
 
