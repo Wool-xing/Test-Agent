@@ -280,7 +280,7 @@ def _render_prompt_message() -> list[tuple[str, str]]:
 
 
 def _render_bottom_toolbar() -> "HTML":
-    """Bottom separator + status bar. Uses prompt_toolkit-compatible HTML tags only."""
+    """Bottom separator + 4-line status bar (CC density)."""
     from prompt_toolkit.formatted_text import HTML
 
     w = _term_width()
@@ -291,30 +291,26 @@ def _render_bottom_toolbar() -> "HTML":
     pct = _context_pct()
     proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
 
-    # Line 1: model · project · git · health
-    parts1 = []
-    model_block = f"<b>[{p}]</b>"
-    if m and m != p:
-        model_block += f" <b>[{m}]</b>"
-    parts1.append(model_block)
-    parts1.append(f"<ansicyan>{proj}</ansicyan>")
-    if b:
-        parts1.append(f"<ansigreen>git:{b}</ansigreen>")
-
+    # Health
     issues = _cached_health()
     errs = [i for i in issues if i["level"] == "error"]
     warns = [i for i in issues if i["level"] == "warning"]
+
+    # Line 1: [provider] [model] · project · git · health
+    l1 = f"  <b>[{p}]</b>"
+    if m and m != p:
+        l1 += f" <b>[{m}]</b>"
+    l1 += f" · <ansicyan>{proj}</ansicyan>"
+    if b:
+        l1 += f" · <ansigreen>git:{b}</ansigreen>"
     if errs:
-        parts1.append(f"<ansired>⚠ {len(errs)}</ansired>")
+        l1 += f" · <ansired>⚠ {len(errs)}</ansired>"
     elif warns:
-        parts1.append(f"<ansiyellow>⚠ {len(warns)}</ansiyellow>")
+        l1 += f" · <ansiyellow>⚠ {len(warns)}</ansiyellow>"
     else:
-        parts1.append("<ansigreen>✓</ansigreen>")
+        l1 += " · <ansigreen>✓</ansigreen>"
 
-    line1 = _fit_line(w - 2, parts1)
-
-    # Line 2: context gauge · counts · tips
-    parts2 = []
+    # Line 2: Context gauge + counts
     bar_len = 10
     filled = min(bar_len, pct * bar_len // 100)
     empty = bar_len - filled
@@ -324,24 +320,30 @@ def _render_bottom_toolbar() -> "HTML":
         gauge = f"<ansiyellow>{'█' * filled}</ansiyellow>{'░' * empty}"
     else:
         gauge = f"<ansigray>{'█' * filled}</ansigray>{'░' * empty}"
-    parts2.append(f"Context {gauge} {pct}%")
+    l2 = f"  Context {gauge} {pct}%"
 
     agents_n = _count_md_files("agents")
     skills_n = _count_md_files("skills")
     if agents_n:
-        parts2.append(f"{agents_n} agents")
+        l2 += f" · {agents_n} agents"
     if skills_n:
-        parts2.append(f"{skills_n} skills")
+        l2 += f" · {skills_n} skills"
 
+    # Line 3: Config files
     root = get_settings().project_root
+    l3_parts = []
     if (root / "CLAUDE.md").is_file():
-        parts2.append("CLAUDE.md")
+        l3_parts.append("CLAUDE.md")
+    if (root / ".env").is_file():
+        l3_parts.append(".env")
+    if (root / ".mcp.json").is_file():
+        l3_parts.append("MCP")
+    l3 = "  <ansigray>" + " · ".join(l3_parts) + "</ansigray>" if l3_parts else ""
 
-    parts2.append("<ansigray>!help · !doctor · !model</ansigray>")
+    # Line 4: Quick tips (always visible, like CC)
+    l4 = "  <ansigray>!help · !doctor · !model · !status · !clear</ansigray>"
 
-    line2 = _fit_line(w - 2, parts2)
-
-    return HTML(f"{sep}\n  {line1}\n  {line2}")
+    return HTML(f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}")
 
 
 def _fit_line(width: int, parts: list[str]) -> str:

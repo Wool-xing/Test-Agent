@@ -139,7 +139,7 @@ class TranscriptTUI:
                     lambda width: FormattedText([("class:prompt.dim", self._rprompt())])
                 ],
             ),
-            Window(height=3, content=FormattedTextControl(
+            Window(height=5, content=FormattedTextControl(
                 text=_status_text, focusable=False,
             ), style="class:bottom-toolbar"),
         ]
