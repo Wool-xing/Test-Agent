@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from runtime.config.settings import get_settings
+
 from loguru import logger
 
 
@@ -122,7 +124,7 @@ class McpClient:
         resolved_args = []
         for a in args:
             if "${PROJECT_ROOT}" in a:
-                root = str(Path(__file__).resolve().parents[2])
+                root = str(get_settings().project_root)
                 a = a.replace("${PROJECT_ROOT}", root)
             resolved_args.append(a)
 

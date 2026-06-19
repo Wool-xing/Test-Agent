@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from loguru import logger
+from runtime.config.settings import get_settings
 
 from runtime.router.llm_client import LLMClient, LLMError
 from runtime.router.schema import DAGNode, RoutingDecision, TargetArtifact
@@ -104,7 +105,7 @@ class IntentRouterV2:
     """
 
     def __init__(self, specs_root: Path | None = None) -> None:
-        self._specs_root = specs_root or (Path(__file__).resolve().parents[2] / "specs")
+        self._specs_root = specs_root or (get_settings().project_root / "specs")
         self._catalog = self._load_catalog()
         self._name_index: dict[str, dict] = self._build_name_index()
 

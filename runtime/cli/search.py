@@ -12,8 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from loguru import logger
+from runtime.config.settings import get_settings
 
-_SEARCH_DB = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "search.db"
+_SEARCH_DB = get_settings().gateway_dir / "search.db"
 _lock = threading.Lock()
 
 

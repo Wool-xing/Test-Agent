@@ -13,6 +13,8 @@ import uuid
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 TASK_STATUSES = ("pending", "in_progress", "done", "cancelled")
@@ -30,7 +32,7 @@ class Task:
 
 
 def _tasks_file() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+    d = get_settings().gateway_dir
     d.mkdir(parents=True, exist_ok=True)
     return d / "tasks.json"
 

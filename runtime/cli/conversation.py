@@ -35,7 +35,7 @@ def _discover_project_context() -> str | None:
     global _PROJECT_CONTEXT_CACHE
     if _PROJECT_CONTEXT_CACHE is not None:
         return _PROJECT_CONTEXT_CACHE or None
-    cwd = Path.cwd()
+    cwd = get_settings().project_root
     for d in [cwd, *cwd.parents]:
         for name in _PROJECT_CONTEXT_FILES:
             cf = d / name

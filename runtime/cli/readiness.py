@@ -13,6 +13,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +49,7 @@ def check_tests() -> GateResult:
             [sys.executable, "-m", "pytest", "runtime/tests/", "-q",
              "--ignore=runtime/tests/test_router_real.py",
              "--ignore=runtime/tests/test_smoke_e2e.py"],
-            capture_output=True, text=True, timeout=120, cwd=Path.cwd(),
+            capture_output=True, text=True, timeout=120, cwd=get_settings().project_root,
         )
         if r.returncode == 0:
             return _score(True, "618/618 passed", "Tests", 1.0)
@@ -63,7 +65,7 @@ def check_tests() -> GateResult:
 def check_coverage() -> GateResult:
     """Check test coverage threshold."""
     try:
-        cov_file = Path.cwd() / "workspace" / "测试报告" / "default" / "coverage.xml"
+        cov_file = get_settings().reports_dir / "default" / "coverage.xml"
         if not cov_file.is_file():
             return _score(False, "No coverage.xml — run tests with --cov first", "Coverage", 0.8)
         content = cov_file.read_text(encoding="utf-8")
@@ -112,13 +114,14 @@ def check_catalog() -> GateResult:
 def check_config() -> GateResult:
     """Check .env and VERSION files exist."""
     issues = []
-    if not (Path.cwd() / ".env").is_file():
+    s = get_settings()
+    if not (s.project_root / ".env").is_file():
         issues.append("Missing .env")
-    if not (Path.cwd() / "VERSION").is_file():
+    if not (s.project_root / "VERSION").is_file():
         issues.append("Missing VERSION")
     if issues:
         return _score(False, ", ".join(issues), "Config", 0.6)
-    ver = (Path.cwd() / "VERSION").read_text().strip()
+    ver = (s.project_root / "VERSION").read_text().strip()
     return _score(True, f"VERSION={ver}", "Config", 0.6)
 
 

@@ -12,11 +12,12 @@ import time
 from pathlib import Path
 from typing import Any
 
+from runtime.config.settings import get_settings
 
 _PROFILE_PREFIX = "[profile]"
 _TRUST_PREFIX = "[trust]"
 
-_MEMORY_PATH = Path(__file__).resolve().parents[2] / "workspace" / "gateway" / "MEMORY.md"
+_MEMORY_PATH = get_settings().gateway_dir / "MEMORY.md"
 
 
 def _read_profile_entries() -> dict[str, str]:

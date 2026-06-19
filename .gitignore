@@ -153,3 +153,4 @@ graphify-out/.graphify_*
 
 # ===== Runtime artifacts =====
 runtime/workspace/
+runtime/graphify-out/

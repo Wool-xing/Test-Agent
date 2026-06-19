@@ -24,8 +24,7 @@ from prompt_toolkit.styles import Style
 from runtime.cli._shared import console
 from runtime.cli.completer import _PROVIDERS, SlashCompleter
 from runtime.cli.conversation import ConversationMemory
-
-
+from runtime.config.settings import get_settings
 
 
 _SHEEP = r"""
@@ -37,7 +36,7 @@ _SHEEP = r"""
   AI Router · {experts} Experts · {skills} Skills
   Type !help for commands, or describe your test task."""
 
-_SESSION_DIR = _Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+_SESSION_DIR = get_settings().gateway_dir
 _SESSION_FILE = _SESSION_DIR / "active_session.json"
 _HISTORY_FILE = _SESSION_DIR / "history.txt"
 
@@ -610,7 +609,7 @@ def _check_first_run() -> None:
         return  # local/stub — no API key needed
 
     api_key = os.environ.get("TAGENT_LLM_API_KEY", "")
-    has_env_file = (_Path(__file__).resolve().parents[2] / ".env").exists()
+    has_env_file = (get_settings().project_root / ".env").exists()
 
     if not api_key and not has_env_file:
         console.print(

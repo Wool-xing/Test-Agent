@@ -12,6 +12,8 @@ import os
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
+from runtime.config.settings import get_settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -24,7 +26,7 @@ class Workspace:
 
 
 def _file() -> Path:
-    d = Path(__file__).resolve().parents[2] / "workspace" / "gateway"
+    d = get_settings().gateway_dir
     d.mkdir(parents=True, exist_ok=True)
     return d / "workspaces.json"
 
@@ -81,7 +83,7 @@ def switch_to(name: str) -> Workspace | None:
 
 def get_current() -> Workspace | None:
     """Get workspace matching current cwd."""
-    cwd = str(Path.cwd())
+    cwd = str(get_settings().project_root)
     for w in _load():
         if w.get("path") == cwd:
             return Workspace(**w)
@@ -90,7 +92,7 @@ def get_current() -> Workspace | None:
 
 def auto_discover() -> Workspace | None:
     """Auto-discover current directory and add as workspace if not already registered."""
-    cwd = Path.cwd()
+    cwd = get_settings().project_root
     existing = [w["path"] for w in _load()]
     if str(cwd) in existing:
         return None

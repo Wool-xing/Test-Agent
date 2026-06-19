@@ -1233,7 +1233,7 @@ def _cmd_ws(args: str) -> None:
     elif action == "add":
         sub = rest.strip().split(maxsplit=1)
         name = sub[0] if sub else ""
-        path = sub[1] if len(sub) > 1 else str(_Path.cwd())
+        path = sub[1] if len(sub) > 1 else str(get_settings().project_root)
         if not name:
             console.print("[dim]Usage: !ws add <name> [path][/]")
             return
