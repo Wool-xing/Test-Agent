@@ -6,7 +6,7 @@ paramiko==5.0.0
 pyserial==3.5
 paho-mqtt==2.1.0
 ffmpeg-python==0.2.0
-kafka-python==2.3.2
+kafka-python==3.0.2
 pika==1.4.1
 # pymodbus==3.5.4      # Modbus 工业协议
 # web3==6.15.1          # 以太坊/EVM
