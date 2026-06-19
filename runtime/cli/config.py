@@ -79,7 +79,7 @@ VENDOR_KEYS = (
 
 def _find_env_file(cwd: Path | None = None) -> Path:
     """优先 CWD/.env. 不存仍返回此路径 (调用者据存在性决定写/读)."""
-    base = cwd or get_settings().project_root
+    base = cwd or Path.cwd()
     return base / ".env"
 
 
