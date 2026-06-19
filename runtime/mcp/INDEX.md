@@ -1,6 +1,6 @@
 # mcp 索引
 
-> 主宪章 §16 预留 6 件套,V1.2.0(M2)实现。
+> 预留 6 件套实现。
 > 当前 `config/.mcp.json` 仅启用 filesystem;本目录服务通过 `config/.mcp.json` 启用。
 
 ## 模块清单
@@ -40,8 +40,8 @@ python -m runtime.mcp.test_orchestrator.server --http 8801  # http mode
 
 `base.py` 提供:
 - `make_server(name, version)`:统一 Server 实例化
-- `tool_decision_logged(name)`:工具装饰器,自动落 `decisions/{date}_mcp_{tool}.json`(宪章 §18-12)
-- `with_run_id(handler)`:run_id 全链路注入(§21 横切可复现性)
+- `tool_decision_logged(name)`:工具装饰器,自动落 `decisions/{date}_mcp_{tool}.json`
+- `with_run_id(handler)`:run_id 全链路注入(横切可复现性)
 
 ## MCP 客户端 (P2 #12)
 

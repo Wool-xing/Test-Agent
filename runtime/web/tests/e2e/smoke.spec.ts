@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// charter §21 L2 必测维度: 功能 + 边界 + 异常 + 兼容 + 可访问性
+// L2 必测维度: 功能 + 边界 + 异常 + 兼容 + 可访问性
 
 test("upload page renders @smoke", async ({ page }) => {
   await page.goto("/");

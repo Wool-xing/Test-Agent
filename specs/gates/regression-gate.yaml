@@ -1,0 +1,48 @@
+# Regression Gate — P0+P1 regression test quality gate
+# Must pass after smoke gate and before performance testing.
+# Referenced by test-coordinator and regression-test workflows.
+
+name: regression-gate
+description: P0+P1 regression test gate — full functional regression must pass before release
+severity: blocker
+checks:
+  - metric: p0_pass_rate
+    operator: eq
+    threshold: 100
+    unit: percent
+    description: "P0 test case pass rate must be 100%"
+  - metric: p1_pass_rate
+    operator: gte
+    threshold: 95
+    unit: percent
+    description: "P1 test case pass rate must be at least 95%"
+  - metric: total_pass_rate
+    operator: gte
+    threshold: 90
+    unit: percent
+    description: "Overall test pass rate must be at least 90%"
+  - metric: coverage
+    operator: gte
+    threshold: 80
+    unit: percent
+    description: "Code coverage must be at least 80%"
+  - metric: flaky_rate
+    operator: lt
+    threshold: 5
+    unit: percent
+    description: "Flaky test rate must be below 5%"
+  - metric: new_p0_bugs
+    operator: eq
+    threshold: 0
+    description: "Zero new P0 bugs allowed"
+  - metric: new_p1_bugs
+    operator: eq
+    threshold: 0
+    description: "Zero new P1 bugs allowed"
+  - metric: performance_regression_pct
+    operator: lt
+    threshold: 20
+    unit: percent
+    description: "Performance regression must be less than 20% of baseline"
+timeout_minutes: 60
+auto_apply: false

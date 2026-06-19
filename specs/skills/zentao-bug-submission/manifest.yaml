@@ -1,0 +1,63 @@
+name: zentao-bug-submission
+version: 1.0.0
+kind: skill
+description: BugTracker Bug 提交技能（默认 adapter:禅道,  BugTrackerBase 统一契约支持 Jira/GitHub/GitLab/Linear/Webhook,由
+  .env BUG_TRACKER 选）。输入 Bug 描述或测试失败信息，自动规范化 Bug 报告并提交到所选 BugTracker，支持批量提交和状态追踪。默认实现
+  utils/zentao_bug_manager.py（severity 1=P0/2=P1/3=P2/4=P3）。
+description_zh: BugTracker Bug 提交技能（默认 adapter
+backend: llm
+tools:
+- Read
+- Write
+- Bash
+- Grep
+- Glob
+paired_skills: []
+requires_layer: []
+system_prompt: "# 禅道 Bug 提交\n\n## 触发方式\n\n```text\n/zentao-bug-submission [Bug 描述\
+  \ 或 测试失败日志]\n```\n\n## \U0001F514 调用前置准备\n\n```text\n□ 禅道实例可访问（ZENTAO_BASE_URL）\n\
+  □ .env 填 ZENTAO_ACCOUNT / ZENTAO_PASSWORD（API 凭证）\n□ 禅道 API v1 已启用（管理后台 → 二次开发 →\
+  \ API）\n□ 已知产品 ID（product 字段必填，禅道后台查）\n□ Bug 描述含必备字段：title / 复现步骤 / 预期 / 实际\n□ utils/zentao_bug_manager.py\
+  \ + utils/api_retry_util.py 已部署\n□ 批量场景：test-executor 已输出 regression_summary.json（含\
+  \ failures 列表）\n```\n\n## 执行流程\n\n### Step 1：Bug 信息规范化（bug-manager 执行）\n\n```text\n\
+  - 确定 Bug 优先级（P0/P1/P2/P3）\n- 提取复现步骤\n- 整理预期/实际结果\n- 识别影响范围\n- 准备附件（截图/日志）\n```\n\
+  \n### Step 2：提交禅道（utils/zentao_bug_manager.py）\n\n```text\n- 自动指数退避重试（10s/20s/40s）\n\
+  - token 失效自动续期\n- 返回禅道 Bug ID\n- 更新本地追踪记录\n```\n\n## 优先级 → severity / pri 映射（权威表）\n\
+  \n| 优先级 | severity | pri | 标准 |\n|-------|----------|-----|------|\n| P0 | 1 | 1\
+  \ | 核心业务流程完全阻断 / 数据丢失 / 安全漏洞 / 系统崩溃 |\n| P1 | 2 | 2 | 主要功能受影响（有临时绕过）/ 关键数据展示错误 /\
+  \ 权限失效 |\n| P2 | 3 | 3 | 次要功能异常 / UI 明显问题 / 错误提示不友好 / 性能低于预期 |\n| P3 | 4 | 4 | 文案错误\
+  \ / 微小 UI 瑕疵 / 体验优化建议 |\n\n定义在 `utils/zentao_bug_manager.SEVERITY_MAP` / `PRI_MAP`。\n\
+  \n## 单条提交\n\n```python\nfrom utils.zentao_bug_manager import ZentaoBugManager, SEVERITY_MAP,\
+  \ PRI_MAP\n\nmanager = ZentaoBugManager()  # 自动从 .env 读取凭证\n\nbug = manager.create_bug({\n\
+  \    \"title\": \"登录模块-正确密码登录后跳转 404\",\n    \"product\": 1,\n    \"severity\":\
+  \ SEVERITY_MAP[\"P0\"],\n    \"pri\":      PRI_MAP[\"P0\"],\n    \"type\": \"codeerror\"\
+  ,\n    \"steps\": \"1. 打开登录页\\n2. 输入账号密码\\n3. 点击登录\\n\\n预期：跳转首页\\n实际：404\",\n  \
+  \  \"buildFound\": \"v1.0.0\",\n    \"assignedTo\": \"frontend-lead\",\n})\nprint(f\"\
+  Bug 已提交：#{bug.get('id')}\")\n```\n\n## 批量提交（从 test-executor 输出 JSON）\n\n```python\n\
+  import json\n\nfrom utils.zentao_bug_manager import ZentaoBugManager\n\nmanager\
+  \ = ZentaoBugManager()\n\nwith open(\"workspace/测试报告/{项目名}/regression_summary.json\"\
+  , encoding=\"utf-8\") as f:\n    results = json.load(f)\n\nsubmitted = manager.batch_submit_from_failures(\n\
+  \    failures=results[\"failures\"],         # 包含 case_id/case_name/priority/steps/module/failure_type\n\
+  \    product_id=1,\n    build_version=results.get(\"build_version\", \"unknown\"\
+  ),\n)\n# submitted: [{\"case_id\": ..., \"bug_id\": ..., \"priority\": \"P0\", \"\
+  status\": \"submitted\"}, ...]\nprint(json.dumps(submitted, ensure_ascii=False,\
+  \ indent=2))\n```\n\n## Bug 状态追踪\n\n```python\ndef track_bug_status(bug_ids: list)\
+  \ -> dict:\n    \"\"\"追踪 Bug 修复状态\"\"\"\n    manager = ZentaoBugManager()\n    status_map\
+  \ = {}\n    for bug_id in bug_ids:\n        try:\n            bug = manager.get_bug(bug_id)\n\
+  \            status_map[bug_id] = {\n                \"status\": bug.get(\"status\"\
+  ),         # new/assigned/fixed/verified/closed\n                \"assignee\": bug.get(\"\
+  assignedTo\"),\n                \"fix_time\": bug.get(\"resolvedDate\"),\n     \
+  \       }\n        except Exception as e:\n            status_map[bug_id] = {\"\
+  error\": str(e)}\n    return status_map\n```\n\n## 禅道配置\n\n`.env` 中配置：\n\n```text\n\
+  ZENTAO_BASE_URL=http://your-zentao.com/zentao/api.php/v1\nTEST_ZENTAO_URL=     \
+  \     # 可选，按环境隔离\nSTAGING_ZENTAO_URL=       # 可选\nZENTAO_ACCOUNT=your_account\n\
+  ZENTAO_PASSWORD=your_password\n```\n\n> 注：当前 `.mcp.json` 仅启用 filesystem，Bug 提交走\
+  \ SDK 直连（`utils/zentao_bug_manager.py`）。如需启用 zentao MCP server，自行实现后追加配置即可（参考 .mcp.json\
+  \ `_comment` 字段）。\n\n## 提交后输出示例\n\n```text\n=== Bug 提交结果 ===\n已提交：3 个 Bug\n\nBug#1024（P0，severity=1）：登录模块-正确密码后跳转\
+  \ 404\n  → 已指派给：frontend-lead\n  → 状态：新建\n\nBug#1025（P1，severity=2）：密码重置邮件发送失败\n\
+  \  → 已指派给：backend-dev\n  → 状态：新建\n\nBug#1026（P2，severity=3）：用户头像上传提示文案错误\n  → 已指派给：frontend-dev\n\
+  \  → 状态：新建\n\n⚠️ P0 Bug 告警：存在 1 个 P0 Bug（Bug#1024），请立即关注！\n```"
+output_schema: {}
+gates: []
+tags: []
+deprecated: false

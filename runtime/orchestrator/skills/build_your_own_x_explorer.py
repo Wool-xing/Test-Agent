@@ -1,4 +1,4 @@
-"""build-your-own-x-explorer skill · 教学层 byox deep-dive 推荐 (V1.32.0).
+"""build-your-own-x-explorer skill · 教学层 byox deep-dive 推荐.
 
 职责: 据用户当前测试场景 + 时间预算, 从 13 类 byox KB 推 deep-dive 路径。
 铁律: 1) 必问时间预算 2) 不强推 3) 不复制全文。

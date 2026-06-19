@@ -1,8 +1,8 @@
-# runtime/orchestrator/agents/ 索引(V1.36.0)
+# runtime/orchestrator/agents/ 索引
 
-> 真 LLM-driven expert runner · 16 核心 expert 全落地 · 主宪章 §40 真 agent 落地 canon。
+> 真 LLM-driven expert runner · 16 核心 expert 全落地 · 真 agent 落地 canon。
 
-## 已实现 16 runner(V1.32)
+## 已实现 16 runner
 
 | Runner | 角色源 | 上游 | 产物 |
 |--------|--------|------|------|
@@ -12,11 +12,11 @@
 | `bug-manager` | agents/08-Bug管理.md | test-executor | `bug_drafts.json`(BugTracker-ready) |
 | `test-lead` | agents/01-测试主管.md | 全链路 | `final_verdict_*.json`(上线决策) |
 
-## 0 未实现(V1.32 rollout 完成)
+## 0 未实现
 
 - test-lead 自身已实现(用全链路上游),其他 11 个:env-manager / data-preparer(scripted)/ testcase-designer(scripted)/ report-generator(scripted)/ mobile-tester / desktop-tester(scripted)/ visual-tester / system-tester / ai-tester(scripted)/ 渗透 / 车载
 - **5 个有 script 真跑**(testcase-designer / data-preparer / report-generator / desktop-tester / ai-tester)→ SCRIPT_MAP 兜
-- **6 个 no-op**(env-manager / mobile-tester / visual-tester / system-tester / 渗透 / 车载)→ 待 V1.15+
+- **6 个 no-op**(env-manager / mobile-tester / visual-tester / system-tester / 渗透 / 车载)→ 待实装
 
 ## 协议
 
@@ -40,12 +40,12 @@
 3. 加 import 到 `__init__.py`(触发 @register)
 4. 跑 `tagent selftest --e2e` 验编排
 
-## 主宪章
+## 原则
 
-- §33 自检铁律(L1+L2+L3+L4)
-- §40 真 agent 落地 canon(V1.32 加)
-- §9 已有实现不动 — 5 个 SCRIPT_MAP 兜底 expert 不动
-- §10 第 5 铭文:test-lead 决策 `requires_human_signoff: true`
+- 自检(L1+L2+L3+L4)
+- 真 agent 落地 canon
+- 已有实现不动 — 5 个 SCRIPT_MAP 兜底 expert 不动
+- test-lead 决策 `requires_human_signoff: true`
 
 ## 相关
 

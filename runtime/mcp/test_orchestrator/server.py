@@ -23,7 +23,7 @@ from runtime.mcp.base import make_server, run_stdio, tool_decision_logged
 
 _kernel: Kernel | None = None
 # Bounded LRU cache for in-memory run results.
-# Charter §21 横切预算: 防 server 长时跑无限增长.
+# 横切预算: 防 server 长时跑无限增长.
 # Production should rely on Postgres `runs` table; this is the fast path.
 _MAX_RUN_RESULTS = 1024
 _run_results: OrderedDict[str, dict] = None  # type: ignore[assignment]

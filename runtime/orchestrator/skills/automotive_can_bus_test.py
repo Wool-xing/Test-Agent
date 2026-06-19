@@ -1,4 +1,4 @@
-"""automotive-can-bus-test · CAN/CAN-FD/LIN/FlexRay/SOME-IP 协议测试编排 (V1.31.0)."""
+"""automotive-can-bus-test · CAN/CAN-FD/LIN/FlexRay/SOME-IP 协议测试编排."""
 from __future__ import annotations
 
 from pathlib import Path

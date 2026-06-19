@@ -3,7 +3,7 @@
 Tools wrap the 5 BugTrackerBase methods; delegate to existing
 `utils/bug_manager.py` if available, else fall back to flywheel `defects` table.
 
-Per charter §12 + §18-4: severity 1=P0 / 2=P1 / 3=P2 / 4=P3 一致。
+severity 1=P0 / 2=P1 / 3=P2 / 4=P3 一致。
 """
 
 from __future__ import annotations
@@ -47,7 +47,7 @@ def _flywheel_get(bug_id: str) -> dict | None:
         d = s.get(Defect, bid)
         if d is None:
             return None
-        # Charter §18-4: 1=P0 / 2=P1 / 3=P2 / 4=P3 (one-based; enum value "P0".."P3" is zero-based string)
+        # 1=P0 / 2=P1 / 3=P2 / 4=P3 (one-based; enum value "P0".."P3" is zero-based string)
         sev_int = int(d.severity.value[1]) + 1 if d.severity.value.startswith("P") else 0
         return {
             "bug_id": str(d.id),
@@ -164,7 +164,7 @@ def build_server():
     TOOLS = [
         Tool(
             name="create_bug",
-            description="Create a defect. severity 1=P0 / 2=P1 / 3=P2 / 4=P3 (charter §18-4).",
+            description="Create a defect. severity 1=P0 / 2=P1 / 3=P2 / 4=P3.",
             inputSchema={
                 "type": "object",
                 "properties": {

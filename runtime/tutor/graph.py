@@ -1,4 +1,4 @@
-"""KB self-wiring graph · gbrain §1.2 派生.
+"""KB self-wiring graph (knowledge graph self-wiring).
 
 零 LLM 调用:从卡片 frontmatter 的 `related_to` + `superseded_by` + body 内的 `[[wikilink]]`
 抽取 typed link,建反向索引。

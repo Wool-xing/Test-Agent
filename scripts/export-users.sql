@@ -1,4 +1,4 @@
--- export-users.sql · 100 用户清单导出模板(主宪章 §24 PII scrub)
+-- export-users.sql · 100 用户清单导出模板(PII scrub)
 --
 -- 假设你的注册系统是 Postgres / MySQL,字段按需调整.
 -- 隐私:GDPR/PIPL/CCPA — user_id 必脱敏(hash),不存真名/邮箱明文.

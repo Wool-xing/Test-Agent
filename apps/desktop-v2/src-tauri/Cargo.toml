@@ -1,0 +1,27 @@
+[package]
+name = "test-agent-desktop"
+version = "2.0.0"
+description = "Test-Agent V2 Desktop — AI-Native Testing Framework"
+authors = ["Test-Agent Team"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "test_agent_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

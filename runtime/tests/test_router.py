@@ -33,7 +33,7 @@ def test_router_picks_platform_expert(text, expected_type, expected_expert):
 
 
 def test_router_pentest_includes_coordinator_skill():
-    """pentest path 头节点 = pentest-coordinator (kind=skill, V1.21 SkillRunner 首接入)."""
+    """pentest path 头节点 = pentest-coordinator (kind=skill, SkillRunner 首接入)."""
     art = TargetArtifact(kind="text", text="pentest SQL injection penetration test")
     decision = route(art, client=LLMClient(provider="stub", fallback="stub"))
     ordered = decision.topological()
@@ -49,7 +49,7 @@ def test_router_starts_with_requirements_analyst():
 
 
 def test_router_ends_with_test_lead_decision():
-    """DAG 末节点 = test-lead 决策(主宪章 §40 + agents/README.md 流程
+    """DAG 末节点 = test-lead 决策(agents/README.md 流程
     "bug-manager → report-generator → test-lead 决策")。report-generator 倒数第二。"""
     art = TargetArtifact(kind="text", text="generic web system")
     decision = route(art, client=LLMClient(provider="stub", fallback="stub"))

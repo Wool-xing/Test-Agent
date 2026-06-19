@@ -1,8 +1,8 @@
 ---
 name: security-review
-description: "代码安全审查 Skill(非渗透 layer)。每 PR/feature 必跑;OWASP Top 10 5 维自检 + SAST + 凭据检测 + 依赖 CVE。派生自 ECC security-review;补 pentest-* 层之前的源码层安全。"
+description: 代码安全审查 Skill(非渗透 layer)。每 PR/feature 必跑;OWASP Top 10 5 维自检 + SAST + 凭据检测 + 依赖 CVE。派生自 ECC security-review;补 pentest-* 层之前的源码层安全。
 tools: Read, Write, Bash, Grep, Glob
-SKILL_IMPL_STATUS: script
+SKILL_IMPL_STATUS: production
 ---
 
 # security-review
@@ -50,10 +50,10 @@ pip-audit
 safety check
 ```
 
-## 与主宪章融合
+## 融合
 
-- §17 Shift-Left 7 层:本 skill 是 L4 pre-commit + L5 PR gate + L6 静态分析
-- §25 渗透 PoC-only 哲学:本 skill 报 unverified 候选;喂 `/pentest-vuln` 验证
+- Shift-Left 7 层:本 skill 是 L4 pre-commit + L5 PR gate + L6 静态分析
+- 渗透 PoC-only 哲学:本 skill 报 unverified 候选;喂 `/pentest-vuln` 验证
 
 ## 不做
 

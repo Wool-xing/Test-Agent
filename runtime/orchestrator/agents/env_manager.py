@@ -1,6 +1,6 @@
 """env-manager · LLM 读 PRD + 上游需求摘要 → 环境检查清单 + 准备步骤.
 
-V1.15.0 minimum viable (ROADMAP rollout #1 落地):
+minimum viable:
 - 仅生成 env checklist + prep steps 结构化 markdown/JSON
 - 不实装 04-环境管理.md 全 5 节 (Docker / 异常退避 / 清理等留 V1.x 深化)
 - 输出消费者: data-preparer / automation-engineer / test-executor

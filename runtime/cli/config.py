@@ -1,11 +1,11 @@
-"""tagent config — LLM provider configuration (V1.22.0 · Step 2 multi-model onboarding).
+"""tagent config — LLM provider configuration.
 
 5 sub-commands:
   list       — list 6 built-in + path-B compatible examples
   show       — show current .env config (keys fully redacted)
   use        — path A: switch to built-in provider, write TAGENT_LLM_PROVIDER + vendor key placeholder
   use-compat — path B: OpenAI-compatible fallback channel (any vendor, plug-and-play)
-  unset      — remove specified key from .env (V1.25.0)
+  unset      — remove specified key from .env
 
 env file priority: CWD/.env -> repo-root/.env. Always backup to .env.bak before writing.
 """

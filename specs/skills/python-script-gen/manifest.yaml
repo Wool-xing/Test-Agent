@@ -1,0 +1,81 @@
+name: python-script-gen
+version: 1.0.0
+kind: skill
+description: pytest 自动化脚本生成技能。输入测试用例 Excel 或功能描述，生成可直接运行的 pytest 自动化测试脚本，支持 UI（Playwright）+
+  API（requests）。性能脚本主用 JMeter（见 /jmeter-script-gen），Locust 仅作开发期备用。
+description_zh: pytest 自动化脚本生成技能
+backend: llm
+tools:
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+paired_skills: []
+requires_layer: []
+system_prompt: "# Python 自动化脚本生成\n\n## 触发方式\n\n```text\n/python-script-gen [测试用例 Excel\
+  \ 路径 或 功能描述]\n```\n\n## \U0001F514 调用前置准备\n\n```text\n□ 测试用例 Excel（workspace/测试用例/testcases_*.xlsx）或功能描述\n\
+  □ pytest + pytest-playwright 已装\n□ Playwright 浏览器（playwright install chromium）\n\
+  □ conftest.py 已部署项目根\n□ utils/api_retry_util.py 已部署（脚本会 import call_with_retry）\n\
+  □ 测试目标 URL → .env TEST_APP_URL / TEST_API_URL\n```\n\n## 执行流程\n\n### Step 1：分析用例\n\
+  \n```text\n读取 Excel 测试用例，提取：\n  - 测试场景和步骤\n  - 测试数据（输入/预期）\n  - 用例类型（UI / API /\
+  \ PERF / SEC）\n  - 优先级分布\n```\n\n### Step 2：生成脚本\n\n```text\n由 automation-engineer\
+  \ 执行：\n  - 根据用例类型选择框架（Playwright / requests）\n  - 性能用例 → 转交 /jmeter-script-gen\n\
+  \  - 生成 Page Object（UI）\n  - 生成 BaseAPI/UserAPI 等封装（API）\n  - 集成 utils.api_retry_util\
+  \ 的 call_with_retry\n  - 集成项目根 conftest.py 中的 fixture\n```\n\n## 脚本类型选择\n\n| 用例\
+  \ TYPE | 生成类型 | 框架 |\n|-----------|---------|------|\n| UI | UI 自动化 | Playwright\
+  \ |\n| API | API 测试 | requests + pytest |\n| PERF | 性能测试 | **转交 /jmeter-script-gen**（主）\
+  \ |\n| SEC | 安全验证 | requests + pytest（含 SQL 注入/XSS 探测） |\n\n> 注：Locust 仅作开发期 Python\
+  \ 内压测备用，正式 CI/release 性能门禁以 JMeter 为准。\n\n## 生成示例（UI）\n\n### 输入\n\n```text\n功能：用户注册\n\
+  步骤：\n1. 访问注册页\n2. 填写手机号、验证码、密码\n3. 点击注册\n4. 验证注册成功跳转\n```\n\n### 输出\n\n```python\n\
+  # workspace/自动化脚本/python/tests/test_p0_smoke/test_register_ui_p0.py\nimport pytest\n\
+  from playwright.sync_api import Page, expect\n\nfrom pages.register_page import\
+  \ RegisterPage\n\n\n@pytest.mark.p0\n@pytest.mark.smoke\n@pytest.mark.ui\n@pytest.mark.register\n\
+  class TestRegisterUI:\n\n    def test_register_success_p0(self, page: Page, test_data):\n\
+  \        \"\"\"TC-REGISTER-UI-001: 正常注册流程\"\"\"\n        register = RegisterPage(page)\n\
+  \        register.navigate()\n        register.fill_phone(test_data[\"new_user\"\
+  ][\"phone\"])\n        register.request_sms_code()\n        register.fill_sms_code(test_data[\"\
+  new_user\"][\"sms_code\"])\n        register.fill_password(test_data[\"new_user\"\
+  ][\"password\"])\n        register.submit()\n        expect(page).to_have_url(\"\
+  /home\")\n        expect(page.get_by_test_id(\"welcome-message\")).to_be_visible()\n\
+  \n    @pytest.mark.parametrize(\"phone,sms,pwd,error\", [\n        (\"\",      \
+  \      \"123456\", \"Test@123\", \"请输入手机号\"),\n        (\"13800138000\", \"wrong\"\
+  ,  \"Test@123\", \"验证码错误\"),\n        (\"13800138000\", \"123456\", \"weak\",  \
+  \   \"密码强度不足\"),\n    ])\n    @pytest.mark.p1\n    def test_register_validation_p1(self,\
+  \ page, phone, sms, pwd, error):\n        \"\"\"TC-REGISTER-UI-002~004: 注册表单验证\"\
+  \"\"\n        register = RegisterPage(page)\n        register.navigate()\n     \
+  \   register.fill_phone(phone)\n        register.fill_sms_code(sms)\n        register.fill_password(pwd)\n\
+  \        register.submit()\n        assert error in register.get_error_message()\n\
+  ```\n\n## 生成示例（API）\n\n```python\n# workspace/自动化脚本/python/tests/test_p0_smoke/test_login_api_p0.py\n\
+  import pytest\n\nfrom api.user_api import UserAPI\n\n\n@pytest.fixture(scope=\"\
+  class\")\ndef user_api(api_client, env_config):\n    return UserAPI(api_client,\
+  \ env_config.api_base_url)\n\n\n@pytest.mark.p0\n@pytest.mark.smoke\n@pytest.mark.api\n\
+  @pytest.mark.login\nclass TestLoginAPI:\n\n    def test_login_success_p0(self, user_api,\
+  \ test_data):\n        \"\"\"TC-LOGIN-API-001\"\"\"\n        resp = user_api.login(\n\
+  \            test_data[\"normal_user\"][\"username\"],\n            test_data[\"\
+  normal_user\"][\"password\"],\n        )\n        assert resp.status_code == 200\n\
+  \        assert \"token\" in resp.json()\n\n    @pytest.mark.parametrize(\"user,pwd,code\"\
+  , [\n        (\"wrong\", \"any\", 401),\n        (\"\",      \"any\", 400),\n  \
+  \  ])\n    @pytest.mark.p1\n    def test_login_errors_p1(self, user_api, user, pwd,\
+  \ code):\n        \"\"\"TC-LOGIN-API-002~003\"\"\"\n        resp = user_api.login(user,\
+  \ pwd)\n        assert resp.status_code == code\n```\n\n## 代码质量要求\n\n```text\n✅\
+  \ 无硬编码数据（使用 test_data fixture）\n✅ 无 time.sleep()（使用 Playwright 显式等待 / expect 自动重试）\n\
+  ✅ 选择器语义化（data-testid > role > label > text）\n✅ API 调用经 utils.api_retry_util.call_with_retry（指数退避）\n\
+  ✅ 失败时有明确 assert message\n✅ 每个测试方法有 docstring（含用例 ID）\n✅ 参数化用 @pytest.mark.parametrize\n\
+  ✅ fixture scope 正确（session/class/function）\n✅ marker 完整：@p0/@p1 + @smoke/@regression\
+  \ + @ui/@api + @{module}\n```\n\n## 输出文件结构\n\n```text\nworkspace/自动化脚本/python/\n\
+  ├── pages/                              # UI Page Object\n│   └── {module}_page.py\n\
+  ├── api/                                # API 封装\n│   ├── base_api.py\n│   └── {module}_api.py\n\
+  └── tests/\n    ├── test_p0_smoke/\n    │   └── test_{module}_{type}_p0.py\n   \
+  \ ├── test_p1_regression/\n    │   └── test_{module}_{type}_p1.py\n    └── test_p2_full/\n\
+  \        └── test_{module}_{type}_p2.py\n```\n\n## 脚本调试\n\n```bash\n# 语法检查（跨平台，比\
+  \ shell glob 更稳）\npython -m compileall workspace/自动化脚本/python/\n\n# 运行单条用例\npytest\
+  \ workspace/自动化脚本/python/tests/test_p0_smoke/test_login_ui_p0.py::TestLoginUI::test_normal_login_p0\
+  \ -v\n\n# 有头模式调试 UI（Linux/Mac）\nHEADLESS=false pytest workspace/自动化脚本/python/tests/test_p0_smoke/\
+  \ -v\n\n# 有头模式调试 UI（Windows PowerShell）\n$env:HEADLESS=\"false\"; pytest workspace/自动化脚本/python/tests/test_p0_smoke/\
+  \ -v\n\n# 生成 Allure 报告\npytest workspace/自动化脚本/python/tests/ \\\n    --alluredir=workspace/测试报告/{项目名}/allure-results\
+  \ -v\n```"
+output_schema: {}
+gates: []
+tags: []
+deprecated: false

@@ -1,7 +1,7 @@
 """automotive-tester · LLM 读 PRD + CAN-bus/ISO-26262 上下文 → ASIL 评估 + HIL 测试用例
 + ADAS 场景 + OTA 升级测试 + 协议特定配置.
 
-V1.20.0 minimum viable (ROADMAP rollout #6 落地, V1.x rollout 收尾):
+minimum viable:
 - 仅生成 ASIL 评估 + test_cases + bus_test_plan + adas_scenarios + ota_plan
   + compliance_matrix 结构化 JSON
 - 不实装 16-车载测试.md 全部职责 (Vector CANoe 真跑 / HIL 台架真接 / VTD/CarMaker/CARLA

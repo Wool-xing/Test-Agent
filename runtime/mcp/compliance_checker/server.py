@@ -33,7 +33,7 @@ async def tool_list_profiles() -> dict:
 
 
 def _load_profile(name: str) -> dict | None:
-    # Charter §4 security: 防 path traversal — 仅允许字母数字+连字符,且 resolve 后必须落在 profiles_dir 下
+    # 防 path traversal — 仅允许字母数字+连字符,且 resolve 后必须落在 profiles_dir 下
     import re
 
     if not re.fullmatch(r"[A-Za-z0-9_\-\.]+", name) or ".." in name:
@@ -135,7 +135,7 @@ def build_server():
         ),
         Tool(
             name="check_compliance",
-            description="Match a profile's evidence_required against a run's actual evidence. L4 被测项必触发(charter §21).",
+            description="Match a profile's evidence_required against a run's actual evidence. L4 被测项必触发.",
             inputSchema={
                 "type": "object",
                 "properties": {

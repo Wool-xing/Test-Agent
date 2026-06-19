@@ -1,6 +1,6 @@
 """visual-test skill · LLM 读上游 visual-tester 产物 → 5 阶段视觉测试执行编排.
 
-V1.24.0 minimum viable (ROADMAP skill rollout #3 落地):
+minimum viable:
 - LLM 读 PRD + 上游 visual-tester expert 产物 → 5 阶段执行计划
   (环境检查 / 模板图准备 / 视觉冒烟 / 视觉回归 / 报告归档)
   + 质量门禁 + 多分辨率策略

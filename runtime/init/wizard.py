@@ -87,13 +87,13 @@ def run_wizard(matrix: Matrix | None = None) -> InitAnswers:
     )
 
     bug_tracker = _pick_one(
-        "4) BugTracker?(主宪章 §37,6 选,默认禅道)",
+        "4) BugTracker?(6 选,默认禅道)",
         [(k, v.label) for k, v in m.bug_trackers.items()],
         default_key="zentao",
     )
 
     notifiers = _pick_many(
-        "5) 通知渠道?(主宪章 §36,可多选,逗号分隔)",
+        "5) 通知渠道?(可多选,逗号分隔)",
         [(k, v.label) for k, v in m.notifiers.items()],
         default_keys=["wechat"],
     )

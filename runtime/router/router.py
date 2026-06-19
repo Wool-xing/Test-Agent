@@ -1,4 +1,7 @@
-"""Main router: artifact -> RoutingDecision."""
+"""Main router: artifact -> RoutingDecision.
+
+Uses IntentRouterV2 as default with V1 as fallback.
+"""
 
 from __future__ import annotations
 
@@ -26,7 +29,7 @@ class RouterError(RuntimeError):
 def _validate_against_catalog(decision: RoutingDecision, catalog: Catalog) -> list[str]:
     issues: list[str] = []
 
-    # V1.14 防 mock (ROADMAP V1.15 Day 0 承诺): 检查 expert / skill 实装状态
+    # 防 mock: 检查 expert / skill 实装状态
     # 单源: catalog entry.impl_status (agents/skills .md frontmatter)
     # rollout / vision / unknown 状态 router 仍可路由,但 issues 列表标 warning + downgrade confidence
     # → orchestrator execute_node 跑到时会硬拒并报明确错误 (returncode=2),不输出 mock 数据
@@ -54,18 +57,27 @@ def _validate_against_catalog(decision: RoutingDecision, catalog: Catalog) -> li
     return issues
 
 
-def route(
+def _artifact_to_text(artifact: TargetArtifact) -> str:
+    """Convert TargetArtifact to a text string for V2 router."""
+    parts = []
+    if artifact.text:
+        parts.append(artifact.text)
+    if artifact.path:
+        parts.append(f"path={artifact.path}")
+    if artifact.mime:
+        parts.append(f"mime={artifact.mime}")
+    if artifact.kind:
+        parts.append(f"kind={artifact.kind}")
+    return " ".join(parts) or "generic test target"
+
+
+def _route_v1(
     artifact: TargetArtifact,
     *,
     client: LLMClient | None = None,
     use_history: bool = True,
 ) -> RoutingDecision:
-    """Single-shot route. Caller decides whether to fallback / vote.
-
-    Args:
-        use_history: when True and history retrieval is wired, prepend top-k similar
-                     past decisions as few-shot examples (flywheel feedback loop §M2-9).
-    """
+    """Original V1 router (LLM via ai/agents + ai/skills frontmatter catalog)."""
     cat = get_catalog()
     client = client or LLMClient()
     user = build_user_prompt(artifact, cat)
@@ -90,6 +102,34 @@ def route(
         if decision.confidence > 0.5:
             decision.confidence = max(0.0, decision.confidence - 0.3)
     return decision
+
+
+def route(
+    artifact: TargetArtifact,
+    *,
+    client: LLMClient | None = None,
+    use_history: bool = True,
+) -> RoutingDecision:
+    """Single-shot route. Uses IntentRouterV2 by default, falls back to V1.
+
+    Args:
+        use_history: when True and history retrieval is wired, prepend top-k similar
+                     past decisions as few-shot examples (flywheel feedback loop §M2-9).
+    """
+    target_text = _artifact_to_text(artifact)
+
+    # Try V2 first (ManifestV2-powered router)
+    try:
+        from runtime.router.v2_router import IntentRouterV2
+        v2 = IntentRouterV2()
+        decision = v2.route(target_text, mode="cli", client=client)
+        logger.debug("routed via IntentRouterV2: {} nodes, confidence={}", len(decision.dag), decision.confidence)
+        return decision
+    except Exception as e:
+        logger.info("IntentRouterV2 unavailable, falling back to V1 router: {}", e)
+
+    # Fallback to V1 router
+    return _route_v1(artifact, client=client, use_history=use_history)
 
 
 def route_with_vote(artifact: TargetArtifact, providers: list[str]) -> RoutingDecision:

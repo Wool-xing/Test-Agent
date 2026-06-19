@@ -17,7 +17,7 @@
 | 05 | `05-数据准备.md` | data-preparer | test_data.json + jmeter_users.csv |
 | 06 | `06-自动化脚本.md` | automation-engineer | pytest UI/API 脚本 + 协调 JMeter |
 | 07 | `07-测试执行.md` | test-executor | 执行结果 JSON + Allure + JMeter |
-| 08 | `08-Bug管理.md` | bug-manager | BugTracker Bug ID 列表 + 日报（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook,主宪章 §12） |
+| 08 | `08-Bug管理.md` | bug-manager | BugTracker Bug ID 列表 + 日报（默认禅道,可换 Jira/GitHub/GitLab/Linear/Webhook） |
 | 09 | `09-报告生成.md` | report-generator | Word 报告 + 多端通知（企微/飞书/钉钉/Slack/邮件/Teams） |
 
 ### 流程依赖关系

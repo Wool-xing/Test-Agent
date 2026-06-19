@@ -1,0 +1,19 @@
+# CI Gate — Fast-feedback CI quality gate
+# Lightweight gate for CI pipelines. Smoke-only, short timeout.
+# Used by CI workflows (GitHub Actions, Jenkins) for per-commit validation.
+
+name: ci-gate
+description: CI fast-feedback gate — smoke-only, quick timeout for per-commit validation
+severity: critical
+checks:
+  - metric: p0_pass_rate
+    operator: gte
+    threshold: 95
+    unit: percent
+    description: "P0 test case pass rate must be at least 95%"
+  - metric: new_p0_bugs
+    operator: eq
+    threshold: 0
+    description: "Zero new P0 bugs allowed"
+timeout_minutes: 10
+auto_apply: true

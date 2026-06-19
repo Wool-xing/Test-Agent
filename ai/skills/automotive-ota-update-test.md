@@ -2,7 +2,6 @@
 name: automotive-ota-update-test
 description: OTA 升级测试 Skill。包签名 + 差分 + A/B 分区 + 断电恢复 + 行车安全 + 回退;UN R156 / GB 44496-2024 合规。
 tools: Read, Write, Bash, Grep, Glob
-requires_layer: [base, system]
 SKILL_IMPL_STATUS: production
 ---
 
@@ -28,7 +27,7 @@ SKILL_IMPL_STATUS: production
 
 - 升级流量重放:wireshark + scapy
 - 中断模拟:`utils/chaos_helper.py` 在升级中触发(`runtime/scheduler` 集成)
-- 弱网模拟:tc + netem(主宪章已用)
+- 弱网模拟:tc + netem
 
 ## 输出
 

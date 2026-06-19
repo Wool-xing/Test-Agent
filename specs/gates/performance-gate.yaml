@@ -1,0 +1,35 @@
+# Performance Gate — Server-side performance quality gate (full mode)
+# Used by test-coordinator for release-branch full performance testing.
+# 50-concurrency, 5-minute duration.
+
+name: performance-gate
+description: Full performance test gate — p95/p99 latency, error rate, and throughput
+severity: blocker
+checks:
+  - metric: p95_latency_ms
+    operator: lt
+    threshold: 500
+    unit: ms
+    description: "P95 latency must be below 500ms"
+  - metric: p99_latency_ms
+    operator: lt
+    threshold: 1000
+    unit: ms
+    description: "P99 latency must be below 1000ms"
+  - metric: error_rate
+    operator: lt
+    threshold: 0.1
+    unit: percent
+    description: "Error rate must be below 0.1%"
+  - metric: throughput_tps
+    operator: gte
+    threshold: 100
+    unit: tps
+    description: "Throughput must meet or exceed baseline (100 TPS minimum)"
+  - metric: avg_latency_ms
+    operator: lt
+    threshold: 200
+    unit: ms
+    description: "Average latency must be below 200ms"
+timeout_minutes: 30
+auto_apply: false

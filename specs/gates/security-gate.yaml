@@ -1,0 +1,26 @@
+# Security Gate — Security vulnerability quality gate
+# Blocks release if any CRITICAL or HIGH vulnerabilities exist.
+# Referenced by pentest-tester and security-review workflows.
+
+name: security-gate
+description: Security vulnerability gate — zero tolerance for CRITICAL and HIGH findings
+severity: blocker
+checks:
+  - metric: critical_vulns
+    operator: eq
+    threshold: 0
+    description: "Zero CRITICAL vulnerabilities allowed"
+  - metric: high_vulns
+    operator: eq
+    threshold: 0
+    description: "Zero HIGH vulnerabilities allowed"
+  - metric: sast_rules_passed
+    operator: eq
+    threshold: 0
+    description: "All SAST rules must pass (zero failures)"
+  - metric: dependency_cve_clean
+    operator: eq
+    threshold: 1
+    description: "Dependency CVE scan must be clean (no known CVEs)"
+timeout_minutes: 30
+auto_apply: false

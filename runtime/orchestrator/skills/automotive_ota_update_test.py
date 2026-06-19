@@ -1,4 +1,4 @@
-"""automotive-ota-update-test · OTA 升级测试编排 (V1.31.0)."""
+"""automotive-ota-update-test · OTA 升级测试编排."""
 from __future__ import annotations
 
 from pathlib import Path

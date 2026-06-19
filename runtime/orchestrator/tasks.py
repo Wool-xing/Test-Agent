@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from loguru import logger
 try:
     from prefect import task
@@ -22,9 +24,12 @@ from runtime.observability.otel import span
 from runtime.orchestrator.adapters.experts import StepOutcome, execute_node
 from runtime.router.schema import DAGNode
 
+if TYPE_CHECKING:
+    from runtime.orchestrator.context import ExecutionContext
+
 
 @task(retries=2, retry_delay_seconds=exponential_backoff(backoff_factor=5), timeout_seconds=3600)
-def execute_dag_node(node: DAGNode) -> dict:
+def execute_dag_node(node: DAGNode, ctx: ExecutionContext | None = None) -> dict:
     """Atomic node execution. Returns serializable summary."""
     with span(f"node.{node.kind}.{node.name}", node_id=node.id):
         outcome: StepOutcome = execute_node(
@@ -32,6 +37,7 @@ def execute_dag_node(node: DAGNode) -> dict:
             kind=node.kind,
             inputs=node.inputs,
             timeout=node.timeout_seconds,
+            ctx=ctx,
         )
     summary = {
         "id": node.id,

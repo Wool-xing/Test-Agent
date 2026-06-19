@@ -17,8 +17,8 @@ class TestLead(AgentRunner):
             "原则:\n"
             "1) 看 requirements / scripts / execution_plan / bug_drafts 完整链路\n"
             "2) 决策标准:P0 Bug=0 + 回归通过率 ≥ 90% + 性能门禁过 = go;否则 conditional / no-go\n"
-            "3) 业务语言(主宪章 §10 五铭文 #5):管理层 / 开发都能秒懂\n"
-            "4) 标 skin-in-the-game:本决策**人类签字**,Agent 仅给建议(主宪章 §10 第 5 铭文)\n"
+            "3) 业务语言:管理层 / 开发都能秒懂\n"
+            "4) 标 skin-in-the-game:本决策**人类签字**,Agent 仅给建议\n"
             "5) 列出已知遗留 + 兜底方案\n"
             "输出严格 JSON,不 markdown 包裹。"
         )
@@ -68,7 +68,7 @@ class TestLead(AgentRunner):
         bug = ctx.upstream.get("bug-manager", {}).get("summary", {})
         p0 = bug.get("p0", 0) if isinstance(bug, dict) else 0
 
-        # V1.14 防 mock 闭环: 检查上游是否有 degraded 信号
+        # 防 mock 闭环: 检查上游是否有 degraded 信号
         # (mock 兜底 / LLM 失败 fallback / JSON 解析错 / rollout expert 被路由)
         degraded_upstream = [
             name for name, meta in ctx.upstream_meta.items()

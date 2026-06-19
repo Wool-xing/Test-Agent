@@ -1,6 +1,6 @@
 # subagent 索引
 
-## 规则(主宪章 §22)
+## 规则
 
 - **隔离 client**:子代理用 `auxiliary` LLM client,永不污染主 session prompt cache
 - **ThreadPool 动态调整**:默认 32 workers,可按并发 evals 数 resize_tool_pool

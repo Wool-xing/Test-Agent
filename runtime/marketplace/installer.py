@@ -1,7 +1,7 @@
-"""Install / Uninstall / Archive · §30.
+"""Install / Uninstall / Archive.
 
 安装流程:catalog 查 → verifier 跑 4 关 → 落地到 marketplace/{lane}/{name}/
-卸载只归档不删(§22)
+卸载只归档不删
 """
 
 from __future__ import annotations
@@ -79,7 +79,7 @@ def install(entry: Entry, content_path: Path) -> dict:
 
 
 def uninstall(name: str) -> dict:
-    """Uninstall by archiving (§22 不可逆禁止)."""
+    """Uninstall by archiving (不可逆禁止)."""
     if not is_allowed("marketplace.enabled"):
         raise SafeByDefaultBlocked(op="marketplace.uninstall", key_path="marketplace.enabled")
 

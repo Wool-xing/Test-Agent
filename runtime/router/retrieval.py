@@ -6,7 +6,7 @@ Requires Postgres+pgvector + populated embeddings. Gracefully no-op otherwise.
 Async-safety:
   - Called from sync `route()`. If already inside a running event loop (e.g. FastAPI
     request handler), running `asyncio.run` or `run_coroutine_threadsafe` on the
-    same loop deadlocks. We detect that and degrade to no-op (charter §21 横切
+    same loop deadlocks. We detect that and degrade to no-op (横切
     可复现性: never block, never silently misbehave).
 """
 
@@ -75,7 +75,7 @@ async def build_similar_examples_block_async(artifact: TargetArtifact, top_k: in
         return ""
     if not isinstance(result, dict) or result.get("error") or not result.get("results"):
         return ""
-    lines = ["# Similar past cases (flywheel retrieval, charter §M2-9):"]
+    lines = ["# Similar past cases (flywheel retrieval):"]
     for r in result["results"]:
         lines.append(f"- similarity={r['similarity']:.2f} preview=\"{r['preview']}\"")
     lines.append("")
