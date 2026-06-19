@@ -1,7 +1,7 @@
 # Test-Agent V1.x ROADMAP
 
 > 项目终态目标:每个 expert / skill 真 LLM-driven / script-backed 实装,**绝不输出 mock 数据**。
-> 当前状态:V1.0.0 (**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
+> 当前状态:V2.0.0 (**expert rollout 收尾（16/16）+ skill rollout 完成（32/32）+ Phase 3 完成 + Phase 4 完成 + Phase 5 完成**)
 > - **expert 16/16 active**(11 production + 5 script);0 rollout。
 > - **skill 32/32 active**(23 production + 7 script + 2 vision→production);0 rollout;0 vision。
 > - 3 meta-skill(nuwa-skill / darwin-skill / karpathy-guidelines)独立,工具属性,不在 32 业务 skill 数内。
