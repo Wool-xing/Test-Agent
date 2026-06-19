@@ -23,7 +23,6 @@ htmlcov/
 # ===== Node / npm =====
 node_modules/
 npm-debug.log
-package-lock.json
 
 # ===== Build output =====
 build/
