@@ -41,12 +41,14 @@ class Settings(BaseSettings):
 
     llm_provider: str = Field(default="claude")
     llm_provider_fallback: str = Field(default="ollama")
-    llm_model: str = Field(default="claude-sonnet-4-6")
-    llm_model_fallback: str = Field(default="qwen2.5:7b")
+    llm_model: str = Field(default="")
+    llm_heavy_model: str = Field(default="")
+    llm_model_fallback: str = Field(default="")
+    llm_api_base: str = Field(default="")
     llm_timeout_seconds: int = Field(default=60)
     llm_max_retries: int = Field(default=2)
 
-    db_url: str = Field(default="")
+    db_url: str = Field(default="sqlite:///workspace/tagent.db")
     minio_endpoint: str = Field(default="localhost:9000")
     minio_access_key: str = Field(default="")
     minio_secret_key: str = Field(default="")
@@ -119,16 +121,16 @@ class Settings(BaseSettings):
 
         issues: list[dict[str, str]] = []
 
-        # LLM key check
+        # LLM key check — any *_API_KEY works (openai/deepseek/anthropic/zhipu/...)
         llm_key = os.getenv("TAGENT_LLM_API_KEY", "")
         if not llm_key:
-            alt_keys = ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DASHSCOPE_API_KEY", "DEEPSEEK_API_KEY"]
-            if not any(os.getenv(k) for k in alt_keys):
-                issues.append({
-                    "level": "warning",
-                    "key": "llm_api_key",
-                    "message": "No LLM API key found — LLM calls will fail. Set TAGENT_LLM_API_KEY in .env or environment.",
-                })
+            llm_key = next((v for k, v in os.environ.items() if k.endswith("_API_KEY") and v), "")
+        if not llm_key:
+            issues.append({
+                "level": "warning",
+                "key": "llm_api_key",
+                "message": "No LLM API key found — LLM calls will fail. Set TAGENT_LLM_API_KEY in .env or environment.",
+            })
 
         # Critical dirs exist
         for attr, label in [("experts_dir", "experts"), ("skills_dir", "skills"), ("scripts_dir", "scripts")]:

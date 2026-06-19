@@ -608,7 +608,10 @@ def _check_first_run() -> None:
     if provider in ("ollama", "stub"):
         return  # local/stub — no API key needed
 
+    # Check any *_API_KEY env var (openai/deepseek/anthropic/zhipu/... all use this convention)
     api_key = os.environ.get("TAGENT_LLM_API_KEY", "")
+    if not api_key:
+        api_key = next((v for k, v in os.environ.items() if k.endswith("_API_KEY") and v), "")
     has_env_file = (get_settings().project_root / ".env").exists()
 
     if not api_key and not has_env_file:

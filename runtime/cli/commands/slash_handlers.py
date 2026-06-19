@@ -931,8 +931,8 @@ def _cmd_model_router(args: str) -> None:
     from rich.table import Table
 
     from runtime.router.model_router import (
-        MODEL_TIERS,
         get_current_provider,
+        get_model_tier,
     )
 
     current = get_current_provider()
@@ -941,7 +941,12 @@ def _cmd_model_router(args: str) -> None:
     table.add_column("Light (routing)", style="dim")
     table.add_column("Heavy (execution)", style="bold")
 
-    for prov, tier in MODEL_TIERS.items():
+    # Provider list for display — any provider works, these show defaults
+    display_providers = [
+        "claude", "openai", "gemini", "deepseek", "qwen", "zhipu", "ollama",
+    ]
+    for prov in display_providers:
+        tier = get_model_tier(prov)
         marker = " ←" if prov == current else ""
         table.add_row(
             prov + marker,

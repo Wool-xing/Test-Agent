@@ -339,6 +339,7 @@ def create_dirs(project_root):
         os.path.join(".github", "workflows"),
         "utils",
         "src",
+        "docs",
         os.path.join("workspace", "测试计划"),
         os.path.join("workspace", "需求分析"),
         os.path.join("workspace", "测试用例"),
@@ -586,6 +587,23 @@ def copy_ci(template_dir, project_root):
     )
 
 
+def copy_docs(template_dir, project_root):
+    """拷贝完整 docs/ 目录 — theory KB + charter + case-studies + tutorial 等。"""
+    docs_src = os.path.join(template_dir, "docs")
+    if not os.path.isdir(docs_src):
+        return
+    docs_dst = os.path.join(project_root, "docs")
+    print("→ 拷贝 docs/（theory KB + charter + tutorial ...）...")
+    if os.path.exists(docs_dst):
+        shutil.rmtree(docs_dst)
+    shutil.copytree(docs_src, docs_dst)
+    theory_dir = os.path.join(docs_dst, "theory")
+    card_count = 0
+    for root, _, files in os.walk(theory_dir):
+        card_count += len([f for f in files if f.endswith(".md") and f != "INDEX.md"])
+    print(f"  已部署 docs/ (theory KB: {card_count} 张卡片)")
+
+
 def copy_top_level_docs(template_dir, project_root):
     """拷贝顶层法律 / 治理 / 路线图文档。"""
     print("→ 拷贝法律 / 治理 / 路线图文档...")
@@ -702,20 +720,21 @@ def finish(project_root):
 
  项目目录: {project_root}
 
- === 独立使用（不需 AI）===
+ === 快速开始 ===
    cd {project_root}
-   .\tagent.bat                        # Windows 终端
-   ./tagent                            # macOS / Linux 终端
-   tagent run "path/to/prd.md"         # 一键执行
    tagent doctor                       # 健康检查
+   tagent run "path/to/prd.md"         # 一键执行
    tagent catalog                      # 查看所有专家和技能
 
+ === 配置 LLM ===
+   编辑 {project_root}/.env:
+     TAGENT_LLM_PROVIDER=你的provider   # 任意 LiteLLM 兼容 provider
+     TAGENT_LLM_API_KEY=你的key         # 官方 / 中转站 / 本地 均可
+     # TAGENT_LLM_API_BASE=            # 中转站/代理时填端点 URL
+
  === AI 协作模式 ===
-   1. 编辑 {project_root}/.env → 设 TAGENT_LLM_PROVIDER + API key
-     内置: claude | openai | gemini | deepseek | qwen | ollama
-     OpenAI 兼容: 智谱/豆包/Kimi/百川/讯飞 (设 TAGENT_LLM_API_BASE)
-   2. cd {project_root} && claude      (或 cursor / Copilot / Windsurf)
-   3. AI 会自动读取 CLAUDE.md，请确保它遵循 skills/ 流程文档
+   cd {project_root} && claude         (或 cursor / Copilot / Windsurf)
+   AI 自动读取 CLAUDE.md 并遵循 skills/ 流程
 
 {'=' * 50}
 """
@@ -847,6 +866,7 @@ def do_update():
         copy_sdk(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
+        copy_docs(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
 
         # 恢复用户数据
@@ -972,6 +992,7 @@ def main():
         copy_sdk(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
+        copy_docs(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
 
         # 7. Python 虚拟环境 + 依赖 + tagent CLI

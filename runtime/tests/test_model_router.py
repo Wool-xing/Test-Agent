@@ -7,7 +7,6 @@ import os
 import pytest
 
 from runtime.router.model_router import (
-    MODEL_TIERS,
     ModelTier,
     TaskTier,
     classify_task,
@@ -50,26 +49,28 @@ class TestTaskClassification:
 
 
 class TestModelTiers:
-    """Test model tier definitions."""
+    """Test model tier resolution — any provider works, no whitelist."""
 
-    def test_all_6_providers_defined(self):
-        expected = {"claude", "openai", "gemini", "deepseek", "qwen", "ollama"}
-        assert set(MODEL_TIERS.keys()) == expected
+    def test_known_providers_resolve_with_defaults(self):
+        for prov in ("claude", "openai", "gemini", "deepseek", "qwen", "zhipu", "ollama"):
+            tier = get_model_tier(prov)
+            assert tier.provider == prov
+            assert tier.light_model, f"{prov} — missing light model"
+            assert tier.heavy_model, f"{prov} — missing heavy model"
 
     def test_each_tier_has_both_models(self):
-        for prov, tier in MODEL_TIERS.items():
-            assert tier.light_model, f"{prov} missing light model"
-            assert tier.heavy_model, f"{prov} missing heavy model"
-            assert tier.provider == prov
+        for prov in ("claude", "openai", "gemini", "deepseek", "qwen", "zhipu"):
+            tier = get_model_tier(prov)
+            assert tier.light_model != tier.heavy_model, f"{prov} — light/heavy should differ"
 
     def test_ollama_same_model_both_tiers(self):
-        tier = MODEL_TIERS["ollama"]
-        assert tier.light_model == tier.heavy_model  # local model — same for both
+        tier = get_model_tier("ollama")
+        assert tier.light_model == tier.heavy_model
 
     def test_get_model_tier_default(self):
         tier = get_model_tier("claude")
         assert tier.provider == "claude"
-        assert "haiku" in tier.light_model.lower() or "haiku" in tier.light_model
+        assert "haiku" in tier.light_model.lower()
 
     def test_get_model_tier_unknown(self):
         tier = get_model_tier("unknown-provider")
