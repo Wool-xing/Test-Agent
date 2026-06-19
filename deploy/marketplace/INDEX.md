@@ -1,4 +1,4 @@
-# marketplace 索引(主宪章 §30)
+# marketplace 索引
 
 > 对标 Claude Code 官方 marketplace · 4 lane 资源库:skills / agents / mcp / hooks
 > 用户按需下载;**4 关安全门必过**(签名 / prompt 扫 / 沙箱试跑 / darwin 评分)
@@ -51,7 +51,7 @@ tagent verify <name>        # 单独跑沙箱验证
 tagent uninstall <name>     # 卸(归档不删)
 ```
 
-## 4 关安全门(主宪章 §30 铁律)
+## 4 关安全门
 
 1. **签名校验**:SHA256 + 可选 GPG/ed25519
 2. **全 prompt 扫描**:`runtime/scheduler/injection_scan.py` 复用,扫 skill 文本
@@ -64,7 +64,7 @@ tagent uninstall <name>     # 卸(归档不删)
 
 - **不复制 Anthropic / OpenAI 源码**(品牌+协议红线)
 - **仅镜像 metadata + 链接**到上游
-- 卸载只**归档**到 `marketplace/.archive/`(§22 不可逆禁止)
+- 卸载只**归档**到 `marketplace/.archive/`(不可逆禁止)
 
 ## 配置
 
