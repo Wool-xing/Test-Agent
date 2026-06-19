@@ -1152,10 +1152,22 @@ def start() -> None:
     console.print = _tui_print  # type: ignore[method-assign]
 
     style = _get_prompt_style()
+    def _warning_line() -> str:
+        """Inline warning for the prompt area (CC: '⚠ 5 setup issues')."""
+        issues = _cached_health()
+        errs = [i for i in issues if i["level"] == "error"]
+        warns = [i for i in issues if i["level"] == "warning"]
+        if errs:
+            return f"{len(errs)} errors · !doctor"
+        if warns:
+            return f"{len(warns)} warnings · !doctor"
+        return ""
+
     tui = TranscriptTUI(
         input_handler=_tui_input_handler,
         status_bar=_render_bottom_toolbar,
         rprompt=lambda: _current_model()[:14] + (".." if len(_current_model()) > 14 else ""),
+        warning_line=_warning_line,
         style=style,
         history=FileHistory(str(_HISTORY_FILE)),
         completer=SlashCompleter(),

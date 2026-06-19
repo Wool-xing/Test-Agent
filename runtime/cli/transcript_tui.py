@@ -42,6 +42,7 @@ class TranscriptTUI:
         input_handler: Callable[[str], None],
         status_bar: Callable[[], str],
         rprompt: Callable[[], str] | None = None,
+        warning_line: Callable[[], str] | None = None,
         style: Style | None = None,
         history = None,
         completer = None,
@@ -49,17 +50,18 @@ class TranscriptTUI:
         self.input_handler = input_handler
         self._status_bar = status_bar
         self._rprompt = rprompt or (lambda: "")
+        self._warning = warning_line or (lambda: "")
 
         # Transcript
         self._lines: list[str] = []
         self._buffer = Buffer(read_only=True, multiline=True)
-        self._width: int = 120
 
-        # Input
+        # Input — ghost text for tab completion
         self._input_buf = Buffer(
             multiline=False,
             history=history,
             completer=completer,
+            complete_while_typing=True,
             accept_handler=self._on_accept,
         )
 
@@ -90,7 +92,7 @@ class TranscriptTUI:
 
     def _build_layout(self) -> Layout:
         def _transcript_text():
-            text = "\n".join(self._lines[-200:]) if self._lines else " [dim]Welcome — type !help for commands[/]"
+            text = "\n".join(self._lines[-200:]) if self._lines else " Welcome — type !help for commands"
             return FormattedText([("class:transcript", text)])
 
         def _status_text():
@@ -99,32 +101,50 @@ class TranscriptTUI:
             clean = _re.sub(r'<[^>]+>', '', raw)
             return FormattedText([("class:bottom-toolbar", clean)])
 
-        return Layout(
-            HSplit([
-                Window(
-                    content=FormattedTextControl(
-                        text=_transcript_text,
-                        focusable=False,
-                    ),
-                    wrap_lines=True,
-                    always_hide_cursor=True,
+        def _warning_text():
+            w = self._warning()
+            if w:
+                return FormattedText([("class:warning", f" ⚠ {w}")])
+            return FormattedText([])
+
+        children = [
+            Window(
+                content=FormattedTextControl(
+                    text=_transcript_text,
+                    focusable=False,
                 ),
-                Window(height=1, char="─", style="class:separator"),
-                Window(
-                    content=BufferControl(buffer=self._input_buf),
-                    height=1,
-                    get_line_prefix=lambda line_count, width: [
-                        ("class:prompt", "❯ ")
-                    ],
-                    right_margins=[
-                        lambda width: FormattedText([("class:prompt.dim", self._rprompt())])
-                    ],
-                ),
-                Window(height=3, content=FormattedTextControl(
-                    text=_status_text, focusable=False,
-                ), style="class:bottom-toolbar"),
-            ])
-        )
+                wrap_lines=True,
+                always_hide_cursor=True,
+            ),
+        ]
+
+        # Warning banner (only shown when there are issues)
+        w = self._warning()
+        if w:
+            children.append(
+                Window(height=1, content=FormattedTextControl(
+                    text=f" ⚠ {w}", focusable=False,
+                ), style="class:warning")
+            )
+
+        children += [
+            Window(height=1, char="─", style="class:separator"),
+            Window(
+                content=BufferControl(buffer=self._input_buf),
+                height=1,
+                get_line_prefix=lambda line_count, width: [
+                    ("class:prompt", "❯ ")
+                ],
+                right_margins=[
+                    lambda width: FormattedText([("class:prompt.dim", self._rprompt())])
+                ],
+            ),
+            Window(height=3, content=FormattedTextControl(
+                text=_status_text, focusable=False,
+            ), style="class:bottom-toolbar"),
+        ]
+
+        return Layout(HSplit(children))
 
     def _on_accept(self, buf: Buffer) -> bool:
         text = buf.text.strip()
