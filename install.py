@@ -703,7 +703,7 @@ def finish(project_root):
 
  === 独立使用（不需 AI）===
    cd {project_root}
-   .\tagent.bat                        # Windows 终端
+   .\\tagent.bat                       # Windows 终端
    ./tagent                            # macOS / Linux 终端
    tagent run "path/to/prd.md"         # 一键执行
    tagent doctor                       # 健康检查
