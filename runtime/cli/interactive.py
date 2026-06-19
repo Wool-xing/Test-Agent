@@ -227,80 +227,198 @@ def _git_branch() -> str:
         return ""
 
 
+def _estimate_tokens(text: str) -> int:
+    """Token count estimate. Uses tiktoken if available, else heuristic."""
+    if not text:
+        return 0
+    try:
+        import tiktoken
+        enc = tiktoken.get_encoding("cl100k_base")
+        return len(enc.encode(text))
+    except Exception:
+        pass
+    cjk = sum(1 for c in text if '一' <= c <= '鿿' or '぀' <= c <= 'ヿ')
+    ascii_chars = len(text) - cjk
+    return max(1, (ascii_chars // 4) + (cjk * 2 // 3))
+
+
 def _context_pct() -> int:
-    """Estimate context window usage percentage (rough)."""
+    """Real token-based context usage percentage."""
     mem = _get_memory()
     if not mem or not mem.messages:
         return 0
-    chars = sum(len(m.get("content", "")) for m in mem.messages)
-    return min(99, chars // 500)
+    total = "".join(m.get("content", "") for m in mem.messages)
+    tokens = _estimate_tokens(total)
+    model = _current_model().lower()
+    _LIMITS = {"claude": 200000, "gpt-4": 128000, "deepseek": 128000,
+               "gemini": 1000000, "qwen": 131072, "glm": 128000}
+    limit = next((v for k, v in _LIMITS.items() if k in model), 200000)
+    return min(99, int(tokens * 100 / limit))
 
 
 def _render_prompt_message() -> list[tuple[str, str]]:
-    """Top separator + prompt — compact, no blank lines."""
-    sep = "─" * _term_width()
-    return [
-        ("class:separator", f"{sep}\n"),
-        ("class:prompt", "❯ "),
-    ]
+    """Prompt only — separator is in bottom toolbar (CC/DeepSeek pattern)."""
+    return [("class:prompt", "❯ ")]
 
 
 def _render_bottom_toolbar() -> "HTML":
-    """Bottom separator + status bar. Uses prompt_toolkit-compatible HTML tags only.
-
-    Supported tags: <b>, <i>, <u>, <s>, <ansired>, <ansigreen>, <ansiyellow>,
-    <ansiblue>, <ansimagenta>, <ansicyan>, <ansigray>, <style fg='...' bg='...'>
-    """
+    """Bottom separator + status bar. Uses prompt_toolkit-compatible HTML tags only."""
     from prompt_toolkit.formatted_text import HTML
 
-    sep = "─" * _term_width()
+    w = _term_width()
+    sep = "─" * w
     p = _current_provider()
     m = _current_model()
     b = _git_branch()
     pct = _context_pct()
     proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
 
-    # Model block
-    line1 = f"  <b>[{p}]</b>"
+    # Line 1: model · project · git · health
+    parts1 = []
+    model_block = f"<b>[{p}]</b>"
     if m and m != p:
-        line1 += f" <b>[{m}]</b>"
-
-    # Project & git
-    line1 += f" │ <ansicyan>{proj}</ansicyan>"
+        model_block += f" <b>[{m}]</b>"
+    parts1.append(model_block)
+    parts1.append(f"<ansicyan>{proj}</ansicyan>")
     if b:
-        line1 += f" │ <ansigreen>git:{b}</ansigreen>"
+        parts1.append(f"<ansigreen>git:{b}</ansigreen>")
 
-    # Health
     issues = _cached_health()
     errs = [i for i in issues if i["level"] == "error"]
     warns = [i for i in issues if i["level"] == "warning"]
     if errs:
-        line1 += f" │ <ansired>⚠ {len(errs)}</ansired>"
+        parts1.append(f"<ansired>⚠ {len(errs)}</ansired>")
     elif warns:
-        line1 += f" │ <ansiyellow>⚠ {len(warns)}</ansiyellow>"
+        parts1.append(f"<ansiyellow>⚠ {len(warns)}</ansiyellow>")
     else:
-        line1 += " │ <ansigreen>✓</ansigreen>"
+        parts1.append("<ansigreen>✓</ansigreen>")
 
-    # Line 2: context bar + counts + tips
+    line1 = _fit_line(w - 2, parts1)
+
+    # Line 2: context gauge · counts · tips
+    parts2 = []
     bar_len = 10
     filled = min(bar_len, pct * bar_len // 100)
-    bar = "█" * filled + "░" * (bar_len - filled)
-    line2 = f"  Context {bar} {pct}%"
+    empty = bar_len - filled
+    if pct >= 85:
+        gauge = f"<ansired>{'█' * filled}</ansired>{'░' * empty}"
+    elif pct >= 60:
+        gauge = f"<ansiyellow>{'█' * filled}</ansiyellow>{'░' * empty}"
+    else:
+        gauge = f"<ansigray>{'█' * filled}</ansigray>{'░' * empty}"
+    parts2.append(f"Context {gauge} {pct}%")
 
     agents_n = _count_md_files("agents")
     skills_n = _count_md_files("skills")
     if agents_n:
-        line2 += f" │ {agents_n} agents"
+        parts2.append(f"{agents_n} agents")
     if skills_n:
-        line2 += f" │ {skills_n} skills"
+        parts2.append(f"{skills_n} skills")
 
     root = get_settings().project_root
     if (root / "CLAUDE.md").is_file():
-        line2 += " │ CLAUDE.md"
+        parts2.append("CLAUDE.md")
 
-    line2 += " │ <ansigray>!help · !doctor · !model</ansigray>"
+    parts2.append("<ansigray>!help · !doctor · !model</ansigray>")
 
-    return HTML(f"{sep}\n{line1}\n{line2}")
+    line2 = _fit_line(w - 2, parts2)
+
+    return HTML(f"{sep}\n  {line1}\n  {line2}")
+
+
+def _fit_line(width: int, parts: list[str]) -> str:
+    """Fit as many parts as possible into `width` columns.
+    Joins with \" · \" (DeepSeek/OI pattern). Drops rightmost first."""
+    import re
+    sep = " · "
+    full = sep.join(parts)
+    if len(re.sub(r'<[^>]+>', '', full)) <= width:
+        return full
+    for n in range(len(parts) - 1, 0, -1):
+        candidate = sep.join(parts[:n])
+        if len(re.sub(r'<[^>]+>', '', candidate)) <= width:
+            return candidate
+    return parts[0]
+    if pct >= 85:
+        gauge = f"<ansired>{'█' * filled}</ansired>{'░' * empty}"
+    elif pct >= 60:
+        gauge = f"<ansiyellow>{'█' * filled}</ansiyellow>{'░' * empty}"
+    else:
+        gauge = f"<ansigray>{'█' * filled}</ansigray>{'░' * empty}"
+    parts2.append(f"Context {gauge} {pct}%")
+
+    agents_n = _count_md_files("agents")
+    skills_n = _count_md_files("skills")
+    if agents_n:
+        parts2.append(f"{agents_n} agents")
+    if skills_n:
+        parts2.append(f"{skills_n} skills")
+
+    root = get_settings().project_root
+    if (root / "CLAUDE.md").is_file():
+        parts2.append("CLAUDE.md")
+
+    parts2.append("<ansigray>!help · !doctor · !model</ansigray>")
+
+    line2 = _fit_line(w - 2, parts2)
+
+    return HTML(f"{sep}\n  {line1}\n  {line2}")
+
+
+def _fit_line(width: int, parts: list[str]) -> str:
+    """Fit as many parts as possible into `width` columns.
+    Joins with \" · \" (DeepSeek/OI pattern). Drops rightmost first."""
+    import re
+    sep = " · "
+    full = sep.join(parts)
+    if len(re.sub(r'<[^>]+>', '', full)) <= width:
+        return full
+    for n in range(len(parts) - 1, 0, -1):
+        candidate = sep.join(parts[:n])
+        if len(re.sub(r'<[^>]+>', '', candidate)) <= width:
+            return candidate
+    return parts[0]
+    if pct >= 85:
+        gauge = f"<ansired>{'█' * filled}</ansired>{'░' * empty}"
+    elif pct >= 60:
+        gauge = f"<ansiyellow>{'█' * filled}</ansiyellow>{'░' * empty}"
+    else:
+        gauge = f"<ansigray>{'█' * filled}</ansigray>{'░' * empty}"
+    parts2.append(f"Context {gauge} {pct}%")
+
+    agents_n = _count_md_files("agents")
+    skills_n = _count_md_files("skills")
+    if agents_n:
+        parts2.append(f"{agents_n} agents")
+    if skills_n:
+        parts2.append(f"{skills_n} skills")
+
+    root = get_settings().project_root
+    if (root / "CLAUDE.md").is_file():
+        parts2.append("CLAUDE.md")
+
+    parts2.append("<ansigray>!help · !doctor · !model</ansigray>")
+
+    line2 = _fit_line(w - 2, parts2)
+
+    return HTML(sep + "\n  " + line1 + "\n  " + line2)
+
+
+def _fit_line(width: int, parts: list[str]) -> str:
+    """Fit as many parts as possible into `width` columns.
+    Joins with " · " (DeepSeek/OI pattern). Drops rightmost first."""
+    import re
+    sep = " · "
+    full = sep.join(parts)
+    if len(re.sub(r'<[^>]+>', '', full)) <= width:
+        return full
+    for n in range(len(parts) - 1, 0, -1):
+        candidate = sep.join(parts[:n])
+        if len(re.sub(r'<[^>]+>', '', candidate)) <= width:
+            return candidate
+    return parts[0]
+
+
 
 
 # ── Banner & Help ─────────────────────────────────────────────────
