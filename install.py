@@ -428,6 +428,19 @@ def copy_ai_support(template_dir, project_root):
     print("  已部署 ai/ 目录")
 
 
+def copy_specs(template_dir, project_root):
+    """拷贝 specs/ 目录到部署项目 — ManifestV2 单源真理。"""
+    specs_src = os.path.join(template_dir, "specs")
+    if not os.path.isdir(specs_src):
+        return
+    specs_dst = os.path.join(project_root, "specs")
+    print("→ 拷贝 specs/ 目录...")
+    if os.path.exists(specs_dst):
+        shutil.rmtree(specs_dst)
+    shutil.copytree(specs_src, specs_dst)
+    print("  已部署 specs/ 目录（ManifestV2 单源真理）")
+
+
 def _ensure_env_overrides(env_path: str) -> None:
     """确保 .env 中包含部署后路径覆盖。"""
     overrides = {
@@ -800,6 +813,7 @@ def do_update():
         copy_agents(template_dir, PROJECT_ROOT)
         copy_skills(template_dir, PROJECT_ROOT)
         copy_ai_support(template_dir, PROJECT_ROOT)
+        copy_specs(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
@@ -922,6 +936,7 @@ def main():
         copy_agents(template_dir, PROJECT_ROOT)
         copy_skills(template_dir, PROJECT_ROOT)
         copy_ai_support(template_dir, PROJECT_ROOT)
+        copy_specs(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)

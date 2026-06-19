@@ -347,7 +347,7 @@ jobs:
             { echo "❌ .gitignore 未排除源 MD"; exit 1; }
           echo "✅ 敏感本地文档受保护"
 
-      - name: 验证 .gitignore 排除精髓库（V1.10 §34）
+      - name: 验证 .gitignore 排除精髓库
         run: |
           if [ -d "_精髓库" ] || [ -d "**/_精髓库" ]; then
             echo "❌ 私有知识库不应出现在仓库"
@@ -523,3 +523,16 @@ jobs:
         run: |
           pip install ruff
           ruff check specs/
+
+  test-rust:
+    name: Rust engine check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cargo check
+        run: cd engine && cargo check -p tagent-engine
+      - name: Cargo test
+        run: cd engine && cargo test
+      - name: Clippy
+        run: cd engine && cargo clippy -- -D warnings

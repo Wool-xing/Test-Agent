@@ -154,3 +154,22 @@ graphify-out/.graphify_*
 # ===== Runtime artifacts =====
 runtime/workspace/
 runtime/graphify-out/
+
+# ===== V2 Rust engine =====
+engine/target/
+
+# ===== V2 VitePress docs =====
+.vitepress/cache/
+.vitepress/dist/
+
+# ===== V2 desktop app =====
+apps/desktop-v2/node_modules/
+apps/desktop-v2/dist/
+
+# ===== V2 Marketplace UI =====
+runtime/web/marketplace/node_modules/
+runtime/web/marketplace/dist/
+
+# ===== Test artifacts =====
+workspace/*.db
+workspace/*.db-journal
