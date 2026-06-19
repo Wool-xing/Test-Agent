@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use suite_minimizer_v2 instead. This file will be removed in V1.2.
+# NOTE: suite_minimizer_v2.py is the enhanced version (CSV/JSON/Excel input, analyze + minimize).
+# This v1 retains excel-specific dedup + coverage-based minimization.
 """
 测试套件减重（Suite Minimization）- 检测重复用例 / 冗余覆盖
 被引用方：testcase-designer / 测试质量

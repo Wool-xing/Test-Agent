@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
-# DEPRECATED: use data_factory_v2 instead. This file will be removed in V1.2.
+# NOTE: data_factory_v2.py is the enhanced version (8 entities, relational data, multi-format).
+# This v1 remains because v2 has a different API (EntityRegistry vs TestDataManager/UserFactory).
+# Conftest.py and jmeter_csv_exporter.py depend on v1's TestDataManager and UserFactory classes.
 """
 测试数据工厂 - Faker + Factory Boy 生成标准化测试数据
 被引用方：05-数据准备 agent / data-preparation skill / conftest.py

@@ -1,6 +1,8 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { Beaker, Upload, BookOpen, Settings, Stethoscope, MessageSquare, BarChart3, Clock } from "lucide-react";
 
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || "1.0.0";
+
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -9,7 +11,7 @@ export default function App() {
           <h1 className="text-lg font-semibold flex items-center gap-2">
             <Beaker className="w-5 h-5" aria-hidden="true" />
             <span>Test-Agent</span>
-            <span className="text-xs text-slate-500">v1.0.0</span>
+            <span className="text-xs text-slate-500">v{APP_VERSION}</span>
           </h1>
           <nav aria-label="Primary">
             <ul className="flex gap-4 text-sm">
@@ -64,7 +66,7 @@ export default function App() {
       </main>
       <footer className="border-t mt-auto" role="contentinfo">
         <div className="container mx-auto px-4 py-3 text-xs text-slate-500">
-          Test-Agent v1.0.0 · MIT License
+          Test-Agent v{APP_VERSION} · MIT License
         </div>
       </footer>
     </div>
