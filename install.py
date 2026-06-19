@@ -520,6 +520,19 @@ def copy_utils(template_dir, project_root):
     print(f"  ✓ {count} 个 .py 文件已拷贝")
 
 
+def copy_sdk(template_dir, project_root):
+    """拷贝 Plugin SDK 到部署项目 — CLI plugin 命令依赖。"""
+    sdk_src = os.path.join(template_dir, "sdk")
+    if not os.path.isdir(sdk_src):
+        return
+    sdk_dst = os.path.join(project_root, "sdk")
+    print("→ 拷贝 sdk/ ...")
+    if os.path.exists(sdk_dst):
+        shutil.rmtree(sdk_dst)
+    shutil.copytree(sdk_src, sdk_dst)
+    print("  已部署 Plugin SDK")
+
+
 def copy_runtime(template_dir, project_root):
     """拷贝 runtime 目录（pyproject.toml / Python / 前端 / Docker / MCP / 配置等）。"""
     print("→ 拷贝 runtime...")
@@ -816,6 +829,7 @@ def do_update():
         copy_specs(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_sdk(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
@@ -939,6 +953,7 @@ def main():
         copy_specs(template_dir, PROJECT_ROOT)
         copy_config(template_dir, PROJECT_ROOT)
         copy_utils(template_dir, PROJECT_ROOT)
+        copy_sdk(template_dir, PROJECT_ROOT)
         copy_runtime(template_dir, PROJECT_ROOT)
         copy_ci(template_dir, PROJECT_ROOT)
         copy_top_level_docs(template_dir, PROJECT_ROOT)
