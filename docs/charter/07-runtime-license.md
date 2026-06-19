@@ -37,7 +37,7 @@ runtime/storage 飞轮                  ← Postgres+pgvector + MinIO
 ### 八维测试矩阵(运行时元数据骨架)
 
 | 维度 | 取值 |
-|------|------|
+| ------ | ------ |
 | 平台 | Web/移动/桌面/嵌入式/云原生/中间件/DB/AI模型/区块链/IoT/工控 |
 | 协议 | HTTP(S)/gRPC/WS/TCP/UDP/MQTT/AMQP/Kafka/Redis/SOAP/GraphQL/Modbus/CAN |
 | 测试类型 | 单元/集成/E2E/UI/API/性能/压力/容量/混沌/安全/渗透/模糊/合规/可访问性/兼容/本地化/可用性/视觉回归/契约/可观测 |
@@ -66,7 +66,7 @@ TAGENT_LLM_PROVIDER_FALLBACK=ollama  # 主路由失败回退
 ### 飞轮 schema(`runtime/storage/`)
 
 | 表 | 用途 |
-|----|------|
+| ---- | ------ |
 | `runs` | 一次执行(run_id/输入/状态/DAG/起止) |
 | `cases` | 测试用例(优先级/步骤/结果/专家/技能) |
 | `defects` | 缺陷(严重度/状态/根因/外部 Bug 系统 URL) |
@@ -107,7 +107,7 @@ uvicorn runtime.api.main:app --port 8800
 ### 与 16 专家 / 32 Skill / 79 utils 的关系
 
 | 项 | 关系 |
-|----|------|
+| ---- | ------ |
 | 16 专家 `.md` | **不动**。`registry` 扫 frontmatter,`router` 喂 LLM 选用 |
 | 32 Skill `.md` | **不动**。同上 |
 | 79 utils `.py` | **不动**。`orchestrator/adapters/scripts.py` subprocess 隔离调用 |

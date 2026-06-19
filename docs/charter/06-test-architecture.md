@@ -48,7 +48,7 @@
 **Shift-Left 实施层级**（从最早到最晚）：
 
 | 层 | 介入点 | 工具 / utils | 阻断力 |
-|----|--------|------------|--------|
+| ---- | -------- | ------------ | -------- |
 | L1 | **需求阶段** | `requirements-analyst` 双轨输出（MD + JSON）+ 风险矩阵 | 弱（评审） |
 | L2 | **设计阶段** | `testcase-designer` 等价类/边界值/状态迁移/配对测试 + 风险矩阵 | 弱（评审） |
 | L3 | **IDE 编码时** | ruff + mypy + IDE 实时提示 | 强（编辑器红线） |
@@ -68,7 +68,7 @@
 **Shift-Right 实施层级**：
 
 | 层 | 机制 | 工具 / utils | Test-Agent 状态 |
-|----|------|------------|----------------|
+| ---- | ------ | ------------ | ---------------- |
 | R1 | **合成监控**（Synthetic Monitoring） | 定时跑核心路径（登录/下单），24h 覆盖 | ⚪ 路线图 Phase 3 加 `utils/synthetic_monitor.py` |
 | R2 | **真实用户监测**（RUM） | Web Vitals 上报 + 前端错误堆栈 | ✅ `utils/web_vitals_collector.py`（采集端） |
 | R3 | **链路追踪**（Distributed Tracing） | Jaeger / Zipkin + traceID 业务断言 | ✅ `utils/tracing_validator.py` |
@@ -91,7 +91,7 @@
 **测试侧可观测**（独立于业务可观测性）：
 
 | 维度 | 数据源 | 现状 | 可视化目标 |
-|------|--------|------|----------|
+| ------ | -------- | ------ | ---------- |
 | 用例通过率 | junit-xml | ✅ Allure | Allure 报告 |
 | 覆盖率 | coverage.xml | ✅ pytest-cov HTML | 覆盖率 HTML |
 | 性能基线 | jmeter-results/result.jtl | ✅ JMeter HTML + baseline.json | JMeter HTML |
@@ -110,7 +110,7 @@
 **Test-Agent 五层门禁**：
 
 | 层 | 触发 | 关键阈值 | 不达标处置 | 实现 |
-|----|------|---------|----------|------|
+| ---- | ------ | --------- | ---------- | ------ |
 | **smoke** | 每次 commit/PR | P0 通过率 ≥95% + 0 新 P0 Bug + API ≤3000ms | 阻断后续 | `utils/ci_quality_gate.py::GATES['smoke']` |
 | **regression** | merge 到 main / develop | P0=100% / P1≥95% / 总体≥90% / cov ≥80% / Flaky <5% | 评估遗留风险 | `utils/ci_quality_gate.py::GATES['regression_p0_p1']` |
 | **performance_ci_quick** | CI 默认（5 并发） | TPS≥20 / P95≤800ms / err <1% | 警告不阻 | `utils/jmeter_result_parser.DEFAULT_GATES_CI_QUICK` |
@@ -132,7 +132,7 @@
 **Phase 触发条件总表**：
 
 | Phase | 触发条件 | 标志性交付 |
-|------|---------|----------|
+| ------ | --------- | ---------- |
 | **Phase 1**（已完成 V1.0.0-V1.36.0） | 概念宪章成 + 工程基线就绪 + expert rollout 收尾 + skill rollout 完成 | 16 expert (11p+5s) + 32 skill (23p+7s+0r+2v) + AgentChat + Bug 多适配 + 按需安装 + darwin-skill + MCP + 教学层 + Marketplace + 多 LLM config |
 | **Phase 2** | utils 单测覆盖 ≥ 60% 且团队 ≥ 5 人 | 契约链路串通 + 门禁引擎 yaml 抽象 + 反问 KB 重新评估 + skill rollout 继续 |
 | **Phase 3** | Phase 2 全交付 + 接入 ≥ 2 行业 | 合成监控 + canary/feature flag + 统一 dashboard + 沉默故障 + 缺席者注入 |
@@ -142,7 +142,7 @@
 **当前路线图详表**：
 
 | 维度 | 现状 | 落点 Phase | 关键交付 |
-|------|------|-----------|---------|
+| ------ | ------ | ----------- | --------- |
 | **金字塔单元层** | 弱（utils 自身无测试） | Phase 2 | `tests/test_utils_*.py` 全覆盖 + 变异测试反向用 |
 | **Shift-Left L7 契约链路** | utils 雏形未串通 | Phase 2 | OpenAPI 改动 → contract → PR 阻断 |
 | **门禁引擎抽象** | 阈值写死代码 | Phase 2 | ✅ `utils/quality_gate_engine.py` + `config/quality_gates.yaml` 驱动 |
@@ -202,7 +202,7 @@
 > 状态：⏳ 未定 / 🔄 评估中 / ✅ 已定 / ❌ 否决
 
 | # | 议题 |  |  |
-|---|------|---------|------|
+| --- | ------ | --------- | ------ |
 |  |  |  |  |
 | Q2 | Agent 架构：单体 vs 专 |  | V1.0.0 选专科 + test-lead 中枢 |
 | Q3 | 五条铭文的技术实现机制（不可变区域、熔断条件）？ | 🔄 | V1.0.0 铭文锁死，无削弱机制；Phase 4 接入合规行业后重新设计 |
@@ -219,7 +219,7 @@
 宪章与工程文档共用术语。读者重新进入项目时，从这里建立词汇基线。
 
 | 术语 | 释义 |
-|------|------|
+| ------ | ------ |
 | 承诺学科 | 把测试从"检查代码"推进到"检查承诺"——金融的守恒、医疗的可逆、司法的可采信，都是承诺 |
 | 隐喻先行 | 进入新行业前先建立"根本隐喻"档案，决定该测什么承诺、不碰什么红线 |
 | 三筐分类 | Yes / No / **Too Hard**。大部分事进第三筐；不做决策也是决策 |

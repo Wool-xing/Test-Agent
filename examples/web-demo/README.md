@@ -70,7 +70,7 @@ examples/web-demo/
 ## 与完整 Test-Agent 工作流的关系
 
 | 完整工作流 | 本 demo |
-|-----------|---------|
+| ----------- | --------- |
 | 16 Agent + 32 Skill + 79 utils | 仅 pytest + playwright |
 | `.env` 配置 8 必填 | 不需 `.env` |
 | Allure / JMeter / BugTracker 集成 | 不集成 |
@@ -107,7 +107,7 @@ cp -r examples/web-demo /path/to/your-test-project/tests
 ## 故障排查
 
 | 现象 | 可能原因 | 解决 |
-|------|---------|------|
+| ------ | --------- | ------ |
 | `failed-wheel-build-for-install` / `greenlet` 编译失败 | Python 3.13/3.14 缺 wheel | 用 Python 3.11/3.12 重建 venv（见上方"5 分钟跑通"段） |
 | `playwright._impl._errors.Error: Executable doesn't exist` | 未装浏览器 | `playwright install chromium --with-deps` |
 | `AssertionError: Get started 链接缺失` | playwright.dev 网站改版 | 改 `pages/playwright_page.py::GET_STARTED_LINK` selector |

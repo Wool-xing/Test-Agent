@@ -6,7 +6,7 @@
 ## 技术栈
 
 | 项 | 选 |
-|----|----|
+| ---- | ---- |
 | 构建 | Vite 5 + TypeScript 5 |
 | UI 框架 | React 18 |
 | 组件库 | shadcn/ui (Radix + Tailwind) |
@@ -19,7 +19,7 @@
 ## 4 页
 
 | 路由 | 用途 |
-|------|------|
+| ------ | ------ |
 | `/` | Upload(多格式:PDF/Word/MD/exe/APK/IPA/Docker/URL/口头) |
 | `/runs/:run_id` | Run Status(SSE 流式 DAG 实时进度) |
 | `/runs/:run_id/report` | Report(执行结果+证据+缺陷链接) |
@@ -40,7 +40,7 @@ npm run test:a11y    # axe-core 可访问性扫
 ## API 端点对接
 
 | 前端 | 后端(`runtime/api/main.py`) |
-|------|-----------------------------|
+| ------ | ----------------------------- |
 | Upload 文本 | `POST /run/text` |
 | Upload 文件 | `POST /run/file` |
 | Upload URL | `POST /run/url` |

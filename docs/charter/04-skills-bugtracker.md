@@ -26,7 +26,7 @@ workspace/测试报告/{项目名}/skill-evolution/
 ### 2. 触发时机
 
 | 触发方式 | 频率 | 操作者 |
-|---------|------|--------|
+| --------- | ------ | -------- |
 | 用户手动 | 任意 | `> /darwin-skill` 或自然语言"优化所有 skills" |
 | 定时（CI 月度） | 每月 1 日 | GitHub Actions schedule job，仅跑 baseline 不自动改 |
 | 新 skill 入库后首测 | 一次性 | 新增 skill 在 .claude/skills/ 后，下次 darwin 跑必扫描 |
@@ -68,7 +68,7 @@ V1.0.0 darwin-skill **不消费**项目运行数据（`discussions/` / `decision
 ### 1. 适配器矩阵
 
 | 适配器 | 状态 | 配置字段 | severity 映射 |
-|--------|------|---------|--------------|
+| -------- | ------ | --------- | -------------- |
 | **zentao**（默认） | ✅ V1.0.0 | `ZENTAO_URL / ZENTAO_USER / ZENTAO_TOKEN` | severity 1=P0 / 2=P1 / 3=P2 / 4=P3 |
 | **jira** | ⚪ Phase 2 | `JIRA_URL / JIRA_USER / JIRA_TOKEN / JIRA_PROJECT_KEY` | Highest=P0 / High=P1 / Medium=P2 / Low=P3 |
 | **github** | ⚪ Phase 2 | `GITHUB_TOKEN / GITHUB_REPO` | label `priority:p0..p3` |

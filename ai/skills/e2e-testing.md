@@ -17,7 +17,7 @@ SKILL_IMPL_STATUS: production
 ## 关键设计
 
 | 维度 | 实现 |
-|------|------|
+| ------ | ------ |
 | 浏览器 | Playwright(Chromium / Firefox / WebKit) |
 | 2FA / TOTP | `pyotp.TOTP(SECRET).now()` |
 | SSO | Playwright follow redirects(Okta / Auth0 / Azure AD / Keycloak) |

@@ -10,7 +10,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `pool.py` | 全局 ThreadPoolExecutor + `resize_pool()` |
 | `spawn.py` | `spawn_subagent(prompt, *, model_override=None) -> Future` |
 | `aux_client.py` | 辅助 LLM client(不共享主缓存) |

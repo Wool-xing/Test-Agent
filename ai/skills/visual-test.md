@@ -85,7 +85,7 @@ git commit -m "chore: update visual baseline for login"
 ## 质量门禁
 
 | 指标 | 要求 |
-|------|------|
+| ------ | ------ |
 | P0 视觉用例通过率 | ≥95% |
 | 视觉相似度（SSIM） | ≥ 0.95 |
 | OCR 字符识别准确率 | ≥ 90%（对清晰文字） |

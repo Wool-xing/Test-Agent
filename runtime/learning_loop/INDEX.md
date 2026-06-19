@@ -14,7 +14,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `curator.py` | 闲置触发的后台 skill 维护协调器 |
 | `session_search.py` | FTS5 跨会话检索(SQLite + LLM 摘要) |
 | `user_model.py` | 跨会话用户画像(类 Honcho dialectic) |

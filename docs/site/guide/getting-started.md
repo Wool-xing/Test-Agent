@@ -52,7 +52,7 @@ tagent run "path/to/prd.md"
 ## What's New in V2
 
 | Feature | Description |
-|---------|-------------|
+| --------- | ------------- |
 | AI Router (Phase 2, #8) | NL query to expert+skill mapping with stub mode |
 | Self-Healing Engine (Phase 3, #9) | Exponential backoff retry, element locator fallback chains |
 | Release Readiness (Phase 4, #15) | Weighted scoring with GREEN/YELLOW/RED gating |

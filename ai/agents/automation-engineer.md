@@ -50,7 +50,7 @@ project_root/
 ### 命名规范
 
 | 对象 | 规范 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 测试文件 | `test_{module}_{type}_{priority}.py` | `test_login_ui_p0.py` |
 | 测试类 | `Test{Module}{Type}` | `TestLoginUI` |
 | 测试方法 | `test_{scenario}_{priority}` | `test_normal_login_p0` |
@@ -343,7 +343,7 @@ allure serve workspace/测试报告/{项目名}/allure-results
 ## 非功能维度脚本（调对应 utils）
 
 | 维度 | 调用 utils | 示例 |
-|------|----------|------|
+| ------ | ---------- | ------ |
 | 安全 | `utils.security_scanner` | `run_bandit("./src")` / `check_security_headers(url)` / `zap_active_scan(url)` |
 | 兼容 | `utils.compatibility_matrix` | `web_matrix()` → 用 `@pytest.mark.parametrize` 跑全矩阵 |
 | 弱网 | `utils.network_throttle` | `apply_preset("3g", mode="tc")` 测试中包裹 try/finally + tc_clear |
@@ -401,7 +401,7 @@ generate_test_cases(spec, "https://api.example.com")
 ## TDD / BDD / ATDD 实践规范
 
 | 方法 | 节奏 | 工具 |
-|------|------|------|
+| ------ | ------ | ------ |
 | **TDD**（Test-Driven Development） | Red → Green → Refactor（先写失败的测试，再写通过代码，再重构） | pytest + pytest-mock |
 | **BDD**（Behavior-Driven Development） | Given-When-Then 场景驱动开发 | utils.bdd_runner（pytest-bdd） |
 | **ATDD**（Acceptance Test-Driven Development） | 业务/产品/开发/测试三方共写验收用例 | BDD + 看板协作 |
@@ -444,7 +444,7 @@ def calculate_discount(price, rate):
 ### Shift-Right（右移：在生产实战测）
 
 | 实践 | 工具 |
-|------|------|
+| ------ | ------ |
 | **生产合成监测**（Synthetic Monitoring） | Pingdom / Datadog Synthetic / 自建 utils.api_retry_util 定时探活 |
 | **金丝雀 / 灰度发布** | Argo Rollouts / Spinnaker / Feature Flag |
 | **混沌工程（生产）** | Chaos Monkey（Netflix）/ utils.chaos_helper（受控） |

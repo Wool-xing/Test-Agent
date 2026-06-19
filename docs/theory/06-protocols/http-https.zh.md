@@ -49,7 +49,7 @@ Web/API 测试**必经协议**。Test-Agent `utils/api_retry_util.py` 提供 10/
 
 ## 必测维度
 | 维度 | 工具 |
-|------|------|
+| ------ | ------ |
 | 状态码 | requests + assert |
 | Header | TLS 版本 / Cache-Control / CORS / Cookie |
 | Body | JSON/XML schema 校验 |

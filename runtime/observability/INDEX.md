@@ -3,7 +3,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `otel.py` | OTel tracer/meter 初始化,FastAPI/Prefect 自动埋点 |
 | `logging.py` | Loguru 结构化(JSON / 人类可读),run_id 自动注入 |
 

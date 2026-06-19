@@ -119,7 +119,7 @@ out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 ## 📋 输出规范
 
 | 输出文件 | 用途 | 使用方 |
-|---------|------|--------|
+| --------- | ------ | -------- |
 | `workspace/测试数据/test_data.json` | pytest 功能测试数据（conftest fixture 消费） | conftest / automation-engineer |
 | `workspace/测试数据/jmeter_users.csv` | JMeter 参数化压测数据 | jmeter-script-gen / test-executor |
 | `workspace/测试报告/{项目名}/数据清理_{日期}.json` | 数据清理报告 | test-lead |

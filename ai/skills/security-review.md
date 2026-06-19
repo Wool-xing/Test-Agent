@@ -10,7 +10,7 @@ SKILL_IMPL_STATUS: production
 ## 与 pentest-* 的区别(避免重复)
 
 | Skill | 时机 | 层 |
-|-------|------|----|
+| ------- | ------ | ---- |
 | **security-review**(本) | 每 PR / feature 阶段 | **代码层**(白盒静态) |
 | `/pentest-coordinator` | 完整渗透项目 | **应用层**(动态利用) |
 | `/pentest-vuln` | 渗透中漏洞发现 | 5 攻击域 |
@@ -27,7 +27,7 @@ SKILL_IMPL_STATUS: production
 ## 5 维自检(快速版)
 
 | 维 | 检查 |
-|----|------|
+| ---- | ------ |
 | **凭据** | 硬编码 password / API key / token → `gitleaks` + `truffleHog` |
 | **注入** | 字符串拼接 SQL / shell / template / LDAP → grep `f"{...}"` 在 `cursor.execute` / `subprocess.run` 等 |
 | **权限** | 缺 `@requires_auth` / 缺 `is_owner` 检查 → 静态扫 endpoint 装饰器 |

@@ -11,7 +11,7 @@
 ## 模块清单
 
 | 模块 | 路径 | 用途 |
-|------|------|------|
+| ------ | ------ | ------ |
 | AI 路由 | [router/](router/INDEX.md) | 被测物 → 专家+Skill 组合 → DAG |
 | 注册中心 | [registry/](registry/INDEX.md) | 扫描 16 专家 + 32 业务 Skill + 3 元 Skill frontmatter,统一目录 |
 | Prefect 编排 | [orchestrator/](orchestrator/INDEX.md) | 执行 DAG,断点续跑,产物归档 |

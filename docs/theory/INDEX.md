@@ -12,7 +12,7 @@
 ## 12 大类(主宪章 §23)
 
 | # | 分类 | 目录 | 主题示例 |
-|---|------|------|---------|
+| --- | ------ | ------ | --------- |
 | 1 | 工具使用 | [`01-tools/`](01-tools/INDEX.md) | pytest / Playwright / JMeter / Appium / Burp / Allure / k6 |
 | 2 | 代码编程 | [`02-coding/`](02-coding/INDEX.md) | pytest fixture / async / typing / mock / Page Object / 设计模式 |
 | 3 | 测试基础理论 | [`03-foundation/`](03-foundation/INDEX.md) | ISTQB / V 模型 / 金字塔 / Boehm 法则 / 七原则 |
@@ -46,7 +46,7 @@
 ## 反幻觉 3 层(主宪章 §23)
 
 | 层 | 机制 |
-|----|------|
+| ---- | ------ |
 | **L1 引用约束** | LLM 在 learn mode 只能引用 KB 中存在的 `id`;否则输出"该领域未收录,慎用" |
 | **L2 自检循环** | LLM 生解释后,二次校验"引用的章节是否真存在 KB" |
 | **L3 用户回报** | learn mode 末尾"👎 标记错误"→ 落 `workspace/learning/feedback/` |

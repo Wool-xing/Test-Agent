@@ -23,7 +23,7 @@
 ## 0 · 两条接入路径
 
 | 路径 | 适用 | 配置 env |
-|---|---|---|
+| --- | --- | --- |
 | **A · 内置 provider** | litellm 已内置 (6 厂商) | `TAGENT_LLM_PROVIDER` + 厂商标准 key env |
 | **B · OpenAI 兼容兜底** | litellm 未内置但提供 OpenAI 兼容端点 (智谱/豆包/Kimi/百川/讯飞 等) | `TAGENT_LLM_PROVIDER=openai/<model>` + `TAGENT_LLM_API_BASE` + `TAGENT_LLM_API_KEY` |
 
@@ -236,7 +236,7 @@ TAGENT_REAL_LLM=1 TAGENT_LLM_PROVIDER=<provider> <KEY_ENV>=<value> \
 ## 7 · 速查表 (10+ 厂商)
 
 | 厂商 | 路径 | provider | api_base | key env |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Claude | A | `claude` | (内置) | `ANTHROPIC_API_KEY` |
 | ChatGPT | A | `openai` | (内置) | `OPENAI_API_KEY` |
 | Gemini | A | `gemini` | (内置) | `GEMINI_API_KEY` |
@@ -273,7 +273,7 @@ export OPENAI_API_KEY=sk-xxx
 ## 9 · 故障排查
 
 | 症状 | 原因 | 修法 |
-|---|---|---|
+| --- | --- | --- |
 | `LLM Provider NOT provided` | model 名 litellm 不识 | 用 `openai/<model>` 前缀走路径 B |
 | `Authentication error` | key 错或未设 | 检 `echo $<KEY_ENV>` |
 | `RateLimitError: 余额不足` | 厂商账户欠费 | 充值或换免费档 model (e.g., glm-4-flash) |

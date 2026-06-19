@@ -3,7 +3,7 @@
 ## 支持的版本
 
 | 版本 | 支持状态 |
-|------|---------|
+| ------ | --------- |
 | 1.x  | ✅ 当前主线，持续修复安全漏洞 |
 | < 1.0 | ❌ 不再维护，请升级至 1.x |
 
@@ -27,7 +27,7 @@
 ### 响应时间（best-effort，志愿者维护）
 
 | 严重级别 | 响应 | 修复 |
-|---------|------|------|
+| --------- | ------ | ------ |
 | Critical（RCE / 凭证泄漏） | 24h 内 | 7d 内 |
 | High（数据泄漏 / 越权） | 3d 内 | 14d 内 |
 | Medium（拒绝服务 / 信息泄漏） | 7d 内 | 30d 内 |
@@ -65,7 +65,7 @@
 本项目含**攻击面工具**示例,运行前必须取得目标系统**书面授权**:
 
 | 资产 | 类型 |
-|------|------|
+| ------ | ------ |
 | `agents/15-渗透测试.md` | 渗透测试 Agent(调用 sqlmap / Metasploit / Hydra 等真实攻击工具) |
 | `skills/pentest-*.md`(7 项) | 渗透 skill 系列(api / coordinator / exploit / recon / report / vuln / web) |
 | `utils/api_security_scanner.py` | API 安全扫描器(SSRF / IDOR / JWT / CSRF; 默认 refuse,需 `TAGENT_PENTEST_AUTHORIZED=1` + AWS metadata 探针需 `confirm_metadata_probe=True`) |
@@ -88,7 +88,7 @@
 本项目 utils 中部分函数具有**副作用 / 命令注入面 / 任意 SQL 执行**(非武器化攻击工具,但误调同样损坏环境)。默认 refuse,需对应环境变量授权:
 
 | utils 文件 | env var | 守护操作 | 额外约束 |
-|------|------|------|------|
+| ------ | ------ | ------ | ------ |
 | `utils/chaos_helper.py` | `TAGENT_CHAOS_AUTHORIZED=1` | 混沌注入 + path / host validation | – |
 | `utils/db_test_helper.py` | `TAGENT_DB_TEST_AUTHORIZED=1` | `explain_query` / `benchmark_query` / `test_migration` / `test_postgres_backup_restore` | `test_postgres_backup_restore` 额外需 `confirm_destructive=True` kwarg;SQL identifier + cmd 双白名单 |
 | `utils/desktop_driver.py` | `TAGENT_DESKTOP_AUTHORIZED=1`(仅 macOS ops) | macOS: `open_macos_app` / `macos_menu`;跨平台: `get_windows_app` / `launch_electron` 路径校验 | macOS ops 需 platform=darwin + AppleScript identifier 白名单;跨平台 driver 接受的 exe / executable 路径必须绝对 + 存在 + 普通文件 + 非 symlink |

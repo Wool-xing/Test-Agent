@@ -62,7 +62,7 @@ cat docs/assets/demo.cast | svg-term --out docs/assets/demo.svg --window
 ## 风险
 
 | 问题 | 防御 |
-|------|------|
+| ------ | ------ |
 | Gif > 2MB 渲染慢 | 800x400 / fps=10 / 60% 质量 |
 | 真跑 30 秒不到 | 用 stub provider + 预录会话回放 |
 | 文字看不清 | 字号 14+ / 暗色背景 / 高对比 |

@@ -17,7 +17,7 @@ SKILL_IMPL_STATUS: production
 ## 5 维度自省
 
 | 维 | 工具 |
-|----|------|
+| ---- | ------ |
 | **决策回放** | `workspace/测试报告/{项目名}/decisions/` JSON 时间序 |
 | **工具调用** | OTel span(`runtime/observability/otel.py`)+ Loguru |
 | **token 消耗** | LLM provider header + LiteLLM 记账 |

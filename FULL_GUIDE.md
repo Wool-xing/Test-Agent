@@ -19,7 +19,7 @@
 > 详见 [docs/charter/INDEX.md](docs/charter/INDEX.md)。
 
 | # | 子文件 | 含节 |
-|---|---|---|
+| --- | --- | --- |
 | 01 | [vision-dimensions](docs/charter/01-vision-dimensions.md) | 项目愿景 + 文档导航 + 维度全图（9 簇）+ 关键模块清单 + 核心特性 |
 | 02 | [coverage-matrix](docs/charter/02-coverage-matrix.md) | 全链路覆盖矩阵（产品 / 协议 / 输入 三视角） |
 | 03 | [agentchat-protocol](docs/charter/03-agentchat-protocol.md) | AgentChat 协作协议 + 关键决议摘要 + 放行决议 |

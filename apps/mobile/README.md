@@ -42,7 +42,7 @@ npx cap open android  # → Android Studio → Build → Play Store
 ## Compatibility
 
 | Platform | Min Version | Status |
-|----------|-------------|--------|
+| ---------- | ------------- | -------- |
 | iOS | 14.0+ | Full PWA + Capacitor |
 | Android | 8.0+ (API 26) | Full PWA + Capacitor |
 | iPadOS | 14.0+ | PWA adaptive layout |

@@ -5,7 +5,7 @@
 ## 注册的 exporter
 
 | 名 | 扩展 | 用途 | 工具兼容 |
-|----|------|------|---------|
+| ---- | ------ | ------ | --------- |
 | `xmind` | `.xmind` | XMind 思维导图(P0) | XMind 8/Zen/2020+ / Mind+ / 大厂主流 |
 | `markmap` | `.md` | Markmap Markdown 嵌入 | markmap.js / VSCode 插件 / GitHub README 直渲 |
 | `opml` | `.opml` | OPML 通用大纲 | MindManager / Word / Workflowy / OmniOutliner |

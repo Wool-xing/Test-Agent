@@ -3,7 +3,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `db.py` | SQLAlchemy 引擎/Session 工厂 |
 | `models.py` | ORM:Run / Case / Defect / Evidence / Feedback / Embedding |
 | `objects.py` | MinIO 客户端 |

@@ -5,7 +5,7 @@
 ## 速查表
 
 | 文件 | 用途 | 跑法 |
-|------|------|------|
+| ------ | ------ | ------ |
 | `analyze-usage.py` | skill / agent 使用率分析(cut/keep 矩阵:keep_core ≥10% / keep_mid 3-10% / deprecate <3% / archive 0%) | `python scripts/analyze-usage.py --input usage.json` |
 | `export-users.sql` | 用户画像 + top skill + 0% skill + 留存 + 反馈 5 段 SQL 模板(含 PII 脱敏正则) | 接入 Postgres 后 `psql -f scripts/export-users.sql` |
 

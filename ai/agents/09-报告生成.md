@@ -32,7 +32,7 @@ paired_skills: []
 ## 报告类型
 
 | 报告 | 受众 | 格式 | 触发时机 | 工具 |
-|------|------|------|---------|------|
+| ------ | ------ | ------ | --------- | ------ |
 | 冒烟报告 | 开发/测试 | 即时消息 | 每次冒烟完成 | utils/generate_report.send_* |
 | 日报 | 项目组 | 消息+Excel | 每天 17:30（GitHub Actions schedule） | utils/generate_report + utils/excel_generator |
 | 阶段报告 | 测试主管/PM | Word | 里程碑节点 | utils/generate_report.generate_test_report |

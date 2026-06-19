@@ -20,7 +20,7 @@ paired_skills: [ai-test]
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | ML 评估 | scikit-learn | 1.4.0 |
 | 漂移检测 | scipy（KS）+ alibi-detect | 1.11 / 0.12 |
 | LLM 评估 | langchain-evaluator / deepeval | 0.20+ |
@@ -236,7 +236,7 @@ AI_DRIFT_BASELINE=workspace/自动化脚本/python/ai/datasets/drift_baseline.cs
 ## 质量门禁（建议项目自定）
 
 | 指标 | 默认门禁 |
-|------|---------|
+| ------ | --------- |
 | 模型准确率 | ≥ 0.90 |
 | 推理 P95 延迟 | ≤ 200ms |
 | 数据漂移（KS p-value） | > 0.05 |
@@ -259,7 +259,7 @@ AI_DRIFT_BASELINE=workspace/自动化脚本/python/ai/datasets/drift_baseline.cs
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/ai-eval/*.json` | 模型评估指标 |
 | `workspace/测试报告/{项目名}/ai-drift/*.json` | 漂移检测报告 |
 | `workspace/测试报告/{项目名}/ai-fairness/*.json` | 公平性指标 |

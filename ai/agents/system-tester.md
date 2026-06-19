@@ -19,7 +19,7 @@ paired_skills: [system-test]
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | SSH | paramiko | 3.4.0 |
 | 串口 | pyserial | 3.5 |
 | MQTT | paho-mqtt | 1.6.1 |
@@ -219,7 +219,7 @@ FFPROBE_BIN=ffprobe
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/iot-logs/*.log` | SSH/串口/MQTT 日志 |
 | `workspace/测试报告/{项目名}/media-frames/*.png` | 视频抽帧对比 |
 | `workspace/测试报告/{项目名}/tracing/*.json` | Jaeger trace 数据 |

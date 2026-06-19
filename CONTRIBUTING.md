@@ -5,7 +5,7 @@
 ## 项目架构速览
 
 | 目录 | 用途 | 放什么 | 不放什么 |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | `ai/` | AI模式界面层 | Agent .md, Skill .md | Python代码 |
 | `apps/` | 分发应用 | desktop/, mobile/ 等 | 共享业务逻辑 |
 | `deploy/` | 部署物料 | 配置模板, 市场, 合规 | 源码 |
@@ -139,7 +139,7 @@ pytest --collect-only
 ### 联动改动清单速查
 
 | 改动类型 | 必同步至 |
-|---------|---------|
+| --------- | --------- |
 | 新增/删除 Agent | `ai/agents/README.md` + `00-项目导航.md` + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS`（install.py 用 glob 自动发现，无需手动加文件名） |
 | 新增/删除 Skill | `ai/skills/README.md` + `00-项目导航.md` + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单（install.py 用 glob 自动发现） |
 | 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers（install.py 用 os.walk 自动发现 .py） |
@@ -177,7 +177,7 @@ pytest --collect-only
 ### 16 专家代号
 
 | 代号 | 专家 | 类别 |
-|------|------|------|
+| ------ | ------ | ------ |
 | TL | test-lead | 协调者 |
 | RA | requirements-analyst | 核心 |
 | TD | testcase-designer | 核心 |
@@ -198,7 +198,7 @@ pytest --collect-only
 ### RACI 主表（测试维度 × 专家）
 
 | 测试维度 | TL | RA | TD | EM | DP | AE | TE | BM | RG | MT | DT | VT | ST | AT | PT | AMT |
-|---------|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|-----|
+| --------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ----- |
 | 需求分析 | A | R | C | I | I | I | I | I | I | C | C | C | C | C | C | |
 | 用例设计-功能 | A | C | R | I | C | I | I | I | I | C | C | C | C | C | C | |
 | 用例设计-非功能 | A | C | R | I | C | C | C | C | I |  |  |  |  |  | C | |
@@ -239,7 +239,7 @@ pytest --collect-only
 ### 责任边界冲突解决
 
 | 冲突场景 | 解决路径 |
-|---------|---------|
+| --------- | --------- |
 | 同一维度多 R（如安全：TD + BM 都 R） | TD 负责"用例设计与扫描执行"；BM 负责"漏洞分类提交 BugTracker（默认禅道）"。分工明确，不重复 |
 | 平台扩展专家发现非自己平台问题 | 走 BM 提交，BM 路由给对应平台专家；不直接跨平台修 |
 | TL 与平台专家路由冲突（PRD 含多平台） | TL 编排核心 8 + 路由到的平台专家并行；不强制串行 |
@@ -249,7 +249,7 @@ pytest --collect-only
 ### 与质量门禁联动
 
 | 门禁层 | A 责任人 | R 执行人 |
-|--------|---------|---------|
+| -------- | --------- | --------- |
 | smoke ≥95% | TL | TE |
 | regression P0=100% / P1≥95% / 总体≥90% | TL | TE |
 | 性能 TPS / P95 双模式 | TL | AE + TE |

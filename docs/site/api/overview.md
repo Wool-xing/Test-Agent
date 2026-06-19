@@ -104,7 +104,7 @@ Returns the full test report in JSON format.
 When `TAGENT_RBAC_ENABLED=1`, endpoints are gated by role:
 
 | Role | Permissions |
-|------|-------------|
+| ------ | ------------- |
 | `admin` | Full access to all endpoints |
 | `leader` | Plan, run, status, report, dashboard |
 | `tester` | Run, status, report |

@@ -22,7 +22,7 @@ tagent doctor
 ## Key directories
 
 | What | Where |
-|------|-------|
+| ------ | ------- |
 | Agent definitions | `agents/` |
 | Skill workflow docs | `skills/` |
 | Python utils | `utils/` |

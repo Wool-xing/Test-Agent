@@ -76,7 +76,7 @@ Both paths converge at utils/ execution layer.
 ## Directory Map
 
 | What | Where |
-|------|-------|
+| ------ | ------- |
 | Agent definitions | `ai/agents/` (16 agents) |
 | Skill workflow docs | `ai/skills/` (32 skills + 3 meta-skill packages) |
 | Python runtime engine | `runtime/` (CLI + orchestrator + MCP + API) |
@@ -108,7 +108,7 @@ Both paths converge at utils/ execution layer.
 ## Quick Reference
 
 | Task | Where |
-|------|-------|
+| ------ | ------- |
 | Add test capability | `ai/skills/` + `utils/<domain>/` |
 | Add agent role | `ai/agents/` |
 | Fix CLI bug | `runtime/` |

@@ -19,7 +19,7 @@ paired_skills: [visual-test]
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 图像识别驱动 | airtest | 1.3.0 |
 | 跨平台 IDE | AirtestIDE | 1.2.x |
 | OCR | pytesseract / paddleocr | 0.3.10 / 2.7.0 |
@@ -131,7 +131,7 @@ VISUAL_SIMILARITY_THRESHOLD=0.95
 ## 视觉专属测试场景
 
 | 场景 | 实现方式 |
-|------|---------|
+| ------ | --------- |
 | 模板匹配 | airtest Template + OpenCV matchTemplate |
 | OCR 文字断言 | pytesseract / paddleocr |
 | UI 像素回归 | scikit-image SSIM / imagehash phash |
@@ -155,7 +155,7 @@ VISUAL_SIMILARITY_THRESHOLD=0.95
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/自动化脚本/python/visual/images/` | 模板图（Git 提交） |
 | `workspace/自动化脚本/python/visual/baselines/` | 视觉回归基线（Git 提交） |
 | `workspace/测试报告/{项目名}/screenshots/visual-diff/*.png` | 视觉差异高亮图 |

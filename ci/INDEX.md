@@ -5,7 +5,7 @@
 ## 文件清单
 
 | 文件 | 用途 | 角色 |
-|------|------|------|
+| ------ | ------ | ------ |
 | [CICD集成说明.md](CICD集成说明.md) | GitHub Actions + Jenkins 双流水线说明 + Secrets 清单 + 门禁 + 常见 Q&A | 阅读入口 |
 | [github-actions-test.yml](github-actions-test.yml) | **用户分发模板**：部署到 `<PROJECT_ROOT>/.github/workflows/test.yml` 跑业务测试 | 模板 |
 | [jenkins-pipeline.groovy](jenkins-pipeline.groovy) | **用户分发模板**：部署到 `<PROJECT_ROOT>/Jenkinsfile` 跑业务测试 | 模板 |
@@ -15,7 +15,7 @@
 本仓库存在两套 CI 配置，不要混淆：
 
 | 配置位置 | 用途 | 谁跑 |
-|---------|------|-----|
+| --------- | ------ | ----- |
 | `.github/workflows/ci.yml` | **本仓库自身 CI**：Ruff / 模板自检 / 文件统计 / 敏感文件防护 / 链接校验 | GitHub Actions（本 repo） |
 | `.github/workflows/codeql.yml` | **本仓库自身 CodeQL**：python + actions 安全扫描 | GitHub Actions（本 repo） |
 | `ci/github-actions-test.yml` | **用户分发模板**：用户 fork/部署后跑业务测试 | 用户自己的 repo |
@@ -43,7 +43,7 @@
 ## 必须配置（开始流水线前）
 
 | 项 | GitHub | Jenkins |
-|----|--------|---------|
+| ---- | -------- | --------- |
 | 凭据 | Settings → Secrets and variables → Actions | Manage Jenkins → Credentials（Secret text） |
 | Secret 清单 | 见 [CICD集成说明.md](CICD集成说明.md) "必须配置的 Secrets" 段 | 名称与 `Jenkinsfile::credentials('XXX')` 一一对应 |
 | 触发条件 | push / PR / workflow_dispatch | SCM 轮询 / multibranch / 手动 |
@@ -51,7 +51,7 @@
 ## 常见问题速查
 
 | 问题 | 答案 |
-|------|------|
+| ------ | ------ |
 | Secrets 在 if 表达式判断永远 false | 已用 `preflight` job outputs 中转模式，详见 yml 注释 |
 | Jenkins JMeter PATH 跨 sh 块丢失 | 用 `withEnv(["PATH+JMETER=..."])` 持久 PATH |
 | 性能 CI 不达标 TPS≥100 | CI 默认 `ci_quick`（5 并发，门禁 TPS≥20）；`PERF_MODE=full` 切完整压测 |
@@ -63,7 +63,7 @@
 修改本目录任一文件时，**必须**联动检查：
 
 | 修改 | 同步至 |
-|------|--------|
+| ------ | -------- |
 | `github-actions-test.yml` 加 stage | `CICD集成说明.md` 流水线表 + `配置清单.md` Secrets 表 |
 | `jenkins-pipeline.groovy` 加 credentials | `CICD集成说明.md` Jenkins Credentials 段 |
 | 门禁阈值变更 | `utils/ci_quality_gate.py::GATES` + `utils/jmeter_result_parser.py::DEFAULT_GATES_*` + `agents/01-测试主管.md::QUALITY_GATES` |

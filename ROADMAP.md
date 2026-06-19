@@ -12,7 +12,7 @@
 ### 11 真 LLM-driven (已上线)
 
 | Expert | 职责 |
-|--------|------|
+| -------- | ------ |
 | `test-lead` | 测试主管,需求分析 → 测试策略 → 路由分发 |
 | `requirements-analyst` | 需求分析(PRD 多格式加载 + 路由建议) |
 | `automation-engineer` | Web/API 脚本编写 + 性能测试编排 |
@@ -28,7 +28,7 @@
 ### 5 script-backed (已上线)
 
 | Expert | 工具栈 |
-|--------|--------|
+| -------- | -------- |
 | `testcase-designer` | Excel 输出测试用例 |
 | `data-preparer` | Faker 生成 + 脱敏 |
 | `report-generator` | Word 报告生成 |
@@ -42,7 +42,7 @@
 ### 23 production (已上线，本节约 13 核心 + rollout 表 10)
 
 | Skill | 类别 |
-|-------|------|
+| ------- | ------ |
 | `tdd-workflow` | TDD 工作流 |
 | `e2e-testing` | E2E 测试 |
 | `automotive-test` | 车载主编排(V1.31.0 · automotive batch) |
@@ -60,7 +60,7 @@
 ### 7 script-backed (已上线)
 
 | Skill | 工具栈 |
-|-------|--------|
+| ------- | -------- |
 | `ai-test` | eval-harness AI 模型测试(utils/ai_validator) |
 | `data-preparation` | Faker / data_masking / jmeter CSV |
 | `desktop-test` | desktop_driver(pywinauto / AppleScript) |
@@ -78,7 +78,7 @@
 **完成标准**: 每 expert 接 LLM 真调用 + 结构化输出(markdown/JSON),通过 3 个测试 prompt 验证。
 
 | # | Expert | LLM-driven 实装范围(minimum viable) | 目标版本 | 状态 |
-|---|--------|------------------------------------|---------|------|
+| --- | -------- | ------------------------------------ | --------- | ------ |
 | 0 | (前置) runtime/router + orchestrator 防 mock | catalog 单源 frontmatter 解析;router._validate_against_catalog warn + 降 confidence;orchestrator.execute_node 硬拒 rollout/vision/unknown(returncode=2,绝不输出 mock);expert + skill 双 layer 覆盖 | V1.14.0+1 | **done** (PR X4) |
 | 1 | `env-manager` | LLM 读 PRD → 环境检查清单 + 准备步骤 markdown | V1.15.0 | **done** (runtime/orchestrator/agents/env_manager.py) |
 | 2 | `mobile-tester` | LLM 读 PRD + Android/iOS 上下文 → 移动测试用例 + ADB/Xcode 命令清单 | V1.16.0 | **done** (runtime/orchestrator/agents/mobile_tester.py) |
@@ -99,7 +99,7 @@
 ### 通用平台 4 skill
 
 | Skill | 范围 | 关联 expert | 状态 |
-|-------|------|-------------|------|
+| ------- | ------ | ------------- | ------ |
 | `mobile-test` | Android/iOS + 小程序 自动化 | mobile-tester | **done** (V1.23.0 · runtime/orchestrator/skills/mobile_test.py) |
 | `visual-test` | 图像识别 + OCR + SSIM 视觉回归 | visual-tester | **done** (V1.24.0 · runtime/orchestrator/skills/visual_test.py) |
 | `system-test` | IoT/串口/MQTT/音视频/Jaeger/Kafka | system-tester | **done** (V1.26.0 · runtime/orchestrator/skills/system_test.py) |
@@ -108,7 +108,7 @@
 ### Pentest 7 skill（已全部完成 · SECURITY.md 武器化授权 wiring 已实装）
 
 | Skill | 范围 | 状态 |
-|-------|------|------|
+| ------- | ------ | ------ |
 | `pentest-coordinator` | 渗透总编排(授权 → 侦察 → 漏洞 → 利用 → 报告) | **done** (V1.21.0 · runtime/orchestrator/skills/pentest_coordinator.py · 5 阶段编排 + authorization_check + subagent_pool + refuse_conditions) |
 | `pentest-recon` | 侦察(被动+主动信息收集) | **done** (V1.25.0) |
 | `pentest-vuln` | 漏洞发现(5 攻击域 + SAST/DAST) | **done** (V1.25.0) |
@@ -120,7 +120,7 @@
 ### Automotive 5 skill
 
 | Skill | 范围 |
-|-------|------|
+| ------- | ------ |
 | `automotive-test` | 整车主编排(ECU + ADAS + IVI + V2X) | **done** (V1.31.0 · automotive batch) |
 | `automotive-can-bus-test` | CAN/CAN-FD/LIN/FlexRay/SOME-IP | **done** (V1.31.0 · automotive batch) |
 | `automotive-adas-scenario` | ADAS 场景库 + SOTIF(ISO 21448) | **done** (V1.31.0 · automotive batch) |
@@ -140,7 +140,7 @@
 ## V2.x vision — 2 skill(暂留方法论参考形态)
 
 | Skill | 当前形态 | V2 路线 |
-|-------|----------|---------|
+| ------- | ---------- | --------- |
 | `agent-introspection-debugging` | 方法论参考 | LLM 决策回放 + 工具调用透明化实装 |
 | `build-your-own-x-explorer` | 教学引导参考 | 与 docs/theory/ 22 KB 卡片联动检索引擎 |
 
@@ -181,7 +181,7 @@ V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 ## 进度跟踪
 
 | 版本 | 日期 | 完成项 | active expert 数 |
-|------|------|--------|----------------|
+| ------ | ------ | -------- | ---------------- |
 | V1.14.0 | 2026-05-13 | bundle1 信任+法律线修复;ROADMAP.md 起步 | 10/16 |
 | V1.14.0+1 | 2026-05-15 | X3 数字诚实化(README/ROADMAP)+ X4 防 mock 闭环 (registry 单源 frontmatter / router warn / orchestrator hard block expert+skill 双 layer) | 10/16 |
 | V1.15.0 | 2026-05-15 | env-manager LLM-driven minimum viable (runtime/orchestrator/agents/env_manager.py;LLM 读 PRD → env_checks + prep_steps + dependencies + risks 结构化 JSON) | 11/16 |

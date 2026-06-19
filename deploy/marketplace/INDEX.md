@@ -6,7 +6,7 @@
 ## 4 lane
 
 | Lane | 类型 | 路径 |
-|------|------|------|
+| ------ | ------ | ------ |
 | **skills** | Claude Code 风 markdown skill | `marketplace/skills/` |
 | **agents** | Subagent 定义 | `marketplace/agents/` |
 | **mcp** | MCP server | `marketplace/mcp/` |
@@ -15,7 +15,7 @@
 ## 3 信任级源
 
 | 级 | 来源 | 默认 confidence |
-|----|------|----------------|
+| ---- | ------ | ---------------- |
 | **high** | Claude Code 官方 mirror(只镜像 metadata,不复制代码) | high |
 | **medium** | 大厂源(Anthropic / OpenAI / Microsoft 公开 repo) | medium |
 | **low** | 社区 GitHub PR | llm-draft-unreviewed → 双签升级 |

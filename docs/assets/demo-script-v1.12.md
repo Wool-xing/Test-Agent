@@ -9,7 +9,7 @@
 ## 分镜表(精确到秒)
 
 | 时间 | 屏幕 | 旁白(可选) |
-|------|------|-------------|
+| ------ | ------ | ------------- |
 | 0-3s | 黑屏 → 项目 logo + `Test-Agent · AI Testing Agent · 5 秒上手` | "AI 测试,5 秒上手" |
 | 3-6s | 终端:`tagent init --preset 国内-web` 命令打出来 | "一行命令选预设" |
 | 6-10s | 屏幕显示生成 3 文件 `✓ 配置生成完毕` + 路径 | "立刻产 .env + tagent.yml + 启动指南" |
@@ -81,7 +81,7 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 ## 渠道适配(同一份素材 3 平台)
 
 | 平台 | 时长 | 格式 | 文案 |
-|------|------|------|------|
+| ------ | ------ | ------ | ------ |
 | Twitter / X | 30 秒 | mp4 | "5 sec AI testing setup with `tagent init`. 16 experts, 32 skills, 8640 config combinations. github.com/Wool-xing/Test-Agent" |
 | 微信视频号 / 抖音 | 30-60 秒 | mp4 1080×1920 竖屏 | "AI 测试 5 秒上手 · 用例 + 思维导图 + Bug 单 + 报告一键产出 · GitHub 搜 Test-Agent" |
 | 掘金 / V2EX / 少数派 | gif | terminalizer | 配文章:介绍 V1.12 配置自动组装 + 矩阵 8640 组合 + 5 preset |
@@ -103,7 +103,7 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 ## 后续 V1.13 扩(若 demo 火)
 
 | 触发条件 | 加什么 |
-|----------|--------|
+| ---------- | -------- |
 | 30 秒太赶 | 录 60 秒长版(加用户改 `.env` + 真 LLM 跑 web 测试场景) |
 | 用户问"能跑 mobile / api 吗" | 录 4 个 60 秒变体,每个 preset 一个 |
 | 公众号 / 视频号要 5 分钟教程 | 录 5 分钟完整 walkthrough(`tagent init` + `tagent run` + 改 `.env` + 修 bug + 跑回归) |

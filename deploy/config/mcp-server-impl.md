@@ -7,7 +7,7 @@
 ## 1. 何时需要自实现 MCP server？
 
 | 场景 | 推荐方案 |
-|------|---------|
+| ------ | --------- |
 | 项目用 Claude Code 单机开发，只需 utils 调用 | **不需要 MCP**，当前直连方案足够 |
 | 团队多个开发者，希望 Claude Code 直接通过 MCP 调用 BugTracker/通知 | 实现对应 mcp_server |
 | 需要 Claude Code agent 主动查询 Bug 状态、读取 webhook 历史 | 实现对应 mcp_server |
@@ -310,7 +310,7 @@ logging.basicConfig(
 ## 8. 与直连方案的取舍
 
 | 维度 | MCP 通道 | SDK/curl 直连（当前默认） |
-|------|---------|--------------------------|
+| ------ | --------- | -------------------------- |
 | 上手成本 | 高（需实现 mcp_server） | 低（utils 已就绪） |
 | 工具自治 | 强（Claude Code agent 可主动调） | 弱（需在 agent prompt 中说明步骤） |
 | 跨工具复用 | ✅ 任意 MCP client 共享 | ❌ 仅当前 Python 项目 |

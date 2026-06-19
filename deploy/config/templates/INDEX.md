@@ -5,7 +5,7 @@
 ## 速查表
 
 | 文件 | 用途 | 何时改 |
-|------|------|--------|
+| ------ | ------ | -------- |
 | `matrix.yaml` | **单源真理**:测试类型 / 平台 / LLM / BugTracker / 通知渠道枚举 + 各自 env 字段 | 加新选项(eg. 新 LLM provider)→ 改这一处即可 |
 | `base.env.tpl` | `.env` 模板 + `{{var}}` 占位 | 改 .env 框架时 |
 | `base.tagent.yml.tpl` | `tagent.yml` 模板(项目级配置) | 改运行时默认行为 |

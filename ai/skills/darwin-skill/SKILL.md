@@ -33,7 +33,7 @@ autoresearch 的精髓：
 ### 结构维度（60分）— 静态分析
 
 | # | 维度 | 权重 | 评分标准 |
-|---|------|------|---------|
+| --- | ------ | ------ | --------- |
 | 1 | **Frontmatter质量** | 8 | name规范、description包含做什么+何时用+触发词、≤1024字符 |
 | 2 | **工作流清晰度** | 15 | 步骤明确可执行、有序号、每步有明确输入/输出 |
 | 3 | **边界条件覆盖** | 10 | 处理异常情况、有fallback路径、错误恢复 |
@@ -44,7 +44,7 @@ autoresearch 的精髓：
 ### 效果维度（40分）— 需要实测
 
 | # | 维度 | 权重 | 评分标准 |
-|---|------|------|---------|
+| --- | ------ | ------ | --------- |
 | 7 | **整体架构** | 15 | 结构层次清晰、不冗余不遗漏、与项目目录风格一致 |
 | 8 | **实测表现** | 25 | 用测试prompt跑一遍，输出质量是否符合skill宣称的能力 |
 
@@ -276,7 +276,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 流程假设环境理想，但实操常遇异常。以下预定义 fallback，保证优化过程不会「一跑就卡住」。
 
 | 场景 | 触发条件 | 处理动作 |
-|---|---|---|
+| --- | --- | --- |
 | 不在 git 仓库 | `git rev-parse` 失败 | 提示用户「建议 git init」；若拒绝，用 `cp SKILL.md SKILL.md.bak.YYYYMMDD-HHMM` 文件备份代替 revert |
 | results.tsv 缺失 | 文件不存在 | 新建并写表头行（9列：含 eval_mode） |
 | results.tsv 损坏 | 列数不匹配 / 非TSV | 备份为 `.bak.YYYYMMDD-HHMM` 后重建，告知用户 |
@@ -360,7 +360,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 3种风格，每次随机选择一种：
 
 | 风格 | CSS类 | URL hash | 视觉特点 |
-|------|--------|----------|---------|
+| ------ | -------- | ---------- | --------- |
 | Warm Swiss | `.theme-swiss` | `#swiss` | 暖白底+赤陶橙，Inter字体，干净网格 |
 | Dark Terminal | `.theme-terminal` | `#terminal` | 近黑底+荧光绿，等宽字体，扫描线 |
 | Newspaper | `.theme-newspaper` | `#newspaper` | 暖白纸+深红，衬线字体，双栏编辑风 |
@@ -386,7 +386,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 ### 资源文件速查
 
 | 路径 | 用途 |
-|---|---|
+| --- | --- |
 | `templates/result-card.html` | 3风格主模板（swiss/terminal/newspaper，hash切换） |
 | `templates/result-card-dark.html` / `-white.html` | 单一风格替代模板（需要锁定风格时用） |
 | `scripts/screenshot.mjs` | 2x 高清截图，只截 .card，自动 open |

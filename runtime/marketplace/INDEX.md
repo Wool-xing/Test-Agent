@@ -3,7 +3,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `catalog.py` | 加载 `marketplace/registry.json` + 索引 |
 | `client.py` | 查询(local + 远程 registry mirror) |
 | `verifier.py` | 4 关安全门(sig + scan + sandbox + darwin) |

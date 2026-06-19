@@ -20,7 +20,7 @@ paired_skills: [pentest-coordinator]
 ## 5 大攻击域(shannon 精髓)
 
 | 域 | 子类 | 工具 |
-|----|------|------|
+| ---- | ------ | ------ |
 | **Injection** | SQL / NoSQL / Cmd / LDAP / XPath / 模板 | sqlmap / commix / NoSQLMap |
 | **XSS** | Reflected / Stored / DOM / Mutation | XSStrike / dalfox / Burp Active Scan |
 | **SSRF** | 内网 / 元数据服务 / Redis / 文件 | gopher 协议 / SSRFmap / interactsh OOB |
@@ -32,7 +32,7 @@ paired_skills: [pentest-coordinator]
 ## 20+ 专业工具栈(pentagi 精髓)
 
 | 类别 | 工具 |
-|------|------|
+| ------ | ------ |
 | 侦察 | nmap / masscan / amass / subfinder / ffuf / dirsearch / waybackurls |
 | Web | burp / zap / wfuzz / sqlmap / wpscan / nikto / nuclei |
 | 漏洞库 | exploitdb / searchsploit / Metasploit msfconsole |
@@ -45,7 +45,7 @@ paired_skills: [pentest-coordinator]
 ## 白盒 + 黑盒 混合(shannon 核心)
 
 | 模式 | 触发 | 流程 |
-|------|------|------|
+| ------ | ------ | ------ |
 | **白盒**(有源码) | `--src ./repo` | 源码 SAST → 攻击向量 → 喂 exploit → **关联回源码行号** |
 | **黑盒**(无源码) | 仅 URL/IP | recon → 主动扫 → 漏洞库匹配 → 实测 PoC |
 | **灰盒** | 有部分 API doc | 黑盒 + 文档辅助;最常见 |
@@ -65,7 +65,7 @@ paired_skills: [pentest-coordinator]
 ## 调用 Skill 速查
 
 | 场景 | Skill |
-|------|------|
+| ------ | ------ |
 | 完整渗透流程 | `/pentest-coordinator` |
 | 侦察 | `/pentest-recon` |
 | 漏洞发现 | `/pentest-vuln` |

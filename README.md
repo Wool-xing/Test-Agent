@@ -59,13 +59,13 @@ No Python / Node / Docker required. Tauri 2 desktop — ~10MB binary, Windows/ma
 ## 📸 Screenshots
 
 | Upload | Dashboard | Catalog | History |
-|--------|-----------|---------|---------|
+| -------- | ----------- | --------- | --------- |
 | ![Upload](docs/assets/screenshots/upload.png) | ![Dashboard](docs/assets/screenshots/dashboard.png) | ![Catalog](docs/assets/screenshots/catalog.png) | ![History](docs/assets/screenshots/history.png) |
 
 ## 📚 Documentation
 
 | Audience | Read |
-|----------|------|
+| ---------- | ------ |
 | **First-time user** | [Quick start](docs/getting-started/INDEX.md) → [Deploy](docs/getting-started/部署说明.md) |
 | **QA engineer** | [User manual](docs/getting-started/使用手册.md) → [Skill catalog](ai/skills/) |
 | **Architect / SRE** | [Architecture deep-dive](docs/charter/06-test-architecture.md) → [Runtime modules](runtime/INDEX.md) |

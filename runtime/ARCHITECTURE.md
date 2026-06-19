@@ -14,14 +14,14 @@
 ## 双层架构
 
 | 层 | 内容 | 谁维护 |
-|----|------|--------|
+| ---- | ------ | -------- |
 | **L1 核心闭包** | 测试编排引擎 / 14 专家+调度器 / 输入解析器 / 输出渲染器 / MCP 协议层 / 飞轮 / AI 路由 | 自己 |
 | **L2 扩展面** | 协议适配器市场 / 测试类型 Skill 包 / 行业 Profile / 工具桥 / 报告模板 | 社区/插件/AI 生成 |
 
 ## 八维测试矩阵
 
 | 维度 | 取值 |
-|------|------|
+| ------ | ------ |
 | 平台 | Web/移动/桌面/嵌入式/云原生/中间件/DB/AI模型/区块链/IoT/工控 |
 | 协议 | HTTP(S)/gRPC/WS/TCP/UDP/MQTT/AMQP/Kafka/Redis/SOAP/GraphQL/Modbus/CAN |
 | 测试类型 | 单元/集成/E2E/UI/API/性能/压力/容量/混沌/安全/渗透/模糊/合规/可访问性/兼容/本地化/可用性/视觉回归/契约/可观测 |
@@ -36,7 +36,7 @@
 ## 6 个 MCP 服务规划
 
 | MCP | 职责 | 状态 |
-|-----|------|------|
+| ----- | ------ | ------ |
 | `mcp-test-orchestrator` | 主调度,被测物→专家组合 | M2 上线 |
 | `mcp-protocol-adapter` | 协议层统一抽象 | M2 上线 |
 | `mcp-evidence-vault` | 证据/录屏/日志 | M2 上线 |
@@ -47,7 +47,7 @@
 ## 选型
 
 | 项 | 选型 |
-|----|------|
+| ---- | ------ |
 | LLM 抽象 | **LiteLLM** 多厂商 + Ollama 兜底 + stub(测试) |
 | 编排引擎 | **Prefect 2.x** + 自研 Direct 降级执行器(无 Prefect 也能跑) |
 | 执行器底层 | Pytest 复用(79 脚本本就是 pytest 生态) |
@@ -63,7 +63,7 @@
 ## M1 交付清单
 
 | # | 模块 | 路径 | 状态 |
-|---|------|------|------|
+| --- | ------ | ------ | ------ |
 | 1 | 目录骨架+pyproject | `runtime/` | ✅ |
 | 2 | AI 路由 v1 | `runtime/router/` | ✅ stub 5/5 类型 |
 | 3 | 注册中心 | `runtime/registry/` | ✅ 14+13 实跑验证 |
@@ -79,7 +79,7 @@
 ## 八维路由验证
 
 | 输入 | 期望 | 实测 |
-|------|------|------|
+| ------ | ------ | ------ |
 | `Web system https://example.com login flow` | web-system | ✓ web-system + 8 专家 |
 | `REST API gRPC endpoints to test` | rest-api | ✓ rest-api + 6 专家 |
 | `APK mobile Android app` | mobile-app | ✓ mobile-app + mobile-tester |
@@ -91,7 +91,7 @@
 ## M2 路线图
 
 | 任务 | 内容 |
-|------|------|
+| ------ | ------ |
 | MCP 6 件套 | `mcp-test-orchestrator/-protocol-adapter/-evidence-vault/-defect-tracker/-knowledge-base/-compliance-checker` 上线 |
 | Web UI | 单页 React:上传被测物 → 看 DAG 实时进度 → 看报告 → 看证据 |
 | 真模型路由 | Claude+Qwen 实测,准确率 ≥85% |

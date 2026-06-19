@@ -20,7 +20,7 @@ SKILL_IMPL_STATUS: production
 ## 3 类测试矩阵
 
 | 类型 | 范围 | 工具(本项目) |
-|------|------|----------------|
+| ------ | ------ | ---------------- |
 | Unit | 函数 / 组件逻辑 / 纯函数 / helper | pytest + pytest-mock(`utils/`)|
 | Integration | API endpoint / DB / 服务交互 / 外部 API | pytest + requests / playwright(API)|
 | E2E | 关键用户流 / 浏览器自动化 / UI | Playwright(已配置) |

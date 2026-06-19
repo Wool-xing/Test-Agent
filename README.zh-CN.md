@@ -59,13 +59,13 @@ python install.py ~/test-agent-project       # macOS / Linux 示例，可改为�
 ## 📸 截图
 
 | 上传 | 仪表盘 | 目录 | 历史 |
-|------|--------|------|------|
+| ------ | -------- | ------ | ------ |
 | ![上传](docs/assets/screenshots/upload.png) | ![仪表盘](docs/assets/screenshots/dashboard.png) | ![目录](docs/assets/screenshots/catalog.png) | ![历史](docs/assets/screenshots/history.png) |
 
 ## 📚 文档导航
 
 | 角色 | 阅读 |
-|------|------|
+| ------ | ------ |
 | **首次用户** | [快速开始](docs/getting-started/INDEX.md) → [部署说明](docs/getting-started/部署说明.md) |
 | **QA 工程师** | [使用手册](docs/getting-started/使用手册.md) → [Skill 目录](ai/skills/) |
 | **架构师 / SRE** | [架构深度](docs/charter/06-test-architecture.md) → [Runtime 模块](runtime/INDEX.md) |

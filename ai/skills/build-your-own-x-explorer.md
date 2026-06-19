@@ -35,7 +35,7 @@ SKILL_IMPL_STATUS: production
 ## 场景 → 推荐速查表
 
 | 测试场景 | 推荐 byox 卡 |
-|----------|------------|
+| ---------- | ------------ |
 | SQL injection / 性能 / 死锁 | byox-database |
 | 弱网 / 丢包 / TIME_WAIT | byox-network-stack |
 | HTTP 并发 / keep-alive | byox-web-server |

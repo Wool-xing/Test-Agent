@@ -16,7 +16,7 @@ SKILL_IMPL_STATUS: production
 ## 流程
 
 | 阶段 | 调用 |
-|------|------|
+| ------ | ------ |
 | 1 HARA + ASIL 分解 | `requirements-analyst` + `automotive-tester` |
 | 2 静态(MISRA + Polyspace + Coverity) | 工具桥 |
 | 3 单元 + MC/DC(ASIL C/D) | `pytest` + 覆盖率工具 |

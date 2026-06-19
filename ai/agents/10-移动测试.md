@@ -19,7 +19,7 @@ paired_skills: [mobile-test]
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 驱动 | Appium-Python-Client | 4.0.0 |
 | WebDriver | selenium | 4.15.0 |
 | Android 调试 | adb（platform-tools） | 最新 |
@@ -134,7 +134,7 @@ WX_APP_ID=<your-wechat-miniprogram-appid>
 ## 移动专属测试场景
 
 | 场景 | 实现方式 |
-|------|---------|
+| ------ | --------- |
 | 弱网测试 | adb shell tc qdisc / Charles Throttling / Network Link Conditioner |
 | 后台切换 | driver.background_app(seconds=5) |
 | 横竖屏 | driver.orientation = "LANDSCAPE" |
@@ -219,7 +219,7 @@ def test_monkey_stability():
 ### Monkey 门禁建议
 
 | 指标 | 要求 |
-|------|------|
+| ------ | ------ |
 | Crash 数 | = 0 |
 | ANR 数 | = 0 |
 | 完成事件数 | ≥ 设定 event_count |
@@ -398,7 +398,7 @@ metrics = collect_perf_metrics(
 ## 移动端 Bug 报告附加字段
 
 | 字段 | 必填 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 设备型号 | ✅ | Pixel 6 Pro / iPhone 14 |
 | 系统版本 | ✅ | Android 14 / iOS 17.2 |
 | APP 版本 | ✅ | v3.2.1 (build 4521) |
@@ -416,7 +416,7 @@ metrics = collect_perf_metrics(
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/mobile-perf/*.json` | 性能采集 |
 | `workspace/测试报告/{项目名}/screenshots/mobile_*.png` | 移动失败截图 |
 | `workspace/测试报告/{项目名}/logcat/*.log` | Android 日志 |

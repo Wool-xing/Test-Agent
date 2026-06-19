@@ -54,7 +54,7 @@ tagent run "https://example.com" --mode learn
 ## 6. 出错怎么办
 
 | 症状 | 处置 |
-|------|------|
+| ------ | ------ |
 | `LLM 调用 raise` | 检查 API key + 网络;切 `TAGENT_LLM_PROVIDER=ollama` 离线兜底 |
 | `BugTracker 提交失败` | 占位没填或网络 / 权限错;不阻塞,但日报会少 |
 | `通知没发出` | 至少配 1 个渠道(主宪章 §36);未配自动跳过 |

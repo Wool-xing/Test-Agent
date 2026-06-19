@@ -5,7 +5,7 @@
 ## 六层结构
 
 | 层 | 文件 | 触发条件 | 安装命令 |
-|----|------|---------|---------|
+| ---- | ------ | --------- | --------- |
 | base | `requirements/base.txt` | 永远装 | `pip install -r requirements/base.txt` |
 | mobile | `requirements/mobile.txt` | 选择 mobile | `pip install -r requirements/mobile.txt` |
 | desktop | `requirements/desktop.txt` | 选择 desktop | `pip install -r requirements/desktop.txt` |

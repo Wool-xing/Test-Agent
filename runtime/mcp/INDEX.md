@@ -6,7 +6,7 @@
 ## 模块清单
 
 | MCP server | 路径 | 工具(tools) |
-|------------|------|-------------|
+| ------------ | ------ | ------------- |
 | test-orchestrator | `test_orchestrator/` | catalog / run / status / report / plan |
 | protocol-adapter | `protocol_adapter/` | http / grpc / ws / mqtt / kafka 各 send/recv |
 | evidence-vault | `evidence_vault/` | upload_evidence / list_evidence / get_evidence / search_evidence |

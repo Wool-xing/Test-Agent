@@ -12,7 +12,7 @@
 ### 矩阵 A：产品形态覆盖
 
 | 产品形态 | 工具栈 | 责任 Agent | 关联 Skill | 状态 |
-|---------|-------|-----------|----------|------|
+| --------- | ------- | ----------- | ---------- | ------ |
 | Web（PC + 移动 H5） | Playwright | automation-engineer | `/python-script-gen` | ✅ |
 | REST / GraphQL / SOAP API | requests / protocol_helper | automation-engineer | `/python-script-gen` | ✅ |
 | Android APP | Appium + adb | mobile-tester | `/mobile-test` | ✅ |
@@ -32,7 +32,7 @@
 ### 矩阵 B：测试类型覆盖
 
 | 测试类型 | 工具 / utils | 责任 Agent | 状态 |
-|---------|------------|-----------|------|
+| --------- | ------------ | ----------- | ------ |
 | 功能（unit / integration / e2e / UAT BDD） | pytest + pytest-mock + pytest-bdd | automation-engineer | ✅ |
 | 性能（基准/负载/压力/Volume/Spike/Soak/SLO） | JMeter + Locust + slo_validator + soak_runner | test-executor | ✅ |
 | 安全（SAST/DAST/依赖/Header/TLS/API/Fuzzing） | Bandit + Safety + ZAP + Burp Pro + api_security_scanner + fuzzer | bug-manager | ✅ |
@@ -67,7 +67,7 @@
 ### 矩阵 C：用例设计方法（ISTQB 经典）
 
 | 方法 | 实现 | 责任 Agent | 状态 |
-|------|------|-----------|------|
+| ------ | ------ | ----------- | ------ |
 | 等价类划分 / 边界值 | 文档 + Excel 模板 | testcase-designer | ✅ |
 | 判定表 / 因果图 | 文档手动 + Excel | testcase-designer | ✅ |
 | 场景法 / 错误推测 | 文档 | testcase-designer | ✅ |
@@ -81,7 +81,7 @@
 ### 矩阵 D：协议覆盖
 
 | 协议 | 实现 utils | 状态 |
-|------|----------|------|
+| ------ | ---------- | ------ |
 | HTTP / HTTPS | api_retry_util | ✅ |
 | WebSocket（同步/异步/重连/并发） | websocket_helper | ✅ |
 | gRPC / TCP / UDP / GraphQL / SOAP / Modbus | protocol_helper | ✅ |

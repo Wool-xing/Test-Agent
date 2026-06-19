@@ -68,7 +68,7 @@ Both paths converge at the utils execution layer.
 ## Directory Map
 
 | What | Where |
-|------|-------|
+| ------ | ------- |
 | Agent definitions | `ai/agents/` (16 agents) |
 | Skill workflow docs | `ai/skills/` (32 skills + 3 meta-skill packages) |
 | Python utils | `utils/` (79 modules) |

@@ -41,7 +41,7 @@ reading_en:
 ## 三层模型(必懂)
 
 | 层 | 工具 | 稳定性 | 何时用 |
-|----|------|--------|--------|
+| ---- | ------ | -------- | -------- |
 | **API 层** | 直接调 DLL / COM / IPC | 最稳 | 业务逻辑测试 |
 | **UI Automation 层** | pywinauto + UIA / WinAppDriver | 稳定 | 大多数场景默认 |
 | **Visual 层** | PyAutoGUI + OpenCV / Airtest OCR | 最脆,易碎 | 无 UIA 树时兜底(游戏/Canvas) |

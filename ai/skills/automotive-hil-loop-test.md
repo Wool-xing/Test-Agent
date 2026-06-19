@@ -10,7 +10,7 @@ SKILL_IMPL_STATUS: production
 ## 4 类环路
 
 | 缩写 | 含义 | 何时 |
-|------|------|------|
+| ------ | ------ | ------ |
 | **MIL** | Model-in-the-Loop | 算法早期(Simulink/Matlab)|
 | **SIL** | Software-in-the-Loop | 编译后软件 + 主机仿真 |
 | **PIL** | Processor-in-the-Loop | 真 ECU + 仿真环境 |
@@ -26,7 +26,7 @@ SKILL_IMPL_STATUS: production
 ## 必测维度
 
 | 维度 | 内容 |
-|------|------|
+| ------ | ------ |
 | 传感器仿真 | 摄像头 / 雷达 / 激光 / IMU / GNSS / 轮速 |
 | 执行器仿真 | 制动 / 转向 / 油门 / 灯光 / 空调 |
 | 总线注入 | CAN/LIN/FlexRay/Ethernet 模拟其他 ECU |

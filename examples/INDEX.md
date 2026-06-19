@@ -5,7 +5,7 @@
 ## 速查表
 
 | 子目录 | 用途 | 跑法 |
-|--------|------|------|
+| -------- | ------ | ------ |
 | `web-demo/` | Playwright + pytest 网页测试最小例(saucedemo.com) | `cd web-demo && pip install -r requirements.txt && pytest` |
 
 ## 新手 5 分钟

@@ -21,7 +21,7 @@ paired_skills: []
 由 `utils/prd_loader.load_prd()` 统一处理：
 
 | 格式 | 解析器 | 备注 |
-|------|--------|------|
+| ------ | -------- | ------ |
 | `.md` / `.txt` | 直接读取 | UTF-8 |
 | `.pdf` | pdfplumber（主）/ pypdf（备） | 表格保留 |
 | `.docx` / `.doc` | python-docx | 段落 + 表格 |
@@ -75,7 +75,7 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 ### 风险评估矩阵
 
 | 风险维度 | 高风险标志 | 测试策略 |
-|---------|-----------|---------|
+| --------- | ----------- | --------- |
 | 业务复杂度 | 分支逻辑>5个 | 组合测试 |
 | 数据敏感 | 含PII/金融数据 | 脱敏验证 |
 | 第三方依赖 | 外部API/支付 | Mock+真实双测 |
@@ -121,7 +121,7 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 
 ## 业务规则清单
 | 规则ID | 规则描述 | 验证方式 |
-|--------|---------|---------|
+| -------- | --------- | --------- |
 | BR-001 | [规则] | [如何验证] |
 
 ## 风险地图
@@ -138,7 +138,7 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 
 ## 测试数据需求
 | 类型 | 数量 | 特殊要求 |
-|------|------|---------|
+| ------ | ------ | --------- |
 | 普通用户 | 3 | 不同角色 |
 | 边界数据 | 若干 | 最大/最小值 |
 
@@ -193,7 +193,7 @@ python -m utils.prd_loader docs/PRD_v1.pdf --detect --save-text workspace/需求
 需求阶段同步识别安全威胁。STRIDE 6 类：
 
 | 类别 | 含义 | 例 |
-|------|------|----|
+| ------ | ------ | ---- |
 | **S**poofing | 身份冒充 | 弱密码 / 无 MFA / token 可猜 |
 | **T**ampering | 篡改 | 表单未签名 / 未做 hash 校验 |
 | **R**epudiation | 抵赖 | 无审计日志 / 时间可被改 |

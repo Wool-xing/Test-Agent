@@ -21,7 +21,7 @@ paired_skills: [automotive-test]
 ## 协议矩阵(车载必懂)
 
 | 协议 | 速度 | 用途 | 工具 |
-|------|------|------|------|
+| ------ | ------ | ------ | ------ |
 | **CAN** | 1 Mbps(Classical)/ 5 Mbps(CAN-FD) | 动力 / 底盘 / 车身 | Vector CANoe / PEAK PCAN / SocketCAN |
 | **LIN** | 20 Kbps | 低成本子网(车窗/座椅) | Vector LIN / Saleae |
 | **FlexRay** | 10 Mbps | 高确定性(线控转向/制动) | Vector / Synopsys |
@@ -34,7 +34,7 @@ paired_skills: [automotive-test]
 ## HIL / SIL / MIL / PIL 环路在路
 
 | 缩写 | 含义 | 何时用 |
-|------|------|--------|
+| ------ | ------ | -------- |
 | **MIL** Model-in-the-Loop | 模型仿真 | 算法早期验证 |
 | **SIL** Software-in-the-Loop | 编译后软件 + 主机仿真 | 单元/集成早期 |
 | **PIL** Processor-in-the-Loop | 真 ECU + 仿真环境 | 算法+硬件初步 |
@@ -45,7 +45,7 @@ paired_skills: [automotive-test]
 ## ADAS 场景库
 
 | 类别 | 子场景 |
-|------|--------|
+| ------ | -------- |
 | **AEB 自动紧急制动** | 静止前车 / 静止行人 / 横穿自行车 / 夜间逆光 |
 | **ACC 自适应巡航** | 减速跟车 / 切入切出 / 弯道 |
 | **LKA / LCC 车道保持** | 标线模糊 / 急弯 / 合流 / 隧道入口 |
@@ -58,7 +58,7 @@ paired_skills: [automotive-test]
 ## 合规标准矩阵
 
 | 标准 | 范围 | 触发 |
-|------|------|------|
+| ------ | ------ | ------ |
 | **ISO 26262** | 功能安全 ASIL A-D | 所有汽车 ECU |
 | **ISO 21448(SOTIF)** | 预期功能安全 | ADAS / AD 必有 |
 | **UN R155** | 网络安全 CSMS | 2024 起新车强制(欧盟) |
@@ -91,7 +91,7 @@ paired_skills: [automotive-test]
 ## 调用 Skill 速查
 
 | 场景 | Skill |
-|------|------|
+| ------ | ------ |
 | 整车测试编排 | `/automotive-test` |
 | CAN/LIN/FlexRay 总线 | `/automotive-can-bus-test` |
 | ADAS 场景 | `/automotive-adas-scenario` |

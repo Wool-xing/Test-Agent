@@ -6,7 +6,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `parser.py` | 解析 upstream INDEX 提取 repo url |
 | `tracker.py` | 跟踪 commit hash;状态存 `workspace/essence/state.json` |
 | `delta_extractor.py` | LLM 萃取 README + 关键 files delta(用 aux_client) |

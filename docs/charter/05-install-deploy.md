@@ -13,7 +13,7 @@
 > **当前状态**：`install.py` 通过 `pip install -r requirements.txt` 统一安装。分层按需安装（按产品形态选择性装依赖）为 Phase 2 路线图项。`requirements/` 目录含规划文档。
 
 | 层 | requirements 文件 | 触发条件 | 关键包 |
-|----|----------------|---------|--------|
+| ---- | ---------------- | --------- | -------- |
 | **base**（必装） | `requirements/base.txt` | 永远装 | pytest / requests / playwright / faker / openpyxl / python-docx / allure-pytest |
 | **mobile** | `requirements/mobile.txt` | 选择 mobile / mini-program | Appium-Python-Client / 微信开发者 CLI（外部） |
 | **desktop** | `requirements/desktop.txt` | 选择 desktop | pywinauto / uiautomation / PyAutoGUI |
@@ -91,7 +91,7 @@ $ python install.py --add visual,ai
 **用户配置一站式清单**（首次部署后必查）：
 
 | 配置项 | 文件 | 必填字段 |
-|--------|------|---------|
+| -------- | ------ | --------- |
 | 被测系统 | `.env` | `TEST_APP_URL` / `APP_SRC_PATH` / `TEST_DB_*` |
 | Bug Tracker | `.env` | `BUG_TRACKER` + 对应 adapter 字段（zentao_/jira_/github_/linear_/webhook_） |
 | 多端通知 | `.env` | `WECHAT_WEBHOOK_URL` / `FEISHU_WEBHOOK_URL` / `DINGTALK_WEBHOOK_URL` / `SLACK_WEBHOOK_URL` / `EMAIL_SMTP_*` / `TEAMS_WEBHOOK_URL`（至少一个） |
@@ -201,7 +201,7 @@ cursor                   # Cursor
 ## 📋 工作流选择指南
 
 | 场景 | 推荐工作流 | 耗时 | 用例范围 | 触发 |
-|------|-----------|------|---------|------|
+| ------ | ----------- | ------ | --------- | ------ |
 | 上线前快速验证 | `/smoke-test` | ~10 分钟 | P0 | 手动 / CI |
 | 新功能完整测试 | `/test-coordinator` | ~2-4 小时 | 全部 | 手动 |
 | 迭代后回归 | `/regression-test` | ~1-2 小时 | P0+P1 | CI 自动 |
@@ -213,7 +213,7 @@ cursor                   # Cursor
 ## 🔧 技术栈速查
 
 | 类型 | 框架/工具 | 版本 | 说明 |
-|------|-----------|------|------|
+| ------ | ----------- | ------ | ------ |
 | 接口测试 | requests + pytest + allure-pytest | pytest 7.4.3 | |
 | UI 测试 | playwright + pytest-playwright | playwright 1.40.0 | |
 | 性能测试（主） | Apache JMeter | 5.6.3（需独立装 Java + JMeter） | CI/release 门禁权威 |
@@ -294,7 +294,7 @@ your-test-project/
 **Claude Code 是默认 / 推荐 runtime，但本项目不强制绑定**。
 
 | 组件 | Claude Code 依赖 | 跨工具适配 |
-|------|----------------|----------|
+| ------ | ---------------- | ---------- |
 | `.claude/agents/*.md`（YAML frontmatter） | ✅ Claude Code spec | Cursor 用 `.cursorrules`；Continue.dev 用 `.continue/`；通用 LLM 拼接为 system prompt |
 | `.claude/skills/*.md`（斜杠技能） | ✅ Claude Code 独有 | 其他工具无对等机制 |
 | `.mcp.json`（MCP 协议） | 半依赖 | MCP 是开放协议；Claude Desktop / Cursor 部分支持；OpenAI 系也开始支持 |

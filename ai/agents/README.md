@@ -9,7 +9,7 @@
 ## 类别 1：核心通用流程 9 Agent（每次测试必经）
 
 | 序号 | Agent 文件 | 角色 | 主要产出 |
-|------|-----------|------|---------|
+| ------ | ----------- | ------ | --------- |
 | 01 | `01-测试主管.md` | **test-lead**（协调者） | 测试计划 / 路由决策 / 质量门禁 / 最终上线建议 |
 | 02 | `02-需求分析.md` | requirements-analyst | requirements_analysis_*.md + JSON 摘要 |
 | 03 | `03-用例设计.md` | testcase-designer | testcases_*.xlsx（4 Sheet） |
@@ -35,7 +35,7 @@ bug-manager → report-generator → test-lead 决策
 ## 类别 2：平台专项扩展 5 Agent（按 PRD 形态路由）
 
 | 序号 | Agent 文件 | 角色 | 触发条件（PRD 关键词） |
-|------|-----------|------|----------------------|
+| ------ | ----------- | ------ | ---------------------- |
 | 10 | `10-移动测试.md` | **mobile-tester** | Android / iOS / .apk / .ipa / 微信小程序 / 支付宝小程序 |
 | 11 | `11-桌面测试.md` | **desktop-tester** | .exe / Windows 桌面 / .app / macOS / Electron / VSCode / 钉钉PC |
 | 12 | `12-视觉游戏测试.md` | **visual-tester** | 游戏 / Canvas / WebGL / Unity / Unreal / OCR / 视觉回归 |
@@ -47,7 +47,7 @@ bug-manager → report-generator → test-lead 决策
 ## 类别 3：垂直领域扩展 2 Agent
 
 | 序号 | Agent 文件 | 角色 | 触发条件（PRD 关键词） |
-|------|-----------|------|----------------------|
+| ------ | ----------- | ------ | ---------------------- |
 | 15 | `15-渗透测试.md` | **pentest-tester** | 渗透 / 安全测试 / SQL 注入 / XSS / SSRF / 漏洞扫描 / OWASP / 攻击面 |
 | 16 | `16-车载测试.md` | **automotive-tester** | 车载 / 汽车 / CAN-bus / SOME-IP / DoIP / UDS / ASIL / ISO-26262 / HIL / OTA |
 

@@ -17,7 +17,7 @@ SKILL_IMPL_STATUS: production
 ## 4 维度评测
 
 | 指标 | 用途 |
-|------|------|
+| ------ | ------ |
 | **Jaccard@k** | 检索集合相似度(本项目 router retrieval 用) |
 | **top-1 stability** | 改动后 top-1 是否稳定 |
 | **latency Δ** | 延迟变化 |

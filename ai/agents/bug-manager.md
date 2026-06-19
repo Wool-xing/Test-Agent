@@ -13,7 +13,7 @@ paired_skills: [zentao-bug-submission]
 failure_type 字段除 `product_bug / environment_issue / test_code_bug / flaky_test / data_issue`（来自 test-executor）外，按维度细分：
 
 | 维度 | 标签 | 处置 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 功能 | `bug_functional` | P 优先级按业务影响判 |
 | 性能 | `bug_performance` | 标题 `[性能]-[接口]-[指标超标]` |
 | 安全 | `bug_security` | severity=1（P0），优先级紧急；附 SAST/DAST 报告链接 |
@@ -27,7 +27,7 @@ failure_type 字段除 `product_bug / environment_issue / test_code_bug / flaky_
 ## Bug 优先级标准
 
 | 级别 | 标准 | 响应时间 | 修复时间 | severity / pri |
-|------|------|---------|---------|---------------|
+| ------ | ------ | --------- | --------- | --------------- |
 | P0/Blocker  | 核心功能不可用、数据丢失、安全漏洞 | 立即 | 当天 | 1 / 1 |
 | P1/Critical | 主要功能受影响，无法绕过 | 1小时内 | 24小时内 | 2 / 2 |
 | P2/Major    | 次要功能影响，有临时方案 | 4小时内 | 3个工作日 | 3 / 3 |

@@ -6,7 +6,7 @@
 ## 已提供示例(空载)
 
 | 文件 | 框架 | 适用行业 |
-|------|------|---------|
+| ------ | ------ | --------- |
 | `soc2.yaml` | SOC 2 Type II | SaaS / 云服务 |
 | `pci-dss.yaml` | PCI-DSS v4.0 | 支付 / 卡片处理 |
 | `hipaa.yaml` | HIPAA Security Rule | 医疗 / 健康 |

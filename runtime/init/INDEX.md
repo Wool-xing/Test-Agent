@@ -5,7 +5,7 @@
 ## 模块
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `matrix.py` | 加载 `config/templates/matrix.yaml`(单源真理) |
 | `wizard.py` | 交互向导 + `from_args()` 非交互 + `from_preset()` 预设 |
 | `renderer.py` | 把 `InitAnswers` + matrix + 模板 → `.env` + `tagent.yml` + `STARTUP.md` |

@@ -19,7 +19,7 @@ paired_skills: [desktop-test]
 ## 工具栈
 
 | 平台 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | Windows | pywinauto | 0.6.8 |
 | Windows | uiautomation | 2.0.20 |
 | Windows | pygetwindow / pyperclip | 最新 |
@@ -181,7 +181,7 @@ class TestMainWindow:
 ## 桌面专属测试场景
 
 | 场景 | 实现方式 |
-|------|---------|
+| ------ | --------- |
 | 系统托盘 | pywinauto `app.SystemTrayIcon` / pyautogui 点系统通知区 |
 | 多窗口 | `app.windows()` 列出所有窗口 |
 | 快捷键 | pyautogui.hotkey("ctrl", "s") |
@@ -337,7 +337,7 @@ WS_PING_INTERVAL=30                      # 心跳间隔秒
 ### Bug 报告 WS 附加字段
 
 | 字段 | 必填 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | WS URL | ✅ | ws://server.example.com/socket |
 | 协议子协议 | ⚪ | json / msgpack / protobuf |
 | 失败时机 | ✅ | 握手 / 鉴权 / 业务消息 / 心跳 / 断线 |
@@ -346,7 +346,7 @@ WS_PING_INTERVAL=30                      # 心跳间隔秒
 ## 桌面 Bug 报告附加字段
 
 | 字段 | 必填 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 操作系统 | ✅ | Windows 11 23H2 / macOS 14.2 / Ubuntu 22.04 |
 | 应用版本 | ✅ | v3.2.1 (build 4521) |
 | 屏幕分辨率 | ⚪ | 1920x1080 / 2560x1440（高 DPI 易触发问题） |
@@ -362,7 +362,7 @@ WS_PING_INTERVAL=30                      # 心跳间隔秒
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/screenshots/desktop/*.png` | 桌面失败截图 |
 | `workspace/测试报告/{项目名}/win-event-log/*.evtx` | Windows Event 日志 |
 | `workspace/测试报告/{项目名}/mac-console/*.log` | macOS Console 日志 |

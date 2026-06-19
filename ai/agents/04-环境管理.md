@@ -284,7 +284,7 @@ def prepare_environment_with_retry(env_config, max_retries: int = 3) -> bool:
 ## 📋 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/环境检查_{时间戳}.json` | 健康报告 |
 | `workspace/测试报告/{项目名}/环境清理_{时间戳}.json` | 清理报告 |
 

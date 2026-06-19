@@ -5,7 +5,7 @@
 ## 已实现 16 runner
 
 | Runner | 角色源 | 上游 | 产物 |
-|--------|--------|------|------|
+| -------- | -------- | ------ | ------ |
 | `requirements-analyst` | agents/02-需求分析.md | PRD(artifact_text) | `requirements_summary.json` |
 | `automation-engineer` | agents/06-自动化脚本.md | requirements-analyst | `automation_scripts_plan.json` |
 | `test-executor` | agents/07-测试执行.md | automation-engineer | `execution_plan.json` |

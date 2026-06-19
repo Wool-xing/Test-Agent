@@ -5,7 +5,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `jobs.py` | Job 存储(`workspace/cron/jobs.json`)+ croniter 解析 |
 | `scheduler.py` | tick() 每 60s,跨平台文件锁(fcntl/msvcrt) |
 | `injection_scan.py` | 运行时 prompt 注入扫描(防 skill 加载注入) |

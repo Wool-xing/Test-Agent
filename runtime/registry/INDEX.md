@@ -3,7 +3,7 @@
 ## 文件清单
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `registry.py` | 扫 agents/*.md + skills/*.md frontmatter,生成内存目录 |
 | `catalog.json` | 启动时生成,可手动 dump 给 LLM 用 |
 

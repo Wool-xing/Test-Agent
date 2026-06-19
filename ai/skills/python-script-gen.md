@@ -51,7 +51,7 @@ SKILL_IMPL_STATUS: production
 ## 脚本类型选择
 
 | 用例 TYPE | 生成类型 | 框架 |
-|-----------|---------|------|
+| ----------- | --------- | ------ |
 | UI | UI 自动化 | Playwright |
 | API | API 测试 | requests + pytest |
 | PERF | 性能测试 | **转交 /jmeter-script-gen**（主） |
