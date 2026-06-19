@@ -5,40 +5,48 @@
 ## 模块
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `matrix.py` | 加载 `config/templates/matrix.yaml`(单源真理) |
 | `wizard.py` | 交互向导 + `from_args()` 非交互 + `from_preset()` 预设 |
 | `renderer.py` | 把 `InitAnswers` + matrix + 模板 → `.env` + `tagent.yml` + `STARTUP.md` |
 
 ## 流程
 
-```
+```text
 matrix.yaml ──┐
               ├──► wizard.run_wizard() ──► InitAnswers ──► renderer.render_all() ──► (.env, tagent.yml, STARTUP.md)
 模板 *.tpl ───┘                          ▲
                                          │
                               CLI args / preset(可绕过向导)
-```
+
+```text
 
 ## 用法
 
 ```bash
+
 # 交互向导(推荐首次用户)
+
 tagent init
 
 # 非交互(CI / 脚本)
+
 tagent init --test-type web --platform linux --llm claude --bug-tracker zentao --notifier wechat,feishu
 
 # preset 5 种:minimal / saas-web / 国内-web / mobile-android / security-pentest
+
 tagent init --preset minimal
 
 # 覆盖已有
+
 tagent init --overwrite
-```
+
+```text
 
 ## 加新选项
 
 不改 wizard / renderer 代码,改 matrix.yaml 即可:
+
 - 新 LLM provider → `llm_providers:` 加节
 - 新 BugTracker → `bug_trackers:` 加节(6 adapter 之外加)
 - 新通知渠道 → `notifiers:` 加节(6 渠道之外加)
@@ -46,7 +54,7 @@ tagent init --overwrite
 
 ## 矩阵规模
 
-8 测试类型 × 6 平台 × 5 LLM × 6 BugTracker × 6 通知 = **8640 种组合**,可参数化。
+8 测试类型 × 6 平台 × 5 LLM × 6 BugTracker × 6 通知 =**8640 种组合**,可参数化。
 
 ## 相关
 

@@ -17,7 +17,7 @@ SKILL_IMPL_STATUS: production
 ## 关键设计
 
 | 维度 | 实现 |
-|------|------|
+| ------ | ------ |
 | 浏览器 | Playwright(Chromium / Firefox / WebKit) |
 | 2FA / TOTP | `pyotp.TOTP(SECRET).now()` |
 | SSO | Playwright follow redirects(Okta / Auth0 / Azure AD / Keycloak) |
@@ -29,14 +29,15 @@ SKILL_IMPL_STATUS: production
 
 ```python
 class LoginPage:
-    def __init__(self, page):
+    def__init__(self, page):
         self.page = page
 
     def login(self, user, pwd):
         self.page.fill('input[name=email]', user)
         self.page.fill('input[name=password]', pwd)
         self.page.click('button[type=submit]')
-```
+
+```text
 
 ## 关键用户流必测(模板)
 

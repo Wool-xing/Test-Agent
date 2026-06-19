@@ -10,12 +10,12 @@ SKILL_IMPL_STATUS: production
 ## 与 pentest-* 的区别(避免重复)
 
 | Skill | 时机 | 层 |
-|-------|------|----|
-| **security-review**(本) | 每 PR / feature 阶段 | **代码层**(白盒静态) |
-| `/pentest-coordinator` | 完整渗透项目 | **应用层**(动态利用) |
+| ------- | ------ | ---- |
+|**security-review**(本) | 每 PR / feature 阶段 |**代码层**(白盒静态) |
+| `/pentest-coordinator` | 完整渗透项目 |**应用层**(动态利用) |
 | `/pentest-vuln` | 渗透中漏洞发现 | 5 攻击域 |
 
-本 skill = **代码 review 时安全角度**,不真打 PoC。
+本 skill =**代码 review 时安全角度**,不真打 PoC。
 
 ## 触发
 
@@ -27,12 +27,12 @@ SKILL_IMPL_STATUS: production
 ## 5 维自检(快速版)
 
 | 维 | 检查 |
-|----|------|
-| **凭据** | 硬编码 password / API key / token → `gitleaks` + `truffleHog` |
-| **注入** | 字符串拼接 SQL / shell / template / LDAP → grep `f"{...}"` 在 `cursor.execute` / `subprocess.run` 等 |
-| **权限** | 缺 `@requires_auth` / 缺 `is_owner` 检查 → 静态扫 endpoint 装饰器 |
-| **CORS / Headers** | `Access-Control-Allow-Origin: *` + 缺 CSP / X-Frame-Options 等 |
-| **依赖 CVE** | `pip-audit` / `safety` / Trivy / DependencyCheck |
+| ---- | ------ |
+|**凭据**| 硬编码 password / API key / token → `gitleaks` + `truffleHog` |
+|**注入**| 字符串拼接 SQL / shell / template / LDAP → grep `f"{...}"` 在 `cursor.execute` / `subprocess.run` 等 |
+|**权限**| 缺 `@requires_auth` / 缺 `is_owner` 检查 → 静态扫 endpoint 装饰器 |
+|**CORS / Headers**| `Access-Control-Allow-Origin: *` + 缺 CSP / X-Frame-Options 等 |
+|**依赖 CVE**| `pip-audit` / `safety` / Trivy / DependencyCheck |
 
 ## 工具(本项目已有)
 
@@ -48,7 +48,8 @@ bandit -r runtime/ -ll
 gitleaks detect --source . --no-banner
 pip-audit
 safety check
-```
+
+```text
 
 ## 融合
 

@@ -5,7 +5,7 @@
 ## 已实现 16 runner
 
 | Runner | 角色源 | 上游 | 产物 |
-|--------|--------|------|------|
+| -------- | -------- | ------ | ------ |
 | `requirements-analyst` | agents/02-需求分析.md | PRD(artifact_text) | `requirements_summary.json` |
 | `automation-engineer` | agents/06-自动化脚本.md | requirements-analyst | `automation_scripts_plan.json` |
 | `test-executor` | agents/07-测试执行.md | automation-engineer | `execution_plan.json` |
@@ -15,12 +15,13 @@
 ## 0 未实现
 
 - test-lead 自身已实现(用全链路上游),其他 11 个:env-manager / data-preparer(scripted)/ testcase-designer(scripted)/ report-generator(scripted)/ mobile-tester / desktop-tester(scripted)/ visual-tester / system-tester / ai-tester(scripted)/ 渗透 / 车载
-- **5 个有 script 真跑**(testcase-designer / data-preparer / report-generator / desktop-tester / ai-tester)→ SCRIPT_MAP 兜
-- **6 个 no-op**(env-manager / mobile-tester / visual-tester / system-tester / 渗透 / 车载)→ 待实装
+-**5 个有 script 真跑**(testcase-designer / data-preparer / report-generator / desktop-tester / ai-tester)→ SCRIPT_MAP 兜
+-**6 个 no-op**(env-manager / mobile-tester / visual-tester / system-tester / 渗透 / 车载)→ 待实装
 
 ## 协议
 
 ### 输入(RunnerContext)
+
 - `artifact_text`:原始 PRD / target 文本
 - `upstream: dict[name, output]`:上游 runner 产物(by expert name)
 - `settings_provider`:LLM provider(`stub` 走 mock)
@@ -28,6 +29,7 @@
 - `lang` / `mode`(exec / learn / mock)
 
 ### 输出(RunnerResult)
+
 - `output: dict`:per-agent schema JSON
 - `artifact_path`:落盘位置(可空)
 - `summary`:1 行业务语言

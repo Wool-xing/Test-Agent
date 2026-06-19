@@ -11,11 +11,13 @@ SKILL_IMPL_STATUS: production
 
 ```text
 /system-test [子场景：iot|media|tracing|mq 或 复合描述]
-```
+
+```text
 
 ## 🔔 开测前准备清单（按子场景）
 
 ```text
+
 IoT/嵌入式：
 □ SSH 凭证 → IOT_SSH_HOST / USER / PASSWORD
 □ 串口路径 + 波特率 → IOT_SERIAL_PORT / IOT_SERIAL_BAUDRATE
@@ -33,7 +35,8 @@ IoT/嵌入式：
 □ Kafka brokers → KAFKA_BROKERS
 □ RabbitMQ URL → RABBITMQ_URL
 □ topic / queue 名称
-```
+
+```text
 
 ## 适用场景
 
@@ -48,7 +51,9 @@ IoT/嵌入式：
 ### Step 1：环境检查
 
 ```bash
+
 # 各组件可用性
+
 ssh -V
 python -c "import paramiko; print(paramiko.__version__)"
 python -c "import serial; print(serial.__version__)"
@@ -56,31 +61,39 @@ python -c "import paho.mqtt.client as m; print('mqtt ok')"
 ffmpeg -version
 ffprobe -version
 curl ${JAEGER_BASE_URL}/api/services      # Jaeger 健康
-```
+
+```text
 
 ### Step 2：执行测试（按子场景）
 
 ```bash
+
 # IoT
+
 pytest -m "system and iot" -v
 
 # 音视频
+
 pytest -m "system and media" -v
 
 # 链路追踪
+
 pytest -m "system and tracing" -v
 
 # 消息队列
+
 pytest -m "system and mq" -v
 
 # 全部系统集成
+
 pytest -m "system and p0" -v
-```
+
+```text
 
 ## 质量门禁
 
 | 子场景 | 关键指标 | 要求 |
-|-------|---------|------|
+| ------- | --------- | ------ |
 | IoT | SSH 响应、MQTT 投递成功率 | 100% / >99% |
 | 音视频 | 帧 SSIM、音画偏移 | ≥0.95 / <80ms |
 | 链路追踪 | Trace 完整服务覆盖 | 100% |
@@ -89,9 +102,11 @@ pytest -m "system and p0" -v
 ## 输出文件
 
 ```text
+
 workspace/测试报告/{项目名}/
 ├── iot-logs/
 ├── media-frames/
 ├── tracing/
 └── mq-logs/
-```
+
+```text

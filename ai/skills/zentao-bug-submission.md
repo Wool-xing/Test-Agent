@@ -11,11 +11,13 @@ SKILL_IMPL_STATUS: production
 
 ```text
 /zentao-bug-submission [Bug 描述 或 测试失败日志]
-```
+
+```text
 
 ## 🔔 调用前置准备
 
 ```text
+
 □ 禅道实例可访问（ZENTAO_BASE_URL）
 □ .env 填 ZENTAO_ACCOUNT / ZENTAO_PASSWORD（API 凭证）
 □ 禅道 API v1 已启用（管理后台 → 二次开发 → API）
@@ -23,33 +25,38 @@ SKILL_IMPL_STATUS: production
 □ Bug 描述含必备字段：title / 复现步骤 / 预期 / 实际
 □ utils/zentao_bug_manager.py + utils/api_retry_util.py 已部署
 □ 批量场景：test-executor 已输出 regression_summary.json（含 failures 列表）
-```
+
+```text
 
 ## 执行流程
 
 ### Step 1：Bug 信息规范化（bug-manager 执行）
 
 ```text
+
 - 确定 Bug 优先级（P0/P1/P2/P3）
 - 提取复现步骤
 - 整理预期/实际结果
 - 识别影响范围
 - 准备附件（截图/日志）
-```
+
+```text
 
 ### Step 2：提交禅道（utils/zentao_bug_manager.py）
 
 ```text
+
 - 自动指数退避重试（10s/20s/40s）
 - token 失效自动续期
 - 返回禅道 Bug ID
 - 更新本地追踪记录
-```
+
+```text
 
 ## 优先级 → severity / pri 映射（权威表）
 
 | 优先级 | severity | pri | 标准 |
-|-------|----------|-----|------|
+| ------- | ---------- | ----- | ------ |
 | P0 | 1 | 1 | 核心业务流程完全阻断 / 数据丢失 / 安全漏洞 / 系统崩溃 |
 | P1 | 2 | 2 | 主要功能受影响（有临时绕过）/ 关键数据展示错误 / 权限失效 |
 | P2 | 3 | 3 | 次要功能异常 / UI 明显问题 / 错误提示不友好 / 性能低于预期 |
@@ -60,6 +67,7 @@ SKILL_IMPL_STATUS: production
 ## 单条提交
 
 ```python
+
 from utils.zentao_bug_manager import ZentaoBugManager, SEVERITY_MAP, PRI_MAP
 
 manager = ZentaoBugManager()  # 自动从 .env 读取凭证
@@ -75,11 +83,13 @@ bug = manager.create_bug({
     "assignedTo": "frontend-lead",
 })
 print(f"Bug 已提交：#{bug.get('id')}")
-```
+
+```text
 
 ## 批量提交（从 test-executor 输出 JSON）
 
 ```python
+
 import json
 
 from utils.zentao_bug_manager import ZentaoBugManager
@@ -95,12 +105,15 @@ submitted = manager.batch_submit_from_failures(
     build_version=results.get("build_version", "unknown"),
 )
 # submitted: [{"case_id": ..., "bug_id": ..., "priority": "P0", "status": "submitted"}, ...]
+
 print(json.dumps(submitted, ensure_ascii=False, indent=2))
-```
+
+```text
 
 ## Bug 状态追踪
 
 ```python
+
 def track_bug_status(bug_ids: list) -> dict:
     """追踪 Bug 修复状态"""
     manager = ZentaoBugManager()
@@ -116,25 +129,29 @@ def track_bug_status(bug_ids: list) -> dict:
         except Exception as e:
             status_map[bug_id] = {"error": str(e)}
     return status_map
-```
+
+```text
 
 ## 禅道配置
 
 `.env` 中配置：
 
 ```text
+
 ZENTAO_BASE_URL=http://your-zentao.com/zentao/api.php/v1
 TEST_ZENTAO_URL=          # 可选，按环境隔离
 STAGING_ZENTAO_URL=       # 可选
 ZENTAO_ACCOUNT=your_account
 ZENTAO_PASSWORD=your_password
-```
+
+```text
 
 > 注：当前 `.mcp.json` 仅启用 filesystem，Bug 提交走 SDK 直连（`utils/zentao_bug_manager.py`）。如需启用 zentao MCP server，自行实现后追加配置即可（参考 .mcp.json `_comment` 字段）。
 
 ## 提交后输出示例
 
 ```text
+
 === Bug 提交结果 ===
 已提交：3 个 Bug
 
@@ -151,4 +168,5 @@ Bug#1026（P2，severity=3）：用户头像上传提示文案错误
   → 状态：新建
 
 ⚠️ P0 Bug 告警：存在 1 个 P0 Bug（Bug#1024），请立即关注！
-```
+
+```text

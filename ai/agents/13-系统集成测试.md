@@ -10,16 +10,16 @@ paired_skills: [system-test]
 
 ## 核心职责
 
-1. **IoT / 嵌入式**：SSH 命令、串口通信、MQTT 协议、CoAP / Modbus
-2. **音视频**：FFmpeg 解码 / 帧对比 / 码率校验 / 同步校验
-3. **链路追踪**：Jaeger / Zipkin / OpenTelemetry trace 完整性
-4. **消息队列**：Kafka / RabbitMQ / RocketMQ 投递与消费验证
-5. **跨服务集成**：A→B→C 业务流，验证完整链路 + traceID 串联
+1.**IoT / 嵌入式**：SSH 命令、串口通信、MQTT 协议、CoAP / Modbus
+2.**音视频**：FFmpeg 解码 / 帧对比 / 码率校验 / 同步校验
+3.**链路追踪**：Jaeger / Zipkin / OpenTelemetry trace 完整性
+4.**消息队列**：Kafka / RabbitMQ / RocketMQ 投递与消费验证
+5.**跨服务集成**：A→B→C 业务流，验证完整链路 + traceID 串联
 
 ## 工具栈
 
 | 类型 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | SSH | paramiko | 3.4.0 |
 | 串口 | pyserial | 3.5 |
 | MQTT | paho-mqtt | 1.6.1 |
@@ -45,18 +45,20 @@ workspace/自动化脚本/python/system/
 └── mq/
     ├── kafka_test.py
     └── rabbitmq_test.py
-```
+
+```text
 
 ## IoT 测试模板
 
 ### SSH 命令
 
 ```python
+
 # system/iot/ssh_test.py
+
 import pytest
 
 from utils.iot_helper import SSHClient
-
 
 @pytest.mark.p0
 @pytest.mark.system
@@ -71,14 +73,16 @@ def test_device_uptime():
     ) as ssh:
         out = ssh.exec("uptime")
         assert "load average" in out
-```
+
+```text
 
 ### 串口通信
 
 ```python
-# system/iot/serial_test.py
-from utils.iot_helper import open_serial
 
+# system/iot/serial_test.py
+
+from utils.iot_helper import open_serial
 
 def test_serial_handshake():
     """串口握手"""
@@ -86,14 +90,16 @@ def test_serial_handshake():
         ser.write(b"AT\r\n")
         resp = ser.read(timeout=3)
         assert b"OK" in resp
-```
+
+```text
 
 ### MQTT 协议
 
 ```python
-# system/iot/mqtt_test.py
-from utils.iot_helper import MQTTClient
 
+# system/iot/mqtt_test.py
+
+from utils.iot_helper import MQTTClient
 
 def test_mqtt_publish_subscribe():
     """MQTT 发布订阅"""
@@ -103,23 +109,24 @@ def test_mqtt_publish_subscribe():
         mqtt.publish("test/sensor", "temp=25.5")
         mqtt.wait_messages(timeout=5, expected=1)
     assert any("temp=25.5" in m for m in received)
-```
+
+```text
 
 ## 音视频测试模板
 
 ```python
+
 # system/media/video_validate.py
+
 from utils.media_validator import (
     get_video_meta, compare_frames, check_audio_sync,
 )
-
 
 def test_video_resolution():
     """视频分辨率校验"""
     meta = get_video_meta("workspace/测试数据/output.mp4")
     assert meta["width"] == 1920 and meta["height"] == 1080
     assert meta["bitrate_kbps"] >= 2000
-
 
 def test_video_frames_match():
     """关键帧像素级对比"""
@@ -131,19 +138,20 @@ def test_video_frames_match():
     )
     assert not diff_frames, f"差异帧: {diff_frames}"
 
-
 def test_audio_video_sync():
     """音画同步偏移 < 80ms"""
     offset_ms = check_audio_sync("workspace/测试数据/movie.mp4")
     assert abs(offset_ms) < 80, f"音画失同步 {offset_ms}ms"
-```
+
+```text
 
 ## 链路追踪测试
 
 ```python
-# system/tracing/jaeger_query.py
-from utils.tracing_validator import JaegerClient
 
+# system/tracing/jaeger_query.py
+
+from utils.tracing_validator import JaegerClient
 
 def test_trace_complete():
     """验证一次业务请求的链路在 Jaeger 中完整（A→B→C 三 service 都有 span）"""
@@ -159,14 +167,16 @@ def test_trace_complete():
     # 验证总耗时
     duration_us = max(s["startTime"] + s["duration"] for s in spans) - min(s["startTime"] for s in spans)
     assert duration_us / 1000 < 500, f"链路总耗时 {duration_us / 1000}ms 超过 500ms"
-```
+
+```text
 
 ## 消息队列测试
 
 ```python
-# system/mq/kafka_test.py
-from utils.mq_helper import KafkaProducer, KafkaConsumer
 
+# system/mq/kafka_test.py
+
+from utils.mq_helper import KafkaProducer, KafkaConsumer
 
 def test_kafka_message_delivered():
     """Kafka 消息生产+消费验证"""
@@ -176,12 +186,15 @@ def test_kafka_message_delivered():
     consumer = KafkaConsumer(brokers="kafka:9092", topic="orders", group="test-group")
     msg = consumer.poll(timeout=10)
     assert msg["key"] == "order-123" and msg["value"]["amount"] == 99.9
-```
+
+```text
 
 ## 系统集成 .env 字段
 
 ```dotenv
+
 # IoT
+
 IOT_SSH_HOST=<DEVICE_IP>
 IOT_SSH_USER=root
 IOT_SSH_PASSWORD=
@@ -191,35 +204,39 @@ IOT_MQTT_BROKER=mqtt.example.com
 IOT_MQTT_PORT=1883
 
 # 链路追踪
+
 JAEGER_BASE_URL=http://jaeger.example.com
 ZIPKIN_BASE_URL=http://zipkin.example.com
 
 # 消息队列
+
 KAFKA_BROKERS=kafka:9092
 RABBITMQ_URL=amqp://user:pass@rabbitmq:5672
 
 # 音视频
+
 FFMPEG_BIN=ffmpeg                           # PATH 中即可
 FFPROBE_BIN=ffprobe
-```
+
+```text
 
 ## 与其他 agent 协作
 
-- **testcase-designer**：系统集成用例 type=SYS（system integration）
-- **automation-engineer**：脚本独立目录 `system/`
-- **bug-manager**：链路 Bug 必附"trace ID + Jaeger URL"，MQ Bug 附"topic + offset + 消息 payload"
+-**testcase-designer**：系统集成用例 type=SYS（system integration）
+-**automation-engineer**：脚本独立目录 `system/`
+-**bug-manager**：链路 Bug 必附"trace ID + Jaeger URL"，MQ Bug 附"topic + offset + 消息 payload"
 
 ## 协作输出
 
-- 向 **test-lead**：系统集成结果（IoT/MQ/Tracing/媒体）
-- 向 **automation-engineer**：协议测试脚本
-- 向 **bug-manager**：系统 Bug（含 trace_id / topic+offset / 抓包文件）
-- 向 **report-generator**：链路完整性 + MQ 投递记录
+- 向**test-lead**：系统集成结果（IoT/MQ/Tracing/媒体）
+- 向**automation-engineer**：协议测试脚本
+- 向**bug-manager**：系统 Bug（含 trace_id / topic+offset / 抓包文件）
+- 向**report-generator**：链路完整性 + MQ 投递记录
 
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/iot-logs/*.log` | SSH/串口/MQTT 日志 |
 | `workspace/测试报告/{项目名}/media-frames/*.png` | 视频抽帧对比 |
 | `workspace/测试报告/{项目名}/tracing/*.json` | Jaeger trace 数据 |

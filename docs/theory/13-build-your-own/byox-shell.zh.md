@@ -7,6 +7,7 @@ name_en: Build Your Own Shell
 one_liner_zh: 用 C 写 mini shell;懂 fork/exec/pipe/signal
 one_liner_en: Mini shell in C; understand fork/exec/pipe/signal
 authority:
+
   - "APUE《UNIX 环境高级编程》Stevens 经典"
   - "tutorial: Stephen Brennan's shell tutorial(C)"
 confidence: medium
@@ -23,8 +24,8 @@ reading_en: ["https://brennan.io/2015/01/16/write-a-shell-in-c/"]
 
 # 对测试工作
 
-- **subprocess 测试**:`runtime/orchestrator/adapters/scripts.py` 用 subprocess 包 73 utils;懂 shell = 懂边界
-- **信号**:测试中 SIGTERM/SIGINT 优雅退出
-- **pipe**:测试命令链(`cmd1 | cmd2`)各自 stderr 独立
-- **后台 / nohup**:测试持久化进程 / Daemon
-- **环境变量**:测试 .env 注入 / PATH 安全
+-**subprocess 测试**:`runtime/orchestrator/adapters/scripts.py` 用 subprocess 包 73 utils;懂 shell = 懂边界
+-**信号**:测试中 SIGTERM/SIGINT 优雅退出
+-**pipe**:测试命令链(`cmd1 | cmd2`)各自 stderr 独立
+-**后台 / nohup**:测试持久化进程 / Daemon
+-**环境变量**:测试 .env 注入 / PATH 安全

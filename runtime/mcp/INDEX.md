@@ -6,7 +6,7 @@
 ## 模块清单
 
 | MCP server | 路径 | 工具(tools) |
-|------------|------|-------------|
+| ------------ | ------ | ------------- |
 | test-orchestrator | `test_orchestrator/` | catalog / run / status / report / plan |
 | protocol-adapter | `protocol_adapter/` | http / grpc / ws / mqtt / kafka 各 send/recv |
 | evidence-vault | `evidence_vault/` | upload_evidence / list_evidence / get_evidence / search_evidence |
@@ -21,11 +21,13 @@
 ```bash
 python -m runtime.mcp.test_orchestrator.server     # stdio mode
 python -m runtime.mcp.test_orchestrator.server --http 8801  # http mode
-```
+
+```text
 
 或注册到 `config/.mcp.json`:
 
 ```json
+
 {
   "mcpServers": {
     "test-orchestrator": {
@@ -34,11 +36,13 @@ python -m runtime.mcp.test_orchestrator.server --http 8801  # http mode
     }
   }
 }
-```
+
+```text
 
 ## 共享基类
 
 `base.py` 提供:
+
 - `make_server(name, version)`:统一 Server 实例化
 - `tool_decision_logged(name)`:工具装饰器,自动落 `decisions/{date}_mcp_{tool}.json`
 - `with_run_id(handler)`:run_id 全链路注入(横切可复现性)
@@ -46,6 +50,7 @@ python -m runtime.mcp.test_orchestrator.server --http 8801  # http mode
 ## MCP 客户端 (P2 #12)
 
 `client.py` 提供:
+
 - `McpClient`: 连接本地 MCP 服务器(stdio), 发现工具, 调用工具
 - `get_client()`: 单例全局实例
 - 自动读取 `config/.mcp.json` 获取服务器配置

@@ -6,12 +6,12 @@
 ## 定位
 
 把 16 专家定义 + 32 业务 Skill + 3 元 Skill + 79 脚本 从"文档+工具箱"升级为"可执行运行时"。
-本层 **不动** `agents/` `skills/` `utils/` 已有内容,仅作调度。
+本层**不动**`agents/` `skills/` `utils/` 已有内容,仅作调度。
 
 ## 模块清单
 
 | 模块 | 路径 | 用途 |
-|------|------|------|
+| ------ | ------ | ------ |
 | AI 路由 | [router/](router/INDEX.md) | 被测物 → 专家+Skill 组合 → DAG |
 | 注册中心 | [registry/](registry/INDEX.md) | 扫描 16 专家 + 32 业务 Skill + 3 元 Skill frontmatter,统一目录 |
 | Prefect 编排 | [orchestrator/](orchestrator/INDEX.md) | 执行 DAG,断点续跑,产物归档 |
@@ -24,17 +24,20 @@
 
 ## 启动顺序
 
-```
+```text
+
 1. docker compose up -d            # 依赖(postgres/minio/prefect)
 2. alembic upgrade head            # 飞轮 schema
 3. tagent catalog                  # 校验注册中心
 4. tagent run <被测物>             # CLI 单次跑
    或 uvicorn runtime.api.main:app # HTTP 服务
-```
+
+```text
 
 ## 与已有层关系
 
-```
+```text
+
 用户输入(任意格式)
    │
    ▼
@@ -55,7 +58,8 @@ runtime/storage 飞轮            ← 新增,数据沉淀
    │
    ▼
 报告 + 通知                      ← 复用已有 utils/
-```
+
+```text
 
 ## 对应任务
 

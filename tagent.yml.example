@@ -7,7 +7,7 @@
 # ║ 想开启 safety gate / 自动化 / 危险操作 → 改 `tagent.yml`,而非本文件 ║
 # ╚══════════════════════════════════════════════════════════════════════╝
 #
-# Test-Agent 配置(safe-by-default 栅栏 · gbrain §1.9 派生)
+# Test-Agent 配置(safe-by-default 栅栏 · gbrain.9 派生)
 #
 # 危险操作 / 自动化 / 影响生产 的功能 **必须显式开启**,否则 destructive-guard 拒绝运行。
 # 复制为 `tagent.yml` 并按需启用。所有未列字段走 runtime 默认值。
@@ -51,18 +51,18 @@ gateway:
   # 例:
   # enabled_platforms: [telegram, feishu]
 
-# ============== 6. Bug Tracker(charter §12) ==============
+# ============== 6. Bug Tracker ==============
 bug_tracker:
   # 由 tagent init wizard 写入; runtime 经 wizard answers 注入, 不直接读 yml
   # tpl schema 用 primary (单一活跃 tracker); 多 tracker 走 extra
   primary: zentao
-  # extra: [github]              # 多 tracker 主宪章 §37 路由
+  # extra: [github]              # 多 tracker
 
 # ============== 7. Pentest 法律契约(rollout · 见 SECURITY 警告) ==============
 # 当前 expert rollout 状态;字段为 V1.x 接入 yml gate 时的契约占位。
 # 未签授权书严禁开启;authorized: true 必须配齐 scope_in / authorization_record。
 pentest:
-  authorized: false                    # 法律授权确认(default refuse · charter §35)
+  authorized: false                    # 法律授权确认(default refuse · )
   scope_in_targets: []                 # 显式 IP/domain/URL 白名单(IN)
   scope_out_targets: []                # 强制黑名单(覆盖 IN)
   authorization_record: ""             # 授权书 / SoW 路径(空 → refuse)

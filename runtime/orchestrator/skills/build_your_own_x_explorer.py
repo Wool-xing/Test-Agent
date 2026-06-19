@@ -1,7 +1,7 @@
 """build-your-own-x-explorer skill · 教学层 byox deep-dive 推荐.
 
 职责: 据用户当前测试场景 + 时间预算, 从 13 类 byox KB 推 deep-dive 路径。
-铁律: 1) 必问时间预算 2) 不强推 3) 不复制全文。
+规则: 1) 必问时间预算 2) 不强推 3) 不复制全文。
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ class BuildYourOwnXExplorer(AgentRunner):
             "(database/network-stack/web-server/git/search-engine/shell/regex-engine/"
             "programming-language/web-browser/bot/...) KB 推 deep-dive 学习路径, "
             "每条带 estimated_hours + why。\n"
-            "铁律: 1) 必问时间预算 (无预算→拒推) 2) 不强推 (用户测试主线优先) 3) 不复制 tutorial 全文。\n"
+            "规则: 1) 必问时间预算 (无预算→拒推) 2) 不强推 (用户测试主线优先) 3) 不复制 tutorial 全文。\n"
             "输出严格 JSON。"
         )
 

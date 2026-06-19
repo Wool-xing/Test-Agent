@@ -5,7 +5,7 @@
 ## 项目架构速览
 
 | 目录 | 用途 | 放什么 | 不放什么 |
-|------|------|--------|---------|
+| ------ | ------ | -------- | --------- |
 | `ai/` | AI模式界面层 | Agent .md, Skill .md | Python代码 |
 | `apps/` | 分发应用 | desktop/, mobile/ 等 | 共享业务逻辑 |
 | `deploy/` | 部署物料 | 配置模板, 市场, 合规 | 源码 |
@@ -14,7 +14,7 @@
 | `docs/` | 文档 | 知识库, 教程 | 历史快照 |
 | `workspace/` | 运行时产出 | 测试报告(全部gitignored) | 源码 |
 
-**核心规则：新增文件前先问——这属于哪一层？** 找不到答案就在issue里问。
+**核心规则：新增文件前先问——这属于哪一层？**找不到答案就在issue里问。
 
 ---
 
@@ -24,7 +24,8 @@
 2. 文件命名 `15-XXX.md`（按编号递增）
 3. 创建 `specs/agents/<name>/manifest.yaml`（参考已有 manifest 格式，schema 定义在 `specs/manifest.py`）
 4. 编写 system_prompt + output_schema
-5. **同步**：
+5.**同步**：
+
    - 运行 `python scripts/render_manifest.py --name <name>` 生成 AI Mode 用的 .md 文件
    - 更新 `specs/` 对应目录
    - 如 script-backed，添加 `script_path` 指向 utils/
@@ -44,7 +45,9 @@
    - 执行流程
    - 质量门禁
    - 输出文件
-5. **同步**：
+
+5.**同步**：
+
    - `ai/skills/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `docs/getting-started/使用手册.md` skill 详解段加描述
@@ -60,7 +63,8 @@
 2. 文件名小写下划线（如 `chaos_helper.py`）
 3. 顶部 docstring 标注被引用方
 4. 必含：公开 API + CLI（argparse）
-5. **同步**：
+5.**同步**：
+
    - `utils/README.md` 表格加一行
    - `00-项目导航.md` 对应分类加一行
    - `deploy/config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
@@ -75,6 +79,7 @@
 ## 添加新 marker
 
 `pytest.ini` markers 段加一行，**必须**：
+
 - 全小写下划线
 - 注释说明用途
 - 同步到 `00-项目导航.md` 维度表（如适用）
@@ -101,7 +106,8 @@ ci(actions): pip-audit 加 --strict
 refactor(skill): smoke-test 改并行 step
 test(utils): data_factory 加 cleanup 单测
 perf(jmeter): 减少不必要心跳
-```
+
+```text
 
 ---
 
@@ -115,31 +121,34 @@ perf(jmeter): 减少不必要心跳
    ruff check workspace/ utils/
    pip-audit -r requirements.txt --strict
    ```
-4. 提 PR → 等 Dependabot / CI 绿灯 → reviewer 审 → merge
+
+1. 提 PR → 等 Dependabot / CI 绿灯 → reviewer 审 → merge
 
 ---
 
 ## 自检脚本（一键验证项目完整性）
 
 ```bash
+
 ls ai/agents/[0-9]*.md | wc -l   # 16（或 +N）
 ls ai/skills/*.md | grep -v README | wc -l  # 32（或 +N,不含 3 个元 skill 子目录）
-ls utils/*.py | wc -l         # 79（或 +N,含 __init__.py）
+ls utils/*.py | wc -l         # 79（或 +N,含__init__.py）
 grep -c "^    [a-z_]+:" deploy/config/pytest.ini  # markers 数
 python -c "from utils.api_retry_util import call_with_retry; print('OK')"
 pytest --collect-only
-```
+
+```text
 
 ---
 
-## 同步铁律
+## 联动规则
 
 任一文档/代码改动 → 必须同步到所有引用方，并加 `CHANGELOG.md` 条目。
 
 ### 联动改动清单速查
 
 | 改动类型 | 必同步至 |
-|---------|---------|
+| --------- | --------- |
 | 新增/删除 Agent | `ai/agents/README.md` + `00-项目导航.md` + `docs/getting-started/部署说明.md` 拷贝清单 + `01-测试主管.md` 路由表 + `prd_loader.PLATFORM_KEYWORDS`（install.py 用 glob 自动发现，无需手动加文件名） |
 | 新增/删除 Skill | `ai/skills/README.md` + `00-项目导航.md` + `docs/getting-started/使用手册.md` skill 详解 + `01-测试主管.md` 快速命令清单（install.py 用 glob 自动发现） |
 | 新增/删除 utils | `utils/README.md` + `00-项目导航.md` + `requirements.txt` + `.env.example` + `conftest.py::pytest_configure` + `pytest.ini` markers（install.py 用 os.walk 自动发现 .py） |
@@ -156,9 +165,11 @@ pytest --collect-only
 ### 提交前自检
 
 ```bash
+
 pre-commit run --all-files
 pytest --collect-only
-```
+
+```text
 
 ---
 
@@ -168,16 +179,17 @@ pytest --collect-only
 
 ### 缩写
 
-- **R** = Responsible（执行者，可多个）
-- **A** = Accountable（最终负责，每行只 1 个）
-- **C** = Consulted（被咨询）
-- **I** = Informed（被通报）
+-**R**= Responsible（执行者，可多个）
+-**A**= Accountable（最终负责，每行只 1 个）
+-**C**= Consulted（被咨询）
+-**I**= Informed（被通报）
+
 - 空 = 不参与
 
 ### 16 专家代号
 
 | 代号 | 专家 | 类别 |
-|------|------|------|
+| ------ | ------ | ------ |
 | TL | test-lead | 协调者 |
 | RA | requirements-analyst | 核心 |
 | TD | testcase-designer | 核心 |
@@ -198,7 +210,7 @@ pytest --collect-only
 ### RACI 主表（测试维度 × 专家）
 
 | 测试维度 | TL | RA | TD | EM | DP | AE | TE | BM | RG | MT | DT | VT | ST | AT | PT | AMT |
-|---------|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|-----|
+| --------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ----- |
 | 需求分析 | A | R | C | I | I | I | I | I | I | C | C | C | C | C | C | |
 | 用例设计-功能 | A | C | R | I | C | I | I | I | I | C | C | C | C | C | C | |
 | 用例设计-非功能 | A | C | R | I | C | C | C | C | I |  |  |  |  |  | C | |
@@ -234,12 +246,12 @@ pytest --collect-only
 | Bug 提交 BugTracker | A | I | I | I | I | I | C | R | C | I | I | I | I | I | I | I |
 | 报告生成 | A | I | I | I | I | I | C | C | R | I | I | I | I | I | I | I |
 | 多端通知 | A | I | I | I | I | I | I | I | R | I | I | I | I | I | I | I |
-| **上线决策** | **R/A** | C | C | I | I | C | C | C | C | I | I | I | I | I | I | I |
+|**上线决策**|**R/A**| C | C | I | I | C | C | C | C | I | I | I | I | I | I | I |
 
 ### 责任边界冲突解决
 
 | 冲突场景 | 解决路径 |
-|---------|---------|
+| --------- | --------- |
 | 同一维度多 R（如安全：TD + BM 都 R） | TD 负责"用例设计与扫描执行"；BM 负责"漏洞分类提交 BugTracker（默认禅道）"。分工明确，不重复 |
 | 平台扩展专家发现非自己平台问题 | 走 BM 提交，BM 路由给对应平台专家；不直接跨平台修 |
 | TL 与平台专家路由冲突（PRD 含多平台） | TL 编排核心 8 + 路由到的平台专家并行；不强制串行 |
@@ -249,7 +261,7 @@ pytest --collect-only
 ### 与质量门禁联动
 
 | 门禁层 | A 责任人 | R 执行人 |
-|--------|---------|---------|
+| -------- | --------- | --------- |
 | smoke ≥95% | TL | TE |
 | regression P0=100% / P1≥95% / 总体≥90% | TL | TE |
 | 性能 TPS / P95 双模式 | TL | AE + TE |

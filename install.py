@@ -44,8 +44,8 @@ import argparse
 
 # Windows 中文终端默认 GBK，Unicode 输出（✓ ✅ → ⚠）直接炸。
 # 强制 UTF-8 输出，避免 UnicodeEncodeError。
-if sys.stdout.encoding is not None and sys.stdout.encoding.upper() != "UTF-8":
-    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stdout, "reconfigure") and sys.stdout.encoding.upper() != "UTF-8":
+    sys.stdout.reconfigure(encoding="utf-8")  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def _parse_args():

@@ -14,52 +14,66 @@
 git clone https://github.com/Wool-xing/Test-Agent.git
 cd Test-Agent
 pip install -e runtime/
-```
+
+```text
 
 验证安装：
 
 ```bash
+
 tagent --version
 # → Test-Agent Runtime v1.x.x
-```
+
+```text
 
 ## Step 2: 初始化（1 分钟）
 
 ```bash
+
 tagent init --preset minimal
-```
+
+```text
 
 生成 `.env` 和 `tagent.yml`。编辑 `.env` 填入你的 LLM API key：
 
 ```ini
+
 TAGENT_LLM_PROVIDER=deepseek
 TAGENT_LLM_API_KEY=sk-your-key-here
 TAGENT_LLM_MODEL=deepseek-chat
-```
+
+```text
 
 可选：`TAGENT_LOG_LEVEL=DEBUG` 查看详细日志。
 
 ## Step 3: 冒烟自检（1 分钟）
 
 ```bash
+
 tagent doctor --agents
-```
+
+```text
 
 验证 16 expert agents 全部就绪。输出类似：
 
-```
+```text
+
 ✓ agents/01-测试主管.md            test-lead
 ✓ agents/02-需求分析.md            requirements-analyst
 ... (16 agents total)
-```
+
+```text
 
 ## Step 4: 第一次 Demo（3 分钟）
 
 ```bash
+
 tagent demo -y
-```
+
+```text
 
 这条命令跑一个完整的内置测试流程：
+
 1. 用 fixture PRD（虚构的 SaaS 登录模块）
 2. 16 agent 编排成 DAG
 3. stub LLM 模拟执行（0 API 费用）
@@ -67,7 +81,8 @@ tagent demo -y
 
 输出示例：
 
-```
+```text
+
 Step 1/4 · tagent init --preset minimal
 Step 2/4 · tagent doctor --agents
 Step 3/4 · tagent selftest --e2e (16 agent DAG · stub LLM · 0 cost)
@@ -78,24 +93,31 @@ Step 4/4 · Artifacts
   · workspace/测试报告/{项目名}/bug_drafts.json
 
 ✓ demo done
-```
+
+```text
 
 ## Step 5: 真 LLM 跑你自己项目（3 分钟）
 
 ```bash
+
 # 用你自己的 PRD
+
 tagent run docs/my-feature.md
 
 # 或用在线文档
+
 tagent run https://your-wiki.com/prd/page
-```
+
+```text
 
 在浏览器看 Dashboard：
 
 ```bash
+
 uvicorn runtime.api.main:app --port 8800
 # → http://127.0.0.1:8800/docs
-```
+
+```text
 
 ## 进阶
 

@@ -13,24 +13,26 @@ SKILL_IMPL_STATUS: production
 
 ## 核心原则
 
-1. **Tests BEFORE Code**:**始终**先写测试,再实现让测试过
-2. **80%+ 覆盖**:unit + integration + E2E
-3. 边界 + 错误 + 异常 + 临界全覆盖
+1.**Tests BEFORE Code**:**始终**先写测试,再实现让测试过
+2.**80%+ 覆盖**:unit + integration + E2E
+
+1. 边界 + 错误 + 异常 + 临界全覆盖
 
 ## 3 类测试矩阵
 
 | 类型 | 范围 | 工具(本项目) |
-|------|------|----------------|
+| ------ | ------ | ---------------- |
 | Unit | 函数 / 组件逻辑 / 纯函数 / helper | pytest + pytest-mock(`utils/`)|
 | Integration | API endpoint / DB / 服务交互 / 外部 API | pytest + requests / playwright(API)|
 | E2E | 关键用户流 / 浏览器自动化 / UI | Playwright(已配置) |
 
 ## TDD Workflow 步骤
 
-1. **写 failing test**(red)
-2. **写最少代码**让它过(green)
-3. **重构**保持测试过(refactor)
-4. 移到下一个测试 case
+1.**写 failing test**(red)
+2.**写最少代码**让它过(green)
+3.**重构**保持测试过(refactor)
+
+1. 移到下一个测试 case
 
 ## 融合
 

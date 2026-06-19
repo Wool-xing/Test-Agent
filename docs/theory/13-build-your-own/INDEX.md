@@ -1,11 +1,11 @@
 # 13-build-your-own 索引
 
-> **元-元层教学库**:从零写 X 帮测试工程师**懂底层 → 测出根因**。
+>**元-元层教学库**:从零写 X 帮测试工程师**懂底层 → 测出根因**。
 
 ## P0 测试相关 10 卡
 
 | 卡 | 测试场景映射 |
-|----|------------|
+| ---- | ------------ |
 | `byox-database` | 性能 / 事务隔离 / SQL 注入根因 |
 | `byox-network-stack` | 弱网 / 丢包 / RTO / 重传 |
 | `byox-web-server` | HTTP / 并发 / 反向代理 / 性能基线 |
@@ -19,10 +19,10 @@
 
 ## 横切准则
 
-- 每卡 `estimated_time_hours` 必填(防 §27 原则 4 时间陷阱)
+- 每卡 `estimated_time_hours` 必填(防 原则 4 时间陷阱)
 - confidence 默认 `medium`(tutorial 质量参差,§23 KB)
 - 引用 URL 必带 1 句摘要(防链接失效)
-- `essence_only` 标:不自动提议入 Test-Agent(§29 policy)
+- `essence_only` 标:不自动提议入 Test-Agent(policy)
 
 ## 不收录
 

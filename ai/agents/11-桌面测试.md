@@ -10,16 +10,16 @@ paired_skills: [desktop-test]
 
 ## 核心职责
 
-1. **Windows EXE**：原生 .exe 应用（WPF / WinForms / Win32 / Qt / Electron）
-2. **macOS GUI**：.app 应用（Cocoa / Electron）
-3. **Linux GUI**：GTK / Qt 应用
-4. **Electron 应用**：跨平台 IM / IDE（如 VSCode / 钉钉 PC / 飞书 PC）
-5. **桌面专属测试**：托盘 / 系统通知 / 多窗口 / 快捷键 / 文件拖拽
+1.**Windows EXE**：原生 .exe 应用（WPF / WinForms / Win32 / Qt / Electron）
+2.**macOS GUI**：.app 应用（Cocoa / Electron）
+3.**Linux GUI**：GTK / Qt 应用
+4.**Electron 应用**：跨平台 IM / IDE（如 VSCode / 钉钉 PC / 飞书 PC）
+5.**桌面专属测试**：托盘 / 系统通知 / 多窗口 / 快捷键 / 文件拖拽
 
 ## 工具栈
 
 | 平台 | 工具 | 版本 |
-|------|------|------|
+| ------ | ------ | ------ |
 | Windows | pywinauto | 0.6.8 |
 | Windows | uiautomation | 2.0.20 |
 | Windows | pygetwindow / pyperclip | 最新 |
@@ -43,17 +43,19 @@ workspace/自动化脚本/python/desktop/
 └── electron/
     ├── pages/login_window.py
     └── tests/test_electron_p0.py
-```
+
+```text
 
 ## Windows EXE 模板（pywinauto）
 
 ```python
+
 # desktop/windows/pages/main_window.py
+
 from pywinauto import Application
 
-
 class MainWindowWindows:
-    def __init__(self, exe_path: str):
+    def__init__(self, exe_path: str):
         self.app = Application(backend="uia").start(exe_path)
         self.window = self.app.window(title_re=".*MyApp.*")
         self.window.wait("ready", timeout=10)
@@ -73,19 +75,21 @@ class MainWindowWindows:
 
     def close(self):
         self.app.kill()
-```
+
+```text
 
 ## macOS 模板（PyAutoGUI + AppleScript）
 
 ```python
+
 # desktop/macos/pages/main_window.py
+
 import subprocess
 
 import pyautogui
 
-
 class MainWindowMacOS:
-    def __init__(self, app_name: str):
+    def__init__(self, app_name: str):
         self.app_name = app_name
         subprocess.run(["open", "-a", app_name])
         pyautogui.sleep(2)
@@ -112,17 +116,19 @@ class MainWindowMacOS:
 
     def close(self):
         subprocess.run(["osascript", "-e", f'quit app "{self.app_name}"'])
-```
+
+```text
 
 ## Electron 模板（Playwright）
 
 ```python
+
 # desktop/electron/pages/login_window.py
+
 from playwright.sync_api import sync_playwright
 
-
 class ElectronApp:
-    def __init__(self, executable_path: str):
+    def__init__(self, executable_path: str):
         self.pw = sync_playwright().start()
         self.app = self.pw._impl_obj.launch_persistent_context(
             executable_path=executable_path,
@@ -142,18 +148,20 @@ class ElectronApp:
     def close(self):
         self.app.close()
         self.pw.stop()
-```
+
+```text
 
 ## 测试用例模板
 
 ```python
+
 # desktop/windows/tests/test_win_p0.py
+
 import os
 
 import pytest
 
 from desktop.windows.pages.main_window import MainWindowWindows
-
 
 @pytest.mark.p0
 @pytest.mark.smoke
@@ -176,12 +184,13 @@ class TestMainWindow:
         import time
         time.sleep(2)
         assert "Home" in app.window.window_text()
-```
+
+```text
 
 ## 桌面专属测试场景
 
 | 场景 | 实现方式 |
-|------|---------|
+| ------ | --------- |
 | 系统托盘 | pywinauto `app.SystemTrayIcon` / pyautogui 点系统通知区 |
 | 多窗口 | `app.windows()` 列出所有窗口 |
 | 快捷键 | pyautogui.hotkey("ctrl", "s") |
@@ -194,27 +203,36 @@ class TestMainWindow:
 ## 桌面 .env 字段
 
 ```text
+
 # Windows
+
 WIN_APP_PATH=C:\Program Files\YourApp\YourApp.exe
 
 # macOS
+
 MAC_APP_NAME=YourApp                       # 用于 osascript 的 process name
 MAC_APP_PATH=/Applications/YourApp.app
 
 # Linux
+
 LINUX_APP_BIN=/usr/local/bin/yourapp
 
 # Electron
+
 ELECTRON_APP_PATH=/Applications/VSCode.app/Contents/MacOS/Electron   # macOS
 ELECTRON_APP_PATH_WIN=C:\Users\...\app.exe                            # Windows
-```
+
+```text
 
 ## 跨平台并行
 
 ```bash
+
 # 在不同 OS 的 CI runner 并行（GitHub Actions matrix）
+
 pytest -m "desktop and p0" --tb=short
-```
+
+```text
 
 ## EXE + WebSocket 协议混合测试
 
@@ -229,7 +247,9 @@ pytest -m "desktop and p0" --tb=short
 ### 综合测试模板
 
 ```python
+
 # desktop/windows/tests/test_exe_ws_p0.py
+
 import json
 import threading
 import time
@@ -238,7 +258,6 @@ import pytest
 
 from desktop.windows.pages.main_window import MainWindowWindows
 from utils.websocket_helper import WSClient
-
 
 @pytest.mark.p0
 @pytest.mark.desktop
@@ -265,12 +284,15 @@ class TestExeWebSocket:
             # 3. 验证 UI 显示发送状态
             time.sleep(1)
             assert "已发送" in exe_app.get_text("statusLabel")
-```
+
+```text
 
 ### WS 协议层独立测试（不经 UI）
 
 ```python
+
 # 直接测协议契约（速度快，CI 友好）
+
 def test_ws_protocol_contract():
     """协议层：连接 → 鉴权 → 收发 → 心跳"""
     with WSClient("ws://server.example.com/socket",
@@ -284,28 +306,31 @@ def test_ws_protocol_contract():
         ws.send({"type": "send_msg", "content": "test"})
         echo = ws.wait_for(lambda m: '"type":"send_msg_ack"' in m, timeout=5)
         assert echo is not None
-```
+
+```text
 
 ### 重连测试
 
 ```python
-from utils.websocket_helper import test_reconnect
 
+from utils.websocket_helper import test_reconnect
 
 def test_ws_auto_reconnect():
     """断线后自动重连"""
     result = test_reconnect("ws://server.example.com/socket",
                              kill_after_sec=5, max_reconnect=3)
     assert result["reconnect_success"], f"重连失败: {result}"
-```
+
+```text
 
 ### WS 并发性能测试
 
 ```python
+
 # 1000 并发连接，每连接 10 条消息
+
 import asyncio
 from utils.websocket_helper import ws_concurrent_load
-
 
 def test_ws_concurrent_1000():
     result = asyncio.run(ws_concurrent_load(
@@ -315,29 +340,34 @@ def test_ws_concurrent_1000():
     ))
     assert result["error_rate_pct"] < 1, f"错误率过高: {result}"
     assert result["p95_latency_ms"] < 500, f"P95 延迟过高: {result}"
-```
+
+```text
 
 CLI 一键性能：
 
 ```bash
+
 python -m utils.websocket_helper load \
     --url ws://server.example.com/socket \
     --count 1000 \
     --messages 10
-```
+
+```text
 
 ### WS .env 字段
 
 ```text
+
 WS_URL=ws://server.example.com/socket
 WS_TOKEN=                                # 可选鉴权 token
 WS_PING_INTERVAL=30                      # 心跳间隔秒
-```
+
+```text
 
 ### Bug 报告 WS 附加字段
 
 | 字段 | 必填 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | WS URL | ✅ | ws://server.example.com/socket |
 | 协议子协议 | ⚪ | json / msgpack / protobuf |
 | 失败时机 | ✅ | 握手 / 鉴权 / 业务消息 / 心跳 / 断线 |
@@ -346,7 +376,7 @@ WS_PING_INTERVAL=30                      # 心跳间隔秒
 ## 桌面 Bug 报告附加字段
 
 | 字段 | 必填 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | 操作系统 | ✅ | Windows 11 23H2 / macOS 14.2 / Ubuntu 22.04 |
 | 应用版本 | ✅ | v3.2.1 (build 4521) |
 | 屏幕分辨率 | ⚪ | 1920x1080 / 2560x1440（高 DPI 易触发问题） |
@@ -354,15 +384,15 @@ WS_PING_INTERVAL=30                      # 心跳间隔秒
 
 ## 协作输出
 
-- 向 **test-lead**：桌面测试结果 JSON
-- 向 **automation-engineer**：桌面脚本（pywinauto / Playwright Electron）
-- 向 **bug-manager**：桌面 Bug（OS 版本/应用版本/Event Log）
-- 向 **report-generator**：截图 + 进程性能 JSON
+- 向**test-lead**：桌面测试结果 JSON
+- 向**automation-engineer**：桌面脚本（pywinauto / Playwright Electron）
+- 向**bug-manager**：桌面 Bug（OS 版本/应用版本/Event Log）
+- 向**report-generator**：截图 + 进程性能 JSON
 
 ## 输出规范
 
 | 文件 | 用途 |
-|------|------|
+| ------ | ------ |
 | `workspace/测试报告/{项目名}/screenshots/desktop/*.png` | 桌面失败截图 |
 | `workspace/测试报告/{项目名}/win-event-log/*.evtx` | Windows Event 日志 |
 | `workspace/测试报告/{项目名}/mac-console/*.log` | macOS Console 日志 |

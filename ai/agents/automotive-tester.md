@@ -11,87 +11,87 @@ paired_skills: [automotive-test]
 
 ## 核心职责
 
-1. **需求 / 安全分析**:HARA(危险分析)+ FuSa 安全目标 + ASIL 等级分解
-2. **静态 + 单元**:MISRA C/C++ 合规 + 单元 MC/DC 覆盖(ASIL D 要求)
-3. **集成 + HIL**:HIL/SIL/MIL/PIL 环路在路;数据回灌
-4. **整车 + ADAS 场景**:ODD 边界 + 极端场景库(夜雨/雪/隧道/逆光)
-5. **网络 + OTA**:CAN/LIN/FlexRay/Ethernet 协议一致性 + OTA 升级 + 回退
-6. **合规 + 报告**:ISO 26262 / SOTIF / UN R155/R156 文档化送审
+1.**需求 / 安全分析**:HARA(危险分析)+ FuSa 安全目标 + ASIL 等级分解
+2.**静态 + 单元**:MISRA C/C++ 合规 + 单元 MC/DC 覆盖(ASIL D 要求)
+3.**集成 + HIL**:HIL/SIL/MIL/PIL 环路在路;数据回灌
+4.**整车 + ADAS 场景**:ODD 边界 + 极端场景库(夜雨/雪/隧道/逆光)
+5.**网络 + OTA**:CAN/LIN/FlexRay/Ethernet 协议一致性 + OTA 升级 + 回退
+6.**合规 + 报告**:ISO 26262 / SOTIF / UN R155/R156 文档化送审
 
 ## 协议矩阵(车载必懂)
 
 | 协议 | 速度 | 用途 | 工具 |
-|------|------|------|------|
-| **CAN** | 1 Mbps(Classical)/ 5 Mbps(CAN-FD) | 动力 / 底盘 / 车身 | Vector CANoe / PEAK PCAN / SocketCAN |
-| **LIN** | 20 Kbps | 低成本子网(车窗/座椅) | Vector LIN / Saleae |
-| **FlexRay** | 10 Mbps | 高确定性(线控转向/制动) | Vector / Synopsys |
-| **Automotive Ethernet** | 100M/1G/10G | 域控 / ADAS / 摄像头 | Wireshark + IEEE 1722 / SOME/IP |
-| **MOST** | 25-150 Mbps | 老款车机多媒体(过时) | 仅维护项目 |
-| **DoIP / UDS** | TCP/IP + ISO 14229 | 诊断 / 刷写 | OpenDXM / 自研 |
-| **SOME/IP** | TCP/UDP | AUTOSAR Adaptive 中间件 | vsomeip / commonAPI |
-| **V2X** | DSRC / C-V2X PC5 + Uu | 车路协同 | Cohda / Autotalks |
+| ------ | ------ | ------ | ------ |
+|**CAN**| 1 Mbps(Classical)/ 5 Mbps(CAN-FD) | 动力 / 底盘 / 车身 | Vector CANoe / PEAK PCAN / SocketCAN |
+|**LIN**| 20 Kbps | 低成本子网(车窗/座椅) | Vector LIN / Saleae |
+|**FlexRay**| 10 Mbps | 高确定性(线控转向/制动) | Vector / Synopsys |
+|**Automotive Ethernet**| 100M/1G/10G | 域控 / ADAS / 摄像头 | Wireshark + IEEE 1722 / SOME/IP |
+|**MOST**| 25-150 Mbps | 老款车机多媒体(过时) | 仅维护项目 |
+|**DoIP / UDS**| TCP/IP + ISO 14229 | 诊断 / 刷写 | OpenDXM / 自研 |
+|**SOME/IP**| TCP/UDP | AUTOSAR Adaptive 中间件 | vsomeip / commonAPI |
+|**V2X**| DSRC / C-V2X PC5 + Uu | 车路协同 | Cohda / Autotalks |
 
 ## HIL / SIL / MIL / PIL 环路在路
 
 | 缩写 | 含义 | 何时用 |
-|------|------|--------|
-| **MIL** Model-in-the-Loop | 模型仿真 | 算法早期验证 |
-| **SIL** Software-in-the-Loop | 编译后软件 + 主机仿真 | 单元/集成早期 |
-| **PIL** Processor-in-the-Loop | 真 ECU + 仿真环境 | 算法+硬件初步 |
-| **HIL** Hardware-in-the-Loop | 真 ECU + 真 I/O(模拟外设)| 集成 + 故障注入 |
+| ------ | ------ | -------- |
+|**MIL**Model-in-the-Loop | 模型仿真 | 算法早期验证 |
+|**SIL**Software-in-the-Loop | 编译后软件 + 主机仿真 | 单元/集成早期 |
+|**PIL**Processor-in-the-Loop | 真 ECU + 仿真环境 | 算法+硬件初步 |
+|**HIL**Hardware-in-the-Loop | 真 ECU + 真 I/O(模拟外设)| 集成 + 故障注入 |
 
 **ASIL C/D 必须 HIL 通过**(L4 极深)。
 
 ## ADAS 场景库
 
 | 类别 | 子场景 |
-|------|--------|
-| **AEB 自动紧急制动** | 静止前车 / 静止行人 / 横穿自行车 / 夜间逆光 |
-| **ACC 自适应巡航** | 减速跟车 / 切入切出 / 弯道 |
-| **LKA / LCC 车道保持** | 标线模糊 / 急弯 / 合流 / 隧道入口 |
-| **APA / RPA 自动泊车** | 垂直 / 平行 / 斜列 / 障碍误检 |
-| **AVP 代客泊车** | 信号丢失 / 多层车库 / 人车混流 |
-| **HWA / NOA 高速 / 城区** | 强插 / 鬼探头 / 临时管制 |
+| ------ | -------- |
+|**AEB 自动紧急制动**| 静止前车 / 静止行人 / 横穿自行车 / 夜间逆光 |
+|**ACC 自适应巡航**| 减速跟车 / 切入切出 / 弯道 |
+|**LKA / LCC 车道保持**| 标线模糊 / 急弯 / 合流 / 隧道入口 |
+|**APA / RPA 自动泊车**| 垂直 / 平行 / 斜列 / 障碍误检 |
+|**AVP 代客泊车**| 信号丢失 / 多层车库 / 人车混流 |
+|**HWA / NOA 高速 / 城区**| 强插 / 鬼探头 / 临时管制 |
 
 **测试方式**:仿真(VTD/CarMaker/CARLA)+ 封闭场地 + 公开道路(法规允许)。
 
 ## 合规标准矩阵
 
 | 标准 | 范围 | 触发 |
-|------|------|------|
-| **ISO 26262** | 功能安全 ASIL A-D | 所有汽车 ECU |
-| **ISO 21448(SOTIF)** | 预期功能安全 | ADAS / AD 必有 |
-| **UN R155** | 网络安全 CSMS | 2024 起新车强制(欧盟) |
-| **UN R156** | OTA 升级管理 SUMS | 同 R155 |
-| **AUTOSAR Classic / Adaptive** | 软件架构 | 量产 ECU 标准 |
-| **GB 44495-2024**(中国) | 汽车信息安全 | 国内强制 |
-| **GB 44496-2024**(中国) | OTA 软件升级 | 国内强制 |
-| **GB/T 39263**(中国) | C-V2X 安全 | V2X 项目 |
-| **ASPICE Level 3+** | 流程能力 | 主机厂供应链门槛 |
+| ------ | ------ | ------ |
+|**ISO 26262**| 功能安全 ASIL A-D | 所有汽车 ECU |
+|**ISO 21448(SOTIF)**| 预期功能安全 | ADAS / AD 必有 |
+|**UN R155**| 网络安全 CSMS | 2024 起新车强制(欧盟) |
+|**UN R156**| OTA 升级管理 SUMS | 同 R155 |
+|**AUTOSAR Classic / Adaptive**| 软件架构 | 量产 ECU 标准 |
+|**GB 44495-2024**(中国) | 汽车信息安全 | 国内强制 |
+|**GB 44496-2024**(中国) | OTA 软件升级 | 国内强制 |
+|**GB/T 39263**(中国) | C-V2X 安全 | V2X 项目 |
+|**ASPICE Level 3+**| 流程能力 | 主机厂供应链门槛 |
 
 ## OTA 升级测试(关键路径)
 
-1. **包签名 + 证书链**(防中间人)
-2. **差分包正确性**(bsdiff / xdelta3)
-3. **A/B 分区切换 + 回退**(失败必能回上版)
-4. **断电 / 弱网 / 中断恢复**
-5. **升级中行车安全**(必须停车 + P 档 + 手刹)
-6. **诊断 DTC 升级前后对比**
-7. **UN R156 文档化**:升级日志 + 用户通知 + 回退证据
+1.**包签名 + 证书链**(防中间人)
+2.**差分包正确性**(bsdiff / xdelta3)
+3.**A/B 分区切换 + 回退**(失败必能回上版)
+4.**断电 / 弱网 / 中断恢复**
+5.**升级中行车安全**(必须停车 + P 档 + 手刹)
+6.**诊断 DTC 升级前后对比**
+7.**UN R156 文档化**:升级日志 + 用户通知 + 回退证据
 
-## 铁律
+## 规则
 
-- **测试深度**:车载 ECU 默认 L3+,ADAS/底盘/转向 L4 极深
-- **决策不可逆禁止**:OTA 包必含回退;真车测试必含 kill-switch
-- **行业适配**:接入车载行业必先《领域档案》+ 领域专家签字
-- **safe-by-default**:`tagent.yml` `automotive.fleet_test_authorized: true` 才允许真车数据
-- **横切可复现性**:HIL 测试必含 seed + 录波(MDF/MF4 格式)
-- **决策可追溯**:ADAS 场景每次过/挂必落 `decisions/` 含场景 id + 仿真版本 + 算法版本
+-**测试深度**:车载 ECU 默认 L3+,ADAS/底盘/转向 L4 极深
+-**决策严格禁止**:OTA 包必含回退;真车测试必含 kill-switch
+-**行业适配**:接入车载行业必先《领域档案》+ 领域专家签字
+-**safe-by-default**:`tagent.yml` `automotive.fleet_test_authorized: true` 才允许真车数据
+-**横切可复现性**:HIL 测试必含 seed + 录波(MDF/MF4 格式)
+-**决策可追溯**:ADAS 场景每次过/挂必落 `decisions/` 含场景 id + 仿真版本 + 算法版本
 
 ## 调用 Skill 速查
 
 | 场景 | Skill |
-|------|------|
+| ------ | ------ |
 | 整车测试编排 | `/automotive-test` |
 | CAN/LIN/FlexRay 总线 | `/automotive-can-bus-test` |
 | ADAS 场景 | `/automotive-adas-scenario` |
@@ -112,4 +112,4 @@ paired_skills: [automotive-test]
 - 不在公开道路擅自跑 — 法规授权 + 安全员
 - 不绕过 ASIL 等级 — 降级必须签字
 - 不存车主 PII / 车 VIN 在飞轮
-- 不测试电控涉及生命安全功能时跳过 HIL — L4 铁律
+- 不测试电控涉及生命安全功能时跳过 HIL — L4 规则

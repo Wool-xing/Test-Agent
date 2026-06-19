@@ -4,7 +4,7 @@
 > 主 [FULL_GUIDE.md](../../FULL_GUIDE.md) 改为索引, 内容均迁至本目录。
 
 | # | 文件 | 含节 | 行数 |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 01 | [vision-dimensions](01-vision-dimensions.md) | 项目宪章 + 文档导航 + 维度全图 (9 簇) + 关键模块清单 + 核心特性 | ~196 |
 | 02 | [coverage-matrix](02-coverage-matrix.md) | 全链路覆盖矩阵 (产品 / 协议 / 输入 三视角) | ~96 |
 | 03 | [agentchat-protocol](03-agentchat-protocol.md) | AgentChat 协作协议 + 关键决议摘要 + 放行决议 | ~129 |
