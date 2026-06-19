@@ -78,6 +78,6 @@ npm run tauri:dev
 
 ## Next Steps
 
-- Read the [Architecture](/guide/architecture) guide
-- Browse the [API Reference](/api/overview)
-- Explore the [Plugin System](/plugins/overview)
+- Read the [Architecture](architecture.md) guide
+- Browse the [API Reference](../api/overview.md)
+- Explore the [Plugin System](../plugins/overview.md)
