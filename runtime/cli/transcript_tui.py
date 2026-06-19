@@ -12,6 +12,8 @@ from __future__ import annotations
 import re
 from typing import Callable
 
+_RE_MARKUP = re.compile(r'\[[^\]]*\]')  # strip Rich markup fallback
+
 from prompt_toolkit.application import Application
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.key_binding import KeyBindings
@@ -133,9 +135,21 @@ class TranscriptTUI:
         return True  # keep input open
 
     def append_output(self, text: str, style: str = "") -> None:
-        """Append text to the scrollable transcript area."""
-        for line in text.split("\n"):
-            self._lines.append(line)
+        """Append text to scrollable transcript. Converts Rich markup → ANSI."""
+        # Convert Rich markup to ANSI text so it renders correctly in the transcript
+        try:
+            from rich.console import Console as RichConsole
+            from rich.text import Text as RichText
+            cap = RichConsole(record=True, width=120, color_system="standard")
+            cap.print(RichText.from_markup(text) if text else "")
+            rendered = cap.export_text(styles=False)
+        except Exception:
+            rendered = _RE_MARKUP.sub('', text) if text else ""
+
+        for line in rendered.split("\n"):
+            stripped = line.rstrip()
+            if stripped or self._lines:
+                self._lines.append(stripped)
         if len(self._lines) > 5000:
             self._lines = self._lines[-3000:]
         self._buffer.text = "\n".join(self._lines)
