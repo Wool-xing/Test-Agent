@@ -2,7 +2,7 @@
 # 被所有上层 requirements 文件通过 -r base.txt 引用。
 
 # 测试框架核心
-pytest>=9.1.0
+pytest>=9.1.1
 pytest-xdist>=3.8.0
 pytest-rerunfailures>=16.3
 pytest-timeout>=2.4.0

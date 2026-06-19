@@ -2,7 +2,7 @@
 # 被 CI 流水线引用，独立于 base.txt 用户运行时依赖。
 
 # 测试框架
-pytest>=8.0
+pytest>=9.1.1
 pytest-cov>=5.0
 
 # 代码质量
