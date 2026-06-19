@@ -7,6 +7,7 @@ name_en: Build Your Own Git
 one_liner_zh: 重写 plumbing(hash-object/cat-file/commit/tree);懂版本控制根
 one_liner_en: Rewrite plumbing; understand version control roots
 authority:
+
   - "Pro Git Book(Scott Chacon)"
   - "Git 官方 plumbing docs"
   - "wyag.thb.lt(Write Yourself a Git)"

@@ -7,6 +7,7 @@ name_en: Windows Desktop App Testing (EXE / Win32 / UI Automation)
 one_liner_zh: pywinauto+UIA 是 .exe 自动化首选,PyAutoGUI 像素级仅兜底
 one_liner_en: pywinauto+UIA is first pick for .exe automation; PyAutoGUI pixel-level only as fallback
 authority:
+
   - "Microsoft UI Automation API https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/"
   - "pywinauto Documentation https://pywinauto.readthedocs.io"
   - "ISTQB Advanced Test Automation Engineer §4.3 Platforms"
@@ -16,6 +17,7 @@ last_reviewed: 2026-05-12
 reviewer: agent-curator
 when_to_use: 被测物 = .exe / .msi Windows 桌面应用 / WPF / WinForms / Electron(可换 Playwright Electron)
 common_pitfall:
+
   - "用 PyAutoGUI 像素 → 屏幕分辨率变即碎"
   - "不锁定 AutomationId(只用名称) → 多语言版本失效"
   - "未处理 UAC 提权 / 模态对话框"
@@ -30,8 +32,10 @@ example: |
   ```
 related_to: [desktop-testing-macos, electron-testing, visual-regression]
 reading_zh:
+
   - "腾讯 TMQ 公众号《Windows 桌面自动化实践》"
 reading_en:
+
   - https://pywinauto.readthedocs.io/en/latest/getting_started.html
   - https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/ui-automation-overview
 ---

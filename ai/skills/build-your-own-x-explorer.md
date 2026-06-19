@@ -18,6 +18,7 @@ SKILL_IMPL_STATUS: production
 1.**识别用户场景**:从最近 run / 当前 query 提取关键概念(`SQL injection` / `flaky test` / `slow regex` 等)
 2.**查 KB 13-build-your-own**:`tutor.theory_kb` 找匹配卡
 3.**筛选**:
+
    - 若用户预算 `time_hours < 5` → 仅推荐 ≤10h 短卡
    - 若 ≥20h → 推荐 P0 深度卡
 

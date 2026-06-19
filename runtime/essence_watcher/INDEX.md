@@ -54,6 +54,7 @@ essence_watcher:
 # 哪些 delta 自动提议入 Test-Agent
 
 auto_propose:
+
   - skill_definitions          # 新 skill 名字 / 描述 / 元数据 → 提议 skills/
   - charter_rules             # 规则更新 → 提议规则
   - safety_patterns           # 防护模式 → 提议 safe-by-default
@@ -62,6 +63,7 @@ auto_propose:
 # 仅入精髓库,不动 Test-Agent
 
 essence_only:
+
   - branding
   - business_lane             # 商业版细节
   - deployment_specifics      # 部署细节
@@ -70,6 +72,7 @@ essence_only:
 # 永不入
 
 never:
+
   - source_code_blocks > 100_lines  # 大段源码不抄
   - vendor_specific_apis             # 厂商锁定 API
 

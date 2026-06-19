@@ -64,4 +64,5 @@
 
 1.**C 路径**:从 `_authority_sources.yaml` 白名单材料压缩
 2.**D 路径**:LLM 生草稿 + 标 `confidence: llm-draft-unreviewed` 待审
+
 3. 用户审完 → 改 `high/medium/low` + 填 `reviewer/last_reviewed`

@@ -156,6 +156,7 @@ P0：100% ✅  P1：95.6% ✅
 质量门禁：通过
 
 失败明细：
+
   - TC-LOGIN-API-012：产品Bug，Bug#1024
   - TC-ORDER-API-023：flaky 候选，归档至 history
 
@@ -182,7 +183,6 @@ P0：100% ✅  P1：95.6% ✅
 import time
 
 ENV_ERROR_RATE_THRESHOLD = 0.05  # 5%
-
 
 def handle_environment_instability(env_error_rate: float, env_config) -> bool:
     """

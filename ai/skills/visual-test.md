@@ -21,6 +21,7 @@ SKILL_IMPL_STATUS: production
 □ Airtest 已装（pip install airtest）
 □ 模板图（关键 UI 元素截图）→ workspace/自动化脚本/python/visual/images/
 □ 设备 URI → AIRTEST_DEVICE_URI
+
    - Android: Android://127.0.0.1:5037/<serial>
    - Windows: Windows:///?title_re=<窗口标题正则>
    - Web: 需先启 chromium remote-debugging

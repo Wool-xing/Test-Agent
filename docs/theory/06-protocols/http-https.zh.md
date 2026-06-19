@@ -7,6 +7,7 @@ name_en: HTTP / HTTPS
 one_liner_zh: Web 通信底座;90% Web/API 测试的协议起点
 one_liner_en: Web communication foundation; starting point for 90% of Web/API tests
 authority:
+
   - "RFC 9110-9114(HTTP/1.1, HTTP/2, HTTP/3 现行 RFC)"
   - "MDN Web Docs HTTP"
   - "OWASP API Security Top 10 2023"
@@ -16,6 +17,7 @@ last_reviewed: 2026-05-12
 reviewer: agent-curator
 when_to_use: REST API / Web 系统 / 浏览器 / 移动 H5 / Webhook / 第三方接口 — 必测
 common_pitfall:
+
   - "只测 200,不测 4xx/5xx"
   - "不测幂等性(POST 重复提交)"
   - "不测 TLS 版本+证书+SNI"
@@ -36,9 +38,11 @@ example: |
   ```
 related_to: [grpc, websocket, quic-http3, rest-api, openapi]
 reading_zh:
+
   - "阮一峰博客《HTTP/2 笔记》"
   - "RFC 9110 中文译本"
 reading_en:
+
   - https://datatracker.ietf.org/doc/html/rfc9110
   - https://developer.mozilla.org/en-US/docs/Web/HTTP
 ---

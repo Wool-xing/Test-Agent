@@ -7,6 +7,7 @@ name_en: Build Your Own Web Browser
 one_liner_zh: HTML/CSS parse + layout + paint;懂 Playwright/Selenium 底层
 one_liner_en: HTML/CSS parse + layout + paint; foundation of Playwright/Selenium
 authority:
+
   - "Browser Engineering(Pavel Panchekha,Python from-scratch)"
   - "WHATWG HTML Living Standard"
 confidence: medium

@@ -30,6 +30,7 @@ SKILL_IMPL_STATUS: production
 | 10 报告 + Bug 单 | `report-generator` |
 
 ## 规则
+
 - L4 极深:ADAS/底盘/转向必 HIL + 形式化验证
 - safe-by-default:`automotive.fleet_test_authorized: true` + `automotive.test_lab: <id>` 才允许真车数据
 - 严格禁止:OTA 必含回退;真车 kill-switch 必有

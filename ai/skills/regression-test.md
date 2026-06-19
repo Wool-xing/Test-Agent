@@ -51,13 +51,16 @@ python -m utils.regression_scope
 
 modules:
   login:
+
     - auth/
     - user/login
     - session/
   payment:
+
     - payment/
     - order/
   profile:
+
     - user/profile
     - account/
 

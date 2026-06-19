@@ -37,6 +37,7 @@ paired_skills: [testcase-design]
 
 1. Charter（章程）：定义本次探索目标
    示例 charter：
+
      - 模块：登录
      - 时长：60 分钟
      - 关注点：异常输入 / 并发会话 / 浏览器后退 / Cookie 篡改

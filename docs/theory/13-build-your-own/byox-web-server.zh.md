@@ -7,6 +7,7 @@ name_en: Build Your Own Web Server
 one_liner_zh: HTTP 1.1 + 多路复用;懂并发/keep-alive/反向代理
 one_liner_en: HTTP/1.1 + multiplexing; concurrency/keep-alive/reverse proxy
 authority:
+
   - "RFC 9110-9114 现行 HTTP 标准"
   - "Beej's Guide / 多个 from-scratch tutorials"
 confidence: medium

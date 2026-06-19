@@ -27,6 +27,7 @@ SKILL_IMPL_STATUS: production
 
 -**runtime/tutor/eval_replay.py**(M5 已 ship): capture + replay + 3 指标
 -**runtime/tests/test_router_real.py**(M2-7 已 ship):20 样本 + 单模型 ≥85% / 双投票 ≥95%
+
 - LongMemEval-style 公共 benchmark(M8 路线)
 
 ## 使用

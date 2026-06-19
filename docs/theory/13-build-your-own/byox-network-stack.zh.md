@@ -7,6 +7,7 @@ name_en: Build Your Own Network Stack
 one_liner_zh: TCP from scratch;懂丢包/重传/RTO/拥塞控制
 one_liner_en: TCP from scratch; understand loss/retx/RTO/congestion
 authority:
+
   - "RFC 9293(TCP 现行)"
   - "Beej's Guide to Network Programming"
   - "多个 saminiir/level-ip 等 TCP-from-scratch"
@@ -16,6 +17,7 @@ reviewer: agent-curator
 estimated_time_hours: 40
 when_to_use: 弱网测试 / 丢包模拟 / 网络分区 / RTO 调优 / 长连接稳定性 根因
 common_pitfall:
+
   - tutorial 多在用户态(tun/tap),忽略硬件中断 / DMA
   - 简化版不实现拥塞控制 → 不能学 CUBIC/BBR
 example: |
@@ -26,7 +28,6 @@ reading_en: ["https://saminiir.com/lets-code-tcp-ip-stack-1/"]
 ---
 
 # 从零写网络栈
-
 
 ## 对测试工作
 

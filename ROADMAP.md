@@ -174,6 +174,7 @@ V1.14.0+1 (PR X4) 起,双 layer 防 mock 已落地:
 -**registry 单源**: catalog 解析 `agents/*.md` `EXPERT_IMPL_STATUS` + `skills/*.md` `SKILL_IMPL_STATUS` frontmatter,实装状态来源唯一
 -**router 软警告**: `_validate_against_catalog` 检测 rollout / vision / unknown → 加 issues 并降 confidence 0.3
 -**orchestrator 硬拒**: `execute_node` 对 expert / skill 任意 rollout / vision / unknown 返回 `returncode=2` + stderr "未实装",绝不走 no-op "documented step recorded" 假成功路径
+
 - 用户路由 0 个 in-rollout expert / 0 个 in-rollout skill / 2 个 vision skill 时**收到明确说明**,而非伪装成"已运行"的 mock 输出
 - 详情见 [agents/01-测试主管.md](ai/agents/01-测试主管.md) 路由表注释
 

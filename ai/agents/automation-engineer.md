@@ -68,7 +68,6 @@ project_root/
 
 from playwright.sync_api import Page, expect
 
-
 class LoginPage:
     def__init__(self, page: Page):
         self.page = page
@@ -101,7 +100,6 @@ import pytest
 
 from pages.login_page import LoginPage
 from pages.home_page import HomePage
-
 
 @pytest.mark.p0
 @pytest.mark.smoke
@@ -150,7 +148,6 @@ import requests
 
 from utils.api_retry_util import call_with_retry
 
-
 class BaseAPI:
     def__init__(self, session: requests.Session, base_url: str):
         self.session = session
@@ -177,7 +174,6 @@ class BaseAPI:
 **kwargs,
         )
 
-
 # workspace/自动化脚本/python/api/user_api.py
 
 class UserAPI(BaseAPI):
@@ -203,11 +199,9 @@ import pytest
 
 from api.user_api import UserAPI
 
-
 @pytest.fixture(scope="class")
 def user_api(api_client, env_config):
     return UserAPI(api_client, env_config.api_base_url)
-
 
 @pytest.mark.p0
 @pytest.mark.smoke
@@ -285,7 +279,6 @@ import os
 
 from locust import HttpUser, between, events, task
 
-
 class TestUser(HttpUser):
     wait_time = between(1, 3)
     token = None
@@ -306,7 +299,6 @@ class TestUser(HttpUser):
     @task(3)
     def get_profile(self):
         self.client.get("/api/v1/profile")
-
 
 @events.quitting.add_listener
 def _(environment,**kwargs):

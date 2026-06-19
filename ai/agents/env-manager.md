@@ -87,7 +87,6 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-
 def health_check(env_config) -> dict:
     """执行环境健康检查，返回报告 dict 并写盘。"""
     import requests
@@ -176,6 +175,7 @@ services:
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpassword
     ports:
+
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
@@ -186,6 +186,7 @@ services:
   test-redis:
     image: redis:7-alpine
     ports:
+
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -196,8 +197,10 @@ services:
   mock-server:
     image: wiremock/wiremock:3.3.1   # 固定版本，不用 :3.x 通配
     ports:
+
       - "8080:8080"
     volumes:
+
       - ./mock-data:/home/wiremock/__files
       - ./mock-mappings:/home/wiremock/mappings
 
@@ -251,7 +254,6 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-
 
 def prepare_environment_with_retry(env_config, max_retries: int = 3) -> bool:
     """带指数退避的环境准备：10s/20s/40s（与全栈重试策略对齐）"""

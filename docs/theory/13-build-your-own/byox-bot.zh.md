@@ -7,6 +7,7 @@ name_en: Build Your Own Bot
 one_liner_zh: webhook / Telegram / Slack / Discord 从零;懂 gateway 测试
 one_liner_en: webhook / Telegram / Slack / Discord from scratch; gateway testing foundation
 authority:
+
   - "Telegram Bot API docs"
   - "Slack Events API docs"
   - "RFC 8259 JSON"

@@ -128,6 +128,7 @@ strategy:
     os: [windows-latest, macos-latest, ubuntu-latest]
 runs-on: ${{ matrix.os }}
 steps:
+
   - run: pytest -m "desktop and p0"
 
 ```text

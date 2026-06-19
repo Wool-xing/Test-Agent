@@ -7,6 +7,7 @@ name_en: Test Pyramid 2024
 one_liner_zh: 单元 40 / 集成 30 / 契约 20 / E2E 10 + 变异反验
 one_liner_en: Unit 40 / Integration 30 / Contract 20 / E2E 10 + mutation reverse-check
 authority:
+
   - "Mike Cohn 2009《Succeeding with Agile》ch.16(原版金字塔)"
   - "Martin Fowler https://martinfowler.com/articles/practical-test-pyramid.html"
   - "Google Testing Blog 2024 doc on pyramid"
@@ -16,6 +17,7 @@ last_reviewed: 2026-05-12
 reviewer: agent-curator
 when_to_use: 任何项目测试架构设计前;
 common_pitfall:
+
   - "70/20/10 一刀切——按变更频率+阻塞代价重新分布才合理"
   - "把视觉回归当成独立层——它属 E2E"
   - "无变异测试 → 覆盖率不等于用例质量"
@@ -28,8 +30,10 @@ example: |
   ```
 related_to: [shift-left, shift-right, mutation-testing, contract-testing]
 reading_zh:
+
   - 阿里测试学院《微服务时代的测试金字塔》
 reading_en:
+
   - https://martinfowler.com/articles/practical-test-pyramid.html
   - "Google Testing Blog: Just say no to More End-to-End Tests"
 ---

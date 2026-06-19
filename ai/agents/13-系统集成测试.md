@@ -60,7 +60,6 @@ import pytest
 
 from utils.iot_helper import SSHClient
 
-
 @pytest.mark.p0
 @pytest.mark.system
 @pytest.mark.iot
@@ -85,7 +84,6 @@ def test_device_uptime():
 
 from utils.iot_helper import open_serial
 
-
 def test_serial_handshake():
     """串口握手"""
     with open_serial(port="/dev/ttyUSB0", baudrate=115200) as ser:
@@ -102,7 +100,6 @@ def test_serial_handshake():
 # system/iot/mqtt_test.py
 
 from utils.iot_helper import MQTTClient
-
 
 def test_mqtt_publish_subscribe():
     """MQTT 发布订阅"""
@@ -125,13 +122,11 @@ from utils.media_validator import (
     get_video_meta, compare_frames, check_audio_sync,
 )
 
-
 def test_video_resolution():
     """视频分辨率校验"""
     meta = get_video_meta("workspace/测试数据/output.mp4")
     assert meta["width"] == 1920 and meta["height"] == 1080
     assert meta["bitrate_kbps"] >= 2000
-
 
 def test_video_frames_match():
     """关键帧像素级对比"""
@@ -142,7 +137,6 @@ def test_video_frames_match():
         ssim_threshold=0.95,
     )
     assert not diff_frames, f"差异帧: {diff_frames}"
-
 
 def test_audio_video_sync():
     """音画同步偏移 < 80ms"""
@@ -158,7 +152,6 @@ def test_audio_video_sync():
 # system/tracing/jaeger_query.py
 
 from utils.tracing_validator import JaegerClient
-
 
 def test_trace_complete():
     """验证一次业务请求的链路在 Jaeger 中完整（A→B→C 三 service 都有 span）"""
@@ -184,7 +177,6 @@ def test_trace_complete():
 # system/mq/kafka_test.py
 
 from utils.mq_helper import KafkaProducer, KafkaConsumer
-
 
 def test_kafka_message_delivered():
     """Kafka 消息生产+消费验证"""

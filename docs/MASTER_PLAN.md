@@ -78,6 +78,7 @@
 ### #8 CLI 拆分 + 冒烟测试
 
 -**CLI 拆分**(680→39 行 main.py):
+
   - `runtime/cli/_shared.py` — kernel, console, 公共 helper
   - `runtime/cli/commands/catalog.py` — catalog 命令
   - `runtime/cli/commands/run.py` — run + plan 命令
@@ -89,6 +90,7 @@
   - `runtime/cli/commands/export.py` — export 命令
 
 -**20 冒烟测试**:
+
   - `test_cli_commands.py` (5 tests) — 所有命令注册, --version, --help
   - `test_api_auth.py` (6 tests) — auth middleware, CORS, health
   - `test_build_artifact.py` (4 tests) — URL, file, text, note
@@ -145,6 +147,7 @@
 ### #16 Flaky 测试自动隔离 ✅
 
 -**修改**: `utils/flaky_detector.py` — 加 3 方法
+
 - `detect_trends()` — P-F-P / F-P-F 模式检测 + confidence scoring
 - `generate_quarantine()` — 隔离清单 (pytest --deselect 兼容)
 - `generate_pytest_markers()` — @pytest.mark.flaky 配置生成
@@ -152,6 +155,7 @@
 ### #17 测试影响分析（Test Impact Analysis）✅
 
 -**新建**: `runtime/intelligence/impact_analyzer.py` — AST 依赖图 + git diff → 影响测试
+
 - `ImportGraph` 类 — 双向导入图 (imports / imported_by)
 - `analyze_impact()` — 入口: git diff → AST scan → impacted test list
 -**不改**: `regression_scope.py` — 独立工具
@@ -159,6 +163,7 @@
 ### #18 需求可追溯性 ✅
 
 -**新建**: `utils/traceability_matrix.py` — 双向追溯矩阵
+
 - `TraceabilityMatrix` 类 — 需求↔用例↔缺陷 自动链接
 - `to_markdown()` — markdown 表格导出
 - 覆盖率统计 + 未覆盖需求 + 孤儿 bug 检测
@@ -170,6 +175,7 @@
 ### #19 RBAC 访问控制 ✅
 
 -**新建**: `runtime/api/rbac.py` — 4 角色 (admin/lead/tester/viewer) + `require_role()` 装饰器
+
 - 通过 `TAGENT_ADMIN_TOKENS` 等 env 配置角色令牌
 - 默认关闭 `TAGENT_RBAC_ENABLED=0` — 向后兼容
 -**不改**: 现有 auth middleware
@@ -177,6 +183,7 @@
 ### #20 审计追踪 ✅
 
 -**新建**: `runtime/observability/audit.py` — JSONL 追加审计日志
+
 - `log_event()` — 记录 who/when/what/outcome
 - `query_events()` — 按 action/resource/actor 过滤查询
 -**不改**: 现有代码 — opt-in 集成
@@ -184,6 +191,7 @@
 ### #21 多租户 ✅
 
 -**新建**: `runtime/api/tenancy.py` — contextvars 租户传播
+
 - `get_current_tenant()` / `tenant_namespace()` / `tenant_prefix()`
 - 默认关闭 `TAGENT_TENANCY_ENABLED=0` — 向后兼容
 -**不改**: 现有 DB schema 或查询
@@ -197,6 +205,7 @@
 ### #23 执行生命周期钩子 ✅
 
 -**新建**: `runtime/orchestrator/hooks.py` — `HookRegistry` (before/after/on_error)
+
 - `runtime/orchestrator/direct.py` — `_run_node()` 集成 hook 触发点
 - 钩子失败不中断执行
 
@@ -207,6 +216,7 @@
 ### #24 安装步骤从 15→3 ✅
 
 -**新建**: `runtime/cli/commands/bootstrap.py` — `tagent bootstrap` 一站式命令
+
 - 检测: Python/Git/pip 版本
 - 配置: 自动生成 .env 模板
 - 验证: LLM key 检查 + Runtime import

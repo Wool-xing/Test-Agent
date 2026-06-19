@@ -25,6 +25,7 @@
 3. 创建 `specs/agents/<name>/manifest.yaml`（参考已有 manifest 格式，schema 定义在 `specs/manifest.py`）
 4. 编写 system_prompt + output_schema
 5.**同步**：
+
    - 运行 `python scripts/render_manifest.py --name <name>` 生成 AI Mode 用的 .md 文件
    - 更新 `specs/` 对应目录
    - 如 script-backed，添加 `script_path` 指向 utils/
@@ -46,6 +47,7 @@
    - 输出文件
 
 5.**同步**：
+
    - `ai/skills/README.md` 加一行
    - `00-项目导航.md` 加一行
    - `docs/getting-started/使用手册.md` skill 详解段加描述
@@ -62,6 +64,7 @@
 3. 顶部 docstring 标注被引用方
 4. 必含：公开 API + CLI（argparse）
 5.**同步**：
+
    - `utils/README.md` 表格加一行
    - `00-项目导航.md` 对应分类加一行
    - `deploy/config/requirements.txt` 加新依赖（标 [稳定层]/[可选]/[外部]）
@@ -180,6 +183,7 @@ pytest --collect-only
 -**A**= Accountable（最终负责，每行只 1 个）
 -**C**= Consulted（被咨询）
 -**I**= Informed（被通报）
+
 - 空 = 不参与
 
 ### 16 专家代号

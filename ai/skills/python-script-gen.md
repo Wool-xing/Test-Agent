@@ -34,6 +34,7 @@ SKILL_IMPL_STATUS: production
 ```text
 
 读取 Excel 测试用例，提取：
+
   - 测试场景和步骤
   - 测试数据（输入/预期）
   - 用例类型（UI / API / PERF / SEC）
@@ -46,6 +47,7 @@ SKILL_IMPL_STATUS: production
 ```text
 
 由 automation-engineer 执行：
+
   - 根据用例类型选择框架（Playwright / requests）
   - 性能用例 → 转交 /jmeter-script-gen
   - 生成 Page Object（UI）
@@ -93,7 +95,6 @@ from playwright.sync_api import Page, expect
 
 from pages.register_page import RegisterPage
 
-
 @pytest.mark.p0
 @pytest.mark.smoke
 @pytest.mark.ui
@@ -140,11 +141,9 @@ import pytest
 
 from api.user_api import UserAPI
 
-
 @pytest.fixture(scope="class")
 def user_api(api_client, env_config):
     return UserAPI(api_client, env_config.api_base_url)
-
 
 @pytest.mark.p0
 @pytest.mark.smoke

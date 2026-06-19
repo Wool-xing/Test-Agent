@@ -92,10 +92,12 @@ test-lead（最终决策：功能+性能双门禁）
 
 input: 用户提供的需求文档（任意格式）或自然语言描述
 处理:
+
   1. 调 utils.prd_loader.load_prd(source) → 文本 + metadata
   2. 调 utils.prd_loader.suggest_agents(text) → 平台识别 + 路由建议
   3. 综合输出任务分析（含动态专家组合）
 output:
+
   - 任务类型（新功能/回归/紧急修复）
   - 涉及平台（mobile_android / desktop_windows / api / ...）
   - 测试范围
@@ -138,6 +140,7 @@ output:
 
 input: 需求文档 / PRD / 用户故事
 output:
+
   - workspace/需求分析/requirements_analysis_{日期}.md
   - workspace/需求分析/requirements_summary_{日期}.json
 
@@ -149,6 +152,7 @@ output:
 
 input: 需求 JSON 摘要
 output:
+
   - workspace/测试用例/testcases_[模块]_[日期].xlsx（4 Sheet）
   - 用例 ID 含 TYPE：TC-{MODULE}-{UI|API|PERF|SEC}-{NUM}
   - 自动化优先级标注
@@ -169,6 +173,7 @@ output: workspace/测试报告/{项目名}/环境检查_{时间戳}.json
 ```text
 
 output:
+
   - workspace/测试数据/test_data.json（pytest 功能测试，conftest fixture 直接消费）
   - workspace/测试数据/jmeter_users.csv（JMeter 参数化）
 
@@ -250,9 +255,11 @@ python -m utils.jmeter_result_parser \
 ```text
 
 input:
+
   - 功能失败列表（failure_type=product_bug）
   - 性能门禁失败项
 output:
+
   - 禅道 Bug ID 列表
   - 性能 Bug 标题：[性能]-[接口名]-[指标超标]
 
@@ -263,6 +270,7 @@ output:
 ```text
 
 output:
+
   - Allure 交互式报告（功能）
   - JMeter HTML 报告（性能）
   - Word 测试报告（含性能基准对比）
@@ -277,6 +285,7 @@ output:
 ```text
 
 output:
+
   - 功能门禁判定
   - 性能门禁判定（按 mode 选择 full / ci_quick 阈值）
   - 上线建议（通过/不建议/有条件）

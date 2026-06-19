@@ -14,11 +14,13 @@
 ### 推荐流程
 
 1.**GitHub Security Advisories**（推荐）
+
    - 访问：[Security Advisories](https://github.com/Wool-xing/Test-Agent/security/advisories/new)
    - 私有提交，仅维护者可见
    - 修复后协调披露
 
 2.**邮件**（暂未公开专用邮箱）
+
    - 优先使用上方 GitHub Security Advisories 私密通道
    - 如需另行联系，请通过仓库 Issue 留言索取邮件地址（不要在 Issue 中粘贴漏洞细节）
    - 标题约定：`[SECURITY] 漏洞简述`

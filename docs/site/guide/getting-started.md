@@ -7,6 +7,7 @@ Test-Agent V2 is an AI-native testing framework that combines 16 specialized AI 
 -**Python**3.10 or later
 -**Git**2.30 or later
 -**pip**23.0 or later
+
 - An LLM API key (Claude, OpenAI, Gemini, DeepSeek, Qwen, or Ollama)
 
 ## Quick Install

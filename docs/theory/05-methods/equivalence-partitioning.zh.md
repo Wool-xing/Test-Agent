@@ -7,6 +7,7 @@ name_en: Equivalence Partitioning
 one_liner_zh: 输入域按"等价行为"切类,每类取一代表测
 one_liner_en: Partition input domain into equivalence classes; one representative per class
 authority:
+
   - "ISTQB Foundation v4.0 §4.3.1 Equivalence Partitioning"
   - "Beizer 1990《Software Testing Techniques》(2nd ed) ch.3"
   - "Myers 2011《The Art of Software Testing》(3rd ed) ch.4"
@@ -15,6 +16,7 @@ last_reviewed: 2026-05-12
 reviewer: agent-curator
 when_to_use: 输入域可分类、类内表现一致(数值范围/选项枚举/字符串长度)
 common_pitfall:
+
   - "漏负边界(年龄字段忘了 <0)"
   - "漏空值/null/缺失"
   - "数值类型边界(int32 overflow)"
@@ -22,6 +24,7 @@ common_pitfall:
 example: |
   字段:年龄 1-120 整数
   等价类:
+
   - 有效:1-120
   - 无效-低:<1(0/-1)
   - 无效-高:>120(121)
@@ -29,8 +32,10 @@ example: |
   - 无效-边界:小数 1.5
 related_to: [boundary-value-analysis, decision-table, pairwise-testing]
 reading_zh:
+
   - 阿里测试学院《等价类划分实战》
 reading_en:
+
   - "ISTQB Foundation Syllabus v4.0 §4.3.1"
   - "Glenford Myers The Art of Software Testing ch.4"
 ---

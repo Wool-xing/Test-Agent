@@ -54,7 +54,6 @@ workspace/自动化脚本/python/desktop/
 
 from pywinauto import Application
 
-
 class MainWindowWindows:
     def__init__(self, exe_path: str):
         self.app = Application(backend="uia").start(exe_path)
@@ -88,7 +87,6 @@ class MainWindowWindows:
 import subprocess
 
 import pyautogui
-
 
 class MainWindowMacOS:
     def__init__(self, app_name: str):
@@ -129,7 +127,6 @@ class MainWindowMacOS:
 
 from playwright.sync_api import sync_playwright
 
-
 class ElectronApp:
     def__init__(self, executable_path: str):
         self.pw = sync_playwright().start()
@@ -165,7 +162,6 @@ import os
 import pytest
 
 from desktop.windows.pages.main_window import MainWindowWindows
-
 
 @pytest.mark.p0
 @pytest.mark.smoke
@@ -263,7 +259,6 @@ import pytest
 from desktop.windows.pages.main_window import MainWindowWindows
 from utils.websocket_helper import WSClient
 
-
 @pytest.mark.p0
 @pytest.mark.desktop
 @pytest.mark.windows
@@ -320,7 +315,6 @@ def test_ws_protocol_contract():
 
 from utils.websocket_helper import test_reconnect
 
-
 def test_ws_auto_reconnect():
     """断线后自动重连"""
     result = test_reconnect("ws://server.example.com/socket",
@@ -337,7 +331,6 @@ def test_ws_auto_reconnect():
 
 import asyncio
 from utils.websocket_helper import ws_concurrent_load
-
 
 def test_ws_concurrent_1000():
     result = asyncio.run(ws_concurrent_load(

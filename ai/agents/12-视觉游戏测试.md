@@ -54,13 +54,11 @@ import pytest
 from airtest.core.api import auto_setup, touch, exists, wait, sleep
 from airtest.core.cv import Template
 
-
 @pytest.fixture(scope="session")
 def airtest_setup():
     auto_setup(__file__, devices=["Android://127.0.0.1:5037/emulator-5554"])
     yield
     # cleanup
-
 
 @pytest.mark.p0
 @pytest.mark.visual
@@ -93,7 +91,6 @@ class TestGameLogin:
 
 import pytesseract
 from PIL import Image
-
 
 def ocr_verify(image_path: str, expected_text: str, lang: str = "chi_sim+eng") -> bool:
     """OCR 识别图片文字，断言包含预期文本"""

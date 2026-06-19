@@ -54,7 +54,6 @@ workspace/自动化脚本/python/
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-
 class LoginPageAndroid:
     def__init__(self, driver):
         self.driver = driver
@@ -82,7 +81,6 @@ class LoginPageAndroid:
 import pytest
 
 from mobile.pages.android.login_page import LoginPageAndroid
-
 
 @pytest.mark.p0
 @pytest.mark.smoke
@@ -220,7 +218,6 @@ assert result["stable"], f"稳定性测试失败：crash={result['crashes']}, an
 import pytest
 from utils.mobile_driver import run_monkey, archive_logcat
 
-
 @pytest.mark.p1
 @pytest.mark.mobile
 @pytest.mark.android
@@ -277,7 +274,6 @@ import subprocess
 
 import pytest
 
-
 @pytest.fixture(scope="session")
 def wx_devtools():
     """启动微信开发者工具自动化端口"""
@@ -286,7 +282,6 @@ def wx_devtools():
     # 命令行打开自动化端口
     subprocess.run([cli, "auto", "--project", project, "--auto-port", "9420"], check=True)
     yield {"port": 9420, "project": project}
-
 
 @pytest.mark.p0
 @pytest.mark.miniprogram

@@ -58,7 +58,6 @@ from sklearn.metrics import accuracy_score, classification_report
 
 from utils.ai_validator import load_predictions
 
-
 @pytest.mark.p0
 @pytest.mark.ai
 @pytest.mark.model
@@ -85,7 +84,6 @@ def test_accuracy_p0():
 import pandas as pd
 from utils.ai_validator import detect_drift
 
-
 def test_no_significant_drift():
     """生产数据相对训练数据无显著漂移"""
     train = pd.read_csv("workspace/自动化脚本/python/ai/datasets/drift_baseline.csv")
@@ -109,7 +107,6 @@ def test_no_significant_drift():
 # ai/tests/test_inference_perf.py
 
 from utils.api_retry_util import call_with_retry
-
 
 @pytest.mark.performance
 @pytest.mark.ai
@@ -144,7 +141,6 @@ def test_inference_latency():
 # ai/tests/test_fairness.py
 
 from utils.ai_validator import fairness_metrics
-
 
 def test_gender_fairness():
     """男女预测准确率差距 < 5%"""
@@ -201,7 +197,6 @@ import yaml
 
 from utils.ai_validator import llm_eval
 
-
 def test_llm_output_format():
     """LLM 输出符合 JSON schema"""
     cases = yaml.safe_load(open("workspace/自动化脚本/python/ai/prompts/llm_eval_cases.yaml"))
@@ -214,7 +209,6 @@ def test_llm_output_format():
             schema=case.get("schema"),
         )
         assert result["valid_format"], f"格式不符: {case['id']}"
-
 
 def test_llm_refusal_rate():
     """有害 prompt 拒答率 ≥ 95%"""

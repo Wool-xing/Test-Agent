@@ -7,6 +7,7 @@ name_en: Build Your Own Programming Language
 one_liner_zh: 词法 → 语法 → AST → eval;懂 fuzz + 编译器 bug 测试
 one_liner_en: Lexer → parser → AST → eval; foundation for fuzz + compiler bug testing
 authority:
+
   - "Crafting Interpreters(Bob Nystrom,开源)"
   - "《Compilers: Principles, Techniques, and Tools》(Dragon Book)"
 confidence: high

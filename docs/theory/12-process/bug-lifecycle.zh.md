@@ -7,6 +7,7 @@ name_en: Defect Lifecycle
 one_liner_zh: New→Open→InProgress→Resolved→Verify→Closed,严重度优先级分离
 one_liner_en: New→Open→InProgress→Resolved→Verify→Closed; severity vs priority decoupled
 authority:
+
   - ISTQB Foundation §5.5 缺陷管理
   - IEEE 1044《Standard Classification for Software Anomalies》
   - "OWASP CWE Severity Rating"
@@ -15,6 +16,7 @@ last_reviewed: 2026-05-12
 reviewer: agent-curator
 when_to_use: 任何 Bug Tracker(zentao/jira/github/linear/...)接入
 common_pitfall:
+
   - "严重度+优先级混为一谈(技术 vs 业务两个维度)"
   - "无 reopen 处理 → flaky bug 反复被关"
   - "无 root cause 字段 → 缺陷分析无据"

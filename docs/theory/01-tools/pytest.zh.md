@@ -7,6 +7,7 @@ name_en: pytest
 one_liner_zh: Python 测试事实标准,fixture+插件生态最强
 one_liner_en: De facto Python testing framework with the richest fixture+plugin ecosystem
 authority:
+
   - "Pytest Official Docs v8.x https://docs.pytest.org"
   - "Brian Okken《Python Testing with pytest》(2nd ed, 2022)"
   - ISTQB Foundation §6.2.2 测试自动化工具
@@ -15,6 +16,7 @@ last_reviewed: 2026-05-11
 reviewer: agent-curator
 when_to_use: Python 项目任何层级测试(单元/集成/E2E);需要 fixture 注入/参数化/插件扩展
 common_pitfall:
+
   - "fixture scope 默认 function;数据库连接没设 module/session 导致重复创建"
   - "未用 pytest-xdist 并行 → 大型套件几小时跑不完"
   - "conftest.py 放错层级 → fixture 跨包不可见"
@@ -34,9 +36,11 @@ example: |
   ```
 related_to: [pytest-fixture, pytest-xdist, allure-pytest, mock]
 reading_zh:
+
   - https://docs.pytest.org/zh-cn/latest/
   - 美团技术博客《pytest 在美团的实践》
 reading_en:
+
   - https://docs.pytest.org/en/stable/
   - "Brian Okken 2022 ch.3 Fixtures"
 ---

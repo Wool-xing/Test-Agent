@@ -83,6 +83,7 @@ terminalizer render demo --output docs/assets/demo.mp4 --quality 80
 1.**场景**:终端 + 浏览器并排
 2.**左屏**(终端):跑 Step 2-6
 3.**右屏**(浏览器):
+
    - 6-14s 切到 GitHub Repo 页(显示 star 计数)
    - 18-25s 打开生成的 `.xmind` 文件(XMind 客户端)或 `.md` 文件(markmap.js 网页渲染)
 

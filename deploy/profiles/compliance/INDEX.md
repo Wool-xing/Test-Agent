@@ -25,6 +25,7 @@ framework: <name>
 version: <date>
 applicable_industries: [list]
 checks:
+
   - id: <unique-id>
     title: <human-readable>
     severity: P0/P1/P2/P3

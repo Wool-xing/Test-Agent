@@ -7,6 +7,7 @@ name_en: Build Your Own Search Engine
 one_liner_zh: 倒排索引 + TF-IDF + BM25;懂检索 + RAG 测试根
 one_liner_en: Inverted index + TF-IDF + BM25; foundation for retrieval + RAG testing
 authority:
+
   - "Manning《Introduction to Information Retrieval》(Stanford)"
   - "Lucene in Action"
 confidence: medium

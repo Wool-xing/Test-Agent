@@ -7,6 +7,7 @@ name_en: Build Your Own Database
 one_liner_zh: 从 B+Tree 到 SQL 3000 行;懂事务/索引/并发竟态根因
 one_liner_en: B+Tree → SQL in 3000 lines; understand transactions/indexes/race roots
 authority:
+
   - "build-your-own.org/database/(Go,B+ tree → SQL)"
   - "cstack/db_tutorial(C,经典)"
   - "AOSA 500L: DBDB / dagoba"
@@ -16,6 +17,7 @@ reviewer: agent-curator
 estimated_time_hours: 30
 when_to_use: 性能测试 / SQL 注入 / 事务隔离 / N+1 查询 / 死锁 根因分析
 common_pitfall:
+
   - tutorial 简化省略 WAL → 不能学 ACID
   - 忽略并发 → 不能学锁/MVCC
 example: |
@@ -26,7 +28,6 @@ reading_en: ["https://build-your-own.org/database/"]
 ---
 
 # 从零写一个数据库
-
 
 ## 对测试工作有什么用?
 

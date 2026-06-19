@@ -7,6 +7,7 @@ name_en: Build Your Own Shell
 one_liner_zh: 用 C 写 mini shell;懂 fork/exec/pipe/signal
 one_liner_en: Mini shell in C; understand fork/exec/pipe/signal
 authority:
+
   - "APUE《UNIX 环境高级编程》Stevens 经典"
   - "tutorial: Stephen Brennan's shell tutorial(C)"
 confidence: medium

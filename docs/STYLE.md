@@ -104,6 +104,7 @@
 
 - id: markdownlint
   args:
+
     - --rules MD001    # heading-increment
     - --rules MD025    # single-h1
     - --rules MD036    # no-emphasis-as-heading

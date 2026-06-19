@@ -54,6 +54,7 @@ autoresearch 的精髓：
 - 维度1-7：每个维度打 1-10 分，乘以权重得到该维度得分
 - 维度8（实测表现）：跑2-3个测试prompt，按输出质量打1-10分
 -**总分 = Σ(维度分 × 权重) / 10**，满分100
+
 - 改进后总分必须**严格高于**改进前才保留
 
 ### 关于「实测表现」维度
@@ -94,6 +95,7 @@ autoresearch 的精髓：
 ```text
 
 for each skill:
+
   1. 读取 SKILL.md，理解它做什么
   2. 设计2-3个测试prompt，覆盖：
      - 最典型的使用场景（happy path）
@@ -115,16 +117,19 @@ for each skill:
 for each skill in 优化范围:
 
   # 结构评分（主agent可以做）
+
   1. 读取 SKILL.md 全文
   2. 按维度1-7逐项打分（附简短理由）
 
   # 效果评分（用子agent做，独立于主agent）
+
   3. 对每个测试prompt，spawn子agent：
      - with_skill: 带着SKILL.md执行测试prompt
      - baseline: 不带skill执行同一prompt
   4. 对比两组输出，打维度8的分
 
   # 汇总
+
   5. 计算加权总分
   6. 记录到 results.tsv
 
@@ -165,6 +170,7 @@ for each skill:
 
     # Step 2: 提出改进方案
     针对最低维度，生成1个具体改进方案：
+
       - 改什么（具体段落/行）
       - 为什么改（对应rubric哪条）
       - 预期提升多少分
@@ -174,6 +180,7 @@ for each skill:
     git add + commit（message: "optimize {skill}: {改进摘要}"）
 
     # Step 4: 重新评估
+
     - 结构维度：主agent重新打分
     - 效果维度：spawn独立子agent重跑测试prompt（关键！不能自己评自己）
 
@@ -191,6 +198,7 @@ for each skill:
 
   # === 每个skill优化完后的人类检查点 ===
   展示该skill的改动摘要：
+
     - git diff（改前 vs 改后）
     - 分数变化（哪些维度提升/下降）
     - 测试prompt输出对比（如果跑过的话）

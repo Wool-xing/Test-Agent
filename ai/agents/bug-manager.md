@@ -227,6 +227,7 @@ def validate_zentao_response(result: dict) -> bool:
   修复率: 72.7%（目标 ≥80%）
 
 【重点关注】
+
   - Bug#1023（P0）超期未修复，请开发负责人关注
 
 ```text
@@ -238,7 +239,6 @@ def validate_zentao_response(result: dict) -> bool:
 from collections import Counter
 
 from utils.zentao_bug_manager import ZentaoBugManager
-
 
 def analyze_bugs(product_id: int) -> dict:
     """Bug 多维度分析"""
@@ -284,7 +284,6 @@ def analyze_bugs(product_id: int) -> dict:
 import json
 from datetime import datetime
 from pathlib import Path
-
 
 def generate_bug_daily_report(product_id: int, output_dir: str = "workspace/测试报告"):
     stats = analyze_bugs(product_id)

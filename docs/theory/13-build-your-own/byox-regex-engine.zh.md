@@ -7,6 +7,7 @@ name_en: Build Your Own Regex Engine
 one_liner_zh: NFA/DFA from scratch;懂 ReDoS 攻击 + fuzz 测试
 one_liner_en: NFA/DFA from scratch; understand ReDoS + fuzz testing
 authority:
+
   - "Russ Cox《Regular Expression Matching Can Be Simple And Fast》经典"
   - "OWASP ReDoS"
 confidence: high

@@ -47,7 +47,6 @@ import openpyxl
 
 logger = logging.getLogger(__name__)
 
-
 def analyze_data_requirements(test_cases_file: str) -> dict:
     """从测试用例 Excel 分析数据需求"""
     wb = openpyxl.load_workbook(test_cases_file)

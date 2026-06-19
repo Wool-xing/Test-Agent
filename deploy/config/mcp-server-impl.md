@@ -59,13 +59,11 @@ logger = logging.getLogger(__name__)
 
 manager: ZentaoBugManager | None = None
 
-
 def get_manager() -> ZentaoBugManager:
     global manager
     if manager is None:
         manager = ZentaoBugManager()
     return manager
-
 
 @server.list_tools()
 async def list_tools() -> list[types.Tool]:
@@ -109,7 +107,6 @@ async def list_tools() -> list[types.Tool]:
         ),
     ]
 
-
 @server.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[types.TextContent]:
     mgr = get_manager()
@@ -134,7 +131,6 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[types.TextCont
         logger.exception(name)
         return [types.TextContent(type="text", text=f"❌ {type(e).__name__}: {e}")]
 
-
 async def main():
     async with mcp.server.stdio.stdio_server() as (read, write):
         await server.run(
@@ -148,7 +144,6 @@ async def main():
                 ),
             ),
         )
-
 
 if__name__== "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -169,7 +164,6 @@ import mcp.types as types
 from utils.generate_report import send_wechat_report
 
 server = Server("wechat-mcp")
-
 
 @server.list_tools()
 async def list_tools():
@@ -192,7 +186,6 @@ async def list_tools():
         ),
     ]
 
-
 @server.call_tool()
 async def call_tool(name, args):
     if name == "wechat_send_report":
@@ -200,11 +193,9 @@ async def call_tool(name, args):
         return [types.TextContent(type="text", text="✅ 已发送" if ok else "❌ 发送失败")]
     raise ValueError(name)
 
-
 async def main():
     async with mcp.server.stdio.stdio_server() as (r, w):
         await server.run(r, w, ...)
-
 
 if__name__== "__main__":
     asyncio.run(main())

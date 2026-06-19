@@ -14,7 +14,7 @@ from runtime.orchestrator.agents.base import AgentRunner, RunnerContext, registe
 @register_skill("build-your-own-x-explorer")
 class BuildYourOwnXExplorer(AgentRunner):
     def system_prompt(self) -> str:
-        return 
+        return (
             "你是 build-your-own-x-explorer skill。职责: 按用户测试场景从 13 类 byox "
             "(database/network-stack/web-server/git/search-engine/shell/regex-engine/"
             "programming-language/web-browser/bot/...) KB 推 deep-dive 学习路径, "
@@ -24,7 +24,7 @@ class BuildYourOwnXExplorer(AgentRunner):
         )
 
     def user_prompt(self, ctx: RunnerContext) -> str:
-        return 
+        return (
             f"## 上游/场景\n```\n{ctx.artifact_text[:3000]}\n```\n\n"
             f"## schema\n"
             "{\n"

@@ -183,13 +183,11 @@ from pathlib import Path
 import allure
 import pytest
 
-
 @pytest.fixture(autouse=True)
 def allure_test_env(env_config):
     """在 Allure 报告中显示测试环境信息"""
     allure.dynamic.label("environment", env_config.env_name)
     allure.dynamic.label("url", env_config.app_base_url)
-
 
 def pytest_sessionstart(session):
     """会话启动时写入 Allure environment.properties"""
@@ -241,11 +239,13 @@ python -m utils.generate_report \
 
 on:
   schedule:
+
     - cron: '30 1 * * 1-5'  # 每个工作日 9:30 UTC+8
 jobs:
   daily:
     runs-on: ubuntu-latest
     steps:
+
       - uses: actions/checkout@v4
       - run: pip install -e runtime/
       - run: tagent run --type smoke --notify
