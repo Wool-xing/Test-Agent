@@ -11,6 +11,7 @@ if _project_root not in _sys.path:
     _sys.path.insert(0, _project_root)
 
 import logging as _logging
+import types as _types
 
 
 class _LoguruBridge(_logging.Handler):
@@ -25,7 +26,7 @@ class _LoguruBridge(_logging.Handler):
             level = _loguru_logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
-        frame: _logging.FrameType | None = _logging.currentframe()
+        frame: _types.FrameType | None = _logging.currentframe()
         depth = 2
         while frame and frame.f_code.co_filename == _logging.__file__:
             frame = frame.f_back
