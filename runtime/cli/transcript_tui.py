@@ -54,7 +54,6 @@ class TranscriptTUI:
 
         # Transcript
         self._lines: list[str] = []
-        self._buffer = Buffer(read_only=True, multiline=True)
 
         # Input — ghost text for tab completion
         self._input_buf = Buffer(
@@ -172,8 +171,6 @@ class TranscriptTUI:
                 self._lines.append(stripped)
         if len(self._lines) > 5000:
             self._lines = self._lines[-3000:]
-        self._buffer.text = "\n".join(self._lines)
-        self._app.invalidate()
 
     def run(self) -> None:
         self._app.run()
