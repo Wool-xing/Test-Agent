@@ -9,6 +9,7 @@ import typer
 import runtime
 from runtime.cli._shared import console, set_no_color
 from runtime.cli.config import config_app
+from runtime.infra.trace import set_trace_id as _set_trace_id
 
 app = typer.Typer(add_completion=True, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
@@ -20,6 +21,7 @@ def _version_callback(
     no_color: bool = typer.Option(False, "--no-color", help="Disable colored output"),
     debug: bool = typer.Option(False, "--debug", help="Enable DEBUG log level"),
 ):
+    _set_trace_id()  # §补-22: Generate trace ID for every CLI invocation
     if no_color:
         set_no_color()
     if debug:
