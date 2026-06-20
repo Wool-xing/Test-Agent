@@ -1,13 +1,26 @@
 """ping-check skill: ICMP ping latency test."""
 import argparse
+import re
 import subprocess
 import sys
 import time
 import json
 import platform
 
+_HOST_RE = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9\-.]*[a-zA-Z0-9])?$")
+
+
+def _validate_host(host: str) -> str | None:
+    """Validate hostname/IP format; return error or None."""
+    if not host or not _HOST_RE.match(host):
+        return f"invalid hostname: {host}"
+    return None
+
 
 def ping_host(host: str, count: int = 4, timeout: int = 30) -> dict:
+    error = _validate_host(host)
+    if error:
+        return {"ok": False, "host": host, "error": error}
     param = "-n" if platform.system() == "Windows" else "-c"
     deadline = ["-w", str(timeout * 1000)] if platform.system() == "Windows" else ["-W", str(timeout)]
     try:

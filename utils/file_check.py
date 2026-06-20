@@ -2,20 +2,33 @@
 import argparse
 import sys
 import json
-import os
 from pathlib import Path
 
 
+def _resolve_safe(path_str: str) -> tuple[Path | None, str | None]:
+    """Resolve path safely. Returns (resolved_path, error)."""
+    p = Path(path_str).resolve()
+    # Restrict to project workspace to prevent path traversal
+    workspace = Path.cwd() / "workspace"
+    try:
+        p.relative_to(Path.cwd())
+    except ValueError:
+        return None, f"path outside project root: {path_str}"
+    return p, None
+
+
 def check_file(path: str, exists: bool = True, min_size: int = 0, max_size: int = 0,
-               content_contains: str = "", content_regex: str = "") -> dict:
-    p = Path(path)
+               content_contains: str = "") -> dict:
+    p, error = _resolve_safe(path)
+    if error:
+        return {"ok": False, "path": path, "error": error}
     if not p.exists():
         return {"ok": not exists, "path": path, "exists": False, "error": "file not found" if exists else ""}
     size = p.stat().st_size
     checks = []
-    if min_size and size < min_size:
+    if min_size > 0 and size < min_size:
         checks.append({"check": "min_size", "expected": f">{min_size}", "actual": str(size), "pass": False})
-    if max_size and size > max_size:
+    if max_size > 0 and size > max_size:
         checks.append({"check": "max_size", "expected": f"<{max_size}", "actual": str(size), "pass": False})
     if content_contains:
         text = p.read_text(encoding="utf-8", errors="replace")

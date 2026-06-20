@@ -1,13 +1,50 @@
 """http-check skill: HTTP endpoint health test."""
 import argparse
+import ipaddress
+import socket
 import sys
 import json
 import time
+from urllib.parse import urlparse
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 
+_PRIVATE_RANGES = [
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+]
+
+
+def _validate_url(url: str) -> str | None:
+    """Validate URL is safe (http/https only, no private IPs). Returns error or None."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        return f"unsupported scheme: {parsed.scheme}"
+    if not parsed.hostname:
+        return "missing hostname"
+    try:
+        addr = ipaddress.ip_address(parsed.hostname)
+    except ValueError:
+        try:
+            addr = ipaddress.ip_address(socket.gethostbyname(parsed.hostname))
+        except (socket.gaierror, ValueError):
+            return None  # DNS resolution failure; let urlopen handle it
+    for net in _PRIVATE_RANGES:
+        if addr in net:
+            return f"private/internal IP blocked: {addr}"
+    return None
+
 
 def check_http(url: str, method: str = "GET", expected_status: int = 200, timeout: int = 30) -> dict:
+    error = _validate_url(url)
+    if error:
+        return {"ok": False, "url": url, "error": error}
     try:
         start = time.monotonic()
         req = Request(url, method=method, headers={"User-Agent": "Test-Agent/2.0"})
