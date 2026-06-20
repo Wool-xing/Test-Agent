@@ -207,14 +207,14 @@ def _cmd_history(args: str) -> None:
 
 # TheFuck-style correction rules: (match_pattern, correction, description)
 _FC_RULES: list[tuple[str, str, str]] = [
-    # Test-Agent specific
-    (r"^tagent\b", "tagent", "typo: tagent → tagent"),
-    (r"^/pentest-recon\b", "/pentest-recon", "extra hyphen: pentest-recon → pentest-recon"),
-    (r"^/regression\b", "/regression", "typo: regression → regression"),
-    (r"^!model\s+cluade\b", "!model claude", "typo: cluade → claude"),
-    (r"^!model\s+deepseek\b", "!model deepseek", "typo: deepseek → deepseek"),
+    # Test-Agent specific typos
+    (r"^tagent\b", "tagent", "tagnt → tagent"),
+    (r"^/pentest-recno\b", "/pentest-recon", "recno → recon"),
+    (r"^/regeresion\b", "/regression", "regeresion → regression"),
+    (r"^!model\s+cluade\b", "!model claude", "cluade → claude"),
+    (r"^!model\s+deepseek\b", "!model deepseek", "deepsek → deepseek"),
     # CLI command typos
-    (r"^tagentr un\b", "tagent run", "typo: tagentr un → tagent run"),
+    (r"^tagentr un\b", "tagent run", "tagentr → tagent"),
     (r"^python -m runtime.cli.main\s+run\b", "tagent run", "use: tagent run"),
 ]
 
