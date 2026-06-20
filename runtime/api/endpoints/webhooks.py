@@ -23,6 +23,9 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from loguru import logger
 
+# ── Constants ──────────────────────────────────────────────────────────
+_DISCORD_WEBHOOK_BASE = "https://discord.com/api/v10/webhooks"
+
 from runtime.gateway.bridge import process_im_message
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -299,7 +302,7 @@ async def _process_discord_followup(text: str, token: str, app_id: str) -> None:
         result = await process_im_message(text, "discord", target=None)
 
         async with httpx.AsyncClient(timeout=15.0) as client:
-            url = f"https://discord.com/api/v10/webhooks/{app_id}/{token}/messages/@original"
+            url = f"{_DISCORD_WEBHOOK_BASE}/{app_id}/{token}/messages/@original"
             await client.patch(url, json={
                 "content": result.reply[:2000],  # Discord message limit
             })

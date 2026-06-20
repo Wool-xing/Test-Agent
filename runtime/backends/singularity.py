@@ -22,6 +22,7 @@ class SingularityBackend(BaseExecutionEnv):
         self.binds = binds or []
 
     async def connect(self) -> None:
+        """Singularity uses ambient CLI auth — no explicit connect step needed."""
         pass
 
     async def _run(self, argv: list[str], *, timeout: float = 120.0) -> tuple[int, str, str]:
@@ -78,4 +79,5 @@ class SingularityBackend(BaseExecutionEnv):
         local.write_bytes(data)
 
     async def close(self) -> None:
+        """Singularity containers are ephemeral — no explicit teardown needed."""
         pass

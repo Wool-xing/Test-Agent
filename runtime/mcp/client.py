@@ -7,7 +7,6 @@ interface for agents and skills to use MCP tools at runtime.
 
 from __future__ import annotations
 
-import asyncio
 import json
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field

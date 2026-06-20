@@ -14,6 +14,7 @@ from runtime.backends.base import BaseExecutionEnv, ExecResult, register
 @register("local")
 class LocalBackend(BaseExecutionEnv):
     async def connect(self) -> None:
+        """Local execution needs no connection setup — always ready."""
         pass
 
     async def exec(self, cmd: str, *, timeout: float = 60.0, cwd: str | None = None, env: dict | None = None) -> ExecResult:
@@ -58,4 +59,5 @@ class LocalBackend(BaseExecutionEnv):
             shutil.copy2(src, local)
 
     async def close(self) -> None:
+        """Local execution needs no teardown — resources released by GC."""
         pass

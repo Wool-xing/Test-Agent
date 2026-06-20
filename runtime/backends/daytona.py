@@ -69,4 +69,5 @@ class DaytonaBackend(BaseExecutionEnv):
         await self._cli(["cp", f"{self.workspace}:{remote}", str(local)])
 
     async def close(self) -> None:
+        """Daytona workspace auto-hibernates — no explicit close needed."""
         pass

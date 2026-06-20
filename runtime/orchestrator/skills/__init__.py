@@ -16,6 +16,9 @@ from runtime.orchestrator.agents.base import (  # noqa: F401
     register_skill,
 )
 
+# Alias for external consumers that expect 'registry'
+registry = SKILL_RUNNERS
+
 # Trigger registration (each module registered via @register_skill on import)
 from runtime.orchestrator.skills import (  # noqa: F401,E402
     agent_introspection_debugging,
