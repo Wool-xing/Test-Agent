@@ -1,5 +1,9 @@
 """timeout-check skill: verify operation completes within time limit."""
-import argparse, sys, json, time, subprocess
+import argparse
+import sys
+import json
+import time
+import subprocess
 
 
 def check_timeout(command: str, timeout: int = 30) -> dict:

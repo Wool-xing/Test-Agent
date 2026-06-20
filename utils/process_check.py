@@ -1,5 +1,9 @@
 """process-check skill: check if a process is running."""
-import argparse, sys, json, subprocess, platform
+import argparse
+import sys
+import json
+import subprocess
+import platform
 
 
 def check_process(name: str, expected_running: bool = True) -> dict:

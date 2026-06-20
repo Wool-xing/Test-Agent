@@ -1,5 +1,8 @@
 """file-check skill: file existence/size/content validation."""
-import argparse, sys, json, os
+import argparse
+import sys
+import json
+import os
 from pathlib import Path
 
 

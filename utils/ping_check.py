@@ -1,5 +1,10 @@
 """ping-check skill: ICMP ping latency test."""
-import argparse, subprocess, sys, time, json, platform
+import argparse
+import subprocess
+import sys
+import time
+import json
+import platform
 
 
 def ping_host(host: str, count: int = 4, timeout: int = 30) -> dict:
