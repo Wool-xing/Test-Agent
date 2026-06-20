@@ -114,7 +114,125 @@ def _notify(on_progress: Any, result: dict | None) -> None:
         on_progress(result)
 
 
-def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers: int = 4, on_progress: Any = None) -> dict[str, Any]:
+def _classify_result(nid: str, r: dict | None, failures: list[str], skipped: list[str],
+                    MAX_FAILURES: int) -> bool:
+    """Classify a completed node result. Returns True if circuit breaker triggered."""
+    if not r:
+        return False
+    if r.get("skipped"):
+        skipped.append(nid)
+    elif not r.get("ok"):
+        failures.append(nid)
+        if r.get("aborted") or len(failures) >= MAX_FAILURES:
+            return True
+    return False
+
+
+def _mark_unreachable(pending: set[str], results: dict, by_id: dict, skipped: list[str],
+                      futures: dict) -> None:
+    """Skip nodes whose hard deps failed (unreachable after upstream failure)."""
+    unreachable = [
+        nid for nid in list(pending)
+        if nid not in futures
+        and all(d in results for d in by_id[nid].depends_on)
+        and not all(d in results and results[d].get("ok", False)
+                    for d in by_id[nid].depends_on
+                    if _is_hard(by_id[nid]))
+    ]
+    for nid in unreachable:
+        failed_upstream = [d for d in by_id[nid].depends_on
+                          if d in results and not results[d].get("ok", False)]
+        results[nid] = {
+            "id": nid, "ok": False, "skipped": True,
+            "error": f"skipped: upstream failed ({', '.join(failed_upstream[:3])})"
+        }
+        skipped.append(nid)
+        pending.discard(nid)
+
+
+def _find_ready_nodes(pending: set, futures: dict, by_id: dict, results: dict) -> list[str]:
+    """Find nodes whose dependencies are all satisfied."""
+    ready = []
+    for nid in list(pending):
+        if nid in futures:
+            continue
+        node = by_id[nid]
+        all_deps = node.depends_on
+        hard_deps = all_deps if _is_hard(node) else []
+        if all(d in results and results[d].get("ok", False) for d in hard_deps) and \
+           all(d in results for d in all_deps):
+            soft_failed = [d for d in all_deps if d not in hard_deps
+                           and d in results and not results[d].get("ok", False)]
+            if soft_failed:
+                node.inputs["integrity"] = "partial"
+                node.inputs["degraded_by"] = soft_failed
+            ready.append(nid)
+    return ready
+
+
+def _drain_inflight(pending: set, futures: dict, results: dict, on_progress) -> None:
+    """Collect results from all in-flight futures after circuit breaker trips."""
+    for nid in list(pending):
+        if nid in futures:
+            try:
+                results[nid] = futures[nid].result()
+            except Exception:
+                results[nid] = {"id": nid, "ok": False, "error": "circuit broken"}
+            pending.discard(nid)
+            _notify(on_progress, results.get(nid))
+
+
+def _process_batch_results(done_now: list[str], futures: dict, results: dict,
+                           by_id: dict, pending: set, failures: list[str],
+                           skipped: list[str], on_progress) -> bool:
+    """Process a batch of completed nodes. Returns True if circuit breaker triggered."""
+    circuit_broken = False
+    for nid in done_now:
+        try:
+            results[nid] = futures[nid].result()
+        except Exception as exc:
+            results[nid] = {"id": nid, "ok": False, "error": str(exc), "aborted": _is_abort_exception(exc)}
+        r = results.get(nid)
+        if _classify_result(nid, r, failures, skipped, MAX_FAILURES=3):
+            circuit_broken = True
+        pending.discard(nid)
+        _notify(on_progress, r)
+        _mark_unreachable(pending, results, by_id, skipped, futures)
+    return circuit_broken
+
+
+def _block_on_oldest(futures: dict, pending: set, by_id: dict, results: dict,
+                     exec_ctx: ExecutionContext, log) -> dict | None:
+    """Block on the oldest pending future, with retry on failure."""
+    next_id = next(nid for nid in futures if nid in pending)
+    try:
+        results[next_id] = futures[next_id].result()
+    except Exception as exc:
+        log.warning("node {} attempt failed: {}", next_id, exc)
+        _run_node_with_retry(by_id[next_id], results, log, exec_ctx)
+    return results.get(next_id)
+
+
+def _build_dag_summary(run_id: str, ordered: list[DAGNode], results: dict,
+                       failures: list[str], skipped: list[str]) -> dict[str, Any]:
+    """Build final summary dict for the DAG run."""
+    rollout_skipped = [
+        nid for nid, r in results.items()
+        if not r.get("ok") and "[unimplemented]" in (r.get("stderr_tail") or "")
+    ] + skipped
+    return {
+        "run_id": run_id,
+        "total": len(ordered),
+        "succeeded": len(ordered) - len(failures) - len(skipped),
+        "failed": len(failures),
+        "skipped": len(skipped),
+        "rollout_skipped": rollout_skipped,
+        "results": results,
+    }
+
+
+def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers: int = 4,
+                        on_progress: Any = None) -> dict[str, Any]:
     if on_progress is not None and not callable(on_progress):
         on_progress = None
     configure_logging()
@@ -126,7 +244,6 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
     ordered: list[DAGNode] = decision.topological()
     log.info("direct flow start: run_id={} nodes={}", run_id, len(ordered))
 
-    MAX_FAILURES = 3
     by_id: dict[str, DAGNode] = {n.id: n for n in ordered}
     results: dict[str, dict] = {}
     failures: list[str] = []
@@ -139,126 +256,32 @@ def run_decision_direct(decision_dict: dict[str, Any], run_id: str, max_workers:
         pool = ThreadPoolExecutor(max_workers=max_workers)
         with span("flow.run", run_id=run_id, nodes=len(ordered)):
             while pending:
-                # circuit breaker: stop submitting new work
                 if circuit_broken:
-                    # drain in-flight futures
-                    for nid in list(pending):
-                        if nid in futures:
-                            try:
-                                results[nid] = futures[nid].result()
-                            except Exception:
-                                results[nid] = {"id": nid, "ok": False, "error": "circuit broken"}
-                            pending.discard(nid)
-                            _notify(on_progress, results.get(nid))
+                    _drain_inflight(pending, futures, results, on_progress)
                     break
-                # find nodes whose deps are satisfied:
-                #   hard deps must ALL be OK (upstream failure → block)
-                #   soft deps just need a result (upstream failure → tolerated, run degraded)
-                ready = []
-                for nid in list(pending):
-                    if nid in futures:
-                        continue
-                    node = by_id[nid]
-                    all_deps = node.depends_on
-                    hard_deps = all_deps if _is_hard(node) else []
-                    # All hard deps succeeded, all deps have results
-                    if all(d in results and results[d].get("ok", False) for d in hard_deps) and \
-                       all(d in results for d in all_deps):
-                        # If any soft dep failed, inject partial flag
-                        soft_failed = [d for d in all_deps if d not in hard_deps
-                                       and d in results and not results[d].get("ok", False)]
-                        if soft_failed:
-                            node.inputs["integrity"] = "partial"
-                            node.inputs["degraded_by"] = soft_failed
-                        ready.append(nid)
+                ready = _find_ready_nodes(pending, futures, by_id, results)
                 for nid in ready:
                     futures[nid] = pool.submit(_run_node, by_id[nid], exec_ctx)
-                # wait for at least one to finish
                 done_now = [nid for nid, f in futures.items() if f.done() and nid in pending]
                 if not done_now:
-                    # block on the oldest pending future
                     next_id = next(nid for nid in futures if nid in pending)
-                    try:
-                        results[next_id] = futures[next_id].result()
-                    except Exception as exc:
-                        log.warning("node {} attempt failed: {}", next_id, exc)
-                        _run_node_with_retry(by_id[next_id], results, log, exec_ctx)
-                    r = results.get(next_id)
-                    if r:
-                        if r.get("skipped"):
-                            skipped.append(next_id)
-                        elif not r.get("ok"):
-                            failures.append(next_id)
-                            if r.get("aborted") or len(failures) >= MAX_FAILURES:
-                                if r.get("aborted"):
-                                    log.error("node {} aborted, terminating DAG", next_id)
-                                else:
-                                    log.error("circuit breaker: {} failures, aborting DAG", len(failures))
-                                circuit_broken = True
+                    r = _block_on_oldest(futures, pending, by_id, results, exec_ctx, log)
+                    if _classify_result(next_id, r, failures, skipped, MAX_FAILURES=3):
+                        circuit_broken = True
                     pending.discard(next_id)
                     _notify(on_progress, r)
                     continue
-                for nid in done_now:
-                    try:
-                        results[nid] = futures[nid].result()
-                    except Exception as exc:
-                        results[nid] = {"id": nid, "ok": False, "error": str(exc), "aborted": _is_abort_exception(exc)}
-                    r = results.get(nid)
-                    if r:
-                        if r.get("skipped"):
-                            skipped.append(nid)
-                        elif not r.get("ok"):
-                            failures.append(nid)
-                            if r.get("aborted") or len(failures) >= MAX_FAILURES:
-                                if r.get("aborted"):
-                                    log.error("node {} aborted, terminating DAG", nid)
-                                else:
-                                    log.error("circuit breaker: {} failures, aborting DAG", len(failures))
-                                circuit_broken = True
-                    pending.discard(nid)
-                    _notify(on_progress, r)
-                    # After processing results, skip nodes whose HARD deps failed
-                    unreachable = [
-                        nid for nid in list(pending)
-                        if nid not in futures
-                        and all(d in results for d in by_id[nid].depends_on)  # all deps resolved
-                        and not all(d in results and results[d].get("ok", False)
-                                    for d in by_id[nid].depends_on
-                                    if _is_hard(by_id[nid]))  # hard dep failed → unreachable
-                    ]
-                    for nid in unreachable:
-                        failed_upstream = [d for d in by_id[nid].depends_on
-                                          if d in results and not results[d].get("ok", False)]
-                        results[nid] = {
-                            "id": nid, "ok": False, "skipped": True,
-                            "error": f"skipped: upstream failed ({', '.join(failed_upstream[:3])})"
-                        }
-                        skipped.append(nid)
-                        pending.discard(nid)
+                if _process_batch_results(done_now, futures, results, by_id, pending,
+                                          failures, skipped, on_progress):
+                    circuit_broken = True
     finally:
         if pool is not None:
             pool.shutdown(wait=True)
 
     completed = len(results)
-    log.info("DAG progress: {}/{} nodes done, {} failed, {} skipped", completed, len(ordered), len(failures), len(skipped))
-
-    # L2-C: rollout 节点 + on_failure=skip 节点
-    rollout_skipped = [
-        nid for nid, r in results.items()
-        if not r.get("ok") and "[unimplemented]" in (r.get("stderr_tail") or "")
-    ] + skipped
-
-    summary = {
-        "run_id": run_id,
-        "total": len(ordered),
-        "succeeded": len(ordered) - len(failures) - len(skipped),
-        "failed": len(failures),
-        "skipped": len(skipped),
-        "rollout_skipped": rollout_skipped,
-        "results": results,
-    }
-    log.info(
-        "direct flow done: {}/{} ok, {} failed, {} skipped",
-        summary["succeeded"], summary["total"], summary["failed"], summary["skipped"]
-    )
+    log.info("DAG progress: {}/{} nodes done, {} failed, {} skipped",
+             completed, len(ordered), len(failures), len(skipped))
+    summary = _build_dag_summary(run_id, ordered, results, failures, skipped)
+    log.info("direct flow done: {}/{} ok, {} failed, {} skipped",
+             summary["succeeded"], summary["total"], summary["failed"], summary["skipped"])
     return summary

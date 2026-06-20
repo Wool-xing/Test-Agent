@@ -63,6 +63,82 @@ _HOUR_MAP = {
 }
 
 
+def _parse_at_time(text: str) -> str | None:
+    """Parse 'at 8am' / 'at 18:00' patterns."""
+    m = re.match(r"at\s+(\d{1,2})\s*(am|pm)?", text)
+    if m:
+        hour = int(m.group(1))
+        if m.group(2) == "pm" and hour < 12:
+            hour += 12
+        return f"0 {hour} * * *"
+    return None
+
+
+def _parse_every_interval(text: str) -> str | None:
+    """Parse 'every N min/hour' patterns."""
+    m = re.match(r"every\s+(\d+)\s*min", text)
+    if m:
+        return f"*/{m.group(1)} * * * *"
+    m = re.match(r"every\s+(\d+)\s*hour", text)
+    if m:
+        return f"0 */{m.group(1)} * * *"
+    return None
+
+
+def _build_cron_values(groups: list[str], template: str | None) -> dict[str, str]:
+    """Build cron field values from matched groups using template hints."""
+    values: dict[str, str] = {}
+    for g in groups:
+        g = str(g).lower()
+        if g in _DAY_MAP:
+            values["d"] = _DAY_MAP[g]
+        elif g in _HOUR_MAP:
+            values["h"] = str(_HOUR_MAP[g])
+        elif g.isdigit():
+            n = int(g)
+            if template and "{h}" in template and n <= 23 and "h" not in values:
+                values["h"] = str(n)
+            elif template and "{d}" in template and n <= 31 and "d" not in values:
+                values["d"] = str(n)
+            elif n >= 24:
+                values["n"] = str(n)
+            elif n <= 7 and "d" not in values:
+                values["d"] = str(n)
+            else:
+                values["h"] = str(n)
+    values.setdefault("h", "9")
+    values.setdefault("n", "1")
+    values.setdefault("d", "*")
+    return values
+
+
+def _validate_cron(expr: str) -> bool:
+    """Validate cron expression using croniter."""
+    try:
+        from datetime import datetime, timezone
+        from croniter import croniter
+        croniter(expr, datetime.now(timezone.utc))
+        return True
+    except Exception:
+        return False
+
+
+def _match_general_pattern(text: str) -> str | None:
+    """Try all general patterns to match natural language to cron expression."""
+    for pattern, template in _PATTERNS:
+        m = re.search(pattern, text)
+        if not m:
+            continue
+        groups = [g for g in m.groups() if g is not None]
+        if template is None:
+            continue
+        values = _build_cron_values(groups, template)
+        expr = template.format(**values)
+        if _validate_cron(expr):
+            return expr
+    return None
+
+
 def parse(text: str) -> str | None:
     """Convert natural language time description to cron expression.
 
@@ -77,70 +153,15 @@ def parse(text: str) -> str | None:
     """
     text = text.lower().strip()
 
-    # Handle "at 8am" / "at 18:00" patterns
-    m = re.match(r"at\s+(\d{1,2})\s*(am|pm)?", text)
-    if m:
-        hour = int(m.group(1))
-        if m.group(2) == "pm" and hour < 12:
-            hour += 12
-        return f"0 {hour} * * *"
+    result = _parse_at_time(text)
+    if result:
+        return result
 
-    # Handle "every N minutes/hours at :MM" patterns
-    m = re.match(r"every\s+(\d+)\s*min", text)
-    if m:
-        return f"*/{m.group(1)} * * * *"
+    result = _parse_every_interval(text)
+    if result:
+        return result
 
-    m = re.match(r"every\s+(\d+)\s*hour", text)
-    if m:
-        return f"0 */{m.group(1)} * * *"
-
-    # General pattern matching
-    for pattern, template in _PATTERNS:
-        m = re.search(pattern, text)
-        if not m:
-            continue
-        groups = [g for g in m.groups() if g is not None]
-        # Build values: prefer template hints over heuristics
-        values: dict[str, str] = {}
-        for g in groups:
-            g = str(g).lower()
-            if g in _DAY_MAP:
-                values["d"] = _DAY_MAP[g]
-            elif g in _HOUR_MAP:
-                values["h"] = str(_HOUR_MAP[g])
-            elif g.isdigit():
-                n = int(g)
-                # Template-driven assignment: if template has {h}, prefer hour
-                if template and "{h}" in template and n <= 23 and "h" not in values:
-                    values["h"] = str(n)
-                elif template and "{d}" in template and n <= 31 and "d" not in values:
-                    values["d"] = str(n)
-                elif n >= 24:
-                    values["n"] = str(n)
-                elif n <= 7 and "d" not in values:
-                    values["d"] = str(n)
-                else:
-                    values["h"] = str(n)
-
-        # Fill defaults
-        values.setdefault("h", "9")
-        values.setdefault("n", "1")
-        values.setdefault("d", "*")
-
-        if template is None:
-            continue
-        expr = template.format(**values)
-        # Validate
-        try:
-            from datetime import datetime, timezone
-
-            from croniter import croniter
-            croniter(expr, datetime.now(timezone.utc))
-            return expr
-        except Exception:
-            continue
-
-    return None
+    return _match_general_pattern(text)
 
 
 def examples() -> list[str]:

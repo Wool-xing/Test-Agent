@@ -257,169 +257,87 @@ def _store_upstream_result(
             _upstream_meta[name] = meta
 
 
-def execute_node(
-    name: str,
-    kind: str,
-    *,
-    inputs: dict | None = None,
-    timeout: int = 1800,
-    ctx: ExecutionContext | None = None,
-) -> StepOutcome:
-    inputs = inputs or {}
+def _check_impl_status(name: str, kind: str) -> StepOutcome | None:
+    """Anti-mock guard: reject unimplemented expert/skill. Returns StepOutcome or None."""
+    if kind not in ("expert", "skill"):
+        return None
+    status = _get_impl_status(name, kind)
+    if status in ("rollout", "vision"):
+        return StepOutcome(
+            name=name, kind=kind, executed_script=None, returncode=2,
+            stdout="",
+            stderr=f"[unimplemented] {kind} '{name}' 未实装;"
+                   f" router/test-lead 应跳过此 {kind},不输出 mock 数据",
+            duration_ms=0,
+        )
+    if status == "unknown":
+        return StepOutcome(
+            name=name, kind=kind, executed_script=None, returncode=2,
+            stdout="",
+            stderr=f"unknown {kind} '{name}' (catalog frontmatter "
+                   f"{'EXPERT' if kind == 'expert' else 'SKILL'}_IMPL_STATUS 缺失或非法)",
+            duration_ms=0,
+        )
+    return None
 
-    # 防 mock: 拒绝路由未实装 expert/skill,不输出 mock 数据
-    # 单源 = agents/skills .md frontmatter (registry catalog)
-    if kind in ("expert", "skill"):
-        status = _get_impl_status(name, kind)
-        if status in ("rollout", "vision"):
-            return StepOutcome(
-                name=name,
-                kind=kind,
-                executed_script=None,
-                returncode=2,  # 明确非 0,标记 "未实装" 而非 no-op 兜底
-                stdout="",
-                stderr=(
-                    f"[unimplemented] {kind} '{name}' 未实装;"
-                    f" router/test-lead 应跳过此 {kind},不输出 mock 数据"
-                ),
-                duration_ms=0,
-            )
-        if status == "unknown":
-            return StepOutcome(
-                name=name,
-                kind=kind,
-                executed_script=None,
-                returncode=2,
-                stdout="",
-                stderr=(
-                    f"unknown {kind} '{name}' (catalog frontmatter "
-                    f"{'EXPERT' if kind == 'expert' else 'SKILL'}_IMPL_STATUS 缺失或非法)"
-                ),
-                duration_ms=0,
-            )
 
-    # 真 agent runner 优先
-    if kind == "expert":
-        try:
-            from runtime.config.settings import get_settings
-            from runtime.orchestrator.agents import get_runner
-            from runtime.orchestrator.agents.base import RunnerContext
+def _run_runner(name: str, kind: str, inputs: dict, ctx: ExecutionContext | None,
+                runner_getter, script_prefix: str) -> StepOutcome | None:
+    """Execute an AgentRunner and return StepOutcome, or None if no runner found."""
+    from runtime.config.settings import get_settings
+    from runtime.orchestrator.agents.base import RunnerContext
 
-            runner = get_runner(name)
-            if runner is not None:
-                s = get_settings()
-                upstream, upstream_meta = _get_upstream_state(ctx)
-                runner_ctx = RunnerContext(
-                    artifact_text=inputs.get("artifact_text", ""),
-                    upstream=upstream,
-                    upstream_meta=upstream_meta,
-                    settings_provider=s.llm_provider,
-                    workspace=s.project_root / "workspace",
-                    lang=inputs.get("lang", "zh"),
-                    mode=inputs.get("mode", "exec"),
-                )
-                import time as _t
-                t0 = _t.time()
-                res = runner.run(runner_ctx)
-                _store_upstream_result(
-                    ctx,
-                    name,
-                    res.output,
-                    {"ok": res.ok, "degraded": res.degraded, "error": res.error},
-                )
-                stdout = res.summary or "[agent runner ok]"
-                if res.artifact_path:
-                    stdout += f"\n→ {res.artifact_path}"
-                return StepOutcome(
-                    name=name,
-                    kind=kind,
-                    executed_script=f"agents/{name}",
-                    returncode=0 if res.ok else 1,
-                    stdout=stdout,
-                    stderr=res.error,
-                    integrity="degraded" if res.degraded else "real",
-                    duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
-                )
-        except Exception as e:  # noqa: BLE001
-            logger.warning("agent runner {} unavailable, fallback to script map: {}", name, e)
+    runner = runner_getter(name)
+    if runner is None:
+        return None
+    s = get_settings()
+    upstream, upstream_meta = _get_upstream_state(ctx)
+    runner_ctx = RunnerContext(
+        artifact_text=inputs.get("artifact_text", ""),
+        upstream=upstream,
+        upstream_meta=upstream_meta,
+        settings_provider=s.llm_provider,
+        workspace=s.project_root / "workspace",
+        lang=inputs.get("lang", "zh"),
+        mode=inputs.get("mode", "exec"),
+    )
+    import time as _t
+    t0 = _t.time()
+    res = runner.run(runner_ctx)
+    _store_upstream_result(ctx, name, res.output,
+                           {"ok": res.ok, "degraded": res.degraded, "error": res.error})
+    stdout = res.summary or f"[{kind} runner ok]"
+    if res.artifact_path:
+        stdout += f"\n→ {res.artifact_path}"
+    return StepOutcome(
+        name=name, kind=kind, executed_script=f"{script_prefix}/{name}",
+        returncode=0 if res.ok else 1, stdout=stdout, stderr=res.error,
+        integrity="degraded" if res.degraded else "real",
+        duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
+    )
 
-    # 真 skill runner 优先
-    # 与 expert runner 接口同, 仅 registry 独立 SKILL_RUNNERS
-    if kind == "skill":
-        try:
-            from runtime.config.settings import get_settings
-            from runtime.orchestrator.agents.base import RunnerContext
-            from runtime.orchestrator.skills import get_skill_runner
 
-            runner = get_skill_runner(name)
-            if runner is not None:
-                s = get_settings()
-                upstream, upstream_meta = _get_upstream_state(ctx)
-                runner_ctx = RunnerContext(
-                    artifact_text=inputs.get("artifact_text", ""),
-                    upstream=upstream,
-                    upstream_meta=upstream_meta,
-                    settings_provider=s.llm_provider,
-                    workspace=s.project_root / "workspace",
-                    lang=inputs.get("lang", "zh"),
-                    mode=inputs.get("mode", "exec"),
-                )
-                import time as _t
-                t0 = _t.time()
-                res = runner.run(runner_ctx)
-                _store_upstream_result(
-                    ctx,
-                    name,
-                    res.output,
-                    {"ok": res.ok, "degraded": res.degraded, "error": res.error},
-                )
-                stdout = res.summary or "[skill runner ok]"
-                if res.artifact_path:
-                    stdout += f"\n→ {res.artifact_path}"
-                return StepOutcome(
-                    name=name,
-                    kind=kind,
-                    executed_script=f"skills/{name}",
-                    returncode=0 if res.ok else 1,
-                    stdout=stdout,
-                    stderr=res.error,
-                    integrity="degraded" if res.degraded else "real",
-                    duration_ms=res.duration_ms or int((_t.time() - t0) * 1000),
-                )
-        except Exception as e:  # noqa: BLE001
-            logger.warning("skill runner {} unavailable, fallback to script map: {}", name, e)
-
-    # Fallback: SCRIPT_MAP(已有实现保留)
+def _run_script_fallback(name: str, kind: str, inputs: dict, timeout: int,
+                         ctx: ExecutionContext | None) -> StepOutcome:
+    """Execute via SCRIPT_MAP when no AgentRunner is available."""
     script = _resolve_script(name, kind)
     if script is None:
         return StepOutcome(
-            name=name,
-            kind=kind,
-            executed_script=None,
-            returncode=None,
+            name=name, kind=kind, executed_script=None, returncode=None,
             stdout=f"[no-op] {kind} '{name}' has no canonical script; documented step recorded.",
-            stderr="",
-            duration_ms=0,
-            integrity="degraded",
+            stderr="", duration_ms=0, integrity="degraded",
         )
     available = set(list_available_scripts())
     if script not in available:
         return StepOutcome(
-            name=name,
-            kind=kind,
-            executed_script=script,
-            returncode=127,
-            stdout="",
-            stderr=f"script '{script}' not found under utils/",
-            duration_ms=0,
-            integrity="degraded",
+            name=name, kind=kind, executed_script=script, returncode=127,
+            stdout="", stderr=f"script '{script}' not found under utils/",
+            duration_ms=0, integrity="degraded",
         )
     defaults = SCRIPT_DEFAULT_ARGS.get(script, {})
-    # When upstream agent outputs exist, build real summary for report generation
     upstream_outputs, upstream_meta = _get_upstream_state(ctx)
     if script == "generate_report.py" and upstream_outputs:
-        import tempfile as _tmp
-        import json as _json
+        import tempfile as _tmp, json as _json
         summary = _build_report_summary_from_upstream(upstream_outputs, upstream_meta)
         if summary:
             _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8")
@@ -431,27 +349,56 @@ def execute_node(
                 _tf.close()
                 os.unlink(_tf.name)
                 raise
-    merged = {**defaults, **inputs}  # explicit inputs win
+    merged = {**defaults, **inputs}
     for k, v in defaults.items():
-        if k not in inputs:  # only materialize fixture for auto-injected defaults
+        if k not in inputs:
             _ensure_fixture(str(v))
-    # `artifact_text` 给 AgentRunner 用,不当 CLI arg(多行文本会炸 argparse)
     _CLI_EXCLUDE = {"artifact_text", "lang", "mode"}
     args = [f"--{k}={v}" for k, v in merged.items() if k not in _CLI_EXCLUDE]
     res: ScriptResult = run_script(script, args=args, timeout=timeout)
-    # Clean up temp data file after script execution
     if defaults.get("data") and "data" in defaults:
         try:
             os.unlink(defaults["data"])
         except OSError:
             pass
     return StepOutcome(
-        name=name,
-        kind=kind,
-        executed_script=script,
-        returncode=res.returncode,
-        stdout=res.stdout,
-        stderr=res.stderr,
+        name=name, kind=kind, executed_script=script,
+        returncode=res.returncode, stdout=res.stdout, stderr=res.stderr,
         duration_ms=res.duration_ms,
         integrity="degraded" if res.returncode != 0 else "real",
     )
+
+
+def execute_node(
+    name: str,
+    kind: str,
+    *,
+    inputs: dict | None = None,
+    timeout: int = 1800,
+    ctx: ExecutionContext | None = None,
+) -> StepOutcome:
+    inputs = inputs or {}
+
+    blocked = _check_impl_status(name, kind)
+    if blocked is not None:
+        return blocked
+
+    # Agent runner (expert or skill)
+    if kind == "expert":
+        try:
+            from runtime.orchestrator.agents import get_runner
+            outcome = _run_runner(name, kind, inputs, ctx, get_runner, "agents")
+            if outcome is not None:
+                return outcome
+        except Exception as e:
+            logger.warning("agent runner {} unavailable, fallback to script map: {}", name, e)
+    elif kind == "skill":
+        try:
+            from runtime.orchestrator.skills import get_skill_runner
+            outcome = _run_runner(name, kind, inputs, ctx, get_skill_runner, "skills")
+            if outcome is not None:
+                return outcome
+        except Exception as e:
+            logger.warning("skill runner {} unavailable, fallback to script map: {}", name, e)
+
+    return _run_script_fallback(name, kind, inputs, timeout, ctx)

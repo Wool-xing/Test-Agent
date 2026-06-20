@@ -54,51 +54,62 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
         return True  # allow in dev
 
 
+def _extract_telegram(data: dict) -> str | None:
+    msg = data.get("message", {})
+    return (msg.get("text") or msg.get("caption") or "").strip() or None
+
+
+def _extract_discord(data: dict) -> str | None:
+    cmd_data = data.get("data", {})
+    options = cmd_data.get("options", [])
+    if options:
+        parts = [cmd_data.get("name", "")]
+        for opt in options:
+            parts.append(f"{opt.get('name', '')}: {opt.get('value', '')}")
+        return " ".join(parts).strip()
+    return cmd_data.get("name", "").strip() or None
+
+
+def _extract_feishu(data: dict) -> str | None:
+    event = data.get("event", {})
+    text = event.get("text", "")
+    if not text:
+        text_content = event.get("content", "{}")
+        try:
+            content = json.loads(text_content) if isinstance(text_content, str) else text_content
+            text = content.get("text", "")
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return text.strip() or None
+
+
+def _extract_dingtalk(data: dict) -> str | None:
+    msg = data.get("msg", {})
+    return (msg.get("text", {}).get("content") or "").strip() or None
+
+
+def _extract_qqbot(data: dict) -> str | None:
+    d = data.get("d", {}) if isinstance(data, dict) else {}
+    text = d.get("content", "")
+    if not text:
+        for att in d.get("attachments", []):
+            text += att.get("content", "")
+    return text.strip() or None
+
+
+_EXTRACTORS = {
+    "telegram": _extract_telegram,
+    "discord": _extract_discord,
+    "feishu": _extract_feishu,
+    "dingtalk": _extract_dingtalk,
+    "qqbot": _extract_qqbot,
+}
+
+
 def _extract_text_from_payload(platform: str, data: dict) -> str | None:
     """Extract message text from a platform-specific webhook payload."""
-    if platform == "telegram":
-        msg = data.get("message", {})
-        return (msg.get("text") or msg.get("caption") or "").strip() or None
-
-    if platform == "discord":
-        cmd_data = data.get("data", {})
-        options = cmd_data.get("options", [])
-        if options:
-            parts = [cmd_data.get("name", "")]
-            for opt in options:
-                parts.append(f"{opt.get('name', '')}: {opt.get('value', '')}")
-            return " ".join(parts).strip()
-        return cmd_data.get("name", "").strip() or None
-
-    if platform == "feishu":
-        event = data.get("event", {})
-        text = event.get("text", "")
-        if not text:
-            text_content = event.get("content", "{}")
-            try:
-                content = json.loads(text_content) if isinstance(text_content, str) else text_content
-                text = content.get("text", "")
-            except (json.JSONDecodeError, TypeError):
-                pass
-        return text.strip() or None
-
-    if platform == "dingtalk":
-        # DingTalk outbound robot callback: text in msg["text"]["content"]
-        msg = data.get("msg", {})
-        return (msg.get("text", {}).get("content") or "").strip() or None
-
-    if platform == "qqbot":
-        # QQ Bot webhook: op=0 dispatch payload
-        d = data.get("d", {}) if isinstance(data, dict) else {}
-        # C2C message: content directly in d
-        text = d.get("content", "")
-        if not text:
-            # Group/Channel message: try attachments
-            for att in d.get("attachments", []):
-                text += att.get("content", "")
-        return text.strip() or None
-
-    return None
+    extractor = _EXTRACTORS.get(platform)
+    return extractor(data) if extractor else None
 
 
 def _extract_sender(data: dict) -> str:

@@ -111,71 +111,42 @@ class ImpactEngine:
 
     # ── core analysis ────────────────────────────────────────
 
-    def analyze(self, changed_files: list[str]) -> ImpactResult:
-        """Given changed files, compute blast radius and impacted tests.
-
-        Algorithm:
-          1. Find all graph nodes whose source_file matches a changed file.
-          2. BFS outward along transitive relations to find dependents.
-          3. Intersect affected nodes with test nodes to find impacted tests.
-          4. Compute composite risk score from blast radius size.
-        """
-        if not changed_files:
-            return ImpactResult(changed_file="", test_recommendation="skip")
-
-        if not self.is_loaded:
-            # Degraded mode: return a conservative recommendation
-            return ImpactResult(
-                changed_file=changed_files[0] if len(changed_files) == 1 else "multiple",
-                affected_functions=[],
-                blast_radius=[],
-                impacted_tests=[],
-                risk_score=0.8,
-                test_recommendation="run-all",
-            )
-
-        # 1. Collect seed nodes — all nodes belonging to changed files
+    def _collect_seed_nodes(self, changed_files: list[str]) -> tuple[set[str], list[str]]:
+        """Collect seed node IDs and affected function names from changed files."""
         seed_ids: set[str] = set()
         affected_functions: list[str] = []
         for cf in changed_files:
             norm = cf.replace("\\", "/")
-            # First try exact match after normalization
-            match_found = False
             if norm in self._nodes_by_file:
-                match_found = True
-                node_ids = self._nodes_by_file[norm]
+                self._add_seed_from_file(norm, seed_ids, affected_functions)
+            else:
+                self._add_seed_by_suffix(norm, seed_ids, affected_functions)
+        return seed_ids, affected_functions
+
+    def _add_seed_from_file(self, norm: str, seed_ids: set, affected: list) -> None:
+        """Add seed nodes by exact file match."""
+        for nid in self._nodes_by_file[norm]:
+            seed_ids.add(nid)
+            node = self._nodes_by_id.get(nid, {})
+            label = node.get("label", "")
+            if label and label not in affected:
+                affected.append(label)
+
+    def _add_seed_by_suffix(self, norm: str, seed_ids: set, affected: list) -> None:
+        """Add seed nodes by suffix/basename match (fallback)."""
+        for file_key, node_ids in self._nodes_by_file.items():
+            if file_key.endswith("/" + norm) or file_key == norm.split("/")[-1]:
                 seed_ids.update(node_ids)
                 for nid in node_ids:
                     node = self._nodes_by_id.get(nid, {})
                     label = node.get("label", "")
-                    if label and label not in affected_functions:
-                        affected_functions.append(label)
-            else:
-                # Fall back to suffix match (e.g. user passes "foo/bar.py", graph has "src/foo/bar.py")
-                for file_key, node_ids in self._nodes_by_file.items():
-                    if file_key.endswith("/" + norm) or file_key == norm.split("/")[-1]:
-                        match_found = True
-                        seed_ids.update(node_ids)
-                        for nid in node_ids:
-                            node = self._nodes_by_id.get(nid, {})
-                            label = node.get("label", "")
-                            if label and label not in affected_functions:
-                                affected_functions.append(label)
+                    if label and label not in affected:
+                        affected.append(label)
 
-        if not seed_ids:
-            return ImpactResult(
-                changed_file=changed_files[0],
-                affected_functions=[],
-                blast_radius=[],
-                impacted_tests=[],
-                risk_score=0.1,
-                test_recommendation="skip",
-            )
-
-        # 2. BFS outward — who depends on the changed code?
+    def _collect_blast_radius(self, seed_ids: set[str]) -> list[str]:
+        """BFS outward from seeds to find dependent nodes (blast radius)."""
         blast_ids = self._bfs_forward(seed_ids, max_depth=3)
-        blast_ids -= seed_ids  # exclude seeds themselves
-
+        blast_ids -= seed_ids
         blast_radius: list[str] = []
         for bid in blast_ids:
             node = self._nodes_by_id.get(bid, {})
@@ -184,37 +155,58 @@ class ImpactEngine:
             entry = f"{sf}::{label}" if sf else label
             if entry and entry not in blast_radius:
                 blast_radius.append(entry)
+        return blast_radius
 
-        # 3. Find impacted test nodes
-        # Tests that are: (a) in the blast radius, or (b) import/reference affected code
+    def _collect_impacted_tests(self, blast_ids: set, seed_ids: set) -> list[str]:
+        """Find test nodes in blast radius or reaching seeds via reverse BFS."""
         impacted_test_ids = blast_ids & self._test_node_ids
-        # Also do a reverse BFS from test nodes to see if they reach seed_ids
         for tnid in self._test_node_ids:
             reachable = self._bfs_reverse({tnid}, max_depth=3)
             if reachable & seed_ids:
                 impacted_test_ids.add(tnid)
-
         impacted_tests: list[str] = []
         for tid in impacted_test_ids:
             node = self._nodes_by_id.get(tid, {})
             sf = node.get("source_file", "")
             if sf and sf not in impacted_tests:
                 impacted_tests.append(sf)
+        return impacted_tests
 
-        # 4. Compute risk score
+    @staticmethod
+    def _recommendation(risk_score: float, impacted_test_count: int) -> str:
+        """Map risk score to test recommendation."""
+        if risk_score > 0.7 or impacted_test_count == 0:
+            return "run-all"
+        return "run-impacted" if impacted_test_count <= 10 else "run-all"
+
+    def analyze(self, changed_files: list[str]) -> ImpactResult:
+        """Compute blast radius and impacted tests from changed files."""
+        if not changed_files:
+            return ImpactResult(changed_file="", test_recommendation="skip")
+
+        if not self.is_loaded:
+            return ImpactResult(
+                changed_file=changed_files[0] if len(changed_files) == 1 else "multiple",
+                affected_functions=[], blast_radius=[], impacted_tests=[],
+                risk_score=0.8, test_recommendation="run-all",
+            )
+
+        seed_ids, affected_functions = self._collect_seed_nodes(changed_files)
+        if not seed_ids:
+            return ImpactResult(
+                changed_file=changed_files[0],
+                affected_functions=[], blast_radius=[], impacted_tests=[],
+                risk_score=0.1, test_recommendation="skip",
+            )
+
+        blast_ids = self._bfs_forward(seed_ids, max_depth=3)
+        blast_radius = self._collect_blast_radius(seed_ids)
+        impacted_tests = self._collect_impacted_tests(blast_ids, seed_ids)
         risk_score = self._compute_risk(
             seed_count=len(seed_ids),
-            blast_count=len(blast_ids),
+            blast_count=len(blast_ids) - len(seed_ids),
             test_count=len(impacted_tests),
         )
-
-        # 5. Recommendation
-        if risk_score > 0.7 or len(impacted_tests) == 0:
-            recommendation = "run-all"
-        elif len(impacted_tests) <= 10:
-            recommendation = "run-impacted"
-        else:
-            recommendation = "run-all"
 
         return ImpactResult(
             changed_file=changed_files[0] if len(changed_files) == 1 else "multiple",
@@ -222,7 +214,7 @@ class ImpactEngine:
             blast_radius=blast_radius,
             impacted_tests=impacted_tests,
             risk_score=risk_score,
-            test_recommendation=recommendation,
+            test_recommendation=self._recommendation(risk_score, len(impacted_tests)),
         )
 
     def recommend_tests(self, changed_files: list[str]) -> list[str]:
