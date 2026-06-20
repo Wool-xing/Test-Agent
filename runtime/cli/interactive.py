@@ -1002,6 +1002,18 @@ def start() -> None:
         model=_current_model(),
     )
 
+    # Route all Rich output through prompt_toolkit's print_formatted_text()
+    # Single monkey-patch covers all 39 console.print() calls in handlers
+    _original_print = console.print
+
+    def _pt_bridge(markup: str = "", **kwargs: object) -> None:
+        try:
+            _repl_print(markup, **kwargs)
+        except Exception:
+            _original_print(markup, **kwargs)
+
+    console.print = _pt_bridge  # type: ignore[method-assign]
+
     session = _create_session()
     if session is None:
         console.print(
