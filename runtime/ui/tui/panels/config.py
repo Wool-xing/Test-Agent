@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 """Config panel — key settings overview."""
+=======
+"""Config Editor panel — view and edit configuration."""
+>>>>>>> 6814523518fcfd06fd81ea6a0fc72be97fd00b08
 
 from textual.widgets import Static
 from textual.containers import Vertical
 
 
 class ConfigPanel(Vertical):
+<<<<<<< HEAD
     """View key configuration (no secrets exposed)."""
 
     def compose(self):
@@ -25,3 +30,23 @@ class ConfigPanel(Vertical):
             yield Static("  Sensitive values (keys, tokens) hidden.")
         except Exception as e:
             yield Static(f"  Configuration unavailable: {e}")
+=======
+    """View and manage Test-Agent configuration."""
+
+    def compose(self):
+        yield Static("Configuration", classes="title")
+        try:
+            from runtime.config.settings import get_settings
+            s = get_settings()
+            cfg_items = [
+                f"llm_provider: {s.llm_provider}",
+                f"project_root: {s.project_root}",
+                f"workspace_dir: {s.workspace_dir}",
+                f"api_host: {s.api_host}:{s.api_port}",
+                f"ci_mode: {s.ci_mode}",
+            ]
+            for item in cfg_items:
+                yield Static(f"  {item}")
+        except Exception:
+            yield Static("Unable to load configuration.")
+>>>>>>> 6814523518fcfd06fd81ea6a0fc72be97fd00b08

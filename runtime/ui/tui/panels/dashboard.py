@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 """Dashboard panel — live overview of test system."""
+=======
+"""Dashboard panel — overview of recent test runs."""
+>>>>>>> 6814523518fcfd06fd81ea6a0fc72be97fd00b08
 
 from textual.widgets import Static
 from textual.containers import Vertical
 
 
 class DashboardPanel(Vertical):
+<<<<<<< HEAD
     """Main dashboard showing test run overview with live data."""
 
     def compose(self):
@@ -42,3 +47,10 @@ class DashboardPanel(Vertical):
                 yield Static(f"  Model: {data.get('model', 'unknown')}")
         except Exception:
             pass
+=======
+    """Main dashboard showing test run overview."""
+
+    def compose(self):
+        yield Static("Test-Agent V2.0.0 Dashboard", classes="title")
+        yield Static("Recent test runs and statistics appear here.")
+>>>>>>> 6814523518fcfd06fd81ea6a0fc72be97fd00b08
