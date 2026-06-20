@@ -19,6 +19,8 @@ from runtime.ui.tui.panels.logs import LogViewerPanel
 from runtime.ui.tui.panels.config import ConfigPanel
 from runtime.ui.tui.panels.help import HelpPanel
 from runtime.ui.tui.panels.scheduler_panel import SchedulerPanel
+from runtime.ui.tui.panels.execution import ExecutionPanel
+from runtime.ui.tui.panels.skins import SkinSelectorPanel
 
 
 THEMES = {
@@ -61,9 +63,11 @@ class TestAgentTUI(App):
         Binding("f3", "show_tab('status')", "Status", show=True),
         Binding("f4", "show_tab('logs')", "Logs", show=True),
         Binding("f5", "show_tab('config')", "Config", show=True),
-        Binding("f6", "show_tab('help')", "Help", show=True),
+        Binding("f6", "show_tab('execution')", "Execute", show=True),
         Binding("f7", "show_tab('scheduler')", "Scheduler", show=True),
-        Binding("f8", "toggle_theme", "Theme", show=True),
+        Binding("f8", "show_tab('help')", "Help", show=True),
+        Binding("f9", "show_tab('skins')", "Skins", show=True),
+        Binding("f10", "toggle_theme", "Theme", show=True),
         Binding("ctrl+q", "quit", "Quit", show=True),
     ]
 
@@ -83,8 +87,12 @@ class TestAgentTUI(App):
                 yield LogViewerPanel()
             with TabPane("Config", id="config"):
                 yield ConfigPanel()
+            with TabPane("Execute", id="execution"):
+                yield ExecutionPanel()
             with TabPane("Scheduler", id="scheduler"):
                 yield SchedulerPanel()
+            with TabPane("Skins", id="skins"):
+                yield SkinSelectorPanel()
             with TabPane("Help", id="help"):
                 yield HelpPanel()
         yield Footer()
