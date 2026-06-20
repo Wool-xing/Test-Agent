@@ -69,6 +69,26 @@ Test-Agent当前的安全层次:
 - ✅**SQL 注入防护**：utils.data_factory 用 SQLAlchemy ORM，禁拼字符串
 - ✅**依赖 SAST**：bandit 扫 utils/ 自身代码
 
+## 沙箱执行层级 (对标 Codex sandbox + Hermes terminal-backend)
+
+| 层级 | 模式 | 允许 | 禁止 | 适用场景 |
+|------|------|------|------|---------|
+| **L1 · read-only** | `TAGENT_SANDBOX=read` | Read/Grep/Glob | Write/Edit/Bash(写) | Plan模式, 代码审查, 需求分析 |
+| **L2 · workspace-write** | `TAGENT_SANDBOX=workspace` | L1 + workspace目录写 | 外部路径写, 网络调用 | 测试生成, 报告输出 (默认) |
+| **L3 · danger-full** | `TAGENT_SANDBOX=full` | L2 + 网络 + 子进程 | `rm -rf /`, `DROP TABLE` (hardline blocklist) | E2E测试, 渗透测试 (需显式授权) |
+
+**hardline blocklist** (对标 Hermes, 所有层级生效):
+- `rm -rf /` `dd if=` `mkfs.` fork bomb `:(){ :|:& };:`
+- `DROP TABLE` `TRUNCATE` (数据库破坏)
+- `curl` 到内网地址 (SSRF防护)
+- 覆盖 `.git/` `.env` `deploy/` (受保护路径)
+
+**当前实施状态**:
+- L1/L2/L3 模式定义: ✅ (本文档)
+- hardline blocklist: ⚠️ 部分 (`injection_scan.py` 8个正则)
+- 受保护路径: ⚠️ 部分 (`.env` `.git` 在 `.gitignore`)
+- OS级Docker隔离: ⬜ 未实现 (见信任边界声明)
+
 ## 用户责任
 
 部署本项目后，**用户须**：
