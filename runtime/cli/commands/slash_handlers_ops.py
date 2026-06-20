@@ -771,22 +771,15 @@ def _cmd_cross(args: str) -> None:
         return
 
     rest = parts[1]
-    # Parse env names (before last part = prompt)
     tokens = rest.split(maxsplit=1)
-    # env1 env2 ... → first is env, rest is prompt
     sub = tokens[0].split()
-    if len(sub) >= 2:
-        envs = sub[:-1]  # all but last are env names
-        prompt = sub[-1]  # last token is prompt start
-    else:
-        envs = sub  # single token = env name (no inline prompt)
-        prompt = ""
-    if len(tokens) > 1:
-        prompt = (prompt + " " + tokens[1]).strip()
-
+    # env1 env2 ... → last token is prompt start, rest are envs
+    prompt_part = sub[-1] if len(sub) >= 2 else ""
+    envs = sub[:-1] if len(sub) >= 2 else sub
+    prompt = f"{prompt_part} {tokens[1]}".strip() if len(tokens) > 1 else prompt_part
     if not envs:
         envs = ["test", "staging"]
-        console.print("[yellow]No env specified, defaulting to test → staging[/]")
+        console.print("[yellow]No env specified, defaulting to test -> staging[/]")
 
     console.print(f"[bold]Cross-env:[/] {' → '.join(envs)} [dim](stop on first failure)[/]")
     with console.status("[bold]Running...", spinner="dots"):
