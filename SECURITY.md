@@ -1,5 +1,23 @@
 # 安全策略
 
+> 对标: Hermes Agent Security Policy
+
+## 信任边界
+
+**唯一的安全边界是操作系统级别隔离。** Agent进程内的任何组件——审批门、输出编辑、模式扫描器(`injection_scan.py`)、工具白名单——都不是真正的安全边界。它们是启发式方法，操作在攻击者可影响的字符串上。
+
+Test-Agent当前的安全层次:
+
+| 层 | 组件 | 类型 | 说明 |
+|---|------|------|------|
+| 1 | `safety.py` (6个gate) | 启发式 | tagent.yml显式授权检查 |
+| 2 | `injection_scan.py` (8个正则) | 启发式 | prompt注入模式匹配 |
+| 3 | `gateway/base.py is_safe_webhook_url` | 网络 | SSRF防护(阻止内网地址) |
+| 4 | `evidence_vault _validate_evidence_path` | 文件系统 | 路径遍历防护 |
+| 5 | `pentest-tester` 沙箱规则 | 文档 | Docker/VM沙箱要求(未强制执行) |
+
+**诚实声明**: 第1-4层是合理的纵深防御启发式，但第5层(Docker沙箱)尚未在代码中强制执行。渗透测试agent目前仅生成计划文本，不执行实际攻击。在实现OS级隔离前，**不应在不可信代码/目标上运行破坏性测试命令**。
+
 ## 支持的版本
 
 | 版本 | 支持状态 |
