@@ -60,8 +60,10 @@ class UpdateChecker:
     def _is_newer(self, latest: str) -> bool:
         """Compare semantic versions."""
         try:
-            cur_parts = [int(x) for x in self._current.split(".")]
-            latest_parts = [int(x) for x in latest.split(".")]
+            cur = self._current.lstrip("vV")
+            lat = latest.lstrip("vV")
+            cur_parts = [int(x) for x in cur.split(".")]
+            latest_parts = [int(x) for x in lat.split(".")]
             return latest_parts > cur_parts
         except Exception:
             return False
