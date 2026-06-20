@@ -1027,36 +1027,50 @@ def start() -> None:
 
     console.print = _pt_bridge  # type: ignore[method-assign]
 
-    session = _create_session()
-    if session is None:
-        console.print(
-            "[dim](Tab completion not available in Git Bash / mintty. "
-            "Use cmd.exe, Windows Terminal, or PowerShell for full features.)[/]\n"
-        )
+    # ── CC-style full-screen TUI (Application + transcript + pinned input) ──
+    from runtime.cli.tui_app import CCTui
 
-    while True:
+    def _tui_input(text: str) -> None:
+        if text.startswith("!"):
+            try:
+                _handle_slash(text)
+            except SystemExit:
+                tui.exit()
+            except Exception as exc:
+                tui.append_output(f"[red]Error: {exc}[/]")
+        else:
+            try:
+                _handle_natural_language(text)
+            except Exception as exc:
+                tui.append_output(f"[red]Error: {exc}[/]")
+
+    # Route Rich markup through transcript
+    def _tui_print(markup: str = "", **kwargs: object) -> None:
         try:
-            result = _read_input(session)
-            if result is None:
-                _save_session()
-                console.print("\n[dim]Session saved. Goodbye.[/]")
-                break
-            user_input = result
-        except (EOFError, KeyboardInterrupt):
-            _save_session()
-            console.print("\n[dim]Session saved. Goodbye.[/]")
-            break
+            tui.append_output(markup)
+        except Exception:
+            _original_print(markup, **kwargs)
 
-        if not user_input:
-            continue
+    console.print = _tui_print  # type: ignore[method-assign]
 
-        try:
-            if user_input.startswith("!"):
-                _handle_slash(user_input)
-            else:
-                _handle_natural_language(user_input)
-        except SystemExit:
-            break
-        except Exception as exc:
-            console.print(f"[red]Error: {exc}[/]")
-            console.print("[dim]REPL continuing — !help for commands.[/]")
+    tui = CCTui(
+        on_input=_tui_input,
+        status_bar=_render_bottom_toolbar,
+        model_display=lambda: _current_model()[:20],
+        completer=SlashCompleter(),
+        history=FileHistory(str(_HISTORY_FILE)),
+    )
+
+    # Seed transcript with banner
+    try:
+        from runtime.cli.skins import apply_skin_to_banner
+        tui.append_output(apply_skin_to_banner())
+    except Exception:
+        pass
+    tui.append_output(f"[bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
+    tui.append_output(f"[dim]{get_settings().project_root}[/]")
+
+    tui.run()
+    _save_session()
+    console.print = _original_print
+    _original_print("[dim]Session saved. Goodbye.[/]")
