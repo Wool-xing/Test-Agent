@@ -91,8 +91,8 @@ def validate_skill(skill_dir: Path) -> ValidationResult:
                     f"Invalid shell permission: {perms['shell']}. "
                     f"Must be one of: {', '.join(sorted(_VALID_SHELL))}"
                 )
-    else:
-        errors.append("Missing required field: permissions")
+    # Note: "permissions" is already checked in _REQUIRED_FIELDS loop above;
+    # no need for duplicate error message here.
 
     return ValidationResult(
         ok=len(errors) == 0,
