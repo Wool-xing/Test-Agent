@@ -63,7 +63,6 @@ def _show_history(gateway_dir: Path, limit: int) -> None:
 
 def _show_workspace_results(workspace: Path) -> None:
     """Scan workspace for test output artifacts."""
-    from rich.table import Table
 
     dirs_to_check = ["测试报告", "测试用例", "测试结果"]
     found = False
