@@ -77,8 +77,10 @@ _reg_impact.register(app)
 _reg_market.register(app)
 import runtime.cli.commands.plugin as _reg_plugin  # noqa: E402
 import runtime.cli.commands.report as _reg_report  # noqa: E402
+import runtime.cli.commands.onboard as _reg_onboard  # noqa: E402
 _reg_plugin.register(app)
 _reg_report.register(app)
+_reg_onboard.register(app)
 
 # P3 #19 daemon mode (inline — simple enough)
 @app.command(name="serve", help="Start 7x24 daemon (FastAPI + scheduler)")
