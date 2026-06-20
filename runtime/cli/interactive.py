@@ -279,8 +279,9 @@ def _render_prompt_message() -> list[tuple[str, str]]:
     return [("class:prompt", "❯ ")]
 
 
-def _render_bottom_toolbar() -> str:
-    """Bottom separator + 4-line status bar (CC density). Returns plain str for PromptSession."""
+def _render_bottom_toolbar() -> "HTML":
+    """Bottom separator + 4-line status bar (CC density). Returns HTML for PromptSession."""
+    from prompt_toolkit.formatted_text import HTML
     w = _term_width()
     sep = "─" * w
     p = _current_provider()
@@ -341,7 +342,7 @@ def _render_bottom_toolbar() -> str:
     # Line 4: Quick tips (always visible, like CC)
     l4 = "  <ansigray>!help · !doctor · !model · !status · !clear</ansigray>"
 
-    return f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}"
+    return HTML(f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}")
 
 
 def _fit_line(width: int, parts: list[str]) -> str:
@@ -1018,24 +1019,16 @@ def _suppress_noise() -> None:
     except Exception:
         pass
 
-    # Prefect — silence task engine noise
-    os.environ.setdefault("PREFECT_LOGGING_LEVEL", "ERROR")
-    try:
-        import prefect.logging
-        prefect.logging.get_logger().setLevel("ERROR")
-    except Exception:
-        pass
-    try:
-        import prefect
-        if hasattr(prefect, "settings"):
-            prefect.settings.PREFECT_LOGGING_LEVEL = "ERROR"
-    except Exception:
-        pass
-    # Silence prefect's own loggers
+    # Prefect — silence ALL noise. Prefect 3.x uses stdlib logging, not env vars.
+    os.environ.setdefault("PREFECT_LOGGING_LEVEL", "CRITICAL")
+    os.environ["PREFECT_API_URL"] = ""  # block Prefect server startup
     try:
         import logging as _logging
-        for _name in ("prefect", "prefect.task_engine", "prefect.client"):
-            _logging.getLogger(_name).setLevel(_logging.ERROR)
+        # Nuke every prefect logger to CRITICAL
+        for _name in list(_logging.root.manager.loggerDict.keys()):
+            if "prefect" in _name.lower():
+                _logging.getLogger(_name).setLevel(_logging.CRITICAL)
+        _logging.getLogger("prefect").setLevel(_logging.CRITICAL)
     except Exception:
         pass
 
