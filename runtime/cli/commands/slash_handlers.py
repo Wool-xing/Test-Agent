@@ -205,8 +205,33 @@ def _cmd_history(args: str) -> None:
 # ── !fc — fix last command typo (thefuck-style) ────────────────────
 
 
+# TheFuck-style correction rules: (match_pattern, correction, description)
+_FC_RULES: list[tuple[str, str, str]] = [
+    # Test-Agent specific
+    (r"^tagent\b", "tagent", "typo: tagent → tagent"),
+    (r"^/pentest-recon\b", "/pentest-recon", "extra hyphen: pentest-recon → pentest-recon"),
+    (r"^/regression\b", "/regression", "typo: regression → regression"),
+    (r"^!model\s+cluade\b", "!model claude", "typo: cluade → claude"),
+    (r"^!model\s+deepseek\b", "!model deepseek", "typo: deepseek → deepseek"),
+    # CLI command typos
+    (r"^tagentr un\b", "tagent run", "typo: tagentr un → tagent run"),
+    (r"^python -m runtime.cli.main\s+run\b", "tagent run", "use: tagent run"),
+]
+
+
+def _apply_fc_rules(text: str) -> tuple[str | None, str | None]:
+    """Apply TheFuck-style correction rules. Returns (corrected, reason) or (None, None)."""
+    import re
+    for pattern, correction, reason in _FC_RULES:
+        if re.match(pattern, text, re.IGNORECASE):
+            corrected = re.sub(pattern, correction, text, count=1, flags=re.IGNORECASE)
+            if corrected != text:
+                return corrected, reason
+    return None, None
+
+
 def _cmd_fc(args: str) -> None:
-    """Re-execute the last suggested command correction. Like 'thefuck' for slash commands."""
+    """Fix last command typo. TheFuck-style: rule-based + edit-distance fallback."""
     global _last_fix
     if _last_fix is None:
         console.print("[dim]Nothing to fix. Type a command to get suggestions.[/]")
