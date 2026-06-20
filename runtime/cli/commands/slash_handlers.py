@@ -3,7 +3,7 @@ from __future__ import annotations
 import os, sys, time
 from pathlib import Path
 from runtime.cli._shared import console
-from runtime.cli.completer import _PROVIDERS
+from runtime.cli.slash_commands import _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
 from runtime.config.settings import get_settings
 _SESSION_FILE = get_settings().gateway_dir / "active_session.json"
@@ -205,8 +205,33 @@ def _cmd_history(args: str) -> None:
 # ── !fc — fix last command typo (thefuck-style) ────────────────────
 
 
+# TheFuck-style correction rules: (match_pattern, correction, description)
+_FC_RULES: list[tuple[str, str, str]] = [
+    # Test-Agent specific typos
+    (r"^/?tagent\b", "tagent", "tagnt → tagent"),
+    (r"^!pentest-recno\b", "!pentest-recon", "recno → recon"),
+    (r"^!regeresion\b", "!regression", "regeresion → regression"),
+    (r"^!model\s+cluade\b", "!model claude", "cluade → claude"),
+    (r"^!model\s+deepseek\b", "!model deepseek", "deepsek → deepseek"),
+    # CLI command typos
+    (r"^tagentr un\b", "tagent run", "tagentr → tagent"),
+    (r"^python -m runtime.cli.main\s+run\b", "tagent run", "use: tagent run"),
+]
+
+
+def _apply_fc_rules(text: str) -> tuple[str | None, str | None]:
+    """Apply TheFuck-style correction rules. Returns (corrected, reason) or (None, None)."""
+    import re
+    for pattern, correction, reason in _FC_RULES:
+        if re.match(pattern, text, re.IGNORECASE):
+            corrected = re.sub(pattern, correction, text, count=1, flags=re.IGNORECASE)
+            if corrected != text:
+                return corrected, reason
+    return None, None
+
+
 def _cmd_fc(args: str) -> None:
-    """Re-execute the last suggested command correction. Like 'thefuck' for slash commands."""
+    """Fix last command typo. TheFuck-style: rule-based + edit-distance fallback."""
     global _last_fix
     if _last_fix is None:
         console.print("[dim]Nothing to fix. Type a command to get suggestions.[/]")
@@ -642,28 +667,54 @@ def _cmd_export(args: str) -> None:
 
 
 def _cmd_compact(args: str) -> None:
+    """Compress conversation context. DCP-style: protect key content, nest summaries."""
     mem = _get_memory()
     if len(mem.messages) <= 4:
         console.print("[dim]Not enough conversation to compact.[/]")
         return
 
-    kept = mem.messages[:2] + mem.messages[-2:]
-    removed = len(mem.messages) - 4
+    # DCP: Protected content — never compress messages containing these patterns
+    _PROTECT_PATTERNS = [
+        "决策", "verdict", "no-go", "go", "conditional",
+        "FAIL", "ERROR", "Bug", "P0", "P1",
+        "[Compacted",  # nested summary preservation
+    ]
+
+    _protect = lambda m: any(p in m.content for p in _PROTECT_PATTERNS)
+
+    # Separate protected from compressible
+    protected_msgs = [m for m in mem.messages if _protect(m)]
+    compressible = [m for m in mem.messages if not _protect(m)]
+
+    if len(compressible) <= 4:
+        console.print("[dim]Most content is protected — nothing to compact.[/]")
+        return
+
+    # Keep first 2 + last 2 of compressible, summarize middle
+    kept = compressible[:2] + compressible[-2:]
+    removed = len(compressible) - 4
 
     summary_parts = []
-    for m in mem.messages[2:-2]:
-        text = m.content[:80] + "..." if len(m.content) > 80 else m.content
+    prev_summary = None
+    for m in compressible[2:-2]:
+        if "[Compacted" in m.content:
+            prev_summary = m.content[:120]  # DCP: preserve nested summary
+            continue
+        text = m.content[:60] + "..." if len(m.content) > 60 else m.content
         summary_parts.append(f"[{m.role}]: {text}")
 
-    from runtime.cli.conversation import Message
-    summary_msg = Message(
-        role="assistant",
-        content=f"[Compacted {removed} turns]\n" + "\n".join(summary_parts[:10]),
-    )
+    summary_text = f"[Compacted {removed} turns]"
+    if prev_summary:
+        summary_text += f"\n  (包含先前摘要: {prev_summary})"
+    summary_text += "\n" + "\n".join(summary_parts[:8])
 
-    mem._messages = kept[:2] + [summary_msg] + kept[2:]
-    mem._truncate()  # re-enforce budget after manual message manipulation
-    console.print(f"[green]Compacted {removed} turns → summary.[/]")
+    from runtime.cli.conversation import Message
+    summary_msg = Message(role="assistant", content=summary_text)
+
+    # Reconstruct: first 2 compressible + summary + last 2 compressible + all protected
+    mem._messages = kept[:2] + [summary_msg] + kept[2:] + protected_msgs
+    mem._truncate()
+    console.print(f"[green]Compacted {removed} turns → summary ({len(protected_msgs)} protected).[/]")
     console.print(f"[dim]Turns: {len(mem.messages)} · Chars: {sum(len(m.content) for m in mem.messages)}[/]")
 
 
@@ -931,8 +982,8 @@ def _cmd_model_router(args: str) -> None:
     from rich.table import Table
 
     from runtime.router.model_router import (
-        MODEL_TIERS,
         get_current_provider,
+        get_model_tier,
     )
 
     current = get_current_provider()
@@ -941,7 +992,12 @@ def _cmd_model_router(args: str) -> None:
     table.add_column("Light (routing)", style="dim")
     table.add_column("Heavy (execution)", style="bold")
 
-    for prov, tier in MODEL_TIERS.items():
+    # Provider list for display — any provider works, these show defaults
+    display_providers = [
+        "claude", "openai", "gemini", "deepseek", "qwen", "zhipu", "ollama",
+    ]
+    for prov in display_providers:
+        tier = get_model_tier(prov)
         marker = " ←" if prov == current else ""
         table.add_row(
             prov + marker,
