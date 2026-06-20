@@ -8,6 +8,54 @@ from runtime.cli._shared import _kernel, console, ping_db, ping_minio
 from runtime.config.settings import get_settings
 
 
+def _run_agent_smoke() -> None:
+    """L1 frontmatter lint for all agents."""
+    from runtime.healthcheck.agent_smoke import run_smoke
+    console.print("\n[bold]L1 frontmatter lint:[/]")
+    report = run_smoke()
+    if report.ok:
+        console.print(f"[green]OK[/] agents={report.expert_count}/16 skills={report.skill_count}/32")
+    else:
+        console.print(f"[red]FAIL[/] {len(report.issues)} issue(s):")
+        for i in report.issues:
+            console.print(f"  - {i}")
+        raise typer.Exit(1)
+
+
+def _run_llm_smoke() -> None:
+    """L3 LLM round-trip smoke test."""
+    from runtime.healthcheck.llm_smoke import run_llm_smoke
+    console.print("\n[bold]L3 LLM smoke (single round-trip 'Hello'):[/]")
+    r = run_llm_smoke()
+    mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
+    console.print(f"  {mark} {r.provider} / {r.model}  {r.latency_ms} ms")
+    if r.response:
+        console.print(f"    response: {r.response!r}")
+    if r.prompt_tokens or r.completion_tokens:
+        console.print(f"    tokens:   prompt={r.prompt_tokens} completion={r.completion_tokens}")
+    if r.cost_usd > 0:
+        console.print(f"    cost:     ${r.cost_usd:.6f}")
+    if r.reason:
+        console.print(f"    reason:   {r.reason}")
+    if not r.ok:
+        raise typer.Exit(1)
+
+
+def _run_probe() -> None:
+    """L3 LLM probe: real call to each agent."""
+    from runtime.healthcheck.llm_probe import probe_all_agents
+    console.print("\n[bold]L3 LLM probe (real call):[/]")
+    results = probe_all_agents()
+    for r in results:
+        mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
+        console.print(f"  {mark} {r.name:30}  {r.latency_ms:>5} ms  {r.reason or ''}")
+    failed = [r for r in results if not r.ok]
+    if failed:
+        console.print(f"[red]{len(failed)}/{len(results)} agents probe failed[/]")
+        raise typer.Exit(1)
+    console.print(f"[green]all {len(results)} agents responded[/]")
+
+
 def register(app: typer.Typer) -> None:
     @app.command()
     def doctor(
@@ -39,43 +87,8 @@ def register(app: typer.Typer) -> None:
         ping_minio()
 
         if agents:
-            from runtime.healthcheck.agent_smoke import run_smoke
-            console.print("\n[bold]L1 frontmatter lint:[/]")
-            report = run_smoke()
-            if report.ok:
-                console.print(f"[green]OK[/] agents={report.expert_count}/16 skills={report.skill_count}/32")
-            else:
-                console.print(f"[red]FAIL[/] {len(report.issues)} issue(s):")
-                for i in report.issues:
-                    console.print(f"  - {i}")
-                raise typer.Exit(1)
-
+            _run_agent_smoke()
         if llm_smoke:
-            from runtime.healthcheck.llm_smoke import run_llm_smoke
-            console.print("\n[bold]L3 LLM smoke (single round-trip 'Hello'):[/]")
-            r = run_llm_smoke()
-            mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
-            console.print(f"  {mark} {r.provider} / {r.model}  {r.latency_ms} ms")
-            if r.response:
-                console.print(f"    response: {r.response!r}")
-            if r.prompt_tokens or r.completion_tokens:
-                console.print(f"    tokens:   prompt={r.prompt_tokens} completion={r.completion_tokens}")
-            if r.cost_usd > 0:
-                console.print(f"    cost:     ${r.cost_usd:.6f}")
-            if r.reason:
-                console.print(f"    reason:   {r.reason}")
-            if not r.ok:
-                raise typer.Exit(1)
-
+            _run_llm_smoke()
         if probe:
-            from runtime.healthcheck.llm_probe import probe_all_agents
-            console.print("\n[bold]L3 LLM probe (real call):[/]")
-            results = probe_all_agents()
-            for r in results:
-                mark = "[green]✓[/]" if r.ok else "[red]✗[/]"
-                console.print(f"  {mark} {r.name:30}  {r.latency_ms:>5} ms  {r.reason or ''}")
-            failed = [r for r in results if not r.ok]
-            if failed:
-                console.print(f"[red]{len(failed)}/{len(results)} agents probe failed[/]")
-                raise typer.Exit(1)
-            console.print(f"[green]all {len(results)} agents responded[/]")
+            _run_probe()

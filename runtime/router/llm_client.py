@@ -102,40 +102,46 @@ class LLMClient:
                 logger.warning("provider {} failed: {}", prov, e)
         raise LLMError(f"all providers failed: primary={self.provider} fallback={self.fallback}")
 
-    def _call(self, provider: str, system: str, user: str, temperature: float, *, max_tokens: int | None = None, json_mode: bool = True) -> str:
+    @staticmethod
+    def _resolve_model(provider: str, user: str) -> str:
+        """Resolve model name: model_router if available, else provider default."""
+        try:
+            from runtime.router.model_router import select_model
+            return select_model(user, provider)
+        except ImportError:
+            return _resolve_model(provider)
+
+    @staticmethod
+    def _try_cache(provider: str, model: str, system: str, user: str,
+                   temperature: float) -> str | None:
+        """Check LLM response cache. Returns cached result or None."""
+        try:
+            from runtime.router.llm_cache import get_cached
+        except ImportError:
+            return None
+        try:
+            return get_cached(provider, model, system, user, temperature)
+        except Exception:
+            return None
+
+    def _call(self, provider: str, system: str, user: str, temperature: float, *,
+              max_tokens: int | None = None, json_mode: bool = True) -> str:
         if provider == "stub":
             return _stub_response(system, user) if json_mode else "stub: ok"
 
-        # Check LLM response cache
-        try:
-            from runtime.router.llm_cache import get_cached, set_cached
-        except ImportError:
-            get_cached = set_cached = None  # type: ignore[assignment]
+        model = self._resolve_model(provider, user)
+        if os.environ.get("TAGENT_LLM_MODEL"):
+            model = os.environ["TAGENT_LLM_MODEL"]
 
-        if get_cached:
-            try:
-                from runtime.router.model_router import select_model
-                model = select_model(user, provider)
-            except ImportError:
-                model = _resolve_model(provider)
-            cached = get_cached(provider, model, system, user, temperature)
-            if cached is not None:
-                return cached
+        cached = self._try_cache(provider, model, system, user, temperature)
+        if cached is not None:
+            return cached
+
         try:
-            import litellm  # local import keeps tests cheap
+            import litellm
         except ImportError as e:
             raise LLMError("litellm not installed; pip install litellm") from e
 
-        # Auto-route model based on task complexity (P2 #14)
-        try:
-            from runtime.router.model_router import select_model
-            model = select_model(user, provider)
-        except ImportError:
-            model = _resolve_model(provider)
-        # Allow env var override for any provider (supports any model / 中转站)
-        if os.environ.get("TAGENT_LLM_MODEL"):
-            model = os.environ["TAGENT_LLM_MODEL"]
-        # OpenAI Responses API (opt-in via TAGENT_LLM_RESPONSES_API=1)
         if os.environ.get("TAGENT_LLM_RESPONSES_API") == "1":
             try:
                 return _call_responses_api(provider, model, system, user,
@@ -157,22 +163,21 @@ class LLMClient:
             kwargs["response_format"] = {"type": "json_object"}
         if max_tokens is not None:
             kwargs["max_tokens"] = max_tokens
-        # 通用 OpenAI 兼容端点支持: TAGENT_LLM_API_BASE + TAGENT_LLM_API_KEY (任厂商即插即用)
-        # 厂商标准 key env (ANTHROPIC_API_KEY / OPENAI_API_KEY / DASHSCOPE_API_KEY ...) 由 litellm 自动识别, 此处不重复处理
         api_base = os.environ.get("TAGENT_LLM_API_BASE")
         if api_base:
             kwargs["api_base"] = api_base
         api_key = os.environ.get("TAGENT_LLM_API_KEY")
         if api_key:
             kwargs["api_key"] = api_key
+
         resp = litellm.completion(**kwargs)
         result = resp["choices"][0]["message"]["content"]
-        # Store in cache (async-safe: write is fast JSON)
-        if set_cached and provider != "stub":
-            try:
+        try:
+            from runtime.router.llm_cache import set_cached
+            if set_cached and provider != "stub":
                 set_cached(provider, model, system, user, temperature, result)
-            except Exception:
-                pass
+        except Exception:
+            pass
         return result
 
     @staticmethod
