@@ -265,7 +265,7 @@ def _context_pct() -> int:
     mem = _get_memory()
     if not mem or not mem.messages:
         return 0
-    total = "".join(m.get("content", "") for m in mem.messages)
+    total = "".join(m.content for m in mem.messages if hasattr(m, 'content'))
     tokens = _estimate_tokens(total)
     model = _current_model().lower()
     _LIMITS = {"claude": 200000, "gpt-4": 128000, "deepseek": 128000,
@@ -279,10 +279,8 @@ def _render_prompt_message() -> list[tuple[str, str]]:
     return [("class:prompt", "❯ ")]
 
 
-def _render_bottom_toolbar() -> "HTML":
-    """Bottom separator + 4-line status bar (CC density)."""
-    from prompt_toolkit.formatted_text import HTML
-
+def _render_bottom_toolbar() -> str:
+    """Bottom separator + 4-line status bar (CC density). Returns plain str for PromptSession."""
     w = _term_width()
     sep = "─" * w
     p = _current_provider()
@@ -343,7 +341,7 @@ def _render_bottom_toolbar() -> "HTML":
     # Line 4: Quick tips (always visible, like CC)
     l4 = "  <ansigray>!help · !doctor · !model · !status · !clear</ansigray>"
 
-    return HTML(f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}")
+    return f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}"
 
 
 def _fit_line(width: int, parts: list[str]) -> str:
@@ -1080,77 +1078,45 @@ def start() -> None:
     except Exception:
         pass
 
-    # ── Full-screen TUI (Application + transcript + pinned input) ──
-    from runtime.cli.transcript_tui import TranscriptTUI
+    # ── PromptSession REPL ──
+    _print_banner()
+    _check_first_run()
 
-    _original_console_print = console.print
-
-    def _tui_input_handler(text: str) -> None:
-        """Route user input → slash dispatch or natural language."""
-        if text.startswith("!"):
-            try:
-                _handle_slash(text)
-            except SystemExit:
-                tui.exit()
-            except Exception as exc:
-                tui.append_output(f"[red]Error: {exc}[/]")
-        else:
-            try:
-                _handle_natural_language(text)
-            except Exception as exc:
-                tui.append_output(f"[red]Error: {exc}[/]")
-
-    def _tui_print(markup: str = "", **kwargs: object) -> None:
-        """Route Rich markup → transcript append + pt print."""
-        import re as _re2
-        plain = _re2.sub(r'\[[^\]]*\]', '', markup) if markup else ""
-        if plain.strip():
-            tui.append_output(markup)
-        else:
-            _original_console_print(markup, **kwargs)
-
-    console.print = _tui_print  # type: ignore[method-assign]
-
-    style = _get_prompt_style()
-    def _warning_line() -> str:
-        """Inline warning for the prompt area (CC: '⚠ 5 setup issues')."""
-        issues = _cached_health()
-        errs = [i for i in issues if i["level"] == "error"]
-        warns = [i for i in issues if i["level"] == "warning"]
-        if errs:
-            return f"{len(errs)} errors · !doctor"
-        if warns:
-            return f"{len(warns)} warnings · !doctor"
-        return ""
-
-    tui = TranscriptTUI(
-        input_handler=_tui_input_handler,
-        status_bar=_render_bottom_toolbar,
-        rprompt=lambda: _current_model()[:14] + (".." if len(_current_model()) > 14 else ""),
-        warning_line=_warning_line,
-        style=style,
-        history=FileHistory(str(_HISTORY_FILE)),
-        completer=SlashCompleter(),
+    _set_terminal_title(
+        proj=os.environ.get("PROJECT_NAME", get_settings().project_root.name),
+        model=_current_model(),
     )
 
-    # Seed transcript with startup info
-    _print_banner_transcript(tui)
+    session = _create_session()
+    if session is None:
+        console.print(
+            "[dim](Tab completion not available in Git Bash / mintty. "
+            "Use cmd.exe, Windows Terminal, or PowerShell for full features.)[/]\n"
+        )
 
-    # Version check thread — output to transcript
-    try:
-        import subprocess, threading
-        def _check_version():
-            from runtime.config.settings import get_settings
-            checker = get_settings().config_dir / "check_version.py"
-            if checker.is_file():
-                r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
-                if r.stdout.strip():
-                    tui.append_output(r.stdout.strip())
-        threading.Thread(target=_check_version, daemon=True).start()
-    except Exception:
-        pass
+    while True:
+        try:
+            result = _read_input(session)
+            if result is None:
+                _save_session()
+                console.print("\n[dim]Session saved. Goodbye.[/]")
+                break
+            user_input = result
+        except (EOFError, KeyboardInterrupt):
+            _save_session()
+            console.print("\n[dim]Session saved. Goodbye.[/]")
+            break
 
-    tui.run()
-    _save_session()
-    console.print = _original_console_print  # restore
-    _original_console_print("[dim]Session saved. Goodbye.[/]")
+        if not user_input:
+            continue
+
+        try:
+            if user_input.startswith("!"):
+                _handle_slash(user_input)
+            else:
+                _handle_natural_language(user_input)
+        except SystemExit:
+            break
+        except Exception as exc:
+            console.print(f"[red]Error: {exc}[/]")
+            console.print("[dim]REPL continuing — !help for commands.[/]")
