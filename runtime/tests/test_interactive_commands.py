@@ -103,6 +103,7 @@ class TestSlashCompact:
         mem = _get_memory()
         mem.clear()
         _cmd_compact("")  # should not crash with 0 messages
+        assert len(mem.messages) == 0  # nothing to compact
 
 
 class TestSlashTools:
@@ -191,6 +192,7 @@ class TestCompact:
         mem.add("user", "a")
         mem.add("assistant", "b")
         _cmd_compact("")  # should not crash with 2 messages
+        assert len(mem.messages) == 2  # not enough to compact
 
     def test_compact_on_six_messages(self):
         from runtime.cli.commands.slash_handlers import _cmd_compact, _get_memory
@@ -205,7 +207,8 @@ class TestCompact:
 class TestSessions:
     def test_sessions_no_crash(self):
         from runtime.cli.commands.slash_handlers import _cmd_sessions
-        _cmd_sessions("")  # should not crash even with no sessions
+        result = _cmd_sessions("")  # should not crash even with no sessions
+        assert result is None
 
 
 class TestExport:
@@ -213,19 +216,22 @@ class TestExport:
         from runtime.cli.commands.slash_handlers import _cmd_export, _get_memory
         mem = _get_memory()
         mem.clear()
-        _cmd_export("")  # should not crash
+        result = _cmd_export("")  # should not crash
+        assert result is None
 
     def test_export_with_messages(self):
         from runtime.cli.commands.slash_handlers import _cmd_export, _get_memory
         mem = _get_memory()
         mem.add("user", "hello")
-        _cmd_export("")  # should create export file
+        result = _cmd_export("")  # should create export file
+        assert result is None
 
 
 class TestMemoryCommands:
     def test_remember_no_args(self):
         from runtime.cli.commands.slash_handlers import _cmd_remember
-        _cmd_remember("")  # should not crash
+        result = _cmd_remember("")  # should not crash
+        assert result is None
 
     def test_remember_and_forget(self):
         from runtime.cli.commands.slash_handlers import _cmd_remember, _cmd_forget
@@ -239,15 +245,18 @@ class TestMemoryCommands:
 
     def test_forget_no_args(self):
         from runtime.cli.commands.slash_handlers import _cmd_forget
-        _cmd_forget("")  # should not crash
+        result = _cmd_forget("")  # should not crash
+        assert result is None
 
     def test_forget_nonexistent(self):
         from runtime.cli.commands.slash_handlers import _cmd_forget
-        _cmd_forget("xyznonexistent123")  # should not crash
+        result = _cmd_forget("xyznonexistent123")  # should not crash
+        assert result is None
 
     def test_memory_display(self):
         from runtime.cli.commands.slash_handlers import _cmd_memory
-        _cmd_memory("")  # should not crash even when empty
+        result = _cmd_memory("")  # should not crash even when empty
+        assert result is None
 
     def test_memory_builtin_registered(self):
         from runtime.cli.slash_commands import resolve
@@ -257,7 +266,8 @@ class TestMemoryCommands:
 
     def test_banner_imports_and_runs(self):
         from runtime.cli.interactive import _print_banner
-        _print_banner()  # should not crash (animated or plain)
+        result = _print_banner()  # should not crash (animated or plain)
+        assert result is None
 
     def test_error_diagnosis_imports(self):
         from runtime.cli.interactive import _diagnose_error

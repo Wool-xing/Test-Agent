@@ -20,25 +20,30 @@ from pathlib import Path as _Path
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.history import FileHistory
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.styles import Style
-
 # Rich Markup → prompt_toolkit FormattedText converter
 from rich.text import Text as RichText
 
 from runtime.cli._shared import console
 from runtime.cli.completer import _PROVIDERS, SlashCompleter
 from runtime.cli.conversation import ConversationMemory
+from runtime.cli.interactive_ui import (
+    _context_pct,
+    _fit_line,
+    _git_branch,
+    _icon,
+    _set_terminal_title,
+    _term_width,
+    diagnose_error,
+    get_prompt_style,
+    make_keybindings,
+    print_banner,
+    print_banner_transcript,
+    print_help,
+    repl_print,
+    rich_to_pt,
+)
 from runtime.config.settings import get_settings
 
-
-_SHEEP = r"""
-    ✧  ▗▛ 🐏 ▜▖  ✧
-         ▀▀▀▀▀
-         ▐▌ ▐▌
-
-  ૮₍˶ᵔ ᗜ ᵔ˶₎ა  Test-Agent v{version}
-  AI Router · {experts} Experts · {skills} Skills"""
 
 _SESSION_DIR = get_settings().gateway_dir
 _SESSION_FILE = _SESSION_DIR / "active_session.json"
@@ -51,41 +56,33 @@ _start_time: float = 0.0
 _cmd_history: list[str] = []  # last 10 user commands for /N quick re-run
 _BUILTIN_MAP: dict = {}
 
-def _get_prompt_style() -> Style:
-    """Build prompt_toolkit Style from active skin's colors (dynamic, not hardcoded)."""
-    try:
-        from runtime.cli.colorscheme import get_colorscheme
-        return get_colorscheme().pt_style()
-    except Exception:
-        return Style.from_dict({
-            "prompt": "bold cyan",
-            "separator": "#888888",
-            "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
-            "bottom-toolbar.separator": "#444444",
-        })
+# ── Backward-compat wrappers (bodies extracted to interactive_ui.py) ──
+
+def _context_pct() -> int:
+    """Estimate context window usage (delegates to interactive_ui)."""
+    return _context_pct(_get_memory())
 
 
-# Key bindings: Ctrl+D exits, Alt+Enter inserts newline for multi-line input
-_kb = KeyBindings()
+def _print_banner() -> None:
+    """Compact banner (delegates to interactive_ui)."""
+    print_banner(_current_provider(), _current_model(), str(get_settings().project_root), _cached_health())
 
 
-@_kb.add("escape", "enter")
-def _insert_newline(event):
-    """Alt+Enter: insert newline in multi-line input."""
-    event.app.current_buffer.insert_text("\n")
+def _print_banner_transcript(tui: object) -> None:
+    """Seed transcript TUI with banner (delegates to interactive_ui)."""
+    print_banner_transcript(tui, _current_provider(), _current_model(), str(get_settings().project_root), _cached_health(), _get_memory())
 
 
-@_kb.add("c-d")
-def _ctrl_d_exit(event):
-    """Ctrl+D: exit REPL."""
-    event.app.exit(result=None)
+def _diagnose_error(exc: Exception) -> str | None:
+    """Friendly error hint (delegates to interactive_ui)."""
+    return diagnose_error(exc, _current_provider())
 
 
-@_kb.add("c-l")
-def _redraw_screen(event):
-    """Ctrl+L: clear and redraw screen (standard terminal behavior)."""
-    event.app.renderer.clear()
-    event.app.invalidate()
+# Re-export aliases for backward compatibility with external importers
+_print_help = print_help
+
+
+_kb = make_keybindings()
 
 
 _ML_START_MARKERS = ('"""', "'''", "```")  # triggers for auto multi-line mode
@@ -191,14 +188,6 @@ def _count_md_files(dirname: str) -> int:
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
 
 
-def _icon(kind: str) -> str:
-    """Get icon from active skin via ColorScheme."""
-    try:
-        from runtime.cli.colorscheme import get_colorscheme
-        return get_colorscheme().icon(kind)
-    except Exception:
-        return {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"}.get(kind, "")
-
 
 def _current_provider() -> str:
     return os.environ.get("TAGENT_LLM_PROVIDER", "claude")
@@ -221,11 +210,6 @@ def _current_model() -> str:
 _health_cache: tuple[float, list[dict]] = (0.0, [])  # (timestamp, issues)
 
 
-def _term_width() -> int:
-    try:
-        return shutil.get_terminal_size().columns
-    except Exception:
-        return 80
 
 
 def _cached_health() -> list[dict]:
@@ -240,47 +224,10 @@ def _cached_health() -> list[dict]:
     return _health_cache[1]
 
 
-def _git_branch() -> str:
-    """Return current git branch name, or empty string."""
-    try:
-        import subprocess
-        r = subprocess.run(
-            ["git", "branch", "--show-current"],
-            capture_output=True, text=True, timeout=3,
-            cwd=str(get_settings().project_root),
-        )
-        return r.stdout.strip()
-    except Exception:
-        return ""
 
 
-def _estimate_tokens(text: str) -> int:
-    """Token count estimate. Uses tiktoken if available, else heuristic."""
-    if not text:
-        return 0
-    try:
-        import tiktoken
-        enc = tiktoken.get_encoding("cl100k_base")
-        return len(enc.encode(text))
-    except Exception:
-        pass
-    cjk = sum(1 for c in text if '一' <= c <= '鿿' or '぀' <= c <= 'ヿ')
-    ascii_chars = len(text) - cjk
-    return max(1, (ascii_chars // 4) + (cjk * 2 // 3))
 
 
-def _context_pct() -> int:
-    """Real token-based context usage percentage."""
-    mem = _get_memory()
-    if not mem or not mem.messages:
-        return 0
-    total = "".join(m.content for m in mem.messages if hasattr(m, 'content'))
-    tokens = _estimate_tokens(total)
-    model = _current_model().lower()
-    _LIMITS = {"claude": 200000, "gpt-4": 128000, "deepseek": 128000,
-               "gemini": 1000000, "qwen": 131072, "glm": 128000}
-    limit = next((v for k, v in _LIMITS.items() if k in model), 200000)
-    return min(99, int(tokens * 100 / limit))
 
 
 def _render_prompt_message() -> list[tuple[str, str]]:
@@ -372,219 +319,8 @@ def _render_bottom_toolbar() -> "HTML":
     return HTML(f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}")
 
 
-def _fit_line(width: int, parts: list[str]) -> str:
-    """Fit as many parts as possible into `width` columns.
-    Joins with " · " (DeepSeek/OI pattern). Drops rightmost first."""
-    import re
-    sep = " · "
-    full = sep.join(parts)
-    if len(re.sub(r'<[^>]+>', '', full)) <= width:
-        return full
-    for n in range(len(parts) - 1, 0, -1):
-        candidate = sep.join(parts[:n])
-        if len(re.sub(r'<[^>]+>', '', candidate)) <= width:
-            return candidate
-    return parts[0]
 
 
-
-
-# ── Banner & Help ─────────────────────────────────────────────────
-
-
-def _print_banner() -> None:
-    """Compact banner: sheep + version + model + project (CC-style header)."""
-    try:
-        from runtime.cli.skins import apply_skin_to_banner
-        banner = apply_skin_to_banner()
-    except Exception:
-        banner = _SHEEP
-    console.print(banner)
-    console.print(f"  [bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
-    console.print(f"  [dim]{get_settings().project_root}[/]")
-
-    issues = _cached_health()
-    errors = [i for i in issues if i["level"] == "error"]
-    warnings = [i for i in issues if i["level"] == "warning"]
-    ico = _icon("warn")
-    if errors:
-        console.print(f"  [red]{ico} {len(errors)} errors[/] · [dim]!doctor[/]")
-    elif warnings:
-        console.print(f"  [yellow]{ico} {len(warnings)} warnings[/] · [dim]!doctor[/]")
-
-    console.print()
-
-
-def _print_banner_transcript(tui: object) -> None:
-    """Seed transcript TUI with banner + provider/model/project + health + startup stats."""
-    try:
-        from runtime.cli.skins import apply_skin_to_banner
-        banner = apply_skin_to_banner()
-    except Exception:
-        banner = _SHEEP
-    tui.append_output(banner)
-    tui.append_output(f"  [bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
-    tui.append_output(f"  [dim]{get_settings().project_root}[/]")
-
-    issues = _cached_health()
-    errors = [i for i in issues if i["level"] == "error"]
-    warnings = [i for i in issues if i["level"] == "warning"]
-    if errors:
-        tui.append_output(f"  [red]⚠ {len(errors)} errors[/] · [dim]!doctor[/]")
-    elif warnings:
-        tui.append_output(f"  [yellow]⚠ {len(warnings)} warnings[/] · [dim]!doctor[/]")
-
-    # Condensed startup stats
-    parts = []
-    try:
-        from runtime.cli.conversation import _discover_project_context, load_memory_md
-        if _discover_project_context():
-            parts.append("[dim]📋 CLAUDE.md[/]")
-    except Exception:
-        pass
-    try:
-        md = load_memory_md()
-        if md:
-            parts.append(f"[dim]🧠 {md.count(chr(10)) + 1}f[/]")
-    except Exception:
-        pass
-    mem = _get_memory()
-    if mem.messages:
-        parts.append(f"[dim]{len(mem.messages)} turns[/]")
-    if parts:
-        tui.append_output("  " + " · ".join(parts))
-
-
-def _print_help() -> None:
-    from rich.panel import Panel
-
-    groups = [
-        ("Run", [
-            ("!task add|list|done|start", "Manage task list with criteria"),
-            ("!test  <target>", "Full 11-step test pipeline"),
-            ("!run   <target>", "Plan + execute (quick)"),
-            ("!plan  <target>", "Plan only, no execution"),
-        ]),
-        ("Data & API", [
-            ("!data users|related <N>", "Generate test data"),
-            ("!api gen|test", "OpenAPI contract testing"),
-            ("!cross env <e1> <e2>", "Cross-environment test run"),
-        ]),
-        ("Quality", [
-            ("!regression", "Regression detection vs baseline"),
-            ("!flaky list|quarantine", "Flaky test management"),
-            ("!prioritize", "Prioritize by git changes"),
-            ("!clean", "Clean temp data (preserves deliverables)"),
-        ]),
-        ("Info", [
-            ("!update", "Check for newer version"),
-            ("!progress", "Test coverage matrix"),
-            ("!status", "Session, model, conversation stats"),
-            ("!tools", "List agents + skills with status"),
-            ("!ls", "Quick list experts + skills"),
-            ("!doctor [--agents]", "Environment health check"),
-            ("!ready", "Release readiness score"),
-        ]),
-        ("Control", [
-            ("!model [provider] [model]", "Switch LLM (Tab to complete)"),
-            ("!lang [zh|en|zh-en]", "Switch UI language"),
-            ("!skin [name]", "Switch CLI theme (4 skins)"),
-            ("!fc", "Fix last typo (like thefuck)"),
-            ("!1..9", "Command history / re-run"),
-            ("!alias add|list", "Command shortcuts"),
-            ("!personality [name]", "Set agent persona (loads expert)"),
-            ("!clear", "Reset conversation memory"),
-            ("!undo", "Remove last exchange from memory"),
-            ("!retry", "Re-run last prompt after undo"),
-            ("!setup [--preset]", "Generate config files"),
-            ("!check [--e2e]", "Framework self-test"),
-        ]),
-        ("Automation", [
-            ("!hook add|list|prebuilt", "Lifecycle hooks (before/after/error)"),
-        ]),
-        ("Learning", [
-            ("!distill", "Save last execution as reusable skill"),
-        ]),
-        ("Memory", [
-            ("!remember <fact>", "Save fact to MEMORY.md"),
-            ("!forget <keyword>", "Remove facts by keyword"),
-            ("!nudge", "Scan session for facts worth remembering"),
-            ("!memory", "Show MEMORY.md contents"),
-        ]),
-        ("Workspace", [
-            ("!ws add|list|switch|auto", "Manage project workspaces"),
-        ]),
-        ("Gateway", [
-            ("!gateway", "IM platform connection status"),
-        ]),
-        ("Session", [
-            ("!cost", "Token usage and cost estimate"),
-            ("!cache [clear]", "LLM response cache stats/clear"),
-            ("!insights [days]", "Cross-session usage analytics"),
-            ("!sessions", "List saved sessions"),
-            ("!resume <id>", "Load a saved session"),
-            ("!save", "Export conversation to markdown"),
-            ("!compact", "Summarize and compress context"),
-            ("!context", "Full conversation history"),
-            ("!help", "This help"),
-            ("!quit  (Ctrl+D)", "Save session and exit"),
-        ]),
-    ]
-
-    console.print()
-    for title, items in groups:
-        body = "\n".join(f"  {cmd:22s} {desc}" for cmd, desc in items)
-        console.print(Panel(body, title=title, title_align="left"))
-    console.print("[dim]↑↓ history · Tab completion · Bare text → LLM routing[/]")
-    console.print()
-
-
-# ── Error Diagnosis ─────────────────────────────────────────────────
-
-
-def _diagnose_error(exc: Exception) -> str | None:
-    """Return a friendly Chinese/English hint for common errors. None if no specific advice."""
-    _msg = str(exc).lower()
-    _t = type(exc).__name__
-
-    # API key / auth errors
-    if any(k in _msg for k in ("api_key", "api key", "apikey", "unauthorized", "401", "credential", "authentication")):
-        provider = _current_provider()
-        return (
-            f"LLM ({provider}) needs an API key. "
-            f"Set [cyan]TAGENT_LLM_API_KEY[/] in [cyan].env[/] or environment. "
-            f"Run [cyan]tagent setup --preset minimal[/] to generate a template."
-        )
-
-    # Missing module / import errors
-    if _t in ("ModuleNotFoundError", "ImportError"):
-        mod = _msg.split("'")[1] if "'" in _msg else "?"
-        return (
-            f"Missing Python package: [cyan]{mod}[/]. "
-            f"Run [cyan]pip install -e runtime/[/] or [cyan]pip install {mod}[/]."
-        )
-
-    # Connection / network errors
-    if any(k in _msg for k in ("connection", "timeout", "refused", "unreachable", "ssl", "dns", "resolve")):
-        return (
-            "Cannot reach the LLM service. Check your network, proxy settings, "
-            "or [cyan]TAGENT_LLM_API_BASE[/] in [cyan].env[/]."
-        )
-
-    # Rate limit
-    if any(k in _msg for k in ("rate limit", "429", "too many")):
-        return "Rate limited by the LLM provider. Wait a moment and try again."
-
-    # Invalid request / bad gateway from LLM
-    if any(k in _msg for k in ("500", "502", "503", "internal", "bad gateway")):
-        provider = _current_provider()
-        return f"{provider} service returned a server error. The provider may be down — try again or switch with [cyan]!model[/]."
-
-    # General: give the error message itself as info, with next steps
-    return None
-
-
-# ── Streaming Activity Feed ────────────────────────────────────────
 
 
 def _execute_with_progress(run_id: str, decision) -> dict:
@@ -614,6 +350,57 @@ def _execute_with_progress(run_id: str, decision) -> dict:
 
     with Live(progress_table, console=console, refresh_per_second=8, transient=False):
         return _kernel.execute_sync(run_id, decision, on_progress=_on_node)
+
+
+
+
+def _run_post_hooks(text: str, decision, summary: dict, total: int, rate: float) -> None:
+    """Auto-learn, voice announce, and skill distillation after DAG execution."""
+    try:
+        from runtime.learning_loop.skill_scorer import auto_learn_and_recommend
+        rec = auto_learn_and_recommend()
+        if rec:
+            console.print(f"  [dim]... {rec}[/]")
+    except Exception:
+        pass
+    try:
+        from runtime.cli.voice import announce_result
+        announce_result(summary)
+    except Exception:
+        pass
+    if total >= 3 and rate >= 0.8:
+        ds = decision.model_dump() if hasattr(decision, "model_dump") else {}
+        nodes = ds.get("dag", ds.get("nodes", []))
+        if len(set(n.get("kind", "") for n in nodes)) >= 2:
+            global _last_trace
+            _last_trace = (text, ds)
+            console.print("  [dim]... Multi-agent pattern detected. Run [cyan]/distill[/] to save as reusable skill.[/]")
+
+
+def _run_regression(summary: dict, run_id: str, elapsed: float, rate: float) -> None:
+    """Regression detection and flaky tracking after execution."""
+    if rate < 0.5:
+        return
+    try:
+        from runtime.cli.regression_tracker import RunResult, save_baseline, compare_with_baseline, is_regression
+        current = RunResult(
+            run_id=run_id, total=summary["total"], succeeded=summary["succeeded"],
+            failed=summary.get("failed", 0), skipped=summary.get("skipped", 0),
+            duration_ms=int(elapsed),
+            node_results=summary.get("results", {}),
+            coverage_pct=rate * 100,
+        )
+        report = compare_with_baseline(current)
+        save_baseline(current)
+        if is_regression(report):
+            color = "red" if report.new_failures else "yellow"
+            console.print(f"  [{color}]... Regression: {report.summary}[/] [dim](/regression for details)[/]")
+        else:
+            console.print(f"  [dim]... {report.summary}[/]")
+        from runtime.cli.flaky_manager import record_run
+        record_run(summary.get("results", {}), run_id)
+    except Exception:
+        pass
 
 
 def _handle_natural_language(text: str) -> None:
@@ -672,55 +459,11 @@ def _handle_natural_language(text: str) -> None:
         console.print(f"  [green]✓ {succ}/{total} ok ({rate:.0%})[/]  [dim]({elapsed:.0f}ms)[/]")
         mem.add("assistant", f"DAG: {succ}/{total} ok, {summary.get('failed', 0)} failed")
 
-        # P3 #18: auto-learn skill scores
-        try:
-            from runtime.learning_loop.skill_scorer import auto_learn_and_recommend
-            rec = auto_learn_and_recommend()
-            if rec:
-                console.print(f"  [dim]📊 {rec}[/]")
-        except Exception:
-            pass
+        # Post-execution hooks (auto-learn, voice, distillation)
+        _run_post_hooks(text, decision, summary, total, rate)
 
-        # P3 #23: voice announce
-        try:
-            from runtime.cli.voice import announce_result
-            announce_result(summary)
-        except Exception:
-            pass
-
-        # Skill distillation hint (≥3 nodes, multi-agent)
-        if total >= 3 and rate >= 0.8:
-            ds = decision.model_dump() if hasattr(decision, "model_dump") else {}
-            nodes = ds.get("dag", ds.get("nodes", []))
-            if len(set(n.get("kind", "") for n in nodes)) >= 2:
-                # Stash trace for !distill command
-                _last_trace = (text, ds)
-                console.print("  [dim]💡 Multi-agent pattern detected. Run [cyan]/distill[/] to save as reusable skill.[/]")
-
-        # Regression detection: compare against previous baseline
-        if total >= 3 and rate >= 0.5:
-            try:
-                from runtime.cli.regression_tracker import RunResult, save_baseline, compare_with_baseline, is_regression
-                current = RunResult(
-                    run_id=run_id, total=total, succeeded=succ,
-                    failed=summary.get("failed", 0), skipped=summary.get("skipped", 0),
-                    duration_ms=int(elapsed),
-                    node_results=summary.get("results", {}),
-                    coverage_pct=rate * 100,
-                )
-                report = compare_with_baseline(current)
-                save_baseline(current)
-                if is_regression(report):
-                    color = "red" if report.new_failures else "yellow"
-                    console.print(f"  [{color}]⚠ Regression: {report.summary}[/] [dim](/regression for details)[/]")
-                else:
-                    console.print(f"  [dim]📈 {report.summary}[/]")
-
-                # Flaky detection
-                from runtime.cli.flaky_manager import record_run, get_flaky_list
-                record_run(summary.get("results", {}), run_id)
-            except Exception:
-                pass
+        # Regression + flaky detection
+        _run_regression(summary, run_id, elapsed, rate)
     except KeyboardInterrupt:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
@@ -746,6 +489,13 @@ def _handle_natural_language(text: str) -> None:
             console.print("  [dim]Run [cyan]!doctor[/] to check environment, [cyan]!help[/] for commands.[/]")
 
         mem.add("assistant", f"[Error: {type(_exc).__name__}]")
+
+
+# ── Fuzzy matching (thefuck-style) ─────────────────────────────────
+
+
+# ── Slash Dispatch ─────────────────────────────────────────────
+
 
 
 # ── Fuzzy matching (thefuck-style) ─────────────────────────────────
@@ -830,82 +580,12 @@ def _render_rprompt() -> list[tuple[str, str]]:
     return [("class:prompt.dim", f"{short}  ")]
 
 
-def _set_terminal_title(proj: str, model: str) -> None:
-    """Set terminal title via OSC escape (CC/DeepSeek pattern)."""
-    try:
-        sys.stdout.write(f"\033]0;Test-Agent: {proj} ({model})\007")
-        sys.stdout.flush()
-    except Exception:
-        pass
 
 
-def _rich_to_pt(markup: str) -> FormattedText:
-    """Convert Rich markup string to prompt_toolkit FormattedText.
-
-    This is the bridge that lets us use Rich markup throughout the codebase
-    while rendering output through prompt_toolkit's print_formatted_text().
-    """
-    rt = RichText.from_markup(markup)
-    segments = []
-    for span in rt.spans:
-        start = span.start
-        end = span.end
-        text = rt.plain[start:end]
-        style_str = str(span.style) if span.style else ""
-        # Map Rich style names → prompt_toolkit style names
-        pt_style = _rich_style_to_pt(style_str)
-        segments.append((pt_style, text))
-    return FormattedText(segments)
 
 
-def _rich_style_to_pt(rich_style: str) -> str:
-    """Map a Rich style string to a prompt_toolkit style string."""
-    mapping = {
-        "bold": "bold",
-        "dim": "ansigray",
-        "italic": "italic",
-        "cyan": "ansicyan",
-        "bright_cyan": "ansicyan",
-        "green": "ansigreen",
-        "bright_green": "ansigreen",
-        "red": "ansired",
-        "bright_red": "ansired",
-        "yellow": "ansiyellow",
-        "bright_yellow": "ansiyellow",
-        "blue": "ansiblue",
-        "magenta": "ansimagenta",
-        "white": "",
-        "bright_white": "bold",
-        "black": "ansigray",
-        "default": "",
-    }
-    parts = []
-    for token in rich_style.split():
-        token = token.strip()
-        if not token:
-            continue
-        # Handle 'bold dim' → ['bold', 'ansigray']
-        mapped = mapping.get(token, "")
-        if mapped:
-            parts.append(mapped)
-    return " ".join(parts)
 
 
-def _repl_print(markup: str = "", **kwargs: object) -> None:
-    """Print to TUI via prompt_toolkit — does NOT corrupt terminal layout.
-
-    Converts Rich markup to prompt_toolkit FormattedText, then uses
-    print_formatted_text() which inserts output cleanly above the prompt.
-    """
-    from prompt_toolkit import print_formatted_text as pt_print
-    try:
-        ft = _rich_to_pt(markup)
-        pt_print(ft)
-    except Exception:
-        # Fallback: print plain text
-        import re as _re
-        plain = _re.sub(r'\[[^\]]*\]', '', markup)
-        pt_print(FormattedText([("", plain)]))
 
 
 def _create_session() -> PromptSession | None:

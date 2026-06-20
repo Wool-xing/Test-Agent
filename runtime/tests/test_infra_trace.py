@@ -15,7 +15,10 @@ class TestTraceId:
     def test_generate_is_valid_uuid(self):
         """Generated trace ID should be valid UUID."""
         tid = generate_trace_id()
-        uuid.UUID(tid)
+        assert isinstance(tid, str)
+        assert len(tid) == 36  # standard UUID string length
+        assert tid.count("-") == 4  # 5 segments separated by hyphens
+        uuid.UUID(tid)  # raises ValueError if invalid
 
     def test_set_and_get(self):
         """set_trace_id should be retrievable via get_trace_id."""

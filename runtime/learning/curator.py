@@ -208,6 +208,29 @@ class Curator:
         return "\n".join(lines)
 
 
+def _format_yaml_scalar(key: str, value, prefix: str) -> str:
+    """Format a single non-dict/non-list YAML value line."""
+    if isinstance(value, str) and "\n" in value:
+        parts = [f"{prefix}{key}: |"]
+        for sub_line in value.split("\n"):
+            parts.append(f"{prefix}  {sub_line}")
+        return "\n".join(parts)
+    if isinstance(value, str):
+        # Quote strings that could be ambiguous
+        if value.startswith(("{", "[", "&", "*", "!", "|", ">", "%", "@", "`")) or value in (
+            "true", "false", "null", "yes", "no", "on", "off",
+        ):
+            return f'{prefix}{key}: "{value}"'
+        return f"{prefix}{key}: {value}"
+    if isinstance(value, bool):
+        return f"{prefix}{key}: {'true' if value else 'false'}"
+    if value is None:
+        return f"{prefix}{key}: null"
+    if isinstance(value, float):
+        return f"{prefix}{key}: {value}"
+    return f"{prefix}{key}: {value}"
+
+
 def _to_yaml(data: dict, indent: int = 0) -> str:
     """Minimal YAML serializer for manifest output.
 
@@ -232,26 +255,8 @@ def _to_yaml(data: dict, indent: int = 0) -> str:
                         lines.append(f"{prefix}  - " + _to_yaml_inline(item))
                     else:
                         lines.append(f"{prefix}  - {item}")
-        elif isinstance(value, str) and "\n" in value:
-            lines.append(f"{prefix}{key}: |")
-            for sub_line in value.split("\n"):
-                lines.append(f"{prefix}  {sub_line}")
-        elif isinstance(value, str):
-            # Quote strings that could be ambiguous
-            if value.startswith(("{", "[", "&", "*", "!", "|", ">", "%", "@", "`")) or value in (
-                "true", "false", "null", "yes", "no", "on", "off",
-            ):
-                lines.append(f'{prefix}{key}: "{value}"')
-            else:
-                lines.append(f"{prefix}{key}: {value}")
-        elif isinstance(value, bool):
-            lines.append(f"{prefix}{key}: {'true' if value else 'false'}")
-        elif value is None:
-            lines.append(f"{prefix}{key}: null")
-        elif isinstance(value, float):
-            lines.append(f"{prefix}{key}: {value}")
         else:
-            lines.append(f"{prefix}{key}: {value}")
+            lines.append(_format_yaml_scalar(key, value, prefix))
 
     return "\n".join(lines)
 

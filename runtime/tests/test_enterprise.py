@@ -56,7 +56,8 @@ class TestRBAC:
     def test_check_passes_for_sufficient_permission(self):
         rbac = RBAC()
         # Should not raise
-        rbac.check(Role.ADMIN, Permission.MANAGE_USERS)
+        result = rbac.check(Role.ADMIN, Permission.MANAGE_USERS)
+        assert result is None  # check() returns None on success
 
     def test_rbac_disabled_allows_all(self):
         rbac = RBAC(enabled=False)

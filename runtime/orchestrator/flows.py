@@ -32,6 +32,30 @@ if ConcurrentTaskRunner is not None:
     _flow_kwargs["task_runner"] = ConcurrentTaskRunner()
 
 
+def _process_node_result(
+    nid: str, result: dict, failures: list[str], skipped: list[str], max_failures: int
+) -> bool:
+    """Process a single DAG node result. Returns True if circuit breaker should trip."""
+    if result.get("skipped"):
+        skipped.append(nid)
+    elif not result.get("ok"):
+        failures.append(nid)
+        if len(failures) >= max_failures:
+            return True
+    return False
+
+
+def _cancel_remaining_futures(futures: dict[str, Any], results: dict[str, dict]) -> int:
+    """Cancel in-flight futures that have no result yet. Returns count of cancelled futures."""
+    cancelled = 0
+    for nid, fut in futures.items():
+        if nid not in results and not fut.state.is_final():
+            if hasattr(fut, "cancel"):
+                fut.cancel()
+            cancelled += 1
+    return cancelled
+
+
 @flow(**_flow_kwargs)
 def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: Any = None) -> dict[str, Any]:
     if on_progress is not None and not callable(on_progress):
@@ -59,18 +83,13 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
         for i, (nid, fut) in enumerate(futures.items(), 1):
             try:
                 results[nid] = fut.result()
-                if results[nid].get("skipped"):
-                    skipped.append(nid)
-                elif not results[nid].get("ok"):
-                    failures.append(nid)
-                    if len(failures) >= MAX_FAILURES:
-                        log.error("circuit breaker: {} failures, aborting DAG", len(failures))
-                        break
+                if _process_node_result(nid, results[nid], failures, skipped, MAX_FAILURES):
+                    log.error("circuit breaker: {} failures, aborting DAG", len(failures))
+                    break
             except Exception as e:  # noqa: BLE001
                 log.error("node {} crashed: {}", nid, e)
                 results[nid] = {"id": nid, "ok": False, "error": str(e)}
-                failures.append(nid)
-                if len(failures) >= MAX_FAILURES:
+                if _process_node_result(nid, results[nid], failures, skipped, MAX_FAILURES):
                     log.error("circuit breaker: {} failures, aborting DAG", len(failures))
                     break
             log.info("DAG progress: {}/{} nodes done", i, total)
@@ -80,12 +99,7 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
             # no break — all futures completed normally
             pass
         # Cancel any remaining in-flight futures after circuit breaker or abort
-        cancelled = 0
-        for nid, fut in futures.items():
-            if nid not in results and not fut.state.is_final():
-                if hasattr(fut, "cancel"):
-                    fut.cancel()
-                cancelled += 1
+        cancelled = _cancel_remaining_futures(futures, results)
         if cancelled:
             log.warning("circuit breaker: cancelled {} in-flight task(s)", cancelled)
 
