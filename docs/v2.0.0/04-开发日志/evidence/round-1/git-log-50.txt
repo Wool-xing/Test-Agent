@@ -1,0 +1,50 @@
+3cc0e5a feat(sdk): Skill SDK — scaffold + validate + package + publish (12/12 TDD)
+3b8e3a4 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+f67c5c0 docs: GitHub高星搜索+竞品周报+极致交付检查单 (#411)
+acd236c docs: GitHub高星搜索记录 + 竞品周报 + 极致交付检查单(5内置Skill)
+75c9797 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+248126c fix: re-apply CC fixes — CC>=18: 4->0 (#410)
+6f97205 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+f94b97c fix: 合并后残留缩进错误 + CHANGELOG重复行清理 (#409)
+222b063 fix: 清理合并残留—缩进错误+CHANGELOG重复行 (#409)
+c8a0455 chore: trigger CI for post-merge cleanup (#409)
+dfab37c fix: 清理合并残留—缩进错误+CHANGELOG重复行+workspace垃圾文件
+a78d844 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+7fd22d6 fix: Sprint 0-2A 缺口修补 — 代码质量+文档+流程 (#408)
+0206841 fix: Sprint 0-2A 缺口修补 — 代码质量+文档+流程
+e1fa32d merge: resolve SPRINT-STATUS.md conflict
+7be1be9 docs: Sprint 0-2A status tracking document (#407)
+36c35e5 docs: Sprint 0-2A 状态追踪文档 — 真相版
+dc4f9f3 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+2c4f3b6 polish: D2 depth — TUI panels upgrade + hook verification (#406)
+c7ed9e5 polish: D2 depth — TUI panels with live data + trend + search
+1a22ef7 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+8515b14 feat: Sprint 2-A final — 10 TUI panels + brew formula (#405)
+2adc6a7 feat: Sprint 2-A TUI 10 panels complete — execution + skins
+46e2c13 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+e597096 feat: Sprint 2-A TUI complete — 7 panels + 3 themes (#404)
+3db59a5 feat: Sprint 2-A TUI complete — 7 panels + 3 themes
+addb92a fix: CI macOS install skill count 32→37 (#403)
+79928e5 fix: CI macOS install skill count 32→37 (5 new Sprint 1 skills)
+e74007f sync: resolve merge conflicts, accept origin/main
+6814523 feat: Sprint 0-2 complete — 17 infra modules + security + TDD
+7af353c polish: D1-D2 deep polish — real data in TUI panels + report
+3c124c8 feat: Sprint 2+2A — Agent verification + Textual TUI + security hardening (#401)
+c3daeca fix: security hardening + TDD tests for Sprints 1-2
+0e8e427 feat: Sprint 2+2A — Agent verification + Textual TUI dashboard
+4c2d97b chore: sync local with origin/main (Sprint 1 merged)
+5c048d5 feat: Sprint 1 — minimum viable delivery (#400)
+bceece9 feat: Sprint 1 — minimum viable delivery
+7b5e088 Merge branch 'main' of https://github.com/Wool-xing/Test-Agent
+b5b7a16 refactor: Sprint 0 — decompose CRITICAL complexity + split oversized files (#399)
+6b56961 refactor: Sprint 0 — decompose CRITICAL complexity + split oversized files
+57d3196 V2.0.0 打磨: 6 bugs修复 + 30步完整验证 (#397)
+79d208d deps(deps-dev): update pydantic requirement from >=2.0 to >=2.13.4 (#392)
+6c1aa11 V2.0.0: security cleanup + markdownlint + jargon removal + Rust engine (#381)
+22c9180 Update INDEX.md (#380)
+84c917b fix: resolve 27 security vulnerabilities — Dependabot + CodeQL root-cause fixes
+2716e0c fix: update vulnerable deps
+76ba107 fix: CodeQL security alerts
+67e74a6 V2.0.0
+c44074c chore: full-project knowledge graph + fix DEPRECATED markers, version drift (#371)
+1c84885 deps(deps): bump selenium in the ui-automation group across 1 directory (#363)
