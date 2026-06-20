@@ -467,7 +467,7 @@ def _print_banner() -> None:
 
 
 def _print_banner_transcript(tui: object) -> None:
-    """Seed transcript TUI with banner + startup info."""
+    """Seed transcript TUI with banner + provider/model/project + health + startup stats."""
     try:
         from runtime.cli.skins import apply_skin_to_banner
         banner = apply_skin_to_banner()
@@ -484,6 +484,26 @@ def _print_banner_transcript(tui: object) -> None:
         tui.append_output(f"  [red]⚠ {len(errors)} errors[/] · [dim]!doctor[/]")
     elif warnings:
         tui.append_output(f"  [yellow]⚠ {len(warnings)} warnings[/] · [dim]!doctor[/]")
+
+    # Condensed startup stats
+    parts = []
+    try:
+        from runtime.cli.conversation import _discover_project_context, load_memory_md
+        if _discover_project_context():
+            parts.append("[dim]📋 CLAUDE.md[/]")
+    except Exception:
+        pass
+    try:
+        md = load_memory_md()
+        if md:
+            parts.append(f"[dim]🧠 {md.count(chr(10)) + 1}f[/]")
+    except Exception:
+        pass
+    mem = _get_memory()
+    if mem.messages:
+        parts.append(f"[dim]{len(mem.messages)} turns[/]")
+    if parts:
+        tui.append_output("  " + " · ".join(parts))
 
 
 def _print_help() -> None:
@@ -1040,87 +1060,25 @@ def start() -> None:
     _start_time = time.time()
 
     _suppress_noise()
-    _print_banner()
-    _check_first_run()
 
-    # Terminal title (OSC escape — shows project + model in tab/window title)
-    _set_terminal_title(
-        proj=os.environ.get("PROJECT_NAME", get_settings().project_root.name),
-        model=_current_model(),
-    )
-
-    # Version check (non-blocking, 24h rate-limited by check_version.py)
+    # ── Load essentials (no stdout — all display goes through transcript TUI) ──
     try:
-        import subprocess
-        import threading
-        def _check_version():
-            from runtime.config.settings import get_settings
-            checker = get_settings().config_dir / "check_version.py"
-            if checker.is_file():
-                r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
-                if r.stdout.strip():
-                    console.print(r.stdout.strip())
-        t = threading.Thread(target=_check_version, daemon=True)
-        t.start()
+        from runtime.plugins import discover_plugins
+        for pname, pmod in (discover_plugins() or {}).items():
+            try:
+                info = pmod.register()
+                if callable(info.get("run")):
+                    _BUILTIN_MAP[pname] = lambda a, fn=info["run"]: None
+            except Exception:
+                pass
     except Exception:
         pass
 
-    # Auto-learn user preferences (P3 #20)
-    try:
-        from runtime.cli.user_profile import learn_from_usage
-        prefs = learn_from_usage()
-    except Exception:
-        prefs = None
-
-    # Load plugins (P3 #22)
-    try:
-        from runtime.plugins import discover_plugins
-        plugins = discover_plugins()
-        if plugins:
-            for pname, pmod in plugins.items():
-                try:
-                    info = pmod.register()
-                    run_fn = info.get("run")
-                    if callable(run_fn):
-                        _BUILTIN_MAP[pname] = lambda a, fn=run_fn: (
-                            console.print(f"[green]Plugin {pname}:[/] {fn(a)}")
-                        )
-                except Exception:
-                    pass
-    except Exception:
-        plugins = {}
-
-    # Load project context (CLAUDE.md / AGENTS.md auto-discovered)
-    try:
-        from runtime.cli.conversation import _discover_project_context
-        proj_ctx = _discover_project_context()
-    except Exception:
-        proj_ctx = None
-
-    # Start background scheduler for cron jobs
     try:
         from runtime.scheduler.scheduler import start_background
-        thread, stop = start_background()
+        start_background()
     except Exception:
-        pass  # scheduler is optional — croniter may not be installed
-
-    # Show cross-session memory status
-    from runtime.cli.conversation import load_memory_md
-    mem_md = load_memory_md()
-    facts = mem_md.count("\n") + 1 if mem_md else 0
-
-    mem = _get_memory()
-    resumed = f" · {len(mem.messages)} turns" if mem.messages else ""
-
-    # Condensed startup line (CC-style: one line, dim)
-    parts = []
-    if proj_ctx:
-        parts.append("[dim]📋 CLAUDE.md[/]")
-    parts.append(f"[dim]🧠 {facts}f[/]")
-    if resumed:
-        parts.append(f"[dim]{resumed}[/]")
-    if parts:
-        console.print("  " + " · ".join(parts) + "\n")
+        pass
 
     # ── Full-screen TUI (Application + transcript + pinned input) ──
     from runtime.cli.transcript_tui import TranscriptTUI

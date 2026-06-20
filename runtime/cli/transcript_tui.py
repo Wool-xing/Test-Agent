@@ -134,9 +134,6 @@ class TranscriptTUI:
                 get_line_prefix=lambda line_count, width: [
                     ("class:prompt", "❯ ")
                 ],
-                right_margins=[
-                    lambda width: FormattedText([("class:prompt.dim", self._rprompt())])
-                ],
             ),
             Window(height=5, content=FormattedTextControl(
                 text=_status_text, focusable=False,
