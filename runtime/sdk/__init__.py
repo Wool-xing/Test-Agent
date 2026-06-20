@@ -10,6 +10,7 @@ from runtime.sdk.scaffold import scaffold_skill
 from runtime.sdk.validate import validate_skill, ValidationResult
 from runtime.sdk.package import package_skill
 from runtime.sdk.publish import publish_skill, PublishResult
+from runtime.sdk.discovery import discover_skills
 
 __all__ = [
     "scaffold_skill",
@@ -18,4 +19,5 @@ __all__ = [
     "package_skill",
     "publish_skill",
     "PublishResult",
+    "discover_skills",
 ]
