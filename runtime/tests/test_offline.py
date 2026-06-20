@@ -12,9 +12,9 @@ from runtime.infra.offline import (
 
 class TestOfflineManager:
     def test_initial_status_online(self):
-        """Initial status should assume online."""
+        """Initial status should be online, limited, or offline."""
         om = OfflineManager()
-        assert om.status.network in (NetworkStatus.ONLINE, NetworkStatus.OFFLINE)
+        assert om.status.network in (NetworkStatus.ONLINE, NetworkStatus.OFFLINE, NetworkStatus.LIMITED)
 
     def test_get_test_capabilities(self):
         """Should return at least local capabilities."""
