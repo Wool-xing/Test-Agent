@@ -9,6 +9,7 @@ import typer
 import runtime
 from runtime.cli._shared import console, set_no_color
 from runtime.cli.config import config_app
+from runtime.infra.trace import set_trace_id as _set_trace_id
 
 app = typer.Typer(add_completion=True, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
@@ -20,6 +21,7 @@ def _version_callback(
     no_color: bool = typer.Option(False, "--no-color", help="Disable colored output"),
     debug: bool = typer.Option(False, "--debug", help="Enable DEBUG log level"),
 ):
+    _set_trace_id()  # §补-22: Generate trace ID for every CLI invocation
     if no_color:
         set_no_color()
     if debug:
@@ -75,8 +77,10 @@ _reg_impact.register(app)
 _reg_market.register(app)
 import runtime.cli.commands.plugin as _reg_plugin  # noqa: E402
 import runtime.cli.commands.report as _reg_report  # noqa: E402
+import runtime.cli.commands.onboard as _reg_onboard  # noqa: E402
 _reg_plugin.register(app)
 _reg_report.register(app)
+_reg_onboard.register(app)
 
 # P3 #19 daemon mode (inline — simple enough)
 @app.command(name="serve", help="Start 7x24 daemon (FastAPI + scheduler)")

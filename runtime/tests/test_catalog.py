@@ -17,7 +17,7 @@ def test_catalog_skills_count():
     k = Kernel()
     data = k.catalog()
     count = data["counts"]["skills"]
-    assert 30 <= count <= 32, f"expected 30-32 skills, got {count}"
+    assert 35 <= count <= 45, f"expected 35-45 skills, got {count}"
 
 
 def test_catalog_experts_have_required_fields():

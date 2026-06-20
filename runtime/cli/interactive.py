@@ -725,7 +725,13 @@ def _handle_natural_language(text: str) -> None:
         console.print(f"  [yellow]Cancelled[/]  [dim]({(time.time()-t0)*1000:.0f}ms)[/]")
         mem.add("assistant", "[Cancelled]")
     except Exception as _exc:
-        _err_msg = str(_exc)[:300]
+        _raw = str(_exc)
+        # §补-15: sanitize error output — strip potential credential leaks
+        import re as _re
+        _err_msg = _re.sub(r'(sk-[a-zA-Z0-9]{20,})', '[REDACTED]', _raw)
+        _err_msg = _re.sub(r'(Bearer\s+[a-zA-Z0-9_\-\.]+)', 'Bearer [REDACTED]', _err_msg)
+        _err_msg = _re.sub(r'(api[_-]?key[=:]\s*)[^\s&]+', r'\1[REDACTED]', _err_msg, flags=_re.IGNORECASE)
+        _err_msg = _err_msg[:300]
         elapsed = (time.time() - t0) * 1000
         console.print(f"  [red]✗ {type(_exc).__name__}[/]  [dim]({elapsed:.0f}ms)[/]")
 
