@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "test-agent"
+version = "2.0.0"
+description = "AI-powered multi-platform test framework — describe tests in natural language"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Test-Agent Team"}]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+]
+keywords = ["testing", "ai", "automation", "cli", "tui", "agent"]
+
+dependencies = [
+    "typer>=0.9",
+    "rich>=13.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "loguru>=0.7",
+    "prompt-toolkit>=3.0",
+    "textual>=0.50",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0",
+    "pytest-cov>=7.0",
+    "pytest-xdist>=3.0",
+    "ruff>=0.5",
+]
+all = [
+    "litellm>=1.50",
+    "prefect>=2.20",
+    "sqlalchemy>=2.0",
+    "playwright>=1.60",
+    "requests>=2.32",
+    "mcp>=1.0",
+    "httpx>=0.28",
+]
+
+[project.scripts]
+tagent = "runtime.cli.main:app"
+
+[project.urls]
+Homepage = "https://github.com/Wool-xing/Test-Agent"
+Documentation = "https://github.com/Wool-xing/Test-Agent/tree/main/docs"
+Repository = "https://github.com/Wool-xing/Test-Agent"
+Issues = "https://github.com/Wool-xing/Test-Agent/issues"
+
+[tool.setuptools.packages.find]
+include = ["runtime*", "utils*", "ai*", "sdk*"]
+exclude = ["tests*", "workspace*"]
+
+[tool.pytest.ini_options]
+testpaths = ["runtime/tests"]
+python_files = ["test_*.py"]
+
+[tool.ruff]
+line-length = 120
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
