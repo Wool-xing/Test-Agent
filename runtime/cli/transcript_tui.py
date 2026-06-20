@@ -96,7 +96,7 @@ class TranscriptTUI:
 
         def _status_text():
             import re as _re
-            raw = self._status_bar()
+            raw = str(self._status_bar())
             clean = _re.sub(r'<[^>]+>', '', raw)
             return FormattedText([("class:bottom-toolbar", clean)])
 
