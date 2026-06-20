@@ -223,7 +223,6 @@ def test_routing_decision_schema_validates():
 
 def test_routing_decision_rejects_empty_dag():
     """RoutingDecision should reject invalid DAG via topology check."""
-        assert decision.dag is not None
     with pytest.raises(ValueError):
         RoutingDecision(
             dag=[

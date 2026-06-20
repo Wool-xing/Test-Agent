@@ -156,7 +156,6 @@ class TestMcpClientHelpers:
         assert "runtime.mcp.test_orchestrator.server" in params.args
 
     def test_unknown_server_raises(self):
-            assert 'unknown' in str(ctx.exception).lower() or 'not found' in str(ctx.exception).lower()
         from runtime.mcp.client import McpClient
 
         client = McpClient()
