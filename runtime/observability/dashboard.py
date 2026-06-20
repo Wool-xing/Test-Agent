@@ -32,7 +32,7 @@ def scan_runs(workspace_dir: Path) -> list[dict[str, Any]]:
 def build_decision_signal(runs: list[dict[str, Any]]) -> dict[str, Any]:
     """Row 1: aggregate pass-rate, flaky indicator, regression trend."""
     if not runs:
-        return {"pass_rate": 0, "flaky_pct": 0, "trend": "no-data", "mttd_minutes": 0, "mttr_minutes": 0}
+        return {"pass_rate_pct": 0, "flaky_pct": 0, "trend": "no-data", "mttd_minutes": 0, "mttr_minutes": 0, "runs_analyzed": 0}
 
     pass_rates = [
         (r.get("succeeded", r.get("passed", 0)) / max(r.get("total", 1), 1))
