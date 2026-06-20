@@ -97,6 +97,12 @@ SKILL_SCRIPT_MAP: dict[str, str | None] = {
     "api-fuzzing": "fuzzer.py",
     "accessibility-scan": "a11y_scanner.py",
     "test-suite-minimization": "suite_minimizer.py",
+    # Sprint 1 basic skills
+    "ping-check": "ping_check.py",
+    "http-check": "http_check.py",
+    "file-check": "file_check.py",
+    "process-check": "process_check.py",
+    "timeout-check": "timeout_check.py",
 }
 
 # Scripts that require CLI args; injected when DAG node provides no inputs.
