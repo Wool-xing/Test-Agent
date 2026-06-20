@@ -209,8 +209,8 @@ def _cmd_history(args: str) -> None:
 _FC_RULES: list[tuple[str, str, str]] = [
     # Test-Agent specific typos
     (r"^/?tagent\b", "tagent", "tagnt → tagent"),
-    (r"^/pentest-recno\b", "/pentest-recon", "recno → recon"),
-    (r"^/regeresion\b", "/regression", "regeresion → regression"),
+    (r"^!pentest-recno\b", "!pentest-recon", "recno → recon"),
+    (r"^!regeresion\b", "!regression", "regeresion → regression"),
     (r"^!model\s+cluade\b", "!model claude", "cluade → claude"),
     (r"^!model\s+deepseek\b", "!model deepseek", "deepsek → deepseek"),
     # CLI command typos

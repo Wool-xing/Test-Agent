@@ -764,13 +764,13 @@ def _handle_slash(text: str) -> None:
     if cmd is None:
         # Try TheFuck-style rule correction first
         from runtime.cli.commands.slash_handlers import _apply_fc_rules
-        rule_text, rule_reason = _apply_fc_rules(f"/{name}")
+        rule_text, rule_reason = _apply_fc_rules(f"!{name}")
         if rule_text:
             global _last_fix
-            _last_fix = rule_text.lstrip("/")
+            _last_fix = rule_text.lstrip("!")
             console.print(
-                f"[red]Unknown: /{name}[/]  "
-                f"[dim]{rule_reason}. Run [/][cyan]/fc[/][dim] to auto-correct.[/]"
+                f"[red]Unknown: !{name}[/]  "
+                f"[dim]{rule_reason}. Run [/][cyan]!fc[/][dim] to auto-correct.[/]"
             )
             return
         # Fallback: edit-distance suggestion
@@ -778,11 +778,11 @@ def _handle_slash(text: str) -> None:
         if suggestion:
             _last_fix = suggestion
             console.print(
-                f"[red]Unknown: /{name}[/]  "
-                f"[dim]Did you mean [/][cyan]/{suggestion}[/][dim]? Run [/][cyan]/fc[/][cyan][/][dim] to fix.[/]"
+                f"[red]Unknown: !{name}[/]  "
+                f"[dim]Did you mean [/][cyan]!{suggestion}[/][dim]? Run [/][cyan]!fc[/][cyan][/][dim] to fix.[/]"
             )
         else:
-            console.print(f"[red]Unknown: /{name}[/]  [dim](!help for commands)[/]")
+            console.print(f"[red]Unknown: !{name}[/]  [dim](!help for commands)[/]")
         return
 
     try:
