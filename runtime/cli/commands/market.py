@@ -11,52 +11,78 @@ from rich.table import Table
 from runtime.cli._shared import console
 
 
-def _search_cmd(
-    keyword: str = typer.Argument(...),
-    lane: str = typer.Option(None, "--lane", help="skills | agents | mcp | hooks"),
-) -> None:
-    """Search marketplace registry."""
-    from runtime.marketplace.catalog import search as catalog_search
-    results = catalog_search(keyword, lane=lane)
-    if not results:
-        console.print("[yellow]no match[/]")
-        return
-    t = Table(title=f"Marketplace search: {keyword}")
-    for col in ("name", "lane", "version", "source_tier", "confidence", "score"):
-        t.add_column(col)
-    for e in results:
-        t.add_row(e.name, e.lane, e.version, e.source_tier, e.confidence, str(e.safety_score))
-    console.print(t)
+def register(app: typer.Typer) -> None:
+    @app.command()
+    def search(
+        keyword: str = typer.Argument(...),
+        lane: str = typer.Option(None, "--lane", help="skills | agents | mcp | hooks"),
+    ):
+        """Search marketplace registry."""
+        from runtime.marketplace.catalog import search as catalog_search
+        results = catalog_search(keyword, lane=lane)
+        if not results:
+            console.print("[yellow]no match[/]")
+            return
+        t = Table(title=f"Marketplace search: {keyword}")
+        for col in ("name", "lane", "version", "source_tier", "confidence", "score"):
+            t.add_column(col)
+        for e in results:
+            t.add_row(e.name, e.lane, e.version, e.source_tier, e.confidence, str(e.safety_score))
+        console.print(t)
+
+    @app.command(name="list")
+    def list_cmd(lane: str = typer.Option(None, "--lane")):
+        """List installed marketplace entries."""
+        from runtime.marketplace.catalog import load_local
+        entries = load_local()
+        if lane:
+            entries = [e for e in entries if e.lane == lane]
+        if not entries:
+            console.print("[yellow]nothing installed[/]")
+            return
+        t = Table(title="Installed marketplace entries")
+        for col in ("name", "lane", "version", "tier", "installed_at"):
+            t.add_column(col)
+        for e in entries:
+            t.add_row(e.name, e.lane, e.version, e.source_tier, e.installed_at or "-")
+        console.print(t)
+
+    @app.command()
+    def install(
+        name: str = typer.Argument(...),
+        lane: str = typer.Argument(...),
+        source: str = typer.Option(..., "--source", help="path to skill .md / agent .md / mcp config / hook"),
+        tier: str = typer.Option("low", "--tier"),
+        version: str = typer.Option("1.32.4", "--version"),
+    ):
+        """Install marketplace entry through 4 safety gates."""
+        _do_install(name, lane, source, tier, version)
+
+    @app.command()
+    def uninstall(name: str = typer.Argument(...)):
+        """Uninstall (archive only, irreversible)."""
+        from runtime.marketplace.installer import uninstall as do_uninstall
+        res = do_uninstall(name)
+        if res["ok"]:
+            console.print(f"[yellow]archived[/] {name} -> {res['archived_to']}")
+        else:
+            console.print(f"[red]failed[/] {res.get('error')}")
+            raise typer.Exit(1)
+
+    @app.command()
+    def verify(
+        source: str = typer.Argument(...),
+        skip_sandbox: bool = typer.Option(False, "--skip-sandbox"),
+        skip_darwin: bool = typer.Option(False, "--skip-darwin"),
+    ):
+        """Run 4 safety gates without install."""
+        _do_verify(source, skip_sandbox, skip_darwin)
 
 
-def _list_cmd(lane: str = typer.Option(None, "--lane")) -> None:
-    """List installed marketplace entries."""
-    from runtime.marketplace.catalog import load_local
-    entries = load_local()
-    if lane:
-        entries = [e for e in entries if e.lane == lane]
-    if not entries:
-        console.print("[yellow]nothing installed[/]")
-        return
-    t = Table(title="Installed marketplace entries")
-    for col in ("name", "lane", "version", "tier", "installed_at"):
-        t.add_column(col)
-    for e in entries:
-        t.add_row(e.name, e.lane, e.version, e.source_tier, e.installed_at or "-")
-    console.print(t)
-
-
-def _install_cmd(
-    name: str = typer.Argument(...),
-    lane: str = typer.Argument(...),
-    source: str = typer.Option(..., "--source", help="path to skill .md / agent .md / mcp config / hook"),
-    tier: str = typer.Option("low", "--tier"),
-    version: str = typer.Option("1.32.4", "--version"),
-) -> None:
+def _do_install(name: str, lane: str, source: str, tier: str, version: str) -> None:
     """Install marketplace entry through 4 safety gates."""
     from runtime.marketplace.catalog import Entry
     from runtime.marketplace.installer import install as do_install
-
     p = Path(source)
     if not p.exists():
         console.print(f"[red]source not found:[/] {source}")
@@ -74,22 +100,7 @@ def _install_cmd(
         raise typer.Exit(1)
 
 
-def _uninstall_cmd(name: str = typer.Argument(...)) -> None:
-    """Uninstall (archive only, irreversible)."""
-    from runtime.marketplace.installer import uninstall as do_uninstall
-    res = do_uninstall(name)
-    if res["ok"]:
-        console.print(f"[yellow]archived[/] {name} -> {res['archived_to']}")
-    else:
-        console.print(f"[red]failed[/] {res.get('error')}")
-        raise typer.Exit(1)
-
-
-def _verify_cmd(
-    source: str = typer.Argument(...),
-    skip_sandbox: bool = typer.Option(False, "--skip-sandbox"),
-    skip_darwin: bool = typer.Option(False, "--skip-darwin"),
-) -> None:
+def _do_verify(source: str, skip_sandbox: bool, skip_darwin: bool) -> None:
     """Run 4 safety gates without install."""
     from runtime.marketplace.verifier import run_all_gates
     p = Path(source)
@@ -103,11 +114,3 @@ def _verify_cmd(
     for g in results:
         t.add_row(g.gate, "✓" if g.passed else "✗", str(g.score or "-"), g.reason or "-")
     console.print(t)
-
-
-def register(app: typer.Typer) -> None:
-    app.command()(_search_cmd)
-    app.command(name="list")(_list_cmd)
-    app.command()(_install_cmd)
-    app.command()(_uninstall_cmd)
-    app.command()(_verify_cmd)
