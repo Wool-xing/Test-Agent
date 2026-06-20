@@ -148,5 +148,119 @@ class TestTimeoutCheck:
         """Invalid command should fail gracefully."""
         from utils.timeout_check import check_timeout
         result = check_timeout("nonexistent_command_xyz", timeout=5)
-        # Should not crash; may return ok=False or ok=True depending on shell
+        assert "command" in result
+
+
+# ═══════════════════════════════════════════════════════════════
+# D1 边界测试 — 空值/超长/异常路径
+# ═══════════════════════════════════════════════════════════════
+
+class TestPingCheckBoundary:
+    """D1 boundary tests for ping-check."""
+
+    def test_ping_empty_host(self):
+        """Empty host should be rejected."""
+        from utils.ping_check import ping_host
+        result = ping_host("", count=1, timeout=3)
+        assert result["ok"] is False
+        assert "invalid" in str(result.get("error", "")).lower()
+
+    def test_ping_negative_count(self):
+        """Negative count should not crash."""
+        from utils.ping_check import ping_host
+        result = ping_host("127.0.0.1", count=-1, timeout=3)
+        assert "host" in result
+
+    def test_ping_very_long_hostname(self):
+        """Very long hostname should be rejected."""
+        from utils.ping_check import ping_host
+        long_host = "a" * 300 + ".com"
+        result = ping_host(long_host, count=1, timeout=3)
+        assert "host" in result
+
+
+class TestHttpCheckBoundary:
+    """D1 boundary tests for http-check."""
+
+    def test_http_empty_url(self):
+        """Empty URL should fail gracefully."""
+        from utils.http_check import check_http
+        result = check_http("", timeout=3)
+        assert result["ok"] is False
+
+    def test_http_very_long_url(self):
+        """Very long URL should be handled."""
+        from utils.http_check import check_http
+        long_url = "http://example.com/" + "a" * 5000
+        result = check_http(long_url, timeout=3)
+        assert "url" in result
+
+    def test_http_private_ip_blocked(self):
+        """SSRF: private IP should be blocked."""
+        from utils.http_check import check_http
+        result = check_http("http://127.0.0.1:8080", timeout=3)
+        assert result["ok"] is False
+        assert "blocked" in str(result.get("error", "")).lower()
+
+    def test_http_invalid_scheme(self):
+        """file:// scheme should be blocked."""
+        from utils.http_check import check_http
+        result = check_http("file:///etc/passwd", timeout=3)
+        assert result["ok"] is False
+        assert "unsupported" in str(result.get("error", "")).lower()
+
+
+class TestFileCheckBoundary:
+    """D1 boundary tests for file-check."""
+
+    def test_file_empty_path(self):
+        """Empty path resolves to CWD — should show exists."""
+        from utils.file_check import check_file
+        result = check_file("")
+        assert "exists" in result  # resolves to CWD, should not crash
+
+    def test_file_path_traversal_blocked(self):
+        """Path traversal attempt should be blocked."""
+        from utils.file_check import check_file
+        result = check_file("../../../etc/passwd")
+        assert result["ok"] is False
+        assert "outside" in str(result.get("error", "")).lower()
+
+    def test_file_min_size_zero_ignored(self):
+        """min_size=0 should be treated as no limit."""
+        from utils.file_check import check_file
+        result = check_file(__file__, min_size=0)
+        assert result["exists"] is True
+
+
+class TestProcessCheckBoundary:
+    """D1 boundary tests for process-check."""
+
+    def test_process_empty_name(self):
+        """Empty process name should fail gracefully."""
+        from utils.process_check import check_process
+        result = check_process("")
+        assert "process" in result
+
+    def test_process_special_chars(self):
+        """Process name with special chars should not crash."""
+        from utils.process_check import check_process
+        result = check_process("test; rm -rf /", expected_running=False)
+        assert result["ok"] is True  # not running
+        assert result["running"] is False
+
+
+class TestTimeoutCheckBoundary:
+    """D1 boundary tests for timeout-check."""
+
+    def test_timeout_zero_seconds(self):
+        """Zero timeout should trigger immediately."""
+        from utils.timeout_check import check_timeout
+        result = check_timeout("echo hello", timeout=0)
+        assert "command" in result
+
+    def test_timeout_empty_command(self):
+        """Empty command should fail."""
+        from utils.timeout_check import check_timeout
+        result = check_timeout("", timeout=5)
         assert "command" in result
