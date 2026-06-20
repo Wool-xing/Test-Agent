@@ -8,7 +8,6 @@ import pytest
 
 from specs.gates.registry import Gate, GateCheck, GateRegistry
 
-
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 

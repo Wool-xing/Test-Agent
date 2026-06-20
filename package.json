@@ -1,0 +1,25 @@
+{
+  "name": "test-agent",
+  "version": "2.0.0",
+  "description": "AI-powered multi-platform test framework — describe tests in natural language",
+  "main": "install.py",
+  "bin": {
+    "tagent": "./install.py"
+  },
+  "scripts": {
+    "postinstall": "python install.py . --quiet",
+    "test": "python -m pytest runtime/tests/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wool-xing/Test-Agent"
+  },
+  "keywords": ["testing", "ai", "automation", "cli", "tui", "agent", "e2e", "playwright", "cypress"],
+  "author": "Test-Agent Team",
+  "license": "MIT",
+  "homepage": "https://github.com/Wool-xing/Test-Agent#readme",
+  "engines": {
+    "node": ">=16",
+    "python": ">=3.10"
+  }
+}
