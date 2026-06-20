@@ -36,11 +36,15 @@ class ColorScheme:
         primary = _SKIN_TO_PT.get(c.get("primary", ""), "cyan")
         dim_pt = _SKIN_TO_PT.get(c.get("dim", ""), "ansigray")
 
+        # Toolbar colors: use skin dim for fg, dark bg derived from skin
+        tb_fg = self._hex_for(dim_pt)
+        tb_bg = c.get("toolbar_bg", "#1a1a2e")
+
         return PtStyle.from_dict({
             "prompt": f"bold {primary}",
             "prompt.dim": dim_pt,
             "separator": self._hex_for(dim_pt),
-            "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
+            "bottom-toolbar": f"bg:{tb_bg} fg:{tb_fg}",
             "bottom-toolbar.separator": "#444444",
         })
 
