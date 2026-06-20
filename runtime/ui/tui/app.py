@@ -43,7 +43,7 @@ THEMES = {
 
 
 class TestAgentTUI(App):
-    """Test-Agent V2.0.0 — Terminal Dashboard."""
+    """Test-Agent V2.0.0 — Terminal Dashboard. Mouse + keyboard support."""
 
     CSS = """
     Screen {
@@ -54,6 +54,12 @@ class TestAgentTUI(App):
     }
     TabPane {
         padding: 1 2;
+    }
+    /* Responsive: compact layout for narrow terminals */
+    @media (max-width: 80) {
+        TabPane {
+            padding: 0 1;
+        }
     }
     """
 
