@@ -304,11 +304,16 @@ def _render_bottom_toolbar() -> "HTML":
     errs = [i for i in issues if i["level"] == "error"]
     warns = [i for i in issues if i["level"] == "warning"]
 
-    # Line 1: [provider] [model] · project · git · health
-    p1 = [f"<b>[{p}]</b>"]
+    # Line 1: [provider model] · project · git · health
+    model_str = f"<b>[{p}]</b>"
     if m and m != p:
-        p1.append(f"<b>[{m}]</b>")
-    p1.append(f"<ansicyan>{proj}</ansicyan>")
+        model_str += f" <b>[{m}]</b>"
+    p1 = [model_str]
+    # Show project folder name when PROJECT_NAME is the default
+    proj_display = proj
+    if proj == "default":
+        proj_display = get_settings().project_root.name
+    p1.append(f"<ansicyan>{proj_display}</ansicyan>")
     if b:
         p1.append(f"<ansigreen>git:{b}</ansigreen>")
     if errs:
@@ -1003,16 +1008,15 @@ def start() -> None:
         pass
 
     # ── PromptSession REPL ──
-    _print_banner()
-    _check_first_run()
-
     _set_terminal_title(
         proj=os.environ.get("PROJECT_NAME", get_settings().project_root.name),
         model=_current_model(),
     )
 
-    # Route all Rich output through prompt_toolkit's print_formatted_text()
-    # Single monkey-patch covers all 39 console.print() calls in handlers
+    _print_banner()
+    _check_first_run()
+
+    # Route Rich output → prompt_toolkit (after banner to stdout)
     _original_print = console.print
 
     def _pt_bridge(markup: str = "", **kwargs: object) -> None:
