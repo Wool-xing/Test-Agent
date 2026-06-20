@@ -362,12 +362,12 @@ def _run_post_hooks(text: str, decision, summary: dict, total: int, rate: float)
         if rec:
             console.print(f"  [dim]... {rec}[/]")
     except Exception:
-        pass
+        pass  # auto-learn is best-effort; never block main flow
     try:
         from runtime.cli.voice import announce_result
         announce_result(summary)
     except Exception:
-        pass
+        pass  # voice announce is optional; silent fallback
     if total >= 3 and rate >= 0.8:
         ds = decision.model_dump() if hasattr(decision, "model_dump") else {}
         nodes = ds.get("dag", ds.get("nodes", []))
@@ -400,7 +400,7 @@ def _run_regression(summary: dict, run_id: str, elapsed: float, rate: float) -> 
         from runtime.cli.flaky_manager import record_run
         record_run(summary.get("results", {}), run_id)
     except Exception:
-        pass
+        pass  # regression/flaky tracking is best-effort
 
 
 def _handle_natural_language(text: str) -> None:
@@ -708,15 +708,15 @@ def start() -> None:
                 if callable(info.get("run")):
                     _BUILTIN_MAP[pname] = lambda a, fn=info["run"]: None
             except Exception:
-                pass
+                pass  # single plugin register failure; skip and continue
     except Exception:
-        pass
+        pass  # plugin discovery is optional
 
     try:
         from runtime.scheduler.scheduler import start_background
         start_background()
     except Exception:
-        pass
+        pass  # background scheduler is optional
 
     # ── PromptSession REPL ──
     _set_terminal_title(
