@@ -331,9 +331,9 @@ jobs:
           SKILLS=$(ls ai/skills/*.md | grep -v README | wc -l)
           UTILS=$(find utils -name "*.py" ! -name "__init__.py" | wc -l)
           echo "Agents=$AGENTS Skills=$SKILLS Utils=$UTILS"
-          [ "$AGENTS" = "16" ] || { echo "❌ Agents count mismatch (expected 16, got $AGENTS)"; exit 1; }
+          [ "$AGENTS" = "17" ] || { echo "❌ Agents count mismatch (expected 17, got $AGENTS)"; exit 1; }
           [ "$SKILLS" -eq "43" ] || { echo "❌ Skills count mismatch (expected 43, got $SKILLS)"; exit 1; }
-          [ "$UTILS" -eq "84" ] || { echo "❌ Utils count mismatch (expected 84, got $UTILS)"; exit 1; }
+          [ "$UTILS" -eq "97" ] || { echo "❌ Utils count mismatch (expected 97, got $UTILS)"; exit 1; }
           echo "✅ File counts correct"
 
       - name: 验证 .gitignore 排除源 MD
