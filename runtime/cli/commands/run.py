@@ -15,18 +15,31 @@ from runtime.tutor.verbosity import Mode, set_mode
 def register(app: typer.Typer) -> None:
     @app.command()
     def run(
-        target: str = typer.Argument(..., help="path / url / free-form text"),
+        target: str = typer.Argument(None, help="path / url / free-form text (use - for stdin)"),
         note: str = typer.Option("", "--note", help="extra hint to the router"),
+        task: str = typer.Option("", "--task", help="read target from file (e.g. @tasks/daily.txt)"),
         no_persist: bool = typer.Option(False, "--no-persist", help="skip DB write"),
         json_only: bool = typer.Option(False, "--json", help="print full result JSON only"),
-        mode: Mode | None = typer.Option(  # noqa: B008
-            None, "--mode", help="exec | learn | silent (default: $TAGENT_MODE or exec)"
-        ),
-        lang: str | None = typer.Option(  # noqa: B008
-            None, "--lang", help="zh | en | zh-en (default: $TAGENT_LANG or zh)"
-        ),
+        mode: Mode | None = typer.Option(None, "--mode", help="exec | learn | silent"),
+        lang: str | None = typer.Option(None, "--lang", help="zh | en | zh-en"),
     ):
-        """Plan + execute a test run."""
+        """Plan + execute a test run. Supports pipeline: echo 'test' | tagent run -"""
+        # §1.2.1: --task flag reads target from file
+        if task:
+            task_path = Path(task.lstrip("@"))
+            if task_path.exists():
+                target = task_path.read_text(encoding="utf-8").strip()
+            else:
+                console.print(f"[red]Task file not found: {task}[/]")
+                raise typer.Exit(1)
+        # §1.2.1: "-" reads target from stdin (pipeline mode)
+        if target is None or target == "-":
+            import sys
+            if not sys.stdin.isatty():
+                target = sys.stdin.read().strip()
+            if not target:
+                console.print("[red]No target provided. Use: tagent run <target> or echo '<target>' | tagent run -[/]")
+                raise typer.Exit(1)
         if mode is not None:
             set_mode(mode)
         if lang is not None:
