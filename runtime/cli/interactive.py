@@ -305,20 +305,21 @@ def _render_bottom_toolbar() -> "HTML":
     warns = [i for i in issues if i["level"] == "warning"]
 
     # Line 1: [provider] [model] · project · git · health
-    l1 = f"  <b>[{p}]</b>"
+    p1 = [f"<b>[{p}]</b>"]
     if m and m != p:
-        l1 += f" <b>[{m}]</b>"
-    l1 += f" · <ansicyan>{proj}</ansicyan>"
+        p1.append(f"<b>[{m}]</b>")
+    p1.append(f"<ansicyan>{proj}</ansicyan>")
     if b:
-        l1 += f" · <ansigreen>git:{b}</ansigreen>"
+        p1.append(f"<ansigreen>git:{b}</ansigreen>")
     if errs:
-        l1 += f" · <ansired>{_icon('warn')} {len(errs)}</ansired>"
+        p1.append(f"<ansired>{_icon('warn')} {len(errs)}</ansired>")
     elif warns:
-        l1 += f" · <ansiyellow>{_icon('warn')} {len(warns)}</ansiyellow>"
+        p1.append(f"<ansiyellow>{_icon('warn')} {len(warns)}</ansiyellow>")
     else:
-        l1 += f" · <ansigreen>{_icon('ok')}</ansigreen>"
+        p1.append(f"<ansigreen>{_icon('ok')}</ansigreen>")
+    l1 = "  " + _fit_line(w - 2, p1)
 
-    # Line 2: Context gauge + counts
+    # Line 2: Context gauge (color-coded) + counts
     bar_len = 10
     filled = min(bar_len, pct * bar_len // 100)
     empty = bar_len - filled
@@ -328,28 +329,26 @@ def _render_bottom_toolbar() -> "HTML":
         gauge = f"<ansiyellow>{'█' * filled}</ansiyellow>{'░' * empty}"
     else:
         gauge = f"<ansigray>{'█' * filled}</ansigray>{'░' * empty}"
-    l2 = f"  Context {gauge} {pct}%"
+    p2 = [f"Context {gauge} {pct}%"]
+    if _count_md_files("agents"):
+        p2.append(f"{_count_md_files('agents')} agents")
+    if _count_md_files("skills"):
+        p2.append(f"{_count_md_files('skills')} skills")
+    l2 = "  " + _fit_line(w - 2, p2)
 
-    agents_n = _count_md_files("agents")
-    skills_n = _count_md_files("skills")
-    if agents_n:
-        l2 += f" · {agents_n} agents"
-    if skills_n:
-        l2 += f" · {skills_n} skills"
-
-    # Line 3: Config files
+    # Line 3: Config files (dimmed, drops first on narrow terminals)
     root = get_settings().project_root
-    l3_parts = []
+    p3 = []
     if (root / "CLAUDE.md").is_file():
-        l3_parts.append("CLAUDE.md")
+        p3.append("CLAUDE.md")
     if (root / ".env").is_file():
-        l3_parts.append(".env")
+        p3.append(".env")
     if (root / ".mcp.json").is_file():
-        l3_parts.append("MCP")
-    l3 = "  <ansigray>" + " · ".join(l3_parts) + "</ansigray>" if l3_parts else ""
+        p3.append("MCP")
+    l3 = "  <ansigray>" + _fit_line(w - 2, p3) + "</ansigray>" if p3 else ""
 
-    # Line 4: Quick tips (always visible, like CC)
-    l4 = "  <ansigray>!help · !doctor · !model · !status · !clear</ansigray>"
+    # Line 4: Quick tips (CC-style, dimmed, first to collapse)
+    l4 = "  <ansigray>" + _fit_line(w - 2, ["!help", "!doctor", "!model", "!status", "!clear"]) + "</ansigray>"
 
     return HTML(f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}")
 
