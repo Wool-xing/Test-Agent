@@ -10,12 +10,12 @@ import re
 
 # Conservative pattern set; production should swap for a model-based scanner.
 SUSPICIOUS = [
-    re.compile(r"ignore (all |previous |prior )?(instructions|prompts|context)", re.I),
+    re.compile(r"ignore ((all|previous|prior) )*(instructions|prompts|context)", re.I),
     re.compile(r"you are now (a|an) (different|new) (agent|assistant|persona)", re.I),
     re.compile(r"reveal (the )?(system|hidden) prompt", re.I),
     re.compile(r"\b(do anything now|DAN mode)\b", re.I),
     re.compile(r"<\s*system\s*>", re.I),
-    re.compile(r"sudo|rm\s+-rf\s+/\s*$"),
+    re.compile(r"\bsudo\b|rm\s+-rf\s+/"),  # word-bound sudo; rm -rf / anywhere
     re.compile(r"<\|.*\|>"),  # special tokens
     re.compile(r"```python.*os\.system\s*\(", re.S),
 ]

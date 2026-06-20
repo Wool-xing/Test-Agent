@@ -22,6 +22,9 @@ _PATTERNS: list[tuple[str, str]] = [
     # Daily with time (before plain daily)
     (r"(?:daily|every\s+day)\s+(?:at\s+)?(\d+)", "0 {h} * * *"),
 
+    # Weekly with time (before plain weekly — captures "every monday at 8")
+    (r"every\s+\b(mon|tue|wed|thu|fri|sat|sun)\b\s+(?:at\s+)?(\d+)", "0 {h} * * {d}"),
+    (r"every\s+\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b\s+(?:at\s+)?(\d+)", "0 {h} * * {d}"),
     # Weekly (word boundary prevents month matching mon)
     (r"every\s+\b(mon|tue|wed|thu|fri|sat|sun)\b", "0 9 * * {d}"),
     (r"every\s+\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b", "0 9 * * {d}"),

@@ -172,11 +172,10 @@ class IntentRouterV2:
     def _route_via_llm(
         self, target: str, mode: str, client: LLMClient | None
     ) -> RoutingDecision:
-        # Stub provider: skip LLM, fall through to keyword routing
-        if client is not None and client.provider == "stub":
-            raise RouterV2Error("stub provider: delegating to keyword routing")
-
         client = client or LLMClient()
+        # Stub provider: skip LLM, fall through to keyword routing
+        if client.provider == "stub":
+            raise RouterV2Error("stub provider: delegating to keyword routing")
 
         system = SYSTEM_PROMPT_V2_AI if mode == "ai" else SYSTEM_PROMPT_V2
         user = build_user_prompt(target, self._catalog)
