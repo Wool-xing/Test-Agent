@@ -191,6 +191,15 @@ def _count_md_files(dirname: str) -> int:
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
 
 
+def _icon(kind: str) -> str:
+    """Get icon from active skin via ColorScheme."""
+    try:
+        from runtime.cli.colorscheme import get_colorscheme
+        return get_colorscheme().icon(kind)
+    except Exception:
+        return {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"}.get(kind, "")
+
+
 def _current_provider() -> str:
     return os.environ.get("TAGENT_LLM_PROVIDER", "claude")
 
@@ -303,11 +312,11 @@ def _render_bottom_toolbar() -> "HTML":
     if b:
         l1 += f" · <ansigreen>git:{b}</ansigreen>"
     if errs:
-        l1 += f" · <ansired>⚠ {len(errs)}</ansired>"
+        l1 += f" · <ansired>{_icon('warn')} {len(errs)}</ansired>"
     elif warns:
-        l1 += f" · <ansiyellow>⚠ {len(warns)}</ansiyellow>"
+        l1 += f" · <ansiyellow>{_icon('warn')} {len(warns)}</ansiyellow>"
     else:
-        l1 += " · <ansigreen>✓</ansigreen>"
+        l1 += f" · <ansigreen>{_icon('ok')}</ansigreen>"
 
     # Line 2: Context gauge + counts
     bar_len = 10
@@ -379,10 +388,11 @@ def _print_banner() -> None:
     issues = _cached_health()
     errors = [i for i in issues if i["level"] == "error"]
     warnings = [i for i in issues if i["level"] == "warning"]
+    ico = _icon("warn")
     if errors:
-        console.print(f"  [red]⚠ {len(errors)} errors[/] · [dim]!doctor[/]")
+        console.print(f"  [red]{ico} {len(errors)} errors[/] · [dim]!doctor[/]")
     elif warnings:
-        console.print(f"  [yellow]⚠ {len(warnings)} warnings[/] · [dim]!doctor[/]")
+        console.print(f"  [yellow]{ico} {len(warnings)} warnings[/] · [dim]!doctor[/]")
 
     console.print()
 
