@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import json
 from collections import OrderedDict
+from pathlib import Path
 from typing import Any
 
 from loguru import logger
@@ -22,10 +23,10 @@ from runtime.api.parsers import parse_path, parse_text, parse_url
 from runtime.mcp.base import make_server, run_stdio, tool_decision_logged
 
 _kernel: Kernel | None = None
-# Bounded LRU cache for in-memory run results.
-# 横切预算: 防 server 长时跑无限增长.
-# Production should rely on Postgres `runs` table; this is the fast path.
+# Bounded LRU cache for in-memory run results, backed by JSON file.
+# JSON file ensures results survive server restart.
 _MAX_RUN_RESULTS = 1024
+_PERSIST_PATH = Path("workspace/mcp_run_results.json")
 _run_results: OrderedDict[str, dict] = None  # type: ignore[assignment]
 
 
@@ -33,7 +34,24 @@ def _results_dict():
     global _run_results
     if _run_results is None:
         _run_results = OrderedDict()
+        # Restore from disk on first access
+        if _PERSIST_PATH.exists():
+            try:
+                _data = json.loads(_PERSIST_PATH.read_text(encoding="utf-8"))
+                for k, v in _data.items():
+                    _run_results[k] = v
+            except Exception:
+                pass
     return _run_results
+
+
+def _persist_results(d: OrderedDict) -> None:
+    """Write current results to JSON file (best-effort)."""
+    try:
+        _PERSIST_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _PERSIST_PATH.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass  # disk full / permission — don't crash the server
 
 
 def _store_result(run_id: str, summary: dict) -> None:
@@ -42,6 +60,7 @@ def _store_result(run_id: str, summary: dict) -> None:
     d.move_to_end(run_id)
     while len(d) > _MAX_RUN_RESULTS:
         d.popitem(last=False)
+    _persist_results(d)
 
 
 def _k() -> Kernel:

@@ -1,5 +1,23 @@
 # 安全策略
 
+> 对标: Hermes Agent Security Policy
+
+## 信任边界
+
+**唯一的安全边界是操作系统级别隔离。** Agent进程内的任何组件——审批门、输出编辑、模式扫描器(`injection_scan.py`)、工具白名单——都不是真正的安全边界。它们是启发式方法，操作在攻击者可影响的字符串上。
+
+Test-Agent当前的安全层次:
+
+| 层 | 组件 | 类型 | 说明 |
+|---|------|------|------|
+| 1 | `safety.py` (6个gate) | 启发式 | tagent.yml显式授权检查 |
+| 2 | `injection_scan.py` (8个正则) | 启发式 | prompt注入模式匹配 |
+| 3 | `gateway/base.py is_safe_webhook_url` | 网络 | SSRF防护(阻止内网地址) |
+| 4 | `evidence_vault _validate_evidence_path` | 文件系统 | 路径遍历防护 |
+| 5 | `pentest-tester` 沙箱规则 | 文档 | Docker/VM沙箱要求(未强制执行) |
+
+**诚实声明**: 第1-4层是合理的纵深防御启发式，但第5层(Docker沙箱)尚未在代码中强制执行。渗透测试agent目前仅生成计划文本，不执行实际攻击。在实现OS级隔离前，**不应在不可信代码/目标上运行破坏性测试命令**。
+
 ## 支持的版本
 
 | 版本 | 支持状态 |
@@ -50,6 +68,26 @@
 - ✅**HTTPS-only**：所有 API 调用强制 TLS（utils.api_retry_util）
 - ✅**SQL 注入防护**：utils.data_factory 用 SQLAlchemy ORM，禁拼字符串
 - ✅**依赖 SAST**：bandit 扫 utils/ 自身代码
+
+## 沙箱执行层级 (对标 Codex sandbox + Hermes terminal-backend)
+
+| 层级 | 模式 | 允许 | 禁止 | 适用场景 |
+|------|------|------|------|---------|
+| **L1 · read-only** | `TAGENT_SANDBOX=read` | Read/Grep/Glob | Write/Edit/Bash(写) | Plan模式, 代码审查, 需求分析 |
+| **L2 · workspace-write** | `TAGENT_SANDBOX=workspace` | L1 + workspace目录写 | 外部路径写, 网络调用 | 测试生成, 报告输出 (默认) |
+| **L3 · danger-full** | `TAGENT_SANDBOX=full` | L2 + 网络 + 子进程 | `rm -rf /`, `DROP TABLE` (hardline blocklist) | E2E测试, 渗透测试 (需显式授权) |
+
+**hardline blocklist** (对标 Hermes, 所有层级生效):
+- `rm -rf /` `dd if=` `mkfs.` fork bomb `:(){ :|:& };:`
+- `DROP TABLE` `TRUNCATE` (数据库破坏)
+- `curl` 到内网地址 (SSRF防护)
+- 覆盖 `.git/` `.env` `deploy/` (受保护路径)
+
+**当前实施状态**:
+- L1/L2/L3 模式定义: ✅ (本文档)
+- hardline blocklist: ⚠️ 部分 (`injection_scan.py` 8个正则)
+- 受保护路径: ⚠️ 部分 (`.env` `.git` 在 `.gitignore`)
+- OS级Docker隔离: ⬜ 未实现 (见信任边界声明)
 
 ## 用户责任
 

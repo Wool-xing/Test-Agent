@@ -30,6 +30,16 @@ def is_safe_webhook_url(url: str) -> bool:
 
     if addr.is_loopback or addr.is_link_local or addr.is_unspecified or addr.is_private:
         return False
+    # Block cloud metadata endpoints (SSRF to AWS/GCP/Azure metadata)
+    if str(addr) == "169.254.169.254":
+        return False
+    # DNS rebinding defense: re-resolve and compare
+    try:
+        addr2 = ipaddress.ip_address(socket.gethostbyname(host))
+        if addr2 != addr:
+            return False  # DNS rebinding detected
+    except (OSError, ValueError):
+        pass
     return True
 
 

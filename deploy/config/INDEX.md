@@ -12,6 +12,12 @@
 | [.env.example](.env.example) | 环境变量模板（占位值，复制为 `.env` 后填实值） | ✅ 模板提交，`.env` 不提交 |
 | [.mcp.json](.mcp.json) | MCP 服务配置（当前仅启用 filesystem；其他通道 SDK 直连） | ✅ |
 | [mcp-server-impl.md](mcp-server-impl.md) | MCP server 自实现教程（zentao / wechat / feishu / dingtalk 骨架，按需启用） | ✅ |
+| [.env.minimal.example](.env.minimal.example) | 最小环境变量模板（仅必需项，快速启动用） | ✅ |
+| [llm-providers.md](llm-providers.md) | 11 家 LLM 厂商配置指南（key / base URL / model） | ✅ |
+| [quality_gates.yaml](quality_gates.yaml) | 质量门禁定义（CRAP / 覆盖率 / 安全 / 性能 / 文档5项） | ✅ |
+| [check_version.py](check_version.py) | 版本一致性检查脚本（VERSION vs pyproject.toml vs tag） | ✅ |
+| [settings.json](settings.json) | Claude Code 项目级 harness 配置（Stop hook → check_version.py） | ✅ |
+| [templates/](templates/) | Jinja 模板目录（base.env.tpl / base.tagent.yml.tpl / STARTUP.md.tpl / MEMORY.md.tpl） | ✅ |
 
 ## 配置生效位置
 

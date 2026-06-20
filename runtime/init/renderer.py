@@ -98,9 +98,9 @@ def _build_tpl_vars(ans: InitAnswers, m: Matrix) -> dict[str, str]:
         "PLATFORM_DEPS_HINT": platform_deps_hint,
         "SAMPLE_TARGET": sample_target,
         # infra defaults (dev only — user must change for production)
-        "DB_URL": "postgresql+psycopg://tagent:tagent@localhost:5432/tagent",
-        "MINIO_ACCESS_KEY": "minioadmin",
-        "MINIO_SECRET_KEY": "minioadmin",
+        "DB_URL": "postgresql+psycopg://<user>:<password>@localhost:5432/<dbname>",
+        "MINIO_ACCESS_KEY": "<your-minio-access-key>",
+        "MINIO_SECRET_KEY": "<your-minio-secret-key>",
     }
 
 

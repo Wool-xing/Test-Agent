@@ -41,19 +41,21 @@ class Settings(BaseSettings):
 
     llm_provider: str = Field(default="claude")
     llm_provider_fallback: str = Field(default="ollama")
-    llm_model: str = Field(default="claude-sonnet-4-6")
-    llm_model_fallback: str = Field(default="qwen2.5:7b")
+    llm_model: str = Field(default="")
+    llm_heavy_model: str = Field(default="")
+    llm_model_fallback: str = Field(default="")
+    llm_api_base: str = Field(default="")
     llm_timeout_seconds: int = Field(default=60)
     llm_max_retries: int = Field(default=2)
 
-    db_url: str = Field(default="")
+    db_url: str = Field(default="sqlite:///workspace/tagent.db")
     minio_endpoint: str = Field(default="localhost:9000")
     minio_access_key: str = Field(default="")
     minio_secret_key: str = Field(default="")
     minio_bucket: str = Field(default="tagent-evidence")
     minio_secure: bool = Field(default=False)
 
-    prefect_api_url: str = Field(default="http://localhost:4200/api")
+    prefect_api_url: str = Field(default="http://127.0.0.1:8831/api")
     otel_endpoint: str = Field(default="http://localhost:4317")
     otel_enabled: bool = Field(default=False)
 
@@ -119,26 +121,51 @@ class Settings(BaseSettings):
 
         issues: list[dict[str, str]] = []
 
-        # LLM key check
+        # LLM key check — explicit provider check, not wildcard *_API_KEY
         llm_key = os.getenv("TAGENT_LLM_API_KEY", "")
         if not llm_key:
-            alt_keys = ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DASHSCOPE_API_KEY", "DEEPSEEK_API_KEY"]
-            if not any(os.getenv(k) for k in alt_keys):
-                issues.append({
-                    "level": "warning",
-                    "key": "llm_api_key",
-                    "message": "No LLM API key found — LLM calls will fail. Set TAGENT_LLM_API_KEY in .env or environment.",
-                })
+            # Check known provider-specific keys (not wildcard — avoids false positives)
+            for provider_key in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "DEEPSEEK_API_KEY",
+                                  "GEMINI_API_KEY", "DASHSCOPE_API_KEY", "ZHIPU_API_KEY"):
+                llm_key = os.getenv(provider_key, "")
+                if llm_key:
+                    break
+        if not llm_key:
+            issues.append({
+                "level": "warning",
+                "key": "llm_api_key",
+                "message": "No LLM API key found — LLM calls will fail. Set TAGENT_LLM_API_KEY in .env or environment.",
+            })
 
-        # Critical dirs exist
+        # Critical dirs exist (already resolved in model_post_init)
         for attr, label in [("experts_dir", "experts"), ("skills_dir", "skills"), ("scripts_dir", "scripts")]:
-            p = self.resolve(getattr(self, attr))
+            p = getattr(self, attr)
             if not p.is_dir():
                 issues.append({
                     "level": "error",
                     "key": attr,
                     "message": f"{label} directory not found: {p}",
                 })
+
+        # Workspace writability
+        ws = self.workspace_dir
+        if ws.is_dir():
+            try:
+                test_file = ws / ".tagent_write_test"
+                test_file.touch()
+                test_file.unlink()
+            except Exception:
+                issues.append({
+                    "level": "warning",
+                    "key": "workspace_dir",
+                    "message": f"workspace directory not writable: {ws}",
+                })
+        else:
+            issues.append({
+                "level": "warning",
+                "key": "workspace_dir",
+                "message": f"workspace directory not found: {ws}",
+            })
 
         # DB URL: warn if postgres and no psycopg
         if self.db_url and "postgres" in self.db_url:

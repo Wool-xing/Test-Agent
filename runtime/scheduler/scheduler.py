@@ -42,9 +42,10 @@ def _acquire_lock(lock_path: Path):
         if _LOCK_BACKEND == "fcntl":
             fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         elif _LOCK_BACKEND == "msvcrt":
+            f.seek(0)  # lock from byte 0 so all processes conflict on same region
             msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
         return f, True
-    except OSError:
+    except (OSError, IOError):
         f.close()
         return None, False
 
@@ -54,7 +55,8 @@ def _release_lock(f) -> None:
         if _LOCK_BACKEND == "fcntl":
             fcntl.flock(f.fileno(), fcntl.LOCK_UN)
         elif _LOCK_BACKEND == "msvcrt":
-            with contextlib.suppress(OSError):
+            with contextlib.suppress(OSError, IOError):
+                f.seek(0)
                 msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
     finally:
         with contextlib.suppress(OSError):

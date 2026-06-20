@@ -7,6 +7,19 @@ SKILL_IMPL_STATUS: production
 
 # tdd-workflow
 
+> 对标: Superpowers test-driven-development
+
+## 铁律 (Iron Law)
+
+```
+无失败测试 = 不得写生产代码
+```
+
+**先写代码再补测试? 删除代码。重新来过。**
+
+不要"保留作为参考"。不要"边写测试边调整"。删除就是删除。
+从测试开始全新的实现。没有例外。
+
 ## 触发
 
 - 新功能 / 修 bug / 重构 / 加 API endpoint / 新组件

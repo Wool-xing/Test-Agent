@@ -19,6 +19,7 @@ PROVIDER_MODEL_MAP: dict[str, str] = {
     "gemini": "gemini/gemini-1.5-pro",
     "qwen": "dashscope/qwen-plus",
     "deepseek": "deepseek/deepseek-chat",
+    "zhipu": "zhipu/glm-4-plus",
     "ollama": "ollama/qwen2.5:7b",
 }
 
@@ -219,6 +220,24 @@ def _stub_response(_system: str, user: str) -> str:
         if any(k in target_text for k in keywords):
             target, experts = t, exp
             break
+    _STUB_ONELINERS = {
+        "requirements-analyst": "分析输入并提取测试需求",
+        "testcase-designer": "根据需求设计测试用例",
+        "env-manager": "准备测试环境与依赖",
+        "data-preparer": "生成或加载测试数据",
+        "automation-engineer": "编写自动化测试脚本",
+        "automotive-tester": "执行车载系统专项测试",
+        "mobile-tester": "执行移动端专项测试",
+        "desktop-tester": "执行桌面端专项测试",
+        "visual-tester": "执行视觉/游戏专项测试",
+        "system-tester": "执行系统集成专项测试",
+        "ai-tester": "执行 AI 模型专项测试",
+        "pentest-tester": "执行渗透测试",
+        "test-executor": "执行已生成的测试用例",
+        "bug-manager": "收集并分类发现的问题",
+        "report-generator": "汇总测试结果生成报告",
+        "test-lead": "协调全流程并输出最终结论",
+    }
     nodes = []
     prev = None
     for i, exp in enumerate(experts):
@@ -234,6 +253,11 @@ def _stub_response(_system: str, user: str) -> str:
             "inputs": {},
             "on_failure": "retry",
             "timeout_seconds": 1800,
+            "one_liner_zh": _STUB_ONELINERS.get(exp_name, f"执行 {exp_name} 任务"),
+            "one_liner_en": f"Execute {exp_name} task",
+            "why": _STUB_ONELINERS.get(exp_name, ""),
+            "theory_refs": [],
+            "alternatives": [],
         }
         nodes.append(node)
         prev = node["id"]

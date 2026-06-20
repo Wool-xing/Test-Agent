@@ -13,6 +13,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -252,7 +253,7 @@ def run_monkey(
 ) -> dict:
     """Execute Android Monkey stability test. Returns crash/ANR summary."""
     if output_dir is None:
-        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/monkey"
+        output_dir = str(get_output_dir("monkey"))
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = Path(output_dir) / f"monkey_{package}_{ts}.log"
@@ -293,7 +294,7 @@ def archive_logcat(serial: Optional[str] = None,
                    output: str = None) -> Optional[str]:
     """归档 Android logcat"""
     if output is None:
-        output = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/logcat"
+        output = str(get_output_dir("logcat"))
     Path(output).mkdir(parents=True, exist_ok=True)
     file = Path(output) / f"logcat_{datetime.now():%Y%m%d_%H%M%S}.log"
     cmd = ["adb"]
@@ -322,7 +323,7 @@ def main():
     perf.add_argument("--platform", choices=["android", "ios"], required=True)
     perf.add_argument("--package", required=True)
     perf.add_argument("--duration", type=int, default=60)
-    perf.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/mobile-perf")
+    perf.add_argument("--output", default=str(get_output_dir("mobile-perf")))
 
     log = sub.add_parser("archive-logcat")
     log.add_argument("--serial", default=None)
@@ -333,7 +334,7 @@ def main():
     monkey.add_argument("--throttle", type=int, default=200)
     monkey.add_argument("--seed", type=int, default=None)
     monkey.add_argument("--serial", default=None)
-    monkey.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/monkey")
+    monkey.add_argument("--output", default=str(get_output_dir("monkey")))
     monkey.add_argument("--timeout", type=int, default=3600)
 
     args = parser.parse_args()

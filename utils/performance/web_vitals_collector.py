@@ -13,6 +13,7 @@ import os
 import subprocess
 from pathlib import Path
 from typing import Dict, Optional
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ def collect_via_playwright(url: str, page=None, timeout: int = 30) -> Dict:
 def collect_via_lighthouse(url: str, output_dir: str = None) -> Dict:
     """需安装 lighthouse: npm install -g lighthouse"""
     if output_dir is None:
-        output_dir = f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/web-vitals"
+        output_dir = str(get_output_dir("web-vitals"))
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     json_path = Path(output_dir) / "lighthouse.json"
 

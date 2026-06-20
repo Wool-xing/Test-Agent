@@ -12,14 +12,19 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import sys
 import time
 from pathlib import Path as _Path
 
 from prompt_toolkit import PromptSession
+from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
+
+# Rich Markup → prompt_toolkit FormattedText converter
+from rich.text import Text as RichText
 
 from runtime.cli._shared import console
 from runtime.cli.completer import _PROVIDERS, SlashCompleter
@@ -33,8 +38,7 @@ _SHEEP = r"""
          ▐▌ ▐▌
 
   ૮₍˶ᵔ ᗜ ᵔ˶₎ა  Test-Agent v{version}
-  AI Router · {experts} Experts · {skills} Skills
-  Type !help for commands, or describe your test task."""
+  AI Router · {experts} Experts · {skills} Skills"""
 
 _SESSION_DIR = get_settings().gateway_dir
 _SESSION_FILE = _SESSION_DIR / "active_session.json"
@@ -47,9 +51,19 @@ _start_time: float = 0.0
 _cmd_history: list[str] = []  # last 10 user commands for /N quick re-run
 _BUILTIN_MAP: dict = {}
 
-_PROMPT_STYLE = Style.from_dict({
-    "prompt": "bold cyan",
-})
+def _get_prompt_style() -> Style:
+    """Build prompt_toolkit Style from active skin's colors (dynamic, not hardcoded)."""
+    try:
+        from runtime.cli.colorscheme import get_colorscheme
+        return get_colorscheme().pt_style()
+    except Exception:
+        return Style.from_dict({
+            "prompt": "bold cyan",
+            "separator": "#888888",
+            "bottom-toolbar": "bg:#1a1a2e fg:#a0a0c0",
+            "bottom-toolbar.separator": "#444444",
+        })
+
 
 # Key bindings: Ctrl+D exits, Alt+Enter inserts newline for multi-line input
 _kb = KeyBindings()
@@ -67,6 +81,13 @@ def _ctrl_d_exit(event):
     event.app.exit(result=None)
 
 
+@_kb.add("c-l")
+def _redraw_screen(event):
+    """Ctrl+L: clear and redraw screen (standard terminal behavior)."""
+    event.app.renderer.clear()
+    event.app.invalidate()
+
+
 _ML_START_MARKERS = ('"""', "'''", "```")  # triggers for auto multi-line mode
 
 
@@ -82,7 +103,7 @@ def _read_multiline(session: PromptSession | None) -> str:
     lines = []
     try:
         first = session.prompt(
-            message=[("class:prompt", "> "), ("class:prompt.dim", "[…] ")],
+            message=[("class:prompt", "❯ "), ("class:prompt.dim", "[…] ")],
         )
         if first is None:
             return ""
@@ -123,7 +144,7 @@ def _fallback_multiline() -> str:
     """Read multi-line input without prompt_toolkit (Git Bash fallback)."""
     lines = []
     try:
-        first = console.input("[bold cyan]> [/]").strip()
+        first = console.input("[bold cyan]❯ [/]").strip()
         if not first:
             return ""
         lines.append(first)
@@ -170,11 +191,13 @@ def _count_md_files(dirname: str) -> int:
     return len([f for f in d.glob("*.md") if f.name.upper() != "README.MD"])
 
 
-_PROVIDER_MODELS = {
-    "claude": "claude-sonnet-4-6", "openai": "gpt-4o",
-    "gemini": "gemini-1.5-pro", "deepseek": "deepseek-chat",
-    "qwen": "qwen-plus", "ollama": "qwen2.5:7b",
-}
+def _icon(kind: str) -> str:
+    """Get icon from active skin via ColorScheme."""
+    try:
+        from runtime.cli.colorscheme import get_colorscheme
+        return get_colorscheme().icon(kind)
+    except Exception:
+        return {"ok": "✓", "fail": "✗", "warn": "⚠", "info": "💡"}.get(kind, "")
 
 
 def _current_provider() -> str:
@@ -182,46 +205,254 @@ def _current_provider() -> str:
 
 
 def _current_model() -> str:
-    return os.environ.get("TAGENT_LLM_MODEL", _PROVIDER_MODELS.get(_current_provider(), "unknown"))
+    """Resolve current model via model_router (no hardcoded list)."""
+    if os.environ.get("TAGENT_LLM_MODEL"):
+        return os.environ["TAGENT_LLM_MODEL"]
+    try:
+        from runtime.router.model_router import get_model_tier
+        tier = get_model_tier()
+        return tier.heavy_model
+    except Exception:
+        return "unknown"
+
+
+# ── Status Bar & Prompt ──────────────────────────────────────────
+
+_health_cache: tuple[float, list[dict]] = (0.0, [])  # (timestamp, issues)
+
+
+def _term_width() -> int:
+    try:
+        return shutil.get_terminal_size().columns
+    except Exception:
+        return 80
+
+
+def _cached_health() -> list[dict]:
+    """Return cached health issues (refresh every 30s)."""
+    global _health_cache
+    now = time.time()
+    if now - _health_cache[0] > 30:
+        try:
+            _health_cache = (now, get_settings().validate_startup())
+        except Exception:
+            _health_cache = (now, [])
+    return _health_cache[1]
+
+
+def _git_branch() -> str:
+    """Return current git branch name, or empty string."""
+    try:
+        import subprocess
+        r = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True, text=True, timeout=3,
+            cwd=str(get_settings().project_root),
+        )
+        return r.stdout.strip()
+    except Exception:
+        return ""
+
+
+def _estimate_tokens(text: str) -> int:
+    """Token count estimate. Uses tiktoken if available, else heuristic."""
+    if not text:
+        return 0
+    try:
+        import tiktoken
+        enc = tiktoken.get_encoding("cl100k_base")
+        return len(enc.encode(text))
+    except Exception:
+        pass
+    cjk = sum(1 for c in text if '一' <= c <= '鿿' or '぀' <= c <= 'ヿ')
+    ascii_chars = len(text) - cjk
+    return max(1, (ascii_chars // 4) + (cjk * 2 // 3))
+
+
+def _context_pct() -> int:
+    """Real token-based context usage percentage."""
+    mem = _get_memory()
+    if not mem or not mem.messages:
+        return 0
+    total = "".join(m.content for m in mem.messages if hasattr(m, 'content'))
+    tokens = _estimate_tokens(total)
+    model = _current_model().lower()
+    _LIMITS = {"claude": 200000, "gpt-4": 128000, "deepseek": 128000,
+               "gemini": 1000000, "qwen": 131072, "glm": 128000}
+    limit = next((v for k, v in _LIMITS.items() if k in model), 200000)
+    return min(99, int(tokens * 100 / limit))
+
+
+def _render_prompt_message() -> list[tuple[str, str]]:
+    """Prompt only — separator is in bottom toolbar (CC/DeepSeek pattern)."""
+    return [("class:prompt", "❯ ")]
+
+
+def _render_bottom_toolbar() -> "HTML":
+    """Bottom separator + 4-line status bar (CC density). Returns HTML for PromptSession."""
+    from prompt_toolkit.formatted_text import HTML
+    w = _term_width()
+    sep = "─" * w
+    p = _current_provider()
+    m = _current_model()
+    b = _git_branch()
+    pct = _context_pct()
+    proj = os.environ.get("PROJECT_NAME", get_settings().project_root.name)
+
+    # Health
+    issues = _cached_health()
+    errs = [i for i in issues if i["level"] == "error"]
+    warns = [i for i in issues if i["level"] == "warning"]
+
+    # Line 1: [provider model] · project · git · health
+    model_str = f"<b>[{p}]</b>"
+    if m and m != p:
+        model_str += f" <b>[{m}]</b>"
+    p1 = [model_str]
+    # Show project folder name when PROJECT_NAME is the default
+    proj_display = proj
+    if proj == "default":
+        proj_display = get_settings().project_root.name
+    p1.append(f"<ansicyan>{proj_display}</ansicyan>")
+    if b:
+        p1.append(f"<ansigreen>git:{b}</ansigreen>")
+    # Show last test result if available
+    try:
+        from pathlib import Path as _P
+        _rf = get_settings().workspace_dir / "测试报告" / "last_run.json"
+        if _rf.exists():
+            import json as _json
+            _lr = _json.loads(_rf.read_text(encoding='utf-8'))
+            _s, _t = _lr.get('succeeded', 0), _lr.get('total', 0)
+            if _t > 0:
+                _rate = _s / _t
+                _c = 'ansigreen' if _rate >= 0.9 else ('ansiyellow' if _rate >= 0.7 else 'ansired')
+                p1.append(f"<{_c}>tests:{_s}/{_t}</{_c}>")
+    except Exception:
+        pass
+    if errs:
+        p1.append(f"<ansired>{_icon('warn')} {len(errs)}</ansired>")
+    elif warns:
+        p1.append(f"<ansiyellow>{_icon('warn')} {len(warns)}</ansiyellow>")
+    else:
+        p1.append(f"<ansigreen>{_icon('ok')}</ansigreen>")
+    l1 = "  " + _fit_line(w - 2, p1)
+
+    # Line 2: Context gauge (color-coded) + counts
+    bar_len = 10
+    filled = min(bar_len, pct * bar_len // 100)
+    empty = bar_len - filled
+    if pct >= 85:
+        gauge = f"<ansired>{'█' * filled}</ansired>{'░' * empty}"
+    elif pct >= 60:
+        gauge = f"<ansiyellow>{'█' * filled}</ansiyellow>{'░' * empty}"
+    else:
+        gauge = f"<ansigray>{'█' * filled}</ansigray>{'░' * empty}"
+    p2 = [f"Context {gauge} {pct}%"]
+    if _count_md_files("agents"):
+        p2.append(f"{_count_md_files('agents')} agents")
+    if _count_md_files("skills"):
+        p2.append(f"{_count_md_files('skills')} skills")
+    l2 = "  " + _fit_line(w - 2, p2)
+
+    # Line 3: Config files (dimmed, drops first on narrow terminals)
+    root = get_settings().project_root
+    p3 = []
+    if (root / "CLAUDE.md").is_file():
+        p3.append("CLAUDE.md")
+    if (root / ".env").is_file():
+        p3.append(".env")
+    if (root / ".mcp.json").is_file():
+        p3.append("MCP")
+    l3 = "  <ansigray>" + _fit_line(w - 2, p3) + "</ansigray>" if p3 else ""
+
+    # Line 4: Quick tips (CC-style, dimmed, first to collapse)
+    l4 = "  <ansigray>" + _fit_line(w - 2, ["!help", "!doctor", "!model", "!status", "!clear"]) + "</ansigray>"
+
+    return HTML(f"{sep}\n{l1}\n{l2}\n{l3}\n{l4}")
+
+
+def _fit_line(width: int, parts: list[str]) -> str:
+    """Fit as many parts as possible into `width` columns.
+    Joins with " · " (DeepSeek/OI pattern). Drops rightmost first."""
+    import re
+    sep = " · "
+    full = sep.join(parts)
+    if len(re.sub(r'<[^>]+>', '', full)) <= width:
+        return full
+    for n in range(len(parts) - 1, 0, -1):
+        candidate = sep.join(parts[:n])
+        if len(re.sub(r'<[^>]+>', '', candidate)) <= width:
+            return candidate
+    return parts[0]
+
+
 
 
 # ── Banner & Help ─────────────────────────────────────────────────
 
 
 def _print_banner() -> None:
-    from rich.live import Live
-    from rich.text import Text
-
-    banner = _SHEEP  # fallback
+    """Compact banner: sheep + version + model + project (CC-style header)."""
     try:
         from runtime.cli.skins import apply_skin_to_banner
         banner = apply_skin_to_banner()
     except Exception:
-        pass  # use default _SHEEP
+        banner = _SHEEP
+    console.print(banner)
+    console.print(f"  [bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
+    console.print(f"  [dim]{get_settings().project_root}[/]")
 
-    # Animated typewriter reveal — speed from skin config
-    try:
-        from runtime.cli.skins import get_skin, get_current_skin_name
-        skin = get_skin(get_current_skin_name())
-        animation_speed = skin.get("animation_speed", 0.0005)
-        text_style = skin.get("panel_style", {}).get("text", "bold white")
-    except Exception:
-        animation_speed = 0.0005
-        text_style = "bold white"
-    try:
-        from rich.markup import render as _render_markup
-        accumulated = Text("")
-        with Live(accumulated, console=console, refresh_per_second=120, transient=False) as live:
-            for ch in banner:
-                accumulated.append(ch)
-                # Re-render with markup so colors appear inline
-                live.update(Text.from_markup(str(accumulated)))
-                time.sleep(animation_speed)
-    except Exception:
-        # Fallback: plain print if terminal doesn't support Live
-        console.print(banner)
+    issues = _cached_health()
+    errors = [i for i in issues if i["level"] == "error"]
+    warnings = [i for i in issues if i["level"] == "warning"]
+    ico = _icon("warn")
+    if errors:
+        console.print(f"  [red]{ico} {len(errors)} errors[/] · [dim]!doctor[/]")
+    elif warnings:
+        console.print(f"  [yellow]{ico} {len(warnings)} warnings[/] · [dim]!doctor[/]")
 
     console.print()
+
+
+def _print_banner_transcript(tui: object) -> None:
+    """Seed transcript TUI with banner + provider/model/project + health + startup stats."""
+    try:
+        from runtime.cli.skins import apply_skin_to_banner
+        banner = apply_skin_to_banner()
+    except Exception:
+        banner = _SHEEP
+    tui.append_output(banner)
+    tui.append_output(f"  [bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
+    tui.append_output(f"  [dim]{get_settings().project_root}[/]")
+
+    issues = _cached_health()
+    errors = [i for i in issues if i["level"] == "error"]
+    warnings = [i for i in issues if i["level"] == "warning"]
+    if errors:
+        tui.append_output(f"  [red]⚠ {len(errors)} errors[/] · [dim]!doctor[/]")
+    elif warnings:
+        tui.append_output(f"  [yellow]⚠ {len(warnings)} warnings[/] · [dim]!doctor[/]")
+
+    # Condensed startup stats
+    parts = []
+    try:
+        from runtime.cli.conversation import _discover_project_context, load_memory_md
+        if _discover_project_context():
+            parts.append("[dim]📋 CLAUDE.md[/]")
+    except Exception:
+        pass
+    try:
+        md = load_memory_md()
+        if md:
+            parts.append(f"[dim]🧠 {md.count(chr(10)) + 1}f[/]")
+    except Exception:
+        pass
+    mem = _get_memory()
+    if mem.messages:
+        parts.append(f"[dim]{len(mem.messages)} turns[/]")
+    if parts:
+        tui.append_output("  " + " · ".join(parts))
 
 
 def _print_help() -> None:
@@ -531,16 +762,27 @@ def _handle_slash(text: str) -> None:
 
     cmd = resolve(name)
     if cmd is None:
+        # Try TheFuck-style rule correction first
+        from runtime.cli.commands.slash_handlers import _apply_fc_rules
+        rule_text, rule_reason = _apply_fc_rules(f"!{name}")
+        if rule_text:
+            global _last_fix
+            _last_fix = rule_text.lstrip("!")
+            console.print(
+                f"[red]Unknown: !{name}[/]  "
+                f"[dim]{rule_reason}. Run [/][cyan]!fc[/][dim] to auto-correct.[/]"
+            )
+            return
+        # Fallback: edit-distance suggestion
         suggestion = closest(name)
         if suggestion:
-            from runtime.cli.slash_commands import resolve as _r
-            _sugg = _r(suggestion)
+            _last_fix = suggestion
             console.print(
-                f"[red]Unknown: /{name}[/]  "
-                f"[dim]Did you mean [/][cyan]/{suggestion}[/][dim]? Run [/][cyan]/fc[/][cyan][/][dim] to fix.[/]"
+                f"[red]Unknown: !{name}[/]  "
+                f"[dim]Did you mean [/][cyan]!{suggestion}[/][dim]? Run [/][cyan]!fc[/][cyan][/][dim] to fix.[/]"
             )
         else:
-            console.print(f"[red]Unknown: /{name}[/]  [dim](!help for commands)[/]")
+            console.print(f"[red]Unknown: !{name}[/]  [dim](!help for commands)[/]")
         return
 
     try:
@@ -574,16 +816,105 @@ def _save_session() -> None:
 # ── REPL Entry ────────────────────────────────────────────────────
 
 
+def _render_rprompt() -> list[tuple[str, str]]:
+    """Right-aligned prompt info — model + context % (compact, CC style)."""
+    m = _current_model()
+    pct = _context_pct()
+    short = m[:14] + ".." if len(m) > 14 else m
+    return [("class:prompt.dim", f"{short}  ")]
+
+
+def _set_terminal_title(proj: str, model: str) -> None:
+    """Set terminal title via OSC escape (CC/DeepSeek pattern)."""
+    try:
+        sys.stdout.write(f"\033]0;Test-Agent: {proj} ({model})\007")
+        sys.stdout.flush()
+    except Exception:
+        pass
+
+
+def _rich_to_pt(markup: str) -> FormattedText:
+    """Convert Rich markup string to prompt_toolkit FormattedText.
+
+    This is the bridge that lets us use Rich markup throughout the codebase
+    while rendering output through prompt_toolkit's print_formatted_text().
+    """
+    rt = RichText.from_markup(markup)
+    segments = []
+    for span in rt.spans:
+        start = span.start
+        end = span.end
+        text = rt.plain[start:end]
+        style_str = str(span.style) if span.style else ""
+        # Map Rich style names → prompt_toolkit style names
+        pt_style = _rich_style_to_pt(style_str)
+        segments.append((pt_style, text))
+    return FormattedText(segments)
+
+
+def _rich_style_to_pt(rich_style: str) -> str:
+    """Map a Rich style string to a prompt_toolkit style string."""
+    mapping = {
+        "bold": "bold",
+        "dim": "ansigray",
+        "italic": "italic",
+        "cyan": "ansicyan",
+        "bright_cyan": "ansicyan",
+        "green": "ansigreen",
+        "bright_green": "ansigreen",
+        "red": "ansired",
+        "bright_red": "ansired",
+        "yellow": "ansiyellow",
+        "bright_yellow": "ansiyellow",
+        "blue": "ansiblue",
+        "magenta": "ansimagenta",
+        "white": "",
+        "bright_white": "bold",
+        "black": "ansigray",
+        "default": "",
+    }
+    parts = []
+    for token in rich_style.split():
+        token = token.strip()
+        if not token:
+            continue
+        # Handle 'bold dim' → ['bold', 'ansigray']
+        mapped = mapping.get(token, "")
+        if mapped:
+            parts.append(mapped)
+    return " ".join(parts)
+
+
+def _repl_print(markup: str = "", **kwargs: object) -> None:
+    """Print to TUI via prompt_toolkit — does NOT corrupt terminal layout.
+
+    Converts Rich markup to prompt_toolkit FormattedText, then uses
+    print_formatted_text() which inserts output cleanly above the prompt.
+    """
+    from prompt_toolkit import print_formatted_text as pt_print
+    try:
+        ft = _rich_to_pt(markup)
+        pt_print(ft)
+    except Exception:
+        # Fallback: print plain text
+        import re as _re
+        plain = _re.sub(r'\[[^\]]*\]', '', markup)
+        pt_print(FormattedText([("", plain)]))
+
+
 def _create_session() -> PromptSession | None:
-    """Create prompt_toolkit session. Returns None if TTY unsupported."""
+    """Create prompt_toolkit session — dynamic style from skin, CC layout."""
     try:
         _SESSION_DIR.mkdir(parents=True, exist_ok=True)
+        style = _get_prompt_style()
         return PromptSession(
             history=FileHistory(str(_HISTORY_FILE)),
             completer=SlashCompleter(),
-            style=_PROMPT_STYLE,
+            style=style,
             key_bindings=_kb,
-            message=[("class:prompt", "> ")],
+            message=_render_prompt_message,
+            rprompt=_render_rprompt,
+            bottom_toolbar=_render_bottom_toolbar,
         )
     except Exception:
         return None
@@ -593,11 +924,11 @@ def _read_input(session: PromptSession | None) -> str | None:
     """Read user input. Uses prompt_toolkit if available, falls back to Rich."""
     if session is not None:
         try:
-            return session.prompt().strip()
+            return session.prompt(rprompt=_render_rprompt).strip()
         except Exception:
-            pass  # fall through to fallback
+            pass
     try:
-        return console.input("[bold cyan]> [/]").strip()
+        return console.input("[bold cyan]❯ [/]").strip()
     except (EOFError, KeyboardInterrupt):
         return None
 
@@ -608,7 +939,10 @@ def _check_first_run() -> None:
     if provider in ("ollama", "stub"):
         return  # local/stub — no API key needed
 
+    # Check any *_API_KEY env var (openai/deepseek/anthropic/zhipu/... all use this convention)
     api_key = os.environ.get("TAGENT_LLM_API_KEY", "")
+    if not api_key:
+        api_key = next((v for k, v in os.environ.items() if k.endswith("_API_KEY") and v), "")
     has_env_file = (get_settings().project_root / ".env").exists()
 
     if not api_key and not has_env_file:
@@ -628,138 +962,140 @@ def _check_first_run() -> None:
         )
 
 
+def _suppress_noise() -> None:
+    """Suppress third-party log noise (LiteLLM, Prefect, loguru) in interactive mode."""
+    # Must be set BEFORE any litellm import — suppress cost-map fetch + debug
+    os.environ["LITELLM_SUPPRESS_DEBUG_INFO"] = "1"
+    os.environ.setdefault("LITELLM_LOCAL_MODEL_COST_MAP", "True")
+
+    # LiteLLM — aggressive suppression
+    try:
+        import litellm
+        litellm.set_verbose = False
+        litellm.suppress_debug_info = True
+        # Silence litellm's own logger
+        import logging as _logging
+        for _name in ("litellm", "LiteLLM"):
+            _logging.getLogger(_name).setLevel(_logging.ERROR)
+    except Exception:
+        pass
+
+    # Prefect — silence ALL noise. Prefect 3.x uses stdlib logging, not env vars.
+    os.environ.setdefault("PREFECT_LOGGING_LEVEL", "CRITICAL")
+    os.environ["PREFECT_API_URL"] = ""  # block Prefect server startup
+    try:
+        import logging as _logging
+        # Nuke every prefect logger to CRITICAL
+        for _name in list(_logging.root.manager.loggerDict.keys()):
+            if "prefect" in _name.lower():
+                _logging.getLogger(_name).setLevel(_logging.CRITICAL)
+        _logging.getLogger("prefect").setLevel(_logging.CRITICAL)
+    except Exception:
+        pass
+
+    # loguru — route to stderr, ERROR only (WARNING during dev)
+    try:
+        from loguru import logger as _loguru
+        _loguru.remove()
+        _loguru.add(
+            sys.stderr,
+            level="ERROR",
+            format="<dim>{time:HH:mm:ss}</dim> | <level>{level: <8}</level> | {message}",
+            colorize=True,
+        )
+    except Exception:
+        pass
+
+
 def start() -> None:
     global _start_time
     _start_time = time.time()
 
+    _suppress_noise()
+
+    # ── Load essentials (no stdout — all display goes through transcript TUI) ──
+    try:
+        from runtime.plugins import discover_plugins
+        for pname, pmod in (discover_plugins() or {}).items():
+            try:
+                info = pmod.register()
+                if callable(info.get("run")):
+                    _BUILTIN_MAP[pname] = lambda a, fn=info["run"]: None
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    try:
+        from runtime.scheduler.scheduler import start_background
+        start_background()
+    except Exception:
+        pass
+
+    # ── PromptSession REPL ──
+    _set_terminal_title(
+        proj=os.environ.get("PROJECT_NAME", get_settings().project_root.name),
+        model=_current_model(),
+    )
+
     _print_banner()
     _check_first_run()
 
-    # Version check (non-blocking, 24h rate-limited by check_version.py)
-    try:
-        import subprocess
-        import threading
-        def _check_version():
-            from runtime.config.settings import get_settings
-            checker = get_settings().config_dir / "check_version.py"
-            if checker.is_file():
-                r = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, timeout=8)
-                if r.stdout.strip():
-                    console.print(r.stdout.strip())
-        t = threading.Thread(target=_check_version, daemon=True)
-        t.start()
-    except Exception:
-        pass
+    # Route Rich output → prompt_toolkit (after banner to stdout)
+    _original_print = console.print
 
-    # Auto-learn user preferences (P3 #20)
-    try:
-        from runtime.cli.user_profile import learn_from_usage
-        prefs = learn_from_usage()
-        if prefs:
-            console.print(f"[dim]👤 Profile: {', '.join(f'{k}={v}' for k,v in prefs.items())}[/]")
-    except Exception:
-        pass
-
-    # Load plugins (P3 #22)
-    try:
-        from runtime.plugins import discover_plugins
-        plugins = discover_plugins()
-        if plugins:
-            for pname, pmod in plugins.items():
-                try:
-                    info = pmod.register()
-                    run_fn = info.get("run")
-                    if callable(run_fn):
-                        _BUILTIN_MAP[pname] = lambda a, fn=run_fn: (
-                            console.print(f"[green]Plugin {pname}:[/] {fn(a)}")
-                        )
-                except Exception:
-                    pass
-            console.print(f"[dim]🔌 {len(plugins)} plugin(s) loaded[/]")
-    except Exception:
-        pass
-
-    # Load project context (CLAUDE.md / AGENTS.md auto-discovered)
-    try:
-        from runtime.cli.conversation import _discover_project_context
-        proj_ctx = _discover_project_context()
-        if proj_ctx:
-            console.print("[dim]📋 Project context loaded[/]")
-    except Exception:
-        pass
-
-    # Start background scheduler for cron jobs
-    try:
-        from runtime.scheduler.scheduler import start_background
-        thread, stop = start_background()
-        console.print(f"[dim]⏰ Scheduler started (tick={60}s)[/]")
-    except Exception:
-        pass  # scheduler is optional — croniter may not be installed
-
-    # Show cross-session memory status
-    from runtime.cli.conversation import load_memory_md
-    mem_md = load_memory_md()
-    if mem_md:
-        facts = mem_md.count("\n") + 1
-        console.print(f"[dim]🧠 {facts} fact(s) loaded from MEMORY.md[/]\n")
-
-    mem = _get_memory()
-    if mem.messages:
-        console.print(f"[dim]Resumed {mem.session_id} ({len(mem.messages)} turns)[/]\n")
-
-    session = _create_session()
-    if session is None:
-        console.print(
-            "[dim](Tab completion not available in Git Bash / mintty. "
-            "Use cmd.exe, Windows Terminal, or PowerShell for full features.)[/]\n"
-        )
-
-    while True:
+    def _pt_bridge(markup: str = "", **kwargs: object) -> None:
         try:
-            result = _read_input(session)
-            if result is None:
-                _save_session()
-                console.print("\n[dim]Session saved. Goodbye.[/]")
-                break
-            user_input = result
-        except (EOFError, KeyboardInterrupt):
-            _save_session()
-            console.print("\n[dim]Session saved. Goodbye.[/]")
-            break
+            _repl_print(markup, **kwargs)
+        except Exception:
+            _original_print(markup, **kwargs)
 
-        if not user_input:
-            continue
+    console.print = _pt_bridge  # type: ignore[method-assign]
 
-        # Multi-line detection: code blocks + !ml command
-        if user_input.strip() == "!ml" or user_input.strip() == "!multiline":
-            user_input = _read_multiline(session)
-            if not user_input:
-                continue
-        elif _is_multiline_candidate(user_input):
-            # Already contains newlines from paste — process as-is
-            pass
+    # ── CC-style full-screen TUI (Application + transcript + pinned input) ──
+    from runtime.cli.tui_app import CCTui
 
-        # Alias expansion: check non-slash input against aliases
-        if not user_input.startswith("!"):
-            from runtime.cli.aliases import expand_alias
-            expanded = expand_alias(user_input)
-            if expanded:
-                console.print(f"[dim]→ {expanded}[/]")
-                user_input = expanded
+    def _tui_input(text: str) -> None:
+        if text.startswith("!"):
+            try:
+                _handle_slash(text)
+            except SystemExit:
+                tui.exit()
+            except Exception as exc:
+                tui.append_output(f"[red]Error: {exc}[/]")
+        else:
+            try:
+                _handle_natural_language(text)
+            except Exception as exc:
+                tui.append_output(f"[red]Error: {exc}[/]")
 
-        # Record in command history (non-slash only)
-        if not user_input.startswith("!"):
-            _cmd_history.append(user_input)
-            if len(_cmd_history) > 10:
-                _cmd_history.pop(0)
-
+    # Route Rich markup through transcript
+    def _tui_print(markup: str = "", **kwargs: object) -> None:
         try:
-            if user_input.startswith("!"):
-                _handle_slash(user_input)
-            else:
-                _handle_natural_language(user_input)
-        except SystemExit:
-            break
-        except Exception as exc:
-            console.print(f"[red]Error: {exc}[/]")
-            console.print("[dim]REPL continuing — !help for commands.[/]")
+            tui.append_output(markup)
+        except Exception:
+            _original_print(markup, **kwargs)
+
+    console.print = _tui_print  # type: ignore[method-assign]
+
+    tui = CCTui(
+        on_input=_tui_input,
+        status_bar=_render_bottom_toolbar,
+        model_display=lambda: _current_model()[:20],
+        completer=SlashCompleter(),
+        history=FileHistory(str(_HISTORY_FILE)),
+    )
+
+    # Seed transcript with banner
+    try:
+        from runtime.cli.skins import apply_skin_to_banner
+        tui.append_output(apply_skin_to_banner())
+    except Exception:
+        pass
+    tui.append_output(f"[bold cyan]{_current_provider()}[/] · [dim]{_current_model()}[/]")
+    tui.append_output(f"[dim]{get_settings().project_root}[/]")
+
+    tui.run()
+    _save_session()
+    console.print = _original_print
+    _original_print("[dim]Session saved. Goodbye.[/]")

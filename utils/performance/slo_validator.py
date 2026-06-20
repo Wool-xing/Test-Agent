@@ -15,6 +15,7 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
+from utils.paths import get_output_dir
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +129,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="SLO/SLI 验证")
     parser.add_argument("--metrics", required=True, help="JSON 文件含 metrics")
     parser.add_argument("--slos", default=None, help="JSON 文件含 SLO 定义")
-    parser.add_argument("--output", default=f"workspace/测试报告/{os.getenv('PROJECT_NAME', 'default')}/slo_report.json")
+    parser.add_argument("--output", default=str(get_output_dir("slo_report.json")))
     args = parser.parse_args()
     metrics = json.loads(Path(args.metrics).read_text(encoding="utf-8"))
     slos = json.loads(Path(args.slos).read_text(encoding="utf-8")) if args.slos else None

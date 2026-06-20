@@ -144,4 +144,4 @@ Both paths converge at utils/ execution layer.
 - Pentest workflows require `tagent.yml` with `pentest.authorized: true` — see `tagent.yml.example`.
 - MCP server: `python -m runtime.mcp.test_orchestrator.server` (catalog/plan/run/status/report).
 - LLM providers: edit `.env` → `TAGENT_LLM_PROVIDER`. Built-in: claude/openai/gemini/deepseek/qwen/ollama.
-- See `deploy/config/llm-providers.md` for OpenAI-compatible endpoints.
+- See `llm-providers.md` for OpenAI-compatible endpoints.

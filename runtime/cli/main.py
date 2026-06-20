@@ -28,6 +28,18 @@ def _version_callback(
     if version:
         console.print(f"Test-Agent Runtime v{runtime.__version__}")
         raise typer.Exit(0)
+
+    # Startup validation — runs for all invocations except --version
+    from runtime.config.settings import get_settings as _gs
+    _issues = _gs().validate_startup()
+    for _i in _issues:
+        _lvl = _i["level"]
+        _style = {"error": "red", "warning": "yellow"}.get(_lvl, "dim")
+        _prefix = {"error": "✗", "warning": "⚠"}.get(_lvl, "•")
+        console.print(f"[{_style}]{_prefix} {_i['message']}[/]")
+    if any(_i["level"] == "error" for _i in _issues):
+        console.print("[red]Startup check failed — run [cyan]!doctor[/] for details.[/]")
+
     # bare `tagent` (no subcommand, no --version) → interactive REPL
     if len(_sys.argv) == 1:
         from runtime.cli.interactive import start
@@ -37,7 +49,9 @@ def _version_callback(
 
 # Auto-discover CLI commands from slash command registry.
 # Commands with cli_module set are exposed as typer CLI commands.
-from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG  # noqa: E402
+# Must init REPL handlers first — gateway, cron, etc. have cli_module set.
+from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG, _init_repl_handlers  # noqa: E402
+_init_repl_handlers()
 
 _seen: set[str] = set()
 for _cmd in _REG:

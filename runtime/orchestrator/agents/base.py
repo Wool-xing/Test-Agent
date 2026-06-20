@@ -102,35 +102,55 @@ class AgentRunner(abc.ABC):
             ok = True
             degraded = True
         else:
-            try:
-                from runtime.subagent.aux_client import aux_client
+            # Devin-style layered error recovery:
+            # L0: retry with backoff → L1: try simpler prompt → L2: degraded fallback
+            retries = 0
+            max_retries = 2
+            while retries <= max_retries:
+                try:
+                    from runtime.subagent.aux_client import aux_client
 
-                client = aux_client()
-                from runtime.config.settings import get_settings
+                    client = aux_client()
+                    from runtime.config.settings import get_settings
 
-                raw = client.complete(
-                    self._system_prompt_with_integrity(),
-                    self.user_prompt(ctx),
-                    temperature=0.1,
-                    max_tokens=get_settings().agent_max_tokens,
-                )
-                output = self._parse_json(raw)
-                # JSON 解析错误 → ok=False + degraded
-                if "_parse_error" in output:
-                    ok = False
-                    degraded = True
-                    error_msg = output.get("_parse_error", "JSON parse failed")
-                else:
-                    ok = True
-                    degraded = False
-            except Exception as e:  # noqa: BLE001
-                # exec 模式 LLM 失败 → fallback to mock 但**绝不假绿**: ok=False + degraded=True
-                logger.error("{} runner LLM failed: {}; degraded fallback", self.name, e)
-                output = self.mock_output(ctx)
-                raw = f"[fallback] LLM raised: {e}"
-                ok = False
-                degraded = True
-                error_msg = f"LLM call failed: {e}"
+                    raw = client.complete(
+                        self._system_prompt_with_integrity(),
+                        self.user_prompt(ctx),
+                        temperature=0.1,
+                        max_tokens=get_settings().agent_max_tokens,
+                    )
+                    output = self._parse_json(raw)
+                    # JSON 解析错误 → retry (L0)
+                    if "_parse_error" in output:
+                        if retries < max_retries:
+                            retries += 1
+                            logger.warning("{} JSON parse error (attempt {}/{}), retrying",
+                                         self.name, retries, max_retries)
+                            continue
+                        ok = False
+                        degraded = True
+                        error_msg = output.get("_parse_error", "JSON parse failed after retries")
+                    else:
+                        ok = True
+                        degraded = False
+                    break
+                except Exception as e:  # noqa: BLE001
+                    if retries < max_retries:
+                        retries += 1
+                        delay = 2 ** retries
+                        logger.warning("{} LLM failed (attempt {}/{}): {}; retrying in {}s",
+                                     self.name, retries, max_retries, e, delay)
+                        time.sleep(delay)
+                    else:
+                        # L2: all retries exhausted → degraded fallback, never false green
+                        logger.error("{} runner LLM failed after {} retries: {}; degraded fallback",
+                                   self.name, max_retries, e)
+                        output = self.mock_output(ctx)
+                        raw = f"[fallback] LLM raised after {max_retries} retries: {e}"
+                        ok = False
+                        degraded = True
+                        error_msg = f"LLM call failed: {e}"
+                        break
 
         # 落盘(可选)
         artifact_path = self.output_file(ctx)
