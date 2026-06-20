@@ -642,28 +642,54 @@ def _cmd_export(args: str) -> None:
 
 
 def _cmd_compact(args: str) -> None:
+    """Compress conversation context. DCP-style: protect key content, nest summaries."""
     mem = _get_memory()
     if len(mem.messages) <= 4:
         console.print("[dim]Not enough conversation to compact.[/]")
         return
 
-    kept = mem.messages[:2] + mem.messages[-2:]
-    removed = len(mem.messages) - 4
+    # DCP: Protected content — never compress messages containing these patterns
+    _PROTECT_PATTERNS = [
+        "决策", "verdict", "no-go", "go", "conditional",
+        "FAIL", "ERROR", "Bug", "P0", "P1",
+        "[Compacted",  # nested summary preservation
+    ]
+
+    _protect = lambda m: any(p in m.content for p in _PROTECT_PATTERNS)
+
+    # Separate protected from compressible
+    protected_msgs = [m for m in mem.messages if _protect(m)]
+    compressible = [m for m in mem.messages if not _protect(m)]
+
+    if len(compressible) <= 4:
+        console.print("[dim]Most content is protected — nothing to compact.[/]")
+        return
+
+    # Keep first 2 + last 2 of compressible, summarize middle
+    kept = compressible[:2] + compressible[-2:]
+    removed = len(compressible) - 4
 
     summary_parts = []
-    for m in mem.messages[2:-2]:
-        text = m.content[:80] + "..." if len(m.content) > 80 else m.content
+    prev_summary = None
+    for m in compressible[2:-2]:
+        if "[Compacted" in m.content:
+            prev_summary = m.content[:120]  # DCP: preserve nested summary
+            continue
+        text = m.content[:60] + "..." if len(m.content) > 60 else m.content
         summary_parts.append(f"[{m.role}]: {text}")
 
-    from runtime.cli.conversation import Message
-    summary_msg = Message(
-        role="assistant",
-        content=f"[Compacted {removed} turns]\n" + "\n".join(summary_parts[:10]),
-    )
+    summary_text = f"[Compacted {removed} turns]"
+    if prev_summary:
+        summary_text += f"\n  (包含先前摘要: {prev_summary})"
+    summary_text += "\n" + "\n".join(summary_parts[:8])
 
-    mem._messages = kept[:2] + [summary_msg] + kept[2:]
-    mem._truncate()  # re-enforce budget after manual message manipulation
-    console.print(f"[green]Compacted {removed} turns → summary.[/]")
+    from runtime.cli.conversation import Message
+    summary_msg = Message(role="assistant", content=summary_text)
+
+    # Reconstruct: first 2 compressible + summary + last 2 compressible + all protected
+    mem._messages = kept[:2] + [summary_msg] + kept[2:] + protected_msgs
+    mem._truncate()
+    console.print(f"[green]Compacted {removed} turns → summary ({len(protected_msgs)} protected).[/]")
     console.print(f"[dim]Turns: {len(mem.messages)} · Chars: {sum(len(m.content) for m in mem.messages)}[/]")
 
 
