@@ -36,10 +36,11 @@ class TestProcessSandbox:
     def test_work_dir_created(self):
         """Sandbox should create isolated work directory."""
         sb = ProcessSandbox()
-        assert sb.work_dir.exists()
-        assert "test-agent-" in str(sb.work_dir)
+        wd = sb.work_dir
+        assert wd.exists()
+        assert "test-agent-" in str(wd)
         sb.cleanup()
-        assert not sb.work_dir.exists()
+        assert not wd.exists()  # Original dir cleaned up
 
     def test_sandbox_config(self):
         """SandboxConfig should have sane defaults."""
