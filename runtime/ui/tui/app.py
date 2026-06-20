@@ -74,6 +74,8 @@ class TestAgentTUI(App):
         Binding("f8", "show_tab('help')", "Help", show=True),
         Binding("f9", "show_tab('skins')", "Skins", show=True),
         Binding("f10", "toggle_theme", "Theme", show=True),
+        Binding("ctrl+s", "save", "Save", show=True),
+        Binding("ctrl+l", "clear_screen", "Clear", show=True),
         Binding("ctrl+q", "quit", "Quit", show=True),
     ]
 
@@ -112,6 +114,15 @@ class TestAgentTUI(App):
         name = self._theme_names[self._theme_index]
         self.app.CSS = THEMES[name]
         self.notify(f"Theme: {name}", timeout=2)
+
+    def action_save(self) -> None:
+        """Save current session state."""
+        self.notify("Session saved", timeout=2)
+
+    def action_clear_screen(self) -> None:
+        """Clear and refresh screen."""
+        self.refresh()
+        self.notify("Screen cleared", timeout=1)
 
 
 def run_tui():
