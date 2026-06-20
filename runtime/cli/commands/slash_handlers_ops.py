@@ -375,9 +375,11 @@ def _cmd_distill(args: str) -> None:
         return
 
     name = args.strip() or suggest_skill_name(trace)
-    path = distill_skill(trace, name)
-    console.print(f"[green]Skill created:[/] {path}")
-    _last_trace = None  # consume once
+    try:
+        path = distill_skill(trace, name)
+        console.print(f"[green]Skill created:[/] {path}")
+    finally:
+        _last_trace = None  # consume once, even on error
 
 
 # ── /api — API contract testing ────────────────────────────────────
@@ -773,13 +775,18 @@ def _cmd_cross(args: str) -> None:
     tokens = rest.split(maxsplit=1)
     # env1 env2 ... → first is env, rest is prompt
     sub = tokens[0].split()
-    envs = sub[:-1]  # env names
-    prompt = sub[-1]  # last token is prompt start
+    if len(sub) >= 2:
+        envs = sub[:-1]  # all but last are env names
+        prompt = sub[-1]  # last token is prompt start
+    else:
+        envs = sub  # single token = env name (no inline prompt)
+        prompt = ""
     if len(tokens) > 1:
-        prompt += " " + tokens[1]
+        prompt = (prompt + " " + tokens[1]).strip()
 
     if not envs:
         envs = ["test", "staging"]
+        console.print("[yellow]No env specified, defaulting to test → staging[/]")
 
     console.print(f"[bold]Cross-env:[/] {' → '.join(envs)} [dim](stop on first failure)[/]")
     with console.status("[bold]Running...", spinner="dots"):
