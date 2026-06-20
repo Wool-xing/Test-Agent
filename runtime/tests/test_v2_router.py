@@ -274,7 +274,6 @@ def test_full_route_with_stub_uses_keyword_fallback(v2_router: IntentRouterV2):
 
 
 def test_dag_node_requires_nonempty_id():
-        assert node.id != ''
     with pytest.raises(ValueError):
         DAGNode(id="", kind="expert", name="test-lead")
 
