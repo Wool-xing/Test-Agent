@@ -316,6 +316,20 @@ def _render_bottom_toolbar() -> "HTML":
     p1.append(f"<ansicyan>{proj_display}</ansicyan>")
     if b:
         p1.append(f"<ansigreen>git:{b}</ansigreen>")
+    # Show last test result if available
+    try:
+        from pathlib import Path as _P
+        _rf = get_settings().workspace_dir / "测试报告" / "last_run.json"
+        if _rf.exists():
+            import json as _json
+            _lr = _json.loads(_rf.read_text(encoding='utf-8'))
+            _s, _t = _lr.get('succeeded', 0), _lr.get('total', 0)
+            if _t > 0:
+                _rate = _s / _t
+                _c = 'ansigreen' if _rate >= 0.9 else ('ansiyellow' if _rate >= 0.7 else 'ansired')
+                p1.append(f"<{_c}>tests:{_s}/{_t}</{_c}>")
+    except Exception:
+        pass
     if errs:
         p1.append(f"<ansired>{_icon('warn')} {len(errs)}</ansired>")
     elif warns:
