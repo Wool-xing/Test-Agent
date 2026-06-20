@@ -1,0 +1,5 @@
+  File "C:\Users\admin\AppData\Roaming\Python\Python314\site-packages\loguru\_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^
+ValueError: I/O operation on closed file.
+--- End of logging error ---

@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import tarfile
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 def package_skill(
@@ -45,10 +48,16 @@ def package_skill(
 def _write_manifest(skill_dir: Path, output_dir: Path) -> None:
     """Generate manifest.json from SKILL.md frontmatter."""
     skill_md = skill_dir / "SKILL.md"
-    content = skill_md.read_text(encoding="utf-8")
-    parts = content.split("---")
-    if len(parts) >= 3:
+    try:
+        content = skill_md.read_text(encoding="utf-8")
+        parts = content.split("---")
+        if len(parts) < 3:
+            raise ValueError("Malformed SKILL.md: missing YAML frontmatter")
         import yaml
         meta = yaml.safe_load(parts[1])
+        if not isinstance(meta, dict):
+            raise ValueError("SKILL.md frontmatter is not a valid YAML mapping")
         manifest = output_dir / "manifest.json"
         manifest.write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        logger.warning("Failed to generate manifest for %s: %s", skill_dir, e)
