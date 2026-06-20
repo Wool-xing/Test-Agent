@@ -87,5 +87,11 @@ def _serve(
     from runtime.cli.commands.serve import serve
     serve(host, port)
 
+
+@app.command(name="tui", help="Launch Textual dashboard (F1-F6 panels)")
+def _tui():
+    from runtime.ui.tui.app import run_tui
+    run_tui()
+
 if __name__ == "__main__":
     app()

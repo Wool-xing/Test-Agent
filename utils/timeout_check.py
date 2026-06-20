@@ -1,5 +1,6 @@
 """timeout-check skill: verify operation completes within time limit."""
 import argparse
+import shlex
 import sys
 import json
 import time
@@ -8,8 +9,9 @@ import subprocess
 
 def check_timeout(command: str, timeout: int = 30) -> dict:
     try:
+        argv = shlex.split(command)
         start = time.monotonic()
-        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=timeout)
+        result = subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
         elapsed_ms = int((time.monotonic() - start) * 1000)
         return {
             "ok": True,
