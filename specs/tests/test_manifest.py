@@ -7,7 +7,6 @@ from pydantic import ValidationError
 
 from specs.manifest import Backend, Kind, ManifestV2, validate_manifest
 
-
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 
