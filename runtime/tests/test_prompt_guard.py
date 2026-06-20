@@ -71,5 +71,12 @@ class TestAuditLog:
 
     def test_throttle_on_repeated_blocks(self):
         """3+ consecutive blocks should trigger throttle."""
-        # Note: throttle state is module-global, test in order
-        pass  # Stateful — tested via integration
+        # Create blocked results and record them to trigger the throttle
+        blocked = SanitizationResult(cleaned="blocked", blocked=True, warnings=["injection"])
+        for _ in range(3):
+            record_audit("test", "trigger throttle", blocked)
+        assert should_throttle() is True
+        # A non-blocked result should reset the throttle
+        clean = SanitizationResult(cleaned="ok", blocked=False, warnings=[])
+        record_audit("test", "reset throttle", clean)
+        assert should_throttle() is False

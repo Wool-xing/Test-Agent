@@ -13,6 +13,7 @@ import pytest
 
 class TestBugTrackerBase:
     def test_cannot_instantiate_abstract(self):
+            with pytest.raises(TypeError): bt.BugTracker()
         from utils.trackers.bug_tracker_base import BugTrackerBase
         with pytest.raises(TypeError):
             BugTrackerBase()  # type: ignore[abstract]
@@ -41,6 +42,7 @@ class TestBugTrackerBase:
         assert tracker.get_status("BUG-1")["status"] == "open"
 
     def test_missing_method_fails(self):
+            with pytest.raises(NotImplementedError): tracker.get_bug('test-123')
         from utils.trackers.bug_tracker_base import BugTrackerBase
 
         class IncompleteTracker(BugTrackerBase):

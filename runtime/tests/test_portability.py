@@ -37,6 +37,7 @@ class TestCoexistence:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.bind(("127.0.0.1", 8800))
+            assert s.getsockname()[1] == 8800  # verify bound to expected port
         except OSError:
             pytest.skip("port 8800 already in use")
         finally:

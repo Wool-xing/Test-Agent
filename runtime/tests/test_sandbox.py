@@ -58,6 +58,7 @@ class TestProcessSandbox:
 
     def test_create_container_not_implemented(self):
         """L2/L3 should raise not implemented."""
+            with pytest.raises(NotImplementedError): sandbox.create_container()
         import pytest
         with pytest.raises(NotImplementedError):
             create_sandbox(SandboxLevel.CONTAINER)

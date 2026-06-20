@@ -110,6 +110,7 @@ class TestAuditDatasetBias:
         assert len(report.recommendations) > 0
 
     def test_mismatched_group_names_raises(self, balanced_dataset):
+            with pytest.raises(ValueError): check_fairness(groups=['a'], references=['b'])
         from utils.a11y_i18n.fairness_auditor import audit_dataset_bias
         y_true, sensitive = balanced_dataset
         with pytest.raises(ValueError):

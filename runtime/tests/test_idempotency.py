@@ -96,10 +96,13 @@ class TestRetryWithBackoff:
 
     def test_max_retries_exceeded(self):
         """Should raise after max retries."""
+        call_count = [0]
         def fn():
+            call_count[0] += 1
             raise ValueError("always fail")
         with pytest.raises(ValueError, match="always fail"):
             retry_with_backoff(fn, max_retries=2, base_delay=0.01)
+        assert call_count[0] == 3  # initial attempt + 2 retries
 
 
 class TestDeadLetterQueue:
