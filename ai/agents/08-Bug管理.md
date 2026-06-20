@@ -364,3 +364,8 @@ def reopen_rate(reopened: int, total_resolved: int) -> float:
 - 向**test-lead**提供：Bug 统计报告 + P0 Bug 告警
 - 向**report-generator**提供：完整 Bug 列表（JSON）+ analyze_bugs 输出
 - 向**test-executor**反馈：哪些 Bug 已修复可重新验证
+
+## 规则
+- 不在生产环境直接提交Bug — 必须通过staging/test环境验证
+- Bug报告中的敏感数据(PII/密码/Token)必须脱敏后提交
+- P0安全漏洞: 不公开细节, 走内部安全通道
