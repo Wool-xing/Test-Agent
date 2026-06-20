@@ -223,7 +223,6 @@ def test_routing_decision_schema_validates():
 
 def test_routing_decision_rejects_empty_dag():
     """RoutingDecision should reject invalid DAG via topology check."""
-        assert decision.dag is not None
     with pytest.raises(ValueError):
         RoutingDecision(
             dag=[
@@ -275,7 +274,6 @@ def test_full_route_with_stub_uses_keyword_fallback(v2_router: IntentRouterV2):
 
 
 def test_dag_node_requires_nonempty_id():
-        assert node.id != ''
     with pytest.raises(ValueError):
         DAGNode(id="", kind="expert", name="test-lead")
 
