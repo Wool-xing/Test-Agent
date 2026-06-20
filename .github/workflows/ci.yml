@@ -191,9 +191,9 @@ jobs:
           skill_md_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
           skill_dir_n=$(find /tmp/test-target/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
           echo "deployed: agent=$agent_n, skill.md=$skill_md_n, skill.dir=$skill_dir_n"
-          # 严格 == 校验 (与 catalog frontmatter 单源真相对齐: 16 agent / 32 skill.md / 3 meta subdir)
+          # 严格 == 校验 (与 catalog frontmatter 单源真相对齐: 16 agent / 37 skill.md / 3 meta subdir)
           test "$agent_n" -eq 16 || { echo "❌ agent 数 $agent_n ≠ 16"; exit 1; }
-          test "$skill_md_n" -eq 32 || { echo "❌ skill .md 数 $skill_md_n ≠ 32"; exit 1; }
+          test "$skill_md_n" -eq 37 || { echo "❌ skill .md 数 $skill_md_n ≠ 37"; exit 1; }
           test "$skill_dir_n" -eq 3 || { echo "❌ skill meta 子目录数 $skill_dir_n ≠ 3 (期望 darwin/karpathy/nuwa)"; exit 1; }
           # 验 utils/ 内 script 存在
           test -f "/tmp/test-target/utils/reporting/generate_report.py" \
