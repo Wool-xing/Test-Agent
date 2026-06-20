@@ -1,0 +1,66 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-06-21T00:00:00Z",
+    "component": {
+      "type": "application",
+      "name": "Test-Agent",
+      "version": "2.0.0"
+    },
+    "tools": [
+      {
+        "name": "manual",
+        "vendor": "Test-Agent team"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "loguru",
+      "version": "0.7"
+    },
+    {
+      "type": "library",
+      "name": "prompt-toolkit",
+      "version": "3.0"
+    },
+    {
+      "type": "library",
+      "name": "pydantic",
+      "version": "2.0"
+    },
+    {
+      "type": "library",
+      "name": "pydantic-settings",
+      "version": "2.0"
+    },
+    {
+      "type": "library",
+      "name": "python-dotenv",
+      "version": "1.0"
+    },
+    {
+      "type": "library",
+      "name": "pyyaml",
+      "version": "6.0"
+    },
+    {
+      "type": "library",
+      "name": "rich",
+      "version": "13.0"
+    },
+    {
+      "type": "library",
+      "name": "textual",
+      "version": "0.50"
+    },
+    {
+      "type": "library",
+      "name": "typer",
+      "version": "0.9"
+    }
+  ]
+}

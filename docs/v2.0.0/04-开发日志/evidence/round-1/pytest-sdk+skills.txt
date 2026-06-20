@@ -1,0 +1,37 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.0.3, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: D:\项目文件\Test-Agent\runtime
+configfile: pyproject.toml
+plugins: anyio-4.13.0, Faker-40.15.0, asyncio-1.3.0, cov-7.1.0, flask-1.3.0, timeout-2.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 26 items
+
+runtime\tests\test_skill_sdk.py::TestSkillCreate::test_scaffold_creates_directory PASSED [  3%]
+runtime\tests\test_skill_sdk.py::TestSkillCreate::test_scaffold_generates_valid_frontmatter PASSED [  7%]
+runtime\tests\test_skill_sdk.py::TestSkillCreate::test_scaffold_rejects_invalid_name PASSED [ 11%]
+runtime\tests\test_skill_sdk.py::TestSkillCreate::test_scaffold_creates_executor_stub PASSED [ 15%]
+runtime\tests\test_skill_sdk.py::TestSkillValidate::test_valid_skill_passes PASSED [ 19%]
+runtime\tests\test_skill_sdk.py::TestSkillValidate::test_missing_skill_md_fails PASSED [ 23%]
+runtime\tests\test_skill_sdk.py::TestSkillValidate::test_missing_required_field_fails PASSED [ 26%]
+runtime\tests\test_skill_sdk.py::TestSkillValidate::test_invalid_permission_value_fails PASSED [ 30%]
+runtime\tests\test_skill_sdk.py::TestSkillPackage::test_package_creates_tar_gz PASSED [ 34%]
+runtime\tests\test_skill_sdk.py::TestSkillPackage::test_package_includes_manifest PASSED [ 38%]
+runtime\tests\test_skill_sdk.py::TestSkillPublish::test_publish_to_local_registry PASSED [ 42%]
+runtime\tests\test_skill_sdk.py::TestSkillPublish::test_publish_duplicate_detected PASSED [ 46%]
+runtime\tests\test_basic_skills.py::TestPingCheck::test_ping_localhost_ok PASSED [ 50%]
+runtime\tests\test_basic_skills.py::TestPingCheck::test_ping_invalid_host_fails PASSED [ 53%]
+runtime\tests\test_basic_skills.py::TestPingCheck::test_ping_script_cli PASSED [ 57%]
+runtime\tests\test_basic_skills.py::TestHttpCheck::test_http_localhost_fails_gracefully PASSED [ 61%]
+runtime\tests\test_basic_skills.py::TestHttpCheck::test_http_invalid_url PASSED [ 65%]
+runtime\tests\test_basic_skills.py::TestHttpCheck::test_http_script_cli_help PASSED [ 69%]
+runtime\tests\test_basic_skills.py::TestFileCheck::test_file_exists_with_content PASSED [ 73%]
+runtime\tests\test_basic_skills.py::TestFileCheck::test_file_not_found PASSED [ 76%]
+runtime\tests\test_basic_skills.py::TestFileCheck::test_file_size_check PASSED [ 80%]
+runtime\tests\test_basic_skills.py::TestProcessCheck::test_python_running PASSED [ 84%]
+runtime\tests\test_basic_skills.py::TestProcessCheck::test_nonexistent_process PASSED [ 88%]
+runtime\tests\test_basic_skills.py::TestTimeoutCheck::test_fast_command_passes PASSED [ 92%]
+runtime\tests\test_basic_skills.py::TestTimeoutCheck::test_timeout_triggers PASSED [ 96%]
+runtime\tests\test_basic_skills.py::TestTimeoutCheck::test_invalid_command PASSED [100%]
+
+============================= 26 passed in 6.57s ==============================
