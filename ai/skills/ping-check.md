@@ -13,6 +13,7 @@ permissions:
   shell: readonly
   packages: []
   timeout: 30
+SKILL_IMPL_STATUS: production
 compatible:
   platforms: [windows, macos, linux]
   modes: [community, enterprise]
