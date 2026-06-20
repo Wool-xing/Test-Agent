@@ -58,6 +58,19 @@ _BUILTIN_MAP: dict = {}
 
 # ── Backward-compat wrappers (bodies extracted to interactive_ui.py) ──
 
+
+def _sanitize_error(raw: str, max_len: int = 300) -> str:
+    """Strip potential credential leaks from error messages before display.
+
+    §补-15 layer 5 — input sanitization applied to error output paths.
+    """
+    import re as _re
+    msg = _re.sub(r'(sk-[a-zA-Z0-9]{20,})', '[REDACTED]', raw)
+    msg = _re.sub(r'(Bearer\s+[a-zA-Z0-9_\-\.]+)', 'Bearer [REDACTED]', msg)
+    msg = _re.sub(r'(api[_-]?key[=:]\s*)[^\s&]+', r'\1[REDACTED]', msg, flags=_re.IGNORECASE)
+    return msg[:max_len]
+
+
 def _context_pct() -> int:
     """Estimate context window usage (delegates to interactive_ui)."""
     return _context_pct(_get_memory())
@@ -469,11 +482,7 @@ def _handle_natural_language(text: str) -> None:
         mem.add("assistant", "[Cancelled]")
     except Exception as _exc:
         _raw = str(_exc)
-        # §补-15: sanitize error output — strip potential credential leaks
-        import re as _re
-        _err_msg = _re.sub(r'(sk-[a-zA-Z0-9]{20,})', '[REDACTED]', _raw)
-        _err_msg = _re.sub(r'(Bearer\s+[a-zA-Z0-9_\-\.]+)', 'Bearer [REDACTED]', _err_msg)
-        _err_msg = _re.sub(r'(api[_-]?key[=:]\s*)[^\s&]+', r'\1[REDACTED]', _err_msg, flags=_re.IGNORECASE)
+        _err_msg = _sanitize_error(_raw)
         _err_msg = _err_msg[:300]
         elapsed = (time.time() - t0) * 1000
         console.print(f"  [red]✗ {type(_exc).__name__}[/]  [dim]({elapsed:.0f}ms)[/]")
@@ -554,7 +563,7 @@ def _handle_slash(text: str) -> None:
             console.print(f"[red]✗ {type(_exc).__name__}[/]")
             console.print(f"[yellow]💡 {hint}[/]")
         else:
-            err_msg = str(_exc)[:200]
+            err_msg = _sanitize_error(str(_exc), max_len=200)
             console.print(f"[red]✗ {type(_exc).__name__}: {err_msg}[/]")
             console.print("[dim]!help for commands, !doctor for health check.[/]")
 
