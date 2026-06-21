@@ -9,12 +9,14 @@ import typer
 import runtime
 from runtime.cli._shared import console, set_no_color
 from runtime.cli.config import config_app
+from runtime.cli.commands.mcp_commands import app as mcp_app
 from runtime.cli.commands.migrate_cmd import app as migrate_app
 from runtime.cli.commands.skill_commands import app as skill_app
 from runtime.infra.trace import set_trace_id as _set_trace_id
 
 app = typer.Typer(add_completion=True, help="Test-Agent Runtime CLI")
 app.add_typer(config_app, name="config")
+app.add_typer(mcp_app, name="mcp")
 app.add_typer(migrate_app, name="migrate")
 app.add_typer(skill_app, name="skill")
 
