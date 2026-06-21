@@ -24,8 +24,8 @@
 | TD-013 | §三-C | LOW | 逐文件深审 (362/364 剩余) | 全量364文件不可行, 高风险文件优先 | 持续 (每Sprint审10文件) | 🔧 |
 | TD-014 | 补-36 | MEDIUM | 文档一致性自动检查CI集成 | 脚本已写, 未集成CI/pre-commit | Sprint 3 | ⏸️ |
 | TD-015 | §三-C experts.py ER-001 | HIGH | runner.run()无超时, LLM hang→DAG永久阻塞 | 需ThreadPoolExecutor+Future.result(timeout) | Sprint 5 | ⏸️ |
-| TD-016 | §三-C webhooks.py WR-002 | HIGH | Discord/QQ签名无timestamp新鲜度校验, 无防重放 | 加5分钟窗口检查 | Sprint 3 | ⏸️ |
-| TD-017 | §三-C webhooks.py WR-003 | HIGH | _process_async_with_reply未实际回复 | 实现reply发送 | Sprint 4 | ⏸️ |
+| TD-016 | §三-C webhooks.py WR-002 | HIGH | Discord/QQ签名无timestamp新鲜度校验 | ✅ 已修复 (5分钟窗口+replay检测) | - | ✅ |
+| TD-017 | §三-C webhooks.py WR-003 | HIGH | _process_async_with_reply未实际回复 | 需实现reply→DingTalk/QQ Bot API | Sprint 4 | ⏸️ |
 
 ---
 

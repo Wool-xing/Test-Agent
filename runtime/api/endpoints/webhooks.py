@@ -41,6 +41,15 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
         logger.error("DISCORD_PUBLIC_KEY not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
 
+    # Replay protection: reject timestamps outside 5-minute window
+    try:
+        ts = int(timestamp)
+        if abs(int(time.time()) - ts) > 300:
+            logger.warning("Discord request outside 5min window — possible replay")
+            return False
+    except (ValueError, TypeError):
+        return False
+
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         from cryptography.exceptions import InvalidSignature
@@ -54,7 +63,7 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
         return False
     except ImportError:
         logger.warning("cryptography not available — Discord signature skipped")
-        return True  # allow in dev
+        return False  # fail-closed
 
 
 def _extract_telegram(data: dict) -> str | None:
@@ -211,6 +220,15 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
         logger.error("QQBOT_PUBLIC_KEY not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
 
+    # Replay protection: reject timestamps outside 5-minute window
+    try:
+        ts = int(timestamp)
+        if abs(int(time.time()) - ts) > 300:
+            logger.warning("QQ Bot request outside 5min window — possible replay")
+            return False
+    except (ValueError, TypeError):
+        return False
+
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         from cryptography.exceptions import InvalidSignature
@@ -224,7 +242,7 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
         return False
     except ImportError:
         logger.warning("cryptography not available — QQ Bot signature skipped")
-        return True
+        return False  # fail-closed
 
 
 # ── Telegram ─────────────────────────────────────────────────────────
@@ -438,7 +456,7 @@ async def _process_async_wechat(text: str, platform: str, userid: str,
             platform_obj = get_platform("wechat")
             await platform_obj.configure()
             await platform_obj.send(
-                Message(text=f"❌ 处理失败: {exc}"), target=userid,
+                Message(text="❌ 处理失败，请稍后重试 (详情已记录日志)"), target=userid,
             )
         except Exception as e2:
             logger.warning("WeChat error reply send failed: {}", e2)

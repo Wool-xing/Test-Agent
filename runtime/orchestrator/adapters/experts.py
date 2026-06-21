@@ -265,7 +265,7 @@ def _store_upstream_result(
 
 def _check_impl_status(name: str, kind: str) -> StepOutcome | None:
     """Anti-mock guard: reject unimplemented expert/skill. Returns StepOutcome or None."""
-    if kind not in ("expert", "skill"):
+    if kind not in ("expert", "skill", "script"):
         return None
     status = _get_impl_status(name, kind)
     if status in ("rollout", "vision"):
