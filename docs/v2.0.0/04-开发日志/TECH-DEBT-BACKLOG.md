@@ -26,6 +26,7 @@
 | TD-015 | §三-C experts.py ER-001 | HIGH | runner.run()无超时, LLM hang→DAG永久阻塞 | 需ThreadPoolExecutor+Future.result(timeout) | Sprint 5 | ⏸️ |
 | TD-016 | §三-C webhooks.py WR-002 | HIGH | Discord/QQ签名无timestamp新鲜度校验 | ✅ 已修复 (5分钟窗口+replay检测) | - | ✅ |
 | TD-017 | §三-C webhooks.py WR-003 | HIGH | _process_async_with_reply未实际回复 | 需实现reply→DingTalk/QQ Bot API | Sprint 4 | ⏸️ |
+| TD-018 | -1.3 D-004 | LOW | import-linter精确循环依赖检测未集成CI | 安装import-linter+配置CI | Sprint 4 | ⏸️ |
 
 ---
 

@@ -33,6 +33,6 @@
 | A-023 | MEDIUM | runtime/mcp/client.py | 未使用导入 `asyncio` | 删除import asyncio | grep确认无残留 | ✅ |
 | A-024 | MEDIUM | runtime/observability/audit.py | 未使用导入 `os` | 删除import os | grep确认无残留 | ✅ |
 | A-025 | MEDIUM | runtime/orchestrator/user_hooks.py | 未使用导入 `threading` | 删除import threading | grep确认无残留 | ✅ |
-| A-026 | LOW | 42个图谱孤立节点 | 候选死代码待调查 | 逐一确认是否真死代码 | 死代码率≤5% | ⬜ |
+| A-026 | LOW | 42个图谱孤立节点 | 候选死代码待调查, 多为文档/stub | 随知识图谱迭代处理 | 死代码率≤5% | ⏸️ TD-001, Sprint 6 |
 
 状态: ⬜待处理 / 🔧处理中 / ✅已验证 / ⏸️延期(附原因)

@@ -11,7 +11,7 @@
 | D-001 | HIGH | skills.registry 导入失败 | 添加 registry = SKILL_RUNNERS | `from runtime.orchestrator.skills import registry` 成功 | ✅ |
 | D-002 | LOW | 15个文件有未使用导入 | 逐文件删除未使用import | grep确认0残留 | ✅ |
 | D-003 | LOW | 42个图谱孤立节点 | Sprint 0逐节点确认 | 死代码率≤5% | ⏸️ 延期(低优先级) |
-| D-004 | LOW | import-linter精确检测 | 安装import-linter运行 | 0循环依赖 | ⬜ Sprint 0 |
+| D-004 | LOW | import-linter精确检测 | CI集成import-linter | 0循环依赖 | ⏸️ TD-018, Sprint 4 CI完善 |
 
 ## 验证记录
 
