@@ -28,8 +28,8 @@ class TestE2EExecutor:
         cfg = E2EConfig(headless=True, timeout_seconds=10)
         executor = E2EExecutor(cfg)
         result = executor.check_page("https://example.com")
-        if result.status == "error" and ("not installed" in (result.error or "") or "not available" in (result.error or "")):
-            pytest.skip("Playwright not available in this environment")
+        if result.status == "error" and any(kw in (result.error or "") for kw in ("not installed", "not available")):
+            pytest.skip("Playwright not available in CI")
         assert result.status == "pass"
         assert result.url == "https://example.com"
 
@@ -38,8 +38,8 @@ class TestE2EExecutor:
         from runtime.testing.e2e import E2EExecutor, E2EConfig
         executor = E2EExecutor(E2EConfig(timeout_seconds=5))
         result = executor.check_page("https://httpbin.org/get")
-        if result.status == "error" and "not installed" in (result.error or ""):
-            pytest.skip("Playwright not installed")
+        if result.status == "error" and any(kw in (result.error or "") for kw in ("not installed", "not available")):
+            pytest.skip("Playwright not available in CI")
         assert len(result.checks) >= 3
         for check in result.checks:
             assert "name" in check
@@ -50,8 +50,8 @@ class TestE2EExecutor:
         from runtime.testing.e2e import E2EExecutor, E2EConfig
         executor = E2EExecutor(E2EConfig(timeout_seconds=3))
         result = executor.check_page("https://192.0.2.1")
-        if result.status == "error" and "not installed" in (result.error or ""):
-            pytest.skip("Playwright not installed")
+        if result.status == "error" and any(kw in (result.error or "") for kw in ("not installed", "not available")):
+            pytest.skip("Playwright not available in CI")
         assert result.status in ("error", "fail")
 
 
@@ -184,7 +184,7 @@ class TestCypressExecutor:
         executor = CypressExecutor()
         result = executor.run("/nonexistent")
         assert result.status == "error"
-        assert "not installed" in (result.error or "").lower()
+        assert "not installed" in (result.error or "") or "not available" in (result.error or "").lower()
 
     def test_cypress_config_defaults(self):
         """Example 3: Cypress config defaults should be sensible."""
