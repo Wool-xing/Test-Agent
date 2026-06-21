@@ -71,6 +71,25 @@
 | 5.5 | Pentest验证 | ✅ | 5 pentest模块 |
 | TDD | 13 tests | ✅ | test_sprint5_e2e.py |
 
+## Sprint 6：企业级完善 ✅
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 6.1 | 多LLM Provider | ✅ | 6 provider可切换 |
+| 6.2 | 报告系统 HTML/JSON/JUnit/PDF | ✅ | XSS+XML注入已修复 |
+| 6.3 | 通知系统 Slack/Email/Webhook | ✅ | notify.py |
+| 6.4 | 知识图谱集成 | ✅ | intelligence模块 |
+| TDD | 11/11 GREEN | ✅ | test_sprint6_enterprise.py |
+
+## Sprint 7：发布准备 ✅
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 7.1 | CHANGELOG更新 | ✅ | Sprint 0-6全覆盖 |
+| 7.2 | 冒烟测试 | ✅ | 12/12 PASS |
+| 7.3 | 文档死链检测 | ✅ | 71链接0死链 |
+| 审查 | security-reviewer | ✅ | 2 HIGH已修复(XSS/XML) |
+| 👤 | 多平台安装包真机 | ⏸️ | 需3 OS真机 |
+| 👤 | GitHub Release | ⏸️ | 需GitHub操作 |
+
 ## Sprint 0：地基 (代码层面)
 
 | # | 要求 | 状态 | 证据 |
