@@ -29,6 +29,6 @@
 
 | 编号 | 行动 | 状态 |
 |------|------|------|
-| S1-A1 | S1-001~010 逐项真机运行, 贴原始输出到 evidence/ | ⬜ |
-| S1-A2 | 5内置Skill 测试通过+贴pytest输出 | ⬜ |
-| S1-A3 | 全量测试通过确认 | ⬜ |
+| S1-A1 | S1-001~010 逐项真机运行 | ✅ evidence/sprint-1-verification.txt |
+| S1-A2 | 5内置Skill 测试通过+贴pytest输出 | ✅ 14/14 PASS |
+| S1-A3 | 全量测试通过确认 | ✅ 42/43 PASS (1 flaky) |

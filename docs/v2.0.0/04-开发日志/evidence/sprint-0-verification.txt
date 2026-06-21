@@ -1,0 +1,10 @@
+=== tagent --version ===
+Test-Agent Runtime v2.0.0
+=== tagent migrate v2 --dry-run ===
+No V1.x configuration found — migration not needed.
+=== pip install check ===
+
+[notice] A new release of pip is available: 25.3 -> 26.1.2
+[notice] To update, run: python.exe -m pip install --upgrade pip
+=== hardcoded scan ===
+0
