@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "description": "AI-powered testing framework — natural language driven, multi-platform CLI + TUI",
+    "homepage": "https://github.com/Wool-xing/Test-Agent",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Wool-xing/Test-Agent/releases/download/v2.0.0/test-agent-2.0.0-windows-x64.zip",
+            "hash": "PLACEHOLDER"
+        }
+    },
+    "bin": "tagent.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/Wool-xing/Test-Agent/releases/download/v$version/test-agent-$version-windows-x64.zip"
+            }
+        }
+    }
+}

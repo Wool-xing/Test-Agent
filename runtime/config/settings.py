@@ -102,6 +102,7 @@ class Settings(BaseSettings):
     selenium_hub_url: str = Field(default="")
     docker_host: str = Field(default="")
     ci_mode: bool = Field(default=False)
+    deployment_mode: str = Field(default="community")  # "community" | "enterprise"
 
     def model_post_init(self, _context: object) -> None:
         """Resolve relative Path fields to absolute after model init."""
