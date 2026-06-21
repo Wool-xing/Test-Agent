@@ -1,0 +1,19 @@
+=== 5内置Skill测试 ===
+..............                                                           [100%]
+14 passed in 5.76s
+=== CLI commands ===
+ Usage: python -m runtime.cli.main [OPTIONS] COMMAND [ARGS]...                 
+│ run        Plan + execute a test run. Supports pipeline: echo 'test' |      │
+│            tagent run -                                                     │
+│ doctor     Sanity check: settings + catalog + optional DB/MinIO ping +      │
+│ catalog    List experts + skills loaded from markdown.                      │
+│ init       Generate .env + tagent.yml + STARTUP.md in 5 minutes.            │
+│ demo       One-command full demo · default 0-config stub · --real-llm for   │
+│ bootstrap  One‑command bootstrap: check system → generate config → verify   │
+│ verify     Run 4 safety gates without install.                              │
+│ report     Display test run results with Rich formatting.                   │
+│ config     LLM provider config (path A: 6 built-in + path B: any            │
+│ migrate    Migrate from V1.x to V2.0.0                                      │
+│ skill      Manage Skills — install, list, search, test                      │
+=== skill list count ===
+29

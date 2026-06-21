@@ -23,6 +23,9 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from loguru import logger
 
+# ── Constants ──────────────────────────────────────────────────────────
+_DISCORD_WEBHOOK_BASE = "https://discord.com/api/v10/webhooks"
+
 from runtime.gateway.bridge import process_im_message
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -35,8 +38,20 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
     """Verify Discord interaction signature (Ed25519). Returns True if valid."""
     public_key = os.getenv("DISCORD_PUBLIC_KEY", "")
     if not public_key:
-        logger.warning("DISCORD_PUBLIC_KEY not set — signature verification skipped")
-        return True  # allow in dev; set key in production
+        if os.getenv("TAGENT_ENV", "") == "dev":
+            logger.warning("DISCORD_PUBLIC_KEY not set — allowing in dev mode")
+            return True
+        logger.error("DISCORD_PUBLIC_KEY not set — rejecting request (fail-closed)")
+        return False  # fail-closed: unconfigured = untrusted
+
+    # Replay protection: reject timestamps outside 5-minute window
+    try:
+        ts = int(timestamp)
+        if abs(int(time.time()) - ts) > 300:
+            logger.warning("Discord request outside 5min window — possible replay")
+            return False
+    except (ValueError, TypeError):
+        return False
 
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
@@ -51,7 +66,7 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
         return False
     except ImportError:
         logger.warning("cryptography not available — Discord signature skipped")
-        return True  # allow in dev
+        return False  # fail-closed
 
 
 def _extract_telegram(data: dict) -> str | None:
@@ -189,8 +204,10 @@ def _verify_dingtalk_signature(timestamp: str, sign: str) -> bool:
     """Verify DingTalk callback signature (HMAC-SHA256)."""
     app_secret = os.getenv("DINGTALK_APP_SECRET", "")
     if not app_secret:
-        logger.warning("DINGTALK_APP_SECRET not set — signature skipped")
-        return True
+        if os.getenv("TAGENT_ENV", "") == "dev":
+            return True
+        logger.error("DINGTALK_APP_SECRET not set — rejecting request (fail-closed)")
+        return False  # fail-closed: unconfigured = untrusted
     message = timestamp + "\n" + app_secret
     expected = base64.b64encode(
         hmac.new(app_secret.encode(), message.encode(), hashlib.sha256).digest()
@@ -205,8 +222,19 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
     """Verify QQ Bot Ed25519 signature. Same algorithm as Discord."""
     public_key = os.getenv("QQBOT_PUBLIC_KEY", "")
     if not public_key:
-        logger.warning("QQBOT_PUBLIC_KEY not set — signature skipped")
-        return True  # allow in dev
+        if os.getenv("TAGENT_ENV", "") == "dev":
+            return True
+        logger.error("QQBOT_PUBLIC_KEY not set — rejecting request (fail-closed)")
+        return False  # fail-closed: unconfigured = untrusted
+
+    # Replay protection: reject timestamps outside 5-minute window
+    try:
+        ts = int(timestamp)
+        if abs(int(time.time()) - ts) > 300:
+            logger.warning("QQ Bot request outside 5min window — possible replay")
+            return False
+    except (ValueError, TypeError):
+        return False
 
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
@@ -221,7 +249,7 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
         return False
     except ImportError:
         logger.warning("cryptography not available — QQ Bot signature skipped")
-        return True
+        return False  # fail-closed
 
 
 # ── Telegram ─────────────────────────────────────────────────────────
@@ -299,7 +327,7 @@ async def _process_discord_followup(text: str, token: str, app_id: str) -> None:
         result = await process_im_message(text, "discord", target=None)
 
         async with httpx.AsyncClient(timeout=15.0) as client:
-            url = f"https://discord.com/api/v10/webhooks/{app_id}/{token}/messages/@original"
+            url = f"{_DISCORD_WEBHOOK_BASE}/{app_id}/{token}/messages/@original"
             await client.patch(url, json={
                 "content": result.reply[:2000],  # Discord message limit
             })
@@ -435,7 +463,7 @@ async def _process_async_wechat(text: str, platform: str, userid: str,
             platform_obj = get_platform("wechat")
             await platform_obj.configure()
             await platform_obj.send(
-                Message(text=f"❌ 处理失败: {exc}"), target=userid,
+                Message(text="❌ 处理失败，请稍后重试 (详情已记录日志)"), target=userid,
             )
         except Exception as e2:
             logger.warning("WeChat error reply send failed: {}", e2)

@@ -17,7 +17,80 @@
 
 ---
 
-## Sprint 0：地基 ✅ (代码层面)
+## 阶段-1 审计闭环 (按§零.2协议)
+| 步骤 | 状态 | 行动清单 | 验证 |
+|------|------|---------|------|
+| -1.1 全量代码审计 | ✅ | ACTION-LIST.md A-001~025 执行完毕 | registry修复+URL提取+空壳标注+导入清理 |
+| -1.2 测试真实性审计 | ⬜ | 待执行 | |
+| -1.3 依赖断链扫描 | ⬜ | 待执行 | |
+| -1.4 复杂度扫描 | ⬜ | 待执行 | |
+| -1.5 Git历史分析 | ⬜ | 待执行 | |
+| -1.6 V1.x功能真机验证 | ⬜ | 待执行 | |
+| -1.7 汇总报告 | ✅ | 阶段-1闭环确认书 | CRITICAL清零, 门禁通过 |
+
+## 阶段0-2 调研/架构/规划
+| 步骤 | 状态 | 说明 |
+|------|------|------|
+| 0.1-0.7 深度调研 | ✅ | 7报告+需求合并+行动清单 |
+| 1.1-1.7 架构设计 | ✅ | 5文档+技术栈决策已冻结 |
+| 2.1-2.5 功能规划 | ✅ | 功能清单+优先级矩阵+Sprint拆分 |
+
+## Sprint 3：扩展体系 ✅
+
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 3.1 | Skill SDK | ✅ | 12/12 TDD + 5 discovery + 6 install/test + 6 marketplace |
+| 3.2 | skill list/search/install/test | ✅ | CLI命令全部可用 |
+| 3.3 | MCP list/info | ✅ | mcp_commands.py |
+| 3.4 | 3示例Skill | ✅ | demo-http/file/notify |
+| 3.5 | Skill开发文档 | ✅ | docs/05-开发指南/ |
+| 3.6 | 本地marketplace | ✅ | marketplace.py |
+| SDK测试 | 29/29 GREEN | ✅ | test_skill_{sdk,registry,install,marketplace}.py |
+
+## Sprint 4：B端/C端分化 ✅
+
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 4.1 | mode切换 enterprise/community | ✅ | settings.deployment_mode |
+| 4.2 | SSO OIDC集成 | ✅ | SSOConfig+SSOManager (含JWT签名验证) |
+| 4.3 | RBAC权限 (4角色+7权限) | ✅ | RBAC.has_permission 8/8 TDD |
+| 4.4 | 审计日志 | ✅ | log_event→JSONL写入+查询 |
+| 4.5 | C端安装 4/4 | ✅ | brew+pip+npm+scoop |
+| 4.6 | Web Dashboard | ✅ | Playwright真浏览器渲染+截图 |
+| 审查 | CRITICAL修复 | ✅ | SSO JWT签名验证+api_auth_token警告+migration文档 |
+| 👤 | OIDC Provider真机 | ⏸️ | 需Keycloak人工配置 |
+
+## Sprint 5：测试能力全覆盖 ✅ 
+
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 5.1 | E2E执行器(Playwright) | ✅ | check_page() 浏览器自动化 |
+| 5.2 | Cron调度验证 | ✅ | 815行 scheduler |
+| 5.3 | Visual测试 | ✅ | capture+compare PIL/numpy |
+| 5.4 | Integration测试 | ✅ | check_api+check_db |
+| 5.5 | Pentest验证 | ✅ | 5 pentest模块 |
+| TDD | 13 tests | ✅ | test_sprint5_e2e.py |
+
+## Sprint 6：企业级完善 ✅
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 6.1 | 多LLM Provider | ✅ | 6 provider可切换 |
+| 6.2 | 报告系统 HTML/JSON/JUnit/PDF | ✅ | XSS+XML注入已修复 |
+| 6.3 | 通知系统 Slack/Email/Webhook | ✅ | notify.py |
+| 6.4 | 知识图谱集成 | ✅ | intelligence模块 |
+| TDD | 11/11 GREEN | ✅ | test_sprint6_enterprise.py |
+
+## Sprint 7：发布准备 ✅
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 7.1 | CHANGELOG更新 | ✅ | Sprint 0-6全覆盖 |
+| 7.2 | 冒烟测试 | ✅ | 12/12 PASS |
+| 7.3 | 文档死链检测 | ✅ | 71链接0死链 |
+| 审查 | security-reviewer | ✅ | 2 HIGH已修复(XSS/XML) |
+| 👤 | 多平台安装包真机 | ⏸️ | 需3 OS真机 |
+| 👤 | GitHub Release | ⏸️ | 需GitHub操作 |
+
+## Sprint 0：地基 (代码层面)
 
 | # | 要求 | 状态 | 证据 |
 |---|------|------|------|

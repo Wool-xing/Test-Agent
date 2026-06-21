@@ -117,8 +117,12 @@ class MigrationManager:
         new.write_text("\n".join(lines), encoding="utf-8")
 
     def _verify_test_compatibility(self, test_dir: Path) -> None:
-        """Verify existing tests work with V2."""
-        pass  # Tests remain compatible
+        """Intentionally a no-op: V2 is backward-compatible with V1.x test format.
+
+        V2 uses the same pytest-based test format as V1.x. If incompatibility is
+        discovered in the future, implement detection logic here.
+        """
+        pass
 
     def _migrate_database(self, db_path: Path) -> None:
         """Upgrade SQLite schema if needed."""

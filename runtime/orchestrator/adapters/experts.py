@@ -265,7 +265,7 @@ def _store_upstream_result(
 
 def _check_impl_status(name: str, kind: str) -> StepOutcome | None:
     """Anti-mock guard: reject unimplemented expert/skill. Returns StepOutcome or None."""
-    if kind not in ("expert", "skill"):
+    if kind not in ("expert", "skill", "script"):
         return None
     status = _get_impl_status(name, kind)
     if status in ("rollout", "vision"):
@@ -309,6 +309,8 @@ def _run_runner(name: str, kind: str, inputs: dict, ctx: ExecutionContext | None
     )
     import time as _t
     t0 = _t.time()
+    # TODO(TD-015): wrap runner.run() with timeout (ThreadPoolExecutor + Future.result)
+    # Hung LLM calls or infinite loops in runners currently block DAG indefinitely.
     res = runner.run(runner_ctx)
     _store_upstream_result(ctx, name, res.output,
                            {"ok": res.ok, "degraded": res.degraded, "error": res.error})

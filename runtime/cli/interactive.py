@@ -58,6 +58,19 @@ _BUILTIN_MAP: dict = {}
 
 # ── Backward-compat wrappers (bodies extracted to interactive_ui.py) ──
 
+
+def _sanitize_error(raw: str, max_len: int = 300) -> str:
+    """Strip potential credential leaks from error messages before display.
+
+    §补-15 layer 5 — input sanitization applied to error output paths.
+    """
+    import re as _re
+    msg = _re.sub(r'(sk-[a-zA-Z0-9]{20,})', '[REDACTED]', raw)
+    msg = _re.sub(r'(Bearer\s+[a-zA-Z0-9_\-\.]+)', 'Bearer [REDACTED]', msg)
+    msg = _re.sub(r'(api[_-]?key[=:]\s*)[^\s&]+', r'\1[REDACTED]', msg, flags=_re.IGNORECASE)
+    return msg[:max_len]
+
+
 def _context_pct() -> int:
     """Estimate context window usage (delegates to interactive_ui)."""
     return _context_pct(_get_memory())
@@ -92,6 +105,8 @@ def _read_multiline(session: PromptSession | None) -> str:
     """Read multi-line input with continuation prompts.
 
     Submit with empty line. Code blocks (```) auto-continue until closed.
+    LEGACY: tui_app.py forces multiline=False; this path is only exercised
+    by tests. Keep for backward API compatibility, remove in V2.1.0.
     Falls back to single-line if prompt_toolkit unavailable.
     """
     if session is None:
@@ -362,12 +377,12 @@ def _run_post_hooks(text: str, decision, summary: dict, total: int, rate: float)
         if rec:
             console.print(f"  [dim]... {rec}[/]")
     except Exception:
-        pass
+        pass  # auto-learn is best-effort; never block main flow
     try:
         from runtime.cli.voice import announce_result
         announce_result(summary)
     except Exception:
-        pass
+        pass  # voice announce is optional; silent fallback
     if total >= 3 and rate >= 0.8:
         ds = decision.model_dump() if hasattr(decision, "model_dump") else {}
         nodes = ds.get("dag", ds.get("nodes", []))
@@ -400,7 +415,7 @@ def _run_regression(summary: dict, run_id: str, elapsed: float, rate: float) -> 
         from runtime.cli.flaky_manager import record_run
         record_run(summary.get("results", {}), run_id)
     except Exception:
-        pass
+        pass  # regression/flaky tracking is best-effort
 
 
 def _handle_natural_language(text: str) -> None:
@@ -469,11 +484,7 @@ def _handle_natural_language(text: str) -> None:
         mem.add("assistant", "[Cancelled]")
     except Exception as _exc:
         _raw = str(_exc)
-        # §补-15: sanitize error output — strip potential credential leaks
-        import re as _re
-        _err_msg = _re.sub(r'(sk-[a-zA-Z0-9]{20,})', '[REDACTED]', _raw)
-        _err_msg = _re.sub(r'(Bearer\s+[a-zA-Z0-9_\-\.]+)', 'Bearer [REDACTED]', _err_msg)
-        _err_msg = _re.sub(r'(api[_-]?key[=:]\s*)[^\s&]+', r'\1[REDACTED]', _err_msg, flags=_re.IGNORECASE)
+        _err_msg = _sanitize_error(_raw)
         _err_msg = _err_msg[:300]
         elapsed = (time.time() - t0) * 1000
         console.print(f"  [red]✗ {type(_exc).__name__}[/]  [dim]({elapsed:.0f}ms)[/]")
@@ -554,7 +565,7 @@ def _handle_slash(text: str) -> None:
             console.print(f"[red]✗ {type(_exc).__name__}[/]")
             console.print(f"[yellow]💡 {hint}[/]")
         else:
-            err_msg = str(_exc)[:200]
+            err_msg = _sanitize_error(str(_exc), max_len=200)
             console.print(f"[red]✗ {type(_exc).__name__}: {err_msg}[/]")
             console.print("[dim]!help for commands, !doctor for health check.[/]")
 
@@ -708,15 +719,15 @@ def start() -> None:
                 if callable(info.get("run")):
                     _BUILTIN_MAP[pname] = lambda a, fn=info["run"]: None
             except Exception:
-                pass
+                pass  # single plugin register failure; skip and continue
     except Exception:
-        pass
+        pass  # plugin discovery is optional
 
     try:
         from runtime.scheduler.scheduler import start_background
         start_background()
     except Exception:
-        pass
+        pass  # background scheduler is optional
 
     # ── PromptSession REPL ──
     _set_terminal_title(

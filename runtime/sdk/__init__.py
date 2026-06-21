@@ -10,6 +10,17 @@ from runtime.sdk.scaffold import scaffold_skill
 from runtime.sdk.validate import validate_skill, ValidationResult
 from runtime.sdk.package import package_skill
 from runtime.sdk.publish import publish_skill, PublishResult
+from runtime.sdk.discovery import discover_skills
+from runtime.sdk.install import install_skill, InstallResult
+from runtime.sdk.test_runner import run_skill_tests, SkillTestResult
+from runtime.sdk.marketplace import (
+    init_marketplace,
+    publish_to_marketplace,
+    search_marketplace,
+    list_marketplace,
+    MarketplaceEntry,
+    MarketplaceResult,
+)
 
 __all__ = [
     "scaffold_skill",
@@ -18,4 +29,15 @@ __all__ = [
     "package_skill",
     "publish_skill",
     "PublishResult",
+    "discover_skills",
+    "install_skill",
+    "InstallResult",
+    "run_skill_tests",
+    "SkillTestResult",
+    "init_marketplace",
+    "publish_to_marketplace",
+    "search_marketplace",
+    "list_marketplace",
+    "MarketplaceEntry",
+    "MarketplaceResult",
 ]

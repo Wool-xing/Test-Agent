@@ -102,6 +102,7 @@ class Settings(BaseSettings):
     selenium_hub_url: str = Field(default="")
     docker_host: str = Field(default="")
     ci_mode: bool = Field(default=False)
+    deployment_mode: str = Field(default="community")  # "community" | "enterprise"
 
     def model_post_init(self, _context: object) -> None:
         """Resolve relative Path fields to absolute after model init."""
@@ -146,6 +147,14 @@ class Settings(BaseSettings):
                     "key": attr,
                     "message": f"{label} directory not found: {p}",
                 })
+
+        # API auth token check (enterprise mode)
+        if self.deployment_mode == "enterprise" and not self.api_auth_token:
+            issues.append({
+                "level": "warning",
+                "key": "api_auth_token",
+                "message": "deployment_mode=enterprise but api_auth_token is empty — API endpoints are unprotected. Set TAGENT_API_AUTH_TOKEN.",
+            })
 
         # Workspace writability
         ws = self.workspace_dir

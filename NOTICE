@@ -1,0 +1,14 @@
+NOTICE - Test-Agent V2.0.0
+Copyright 2024-2026 Test-Agent Contributors
+
+This product includes software developed by:
+- Textualize (textual, rich) - MIT License
+- Anthropic (Claude API) - used via litellm SDK
+- OpenAI (GPT API) - used via litellm SDK
+- Google (Gemini API) - used via litellm SDK
+- prompt_toolkit (REPL) - BSD License
+- loguru (logging) - MIT License
+- pydantic (validation) - MIT License
+
+Third-party dependencies are used under their respective licenses
+(MIT, BSD, Apache 2.0). Full list: pyproject.toml

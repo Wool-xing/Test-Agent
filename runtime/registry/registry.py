@@ -133,7 +133,15 @@ def _entry_from_file(path: Path, kind: EntryKind) -> CatalogEntry | None:
     )
 
 
-def build_catalog() -> Catalog:
+def build_catalog(
+    extra_skill_dirs: list[Path] | None = None,
+) -> Catalog:
+    """Build catalog from configured expert/skill dirs + optional extra skill dirs.
+
+    Args:
+        extra_skill_dirs: Additional SDK-style skill directories to scan.
+            Each should contain subdirectories with SKILL.md files.
+    """
     s = get_settings()
     experts_dir = s.resolve(s.experts_dir)
     skills_dir = s.resolve(s.skills_dir)
@@ -150,6 +158,20 @@ def build_catalog() -> Catalog:
         e = _entry_from_file(md, "skill")
         if e:
             cat.skills[e.name] = e
+
+    # Merge extra SDK-style skill directories
+    if extra_skill_dirs:
+        from runtime.sdk.discovery import discover_skills
+        for skill_dir in extra_skill_dirs:
+            for meta in discover_skills(skill_dir):
+                name = meta.get("name", "")
+                if name and name not in cat.skills:
+                    cat.skills[name] = CatalogEntry(
+                        kind="skill",
+                        name=name,
+                        description=meta.get("description", ""),
+                    )
+
     logger.info("catalog built: {} experts, {} skills", len(cat.experts), len(cat.skills))
     return cat
 

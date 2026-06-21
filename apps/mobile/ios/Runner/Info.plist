@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Test-Agent</string>
+    <key>CFBundleVersion</key>
+    <string>2.0.0</string>
+    <!-- App Transport Security: 强制HTTPS, 禁止明文连接 (§1.1.1) -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>api.test-agent.dev</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <false/>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <!-- 证书固定 (SSL Pinning) -->
+                <key>NSPinnedDomains</key>
+                <dict>
+                    <key>api.test-agent.dev</key>
+                    <dict>
+                        <key>NSPinnedLeafIdentities</key>
+                        <array>
+                            <dict>
+                                <key>SPKI-SHA256-BASE64</key>
+                                <string>PLACEHOLDER_CERT_PIN</string>
+                            </dict>
+                        </array>
+                    </dict>
+                </dict>
+            </dict>
+        </dict>
+    </dict>
+    <!-- Keychain 存储敏感数据 (Token/API Key) -->
+    <key>Keychain Access Groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)dev.testagent.mobile</string>
+    </array>
+</dict>
+</plist>

@@ -7,7 +7,6 @@ Reports per-environment results with diff.
 
 from __future__ import annotations
 
-import json
 import logging
 import subprocess
 import sys

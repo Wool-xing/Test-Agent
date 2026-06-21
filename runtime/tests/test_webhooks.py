@@ -130,13 +130,15 @@ class TestDiscordSignatureVerification:
     def test_no_public_key_allows_in_dev(self):
         from runtime.api.endpoints.webhooks import _verify_discord_signature
         import os
-        # Ensure no public key set
+        # Ensure no public key set, TAGENT_ENV=dev
         old_key = os.environ.pop("DISCORD_PUBLIC_KEY", None)
+        os.environ["TAGENT_ENV"] = "dev"
         try:
             assert _verify_discord_signature(b"{}", "bad_sig", "123") is True
         finally:
             if old_key:
                 os.environ["DISCORD_PUBLIC_KEY"] = old_key
+            os.environ.pop("TAGENT_ENV", None)
 
     def test_invalid_signature_rejected(self):
         from runtime.api.endpoints.webhooks import _verify_discord_signature
@@ -389,9 +391,11 @@ class TestDingTalkCrypto:
         import os
 
         old = os.environ.pop("DINGTALK_APP_SECRET", None)
+        os.environ["TAGENT_ENV"] = "dev"
         try:
             assert _verify_dingtalk_signature("123", "any") is True
         finally:
+            os.environ.pop("TAGENT_ENV", None)
             if old:
                 os.environ["DINGTALK_APP_SECRET"] = old
 
@@ -407,9 +411,11 @@ class TestQQBotCrypto:
         import os
 
         old = os.environ.pop("QQBOT_PUBLIC_KEY", None)
+        os.environ["TAGENT_ENV"] = "dev"
         try:
             assert _verify_qqbot_signature(b"{}", "bad_sig", "123") is True
         finally:
+            os.environ.pop("TAGENT_ENV", None)
             if old:
                 os.environ["QQBOT_PUBLIC_KEY"] = old
 
