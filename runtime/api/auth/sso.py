@@ -168,13 +168,21 @@ class SSOManager:
     # ── Token Validation ────────────────────────────────────────
 
     def validate_token(self, token: str) -> dict:
-        """Validate a JWT access token and return its claims.
+        """Validate a JWT access token (sync, requires pre-warmed JWKS).
 
-        For async JWKS fetching, use validate_token_async() instead.
-        This sync version expects _jwks_client to be pre-warmed or
-        validates without key lookup (signature check only with HS256).
+        SECURITY: This method REQUIRES _jwks_client to be pre-warmed via
+        preload_jwks(). Without it, signature verification is impossible
+        and the method will refuse to validate tokens.
+
+        Prefer validate_token_async() which fetches JWKS automatically.
         """
-        # Try decoding without verification first to read kid/iss
+        if self._jwks_client is None:
+            raise HTTPException(
+                status_code=500,
+                detail="JWKS client not initialized. Call preload_jwks() first, or use validate_token_async().",
+            )
+
+        # Decode WITHOUT verifying signature first to extract kid
         try:
             unverified = jwt.decode(token, options={"verify_signature": False})
         except jwt.DecodeError as e:
@@ -185,19 +193,32 @@ class SSOManager:
         if unverified.get("iss") != issuer:
             raise HTTPException(status_code=401, detail="Token issuer mismatch")
 
-        # Check expiration with 30s clock skew tolerance
         exp = unverified.get("exp", 0)
         if exp and exp < time.time() - 30:
             raise HTTPException(status_code=401, detail="Token expired")
 
-        # Audience check
         aud = unverified.get("aud", "")
         if aud and aud != self.config.client_id:
-            # Azure AD returns app ID URI, not client ID, in aud
             if self.config.provider not in ("azure",):
                 raise HTTPException(status_code=401, detail="Token audience mismatch")
 
-        return unverified
+        # Verify cryptographic signature using pre-warmed JWKS
+        signing_key = self._jwks_client.get_signing_key_from_jwt(token)
+        try:
+            claims = jwt.decode(
+                token,
+                key=signing_key.key,
+                algorithms=[unverified.get("alg", "RS256")],
+                audience=self.config.client_id,
+                issuer=issuer,
+                options={"verify_exp": True},
+            )
+        except jwt.InvalidSignatureError:
+            raise HTTPException(status_code=401, detail="Invalid token signature")
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token expired")
+
+        return claims
 
     async def validate_token_async(self, token: str) -> dict:
         """Validate a JWT with async JWKS key fetching."""

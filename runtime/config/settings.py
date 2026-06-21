@@ -148,6 +148,14 @@ class Settings(BaseSettings):
                     "message": f"{label} directory not found: {p}",
                 })
 
+        # API auth token check (enterprise mode)
+        if self.deployment_mode == "enterprise" and not self.api_auth_token:
+            issues.append({
+                "level": "warning",
+                "key": "api_auth_token",
+                "message": "deployment_mode=enterprise but api_auth_token is empty — API endpoints are unprotected. Set TAGENT_API_AUTH_TOKEN.",
+            })
+
         # Workspace writability
         ws = self.workspace_dir
         if ws.is_dir():
