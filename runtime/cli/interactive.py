@@ -105,6 +105,8 @@ def _read_multiline(session: PromptSession | None) -> str:
     """Read multi-line input with continuation prompts.
 
     Submit with empty line. Code blocks (```) auto-continue until closed.
+    LEGACY: tui_app.py forces multiline=False; this path is only exercised
+    by tests. Keep for backward API compatibility, remove in V2.1.0.
     Falls back to single-line if prompt_toolkit unavailable.
     """
     if session is None:

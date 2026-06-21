@@ -66,9 +66,9 @@
 
 | ID | 严重级 | 门禁项 | 现状 | 修复 | 状态 |
 |----|--------|--------|------|------|------|
-| G-001 | HIGH | 覆盖率34%→80% | 缺口46% | 补充测试(Sprint持续) | ⬜ |
-| G-002 | MEDIUM | 新用户5分钟验证 | 未真新人测试 | Sprint 7 β测试 | ⏸️ |
-| G-003 | LOW | pre-commit claude-crap | 待集成 | CI配置 | ⏸️ |
+| G-001 | HIGH | 覆盖率34%→80% | 缺口46% | 持续补充 (TD-004, 每Sprint+5%) | 🔧 |
+| G-002 | MEDIUM | 新用户5分钟验证 | 未真新人测试 | Sprint 7 β测试 (TD-009) | ⏸️ |
+| G-003 | LOW | pre-commit claude-crap score | .pre-commit-config.yaml存在, claude-crap:score待集成 | Sprint 3 CI完善 | ⏸️ |
 
 ## 门禁裁决
 

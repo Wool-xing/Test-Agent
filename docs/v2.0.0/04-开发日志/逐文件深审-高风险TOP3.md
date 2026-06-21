@@ -49,12 +49,12 @@
 |----|--------|--------|------|------|------|
 | DR-001 | HIGH | slash_handlers_ops.py:773 | /cross单env被忽略 | 修复env解析: len(sub)≥2判断 | ✅ |
 | DR-002 | HIGH | slash_handlers_ops.py:782 | /cross静默回退 | 加yellow warning | ✅ |
-| DR-003 | MEDIUM | interactive.py:557 | 凭据可能泄漏到transcript | 共用脱敏函数 | ⬜ |
-| DR-004 | MEDIUM | interactive.py:363+ | 6处静默吞错 | 加logger.warning | ⬜ |
-| DR-005 | MEDIUM | interactive.py:91 | multiline死代码(70行) | 标注legacy或移除 | ⬜ |
-| DR-006 | MEDIUM | interactive.py:51 | 全局可变状态耦合 | 收敛到Context对象 | ⬜ |
+| DR-003 | MEDIUM | interactive.py:557 | 凭据可能泄漏到transcript | _sanitize_error()共享函数 | ✅ |
+| DR-004 | MEDIUM | interactive.py:363+ | 6处静默吞错 | 添加意图注释说明 | ✅ |
+| DR-005 | MEDIUM | interactive.py:91 | multiline死代码(70行) | 标注LEGACY注释, V2.1.0移除 | ✅ |
+| DR-006 | MEDIUM | interactive.py:51 | 全局可变状态耦合 | Sprint 6架构重构 (TD-011) | ⏸️ |
 | DR-007 | MEDIUM | slash_handlers_ops.py:378 | _last_trace状态泄漏 | try/finally包裹 | ✅ |
-| DR-008 | MEDIUM | slash_handlers_ops.py:664 | task状态无转换守卫 | 加状态机验证 | ⬜ |
+| DR-008 | MEDIUM | slash_handlers_ops.py:664 | task状态无转换守卫 | Sprint 5状态机设计 (TD-012) | ⏸️ |
 
 ---
 
