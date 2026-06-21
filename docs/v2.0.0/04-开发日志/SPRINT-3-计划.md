@@ -23,11 +23,11 @@
 
 | # | 功能 | TDD | 预计 |
 |---|------|-----|------|
-| 3.1 | skill install 命令 | ⬜ | 安装本地Skill目录到workspace |
-| 3.2 | skill test 命令 | ⬜ | 运行Skill自带测试 |
-| 3.3 | MCP list/info 命令 | ⬜ | 发现外部MCP Server工具 |
-| 3.4 | 3个示例Skill | ⬜ | demo-http / demo-file / demo-notify |
-| 3.5 | Skill开发文档 | ⬜ | docs/v2.0.0/05-开发指南/Skill开发.md |
+| 3.1 | skill install 命令 | ✅ | 6/6 TDD, CLI可用 |
+| 3.2 | skill test 命令 | ✅ | pytest子进程, CLI可用 |
+| 3.3 | MCP list/info 命令 | ✅ | 已有McpClient基础设施 |
+| 3.4 | 3个示例Skill | ✅ | demo-http/file/notify 含test |
+| 3.5 | Skill开发文档 | 🔧 | 进行中 |
 | 3.6 | Skill市场本地registry | ⬜ | tagent skill publish到本地市场 |
 
 ## 验收标准 (§五-A)

@@ -8,6 +8,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+def _is_safe_name(name: str) -> bool:
+    """Reject names with path separators or non-kebab-case characters."""
+    if not name or len(name) > 128:
+        return False
+    dangerous = {"..", "/", "\\", "\x00"}
+    for d in dangerous:
+        if d in name:
+            return False
+    return all(c.islower() or c.isdigit() or c == '-' for c in name)
+
+
 @dataclass
 class SkillTestResult:
     ok: bool
@@ -21,12 +32,16 @@ def run_skill_tests(skill_name: str, skills_dir: Path) -> SkillTestResult:
     """Run pytest on a skill's test file.
 
     Args:
-        skill_name: Name of the installed skill.
+        skill_name: Name of the installed skill (must be valid kebab-case).
         skills_dir: Path to the workspace skills directory.
 
     Returns:
         SkillTestResult with pass/fail counts.
     """
+    # Validate name to prevent path traversal (.. / \)
+    if not _is_safe_name(skill_name):
+        return SkillTestResult(ok=False, error=f"Invalid skill name: {skill_name}")
+
     skill_dir = skills_dir / skill_name
     if not skill_dir.is_dir():
         return SkillTestResult(ok=False, error=f"Skill '{skill_name}' not found in {skills_dir}")
