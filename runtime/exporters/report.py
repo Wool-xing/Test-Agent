@@ -50,6 +50,34 @@ td,th{{padding:8px;border:1px solid #ddd}}</style></head>
         Path(output_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
         return output_path
 
+    def to_pdf(self, results: list[dict], output_path: str) -> str:
+        """Generate a PDF report (requires fpdf2). Falls back to HTML if unavailable."""
+        passed = sum(1 for r in results if r.get("status") == "pass")
+        failed = sum(1 for r in results if r.get("status") == "fail")
+        total = len(results)
+
+        try:
+            from fpdf import FPDF
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Helvetica", size=12)
+            pdf.cell(200, 10, text="Test-Agent Report", align="C")
+            pdf.ln()
+            pdf.set_font("Helvetica", size=10)
+            pdf.cell(200, 8, text=f"Passed: {passed}  Failed: {failed}  Total: {total}")
+            pdf.ln(12)
+            for r in results:
+                status = r.get("status", "?")
+                name = r.get("name", "?")
+                pdf.cell(200, 7, text=f"[{'PASS' if status == 'pass' else 'FAIL'}] {name}")
+                pdf.ln()
+            pdf.output(output_path)
+            return output_path
+        except ImportError:
+            # Fall back to HTML
+            html_path = output_path.replace(".pdf", ".html")
+            return self.to_html(results, html_path)
+
     def to_junit(self, results: list[dict], output_path: str) -> str:
         """Generate a JUnit XML report for CI integration."""
         passed = sum(1 for r in results if r.get("status") == "pass")
