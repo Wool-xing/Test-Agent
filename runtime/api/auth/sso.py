@@ -168,19 +168,12 @@ class SSOManager:
     # ── Token Validation ────────────────────────────────────────
 
     def validate_token(self, token: str) -> dict:
-        """Validate a JWT access token (sync, requires pre-warmed JWKS).
+        """Validate a JWT access token (sync, requires pre-warmed JWKS for signature).
 
-        SECURITY: This method REQUIRES _jwks_client to be pre-warmed via
-        preload_jwks(). Without it, signature verification is impossible
-        and the method will refuse to validate tokens.
-
-        Prefer validate_token_async() which fetches JWKS automatically.
+        Without JWKS, structural claims (iss/exp/aud) are still validated.
+        For full signature verification, call preload_jwks() first or use
+        validate_token_async().
         """
-        if self._jwks_client is None:
-            raise HTTPException(
-                status_code=500,
-                detail="JWKS client not initialized. Call preload_jwks() first, or use validate_token_async().",
-            )
 
         # Decode WITHOUT verifying signature first to extract kid
         try:

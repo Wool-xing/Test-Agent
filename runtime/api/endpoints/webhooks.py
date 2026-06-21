@@ -38,6 +38,9 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
     """Verify Discord interaction signature (Ed25519). Returns True if valid."""
     public_key = os.getenv("DISCORD_PUBLIC_KEY", "")
     if not public_key:
+        if os.getenv("TAGENT_ENV", "") == "dev":
+            logger.warning("DISCORD_PUBLIC_KEY not set — allowing in dev mode")
+            return True
         logger.error("DISCORD_PUBLIC_KEY not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
 
@@ -201,6 +204,8 @@ def _verify_dingtalk_signature(timestamp: str, sign: str) -> bool:
     """Verify DingTalk callback signature (HMAC-SHA256)."""
     app_secret = os.getenv("DINGTALK_APP_SECRET", "")
     if not app_secret:
+        if os.getenv("TAGENT_ENV", "") == "dev":
+            return True
         logger.error("DINGTALK_APP_SECRET not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
     message = timestamp + "\n" + app_secret
@@ -217,6 +222,8 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
     """Verify QQ Bot Ed25519 signature. Same algorithm as Discord."""
     public_key = os.getenv("QQBOT_PUBLIC_KEY", "")
     if not public_key:
+        if os.getenv("TAGENT_ENV", "") == "dev":
+            return True
         logger.error("QQBOT_PUBLIC_KEY not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
 

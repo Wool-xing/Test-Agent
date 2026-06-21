@@ -23,11 +23,13 @@ class TestE2EExecutor:
         assert cfg.headless is True
 
     def test_e2e_simple_check(self):
-        """Example 1: Simple page load check."""
+        """Example 1: Simple page load check (skips if Playwright unavailable)."""
         from runtime.testing.e2e import E2EExecutor, E2EConfig
         cfg = E2EConfig(headless=True, timeout_seconds=10)
         executor = E2EExecutor(cfg)
         result = executor.check_page("https://example.com")
+        if result.status == "error" and "not installed" in (result.error or ""):
+            pytest.skip("Playwright not installed in this environment")
         assert result.status == "pass"
         assert result.url == "https://example.com"
 
@@ -36,7 +38,9 @@ class TestE2EExecutor:
         from runtime.testing.e2e import E2EExecutor, E2EConfig
         executor = E2EExecutor(E2EConfig(timeout_seconds=5))
         result = executor.check_page("https://httpbin.org/get")
-        assert len(result.checks) >= 3  # Page loaded, HTTP 2xx, Has title, No JS errors
+        if result.status == "error" and "not installed" in (result.error or ""):
+            pytest.skip("Playwright not installed")
+        assert len(result.checks) >= 3
         for check in result.checks:
             assert "name" in check
             assert "pass" in check
@@ -46,6 +50,8 @@ class TestE2EExecutor:
         from runtime.testing.e2e import E2EExecutor, E2EConfig
         executor = E2EExecutor(E2EConfig(timeout_seconds=3))
         result = executor.check_page("https://192.0.2.1")
+        if result.status == "error" and "not installed" in (result.error or ""):
+            pytest.skip("Playwright not installed")
         assert result.status in ("error", "fail")
 
 
