@@ -60,6 +60,13 @@ class TestAuditLog:
         assert callable(log_event)
         assert callable(query_events)
 
+    def test_audit_log_writes_events(self):
+        """Audit should persist events to JSONL file."""
+        from runtime.observability.audit import log_event, query_events
+        log_event('test_login', actor='admin', resource='auth')
+        events = query_events(limit=1)
+        assert len(events) >= 1
+
 
 class TestSsoImport:
     """SSO module smoke test."""
