@@ -38,8 +38,8 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
     """Verify Discord interaction signature (Ed25519). Returns True if valid."""
     public_key = os.getenv("DISCORD_PUBLIC_KEY", "")
     if not public_key:
-        logger.warning("DISCORD_PUBLIC_KEY not set — signature verification skipped")
-        return True  # allow in dev; set key in production
+        logger.error("DISCORD_PUBLIC_KEY not set — rejecting request (fail-closed)")
+        return False  # fail-closed: unconfigured = untrusted
 
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
@@ -192,8 +192,8 @@ def _verify_dingtalk_signature(timestamp: str, sign: str) -> bool:
     """Verify DingTalk callback signature (HMAC-SHA256)."""
     app_secret = os.getenv("DINGTALK_APP_SECRET", "")
     if not app_secret:
-        logger.warning("DINGTALK_APP_SECRET not set — signature skipped")
-        return True
+        logger.error("DINGTALK_APP_SECRET not set — rejecting request (fail-closed)")
+        return False  # fail-closed: unconfigured = untrusted
     message = timestamp + "\n" + app_secret
     expected = base64.b64encode(
         hmac.new(app_secret.encode(), message.encode(), hashlib.sha256).digest()
@@ -208,8 +208,8 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
     """Verify QQ Bot Ed25519 signature. Same algorithm as Discord."""
     public_key = os.getenv("QQBOT_PUBLIC_KEY", "")
     if not public_key:
-        logger.warning("QQBOT_PUBLIC_KEY not set — signature skipped")
-        return True  # allow in dev
+        logger.error("QQBOT_PUBLIC_KEY not set — rejecting request (fail-closed)")
+        return False  # fail-closed: unconfigured = untrusted
 
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
