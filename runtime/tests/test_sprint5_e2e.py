@@ -28,8 +28,8 @@ class TestE2EExecutor:
         cfg = E2EConfig(headless=True, timeout_seconds=10)
         executor = E2EExecutor(cfg)
         result = executor.check_page("https://example.com")
-        if result.status == "error" and "not installed" in (result.error or ""):
-            pytest.skip("Playwright not installed in this environment")
+        if result.status == "error" and ("not installed" in (result.error or "") or "not available" in (result.error or "")):
+            pytest.skip("Playwright not available in this environment")
         assert result.status == "pass"
         assert result.url == "https://example.com"
 
