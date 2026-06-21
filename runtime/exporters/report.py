@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import html as _html
 import json
+import xml.sax.saxutils as _xmlutils
 from pathlib import Path
 
 
@@ -17,12 +19,15 @@ class ReportGenerator:
 
         rows = ""
         for r in results:
-            status = r.get("status", "?")
-            icon = "✅" if status == "pass" else "❌"
-            error = f'<div class="error">{r.get("error", "")}</div>' if r.get("error") else ""
+            status = _html.escape(r.get("status", "?"))
+            icon = "&#x2705;" if r.get("status") == "pass" else "&#x274C;"
+            name = _html.escape(str(r.get("name", "?")))
+            dur = r.get("duration_ms", "?")
+            error_text = _html.escape(str(r.get("error", ""))) if r.get("error") else ""
+            error = f'<div class="error">{error_text}</div>' if error_text else ""
             rows += f"""<tr class="{status}">
-                <td>{icon}</td><td>{r.get('name', '?')}</td>
-                <td>{r.get('duration_ms', '?')}ms</td>
+                <td>{icon}</td><td>{name}</td>
+                <td>{dur}ms</td>
                 <td>{error}</td></tr>"""
 
         html = f"""<!DOCTYPE html>
@@ -85,13 +90,13 @@ td,th{{padding:8px;border:1px solid #ddd}}</style></head>
 
         cases = ""
         for r in results:
-            name = r.get("name", "unknown")
+            name = _xmlutils.escape(str(r.get("name", "unknown")))
             dur = r.get("duration_ms", 0) / 1000.0
             status = r.get("status", "error")
             if status == "pass":
                 cases += f'<testcase name="{name}" time="{dur:.3f}"/>\n'
             else:
-                error_msg = r.get("error", "unknown error")
+                error_msg = _xmlutils.escape(str(r.get("error", "unknown error")))
                 cases += f'<testcase name="{name}" time="{dur:.3f}"><failure message="{error_msg}"/></testcase>\n'
 
         xml = f"""<?xml version="1.0" encoding="UTF-8"?>
