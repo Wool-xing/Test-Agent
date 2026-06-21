@@ -35,6 +35,18 @@
 | 1.1-1.7 架构设计 | ✅ | 5文档+技术栈决策已冻结 |
 | 2.1-2.5 功能规划 | ✅ | 功能清单+优先级矩阵+Sprint拆分 |
 
+## Sprint 3：扩展体系 ✅
+
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 3.1 | Skill SDK | ✅ | 12/12 TDD + 5 discovery + 6 install/test + 6 marketplace |
+| 3.2 | skill list/search/install/test | ✅ | CLI命令全部可用 |
+| 3.3 | MCP list/info | ✅ | mcp_commands.py |
+| 3.4 | 3示例Skill | ✅ | demo-http/file/notify |
+| 3.5 | Skill开发文档 | ✅ | docs/05-开发指南/ |
+| 3.6 | 本地marketplace | ✅ | marketplace.py |
+| SDK测试 | 29/29 GREEN | ✅ | test_skill_{sdk,registry,install,marketplace}.py |
+
 ## Sprint 0：地基 (代码层面)
 
 | # | 要求 | 状态 | 证据 |

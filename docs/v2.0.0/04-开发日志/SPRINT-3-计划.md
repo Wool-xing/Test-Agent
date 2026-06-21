@@ -27,8 +27,8 @@
 | 3.2 | skill test 命令 | ✅ | pytest子进程, CLI可用 |
 | 3.3 | MCP list/info 命令 | ✅ | 已有McpClient基础设施 |
 | 3.4 | 3个示例Skill | ✅ | demo-http/file/notify 含test |
-| 3.5 | Skill开发文档 | 🔧 | 进行中 |
-| 3.6 | Skill市场本地registry | ⬜ | tagent skill publish到本地市场 |
+| 3.5 | Skill开发文档 | ✅ | docs/05-开发指南/Skill开发指南.md |
+| 3.6 | Skill市场本地registry | ✅ | 6/6 TDD, marketplace.py |
 
 ## 验收标准 (§五-A)
 
