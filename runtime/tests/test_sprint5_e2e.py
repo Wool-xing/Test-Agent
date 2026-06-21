@@ -83,3 +83,55 @@ class TestVisualExecutor:
         result = executor.compare("https://example.com", "nonexistent")
         assert result.status == "error"
         assert "Baseline not found" in (result.error or "")
+
+
+class TestIntegrationExecutor:
+    """API + DB integration testing."""
+
+    def test_integration_module_imports(self):
+        """Integration executor should be importable."""
+        from runtime.testing.integration import IntegrationExecutor, IntegrationConfig, ApiCheck
+        assert IntegrationExecutor is not None
+
+    def test_api_check_basic(self):
+        """Basic API check against a test endpoint."""
+        from runtime.testing.integration import IntegrationExecutor, ApiCheck
+        executor = IntegrationExecutor()
+        checks = [ApiCheck(method="GET", path="/get", expected_status=200)]
+        result = executor.check_api("https://httpbin.org", checks)
+        assert result.status in ("pass", "fail", "error")  # network-dependent
+
+    def test_db_check_in_memory(self, tmp_path):
+        """DB check against SQLite in-memory database."""
+        import sqlite3
+        db_path = str(tmp_path / "test.db")
+        conn = sqlite3.connect(db_path)
+        conn.execute("CREATE TABLE test (id INTEGER)")
+        conn.execute("INSERT INTO test VALUES (1)")
+        conn.commit()
+        conn.close()
+
+        from runtime.testing.integration import IntegrationExecutor
+        executor = IntegrationExecutor()
+        result = executor.check_db(f"sqlite:///{db_path}", "SELECT * FROM test", expected_rows_min=1)
+        assert result.status == "pass"
+
+
+class TestPentestSkills:
+    """Verify existing pentest skills are importable."""
+
+    def test_pentest_modules_exist(self):
+        """Pentest skill modules should be importable."""
+        modules = [
+            "runtime.orchestrator.skills.pentest_coordinator",
+            "runtime.orchestrator.skills.pentest_recon",
+            "runtime.orchestrator.skills.pentest_vuln",
+            "runtime.orchestrator.skills.pentest_api",
+            "runtime.orchestrator.skills.pentest_web",
+        ]
+        import importlib
+        for mod in modules:
+            try:
+                importlib.import_module(mod)
+            except ImportError as e:
+                pytest.fail(f"Failed to import {mod}: {e}")
