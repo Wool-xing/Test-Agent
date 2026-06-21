@@ -62,10 +62,37 @@ class TestIMBot:
         assert "http-check" in resp.text
 
     def test_route_skill_list(self):
-        """tagent skill list via IM should return skills."""
+        """Example 7: tagent skill list via IM should return skills."""
         from runtime.gateway.im_bot import IMBotRouter, IMMessage
         router = IMBotRouter()
         msg = IMMessage(platform="feishu", user_id="u1", text="tagent skill list")
         resp = router.route(msg)
         assert resp.ok is True
         assert "37" in resp.text or "Skill" in resp.text
+
+    def test_route_catalog(self):
+        """Example 8: tagent catalog via IM should return info."""
+        from runtime.gateway.im_bot import IMBotRouter, IMMessage
+        router = IMBotRouter()
+        msg = IMMessage(platform="dingtalk", user_id="u1", text="tagent catalog")
+        resp = router.route(msg)
+        assert resp.ok is True
+        assert "Expert" in resp.text or "Skill" in resp.text
+
+    def test_route_doctor(self):
+        """Example 9: tagent doctor via IM should return health status."""
+        from runtime.gateway.im_bot import IMBotRouter, IMMessage
+        router = IMBotRouter()
+        msg = IMMessage(platform="wechat", user_id="u1", text="tagent doctor")
+        resp = router.route(msg)
+        assert resp.ok is True
+        assert "健康" in resp.text or "正常" in resp.text or "Health" in resp.text.lower()
+
+    def test_message_too_long_rejected(self):
+        """Example 10: Overly long messages should be rejected."""
+        from runtime.gateway.im_bot import IMBotRouter, IMMessage
+        router = IMBotRouter()
+        long_text = "tagent status " + "x" * 3000
+        msg = IMMessage(platform="wechat", user_id="u1", text=long_text)
+        resp = router.route(msg)
+        assert resp.ok is False

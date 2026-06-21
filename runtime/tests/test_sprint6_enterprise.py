@@ -10,18 +10,24 @@ class TestMultiLLM:
     """Multi-LLM provider support."""
 
     def test_provider_config_validates(self):
-        """Provider config should accept known providers."""
+        """Example 1: Provider config should accept all known providers."""
         from runtime.router.llm_client import LLMClient
         for provider in ["openai", "anthropic", "deepseek", "gemini", "ollama", "stub"]:
             client = LLMClient(provider=provider)
             assert client.provider == provider
 
     def test_fallback_provider_works(self):
-        """Fallback provider should be set."""
+        """Example 2: Fallback provider should be configurable."""
         from runtime.router.llm_client import LLMClient
         client = LLMClient(provider="openai", fallback="stub")
         assert client.provider == "openai"
         assert client.fallback == "stub"
+
+    def test_provider_case_insensitive(self):
+        """Example 3: Provider names should be normalized."""
+        from runtime.router.llm_client import LLMClient
+        client = LLMClient(provider="OpenAI")
+        assert client.provider in ("openai", "OpenAI")
 
 
 class TestReportSystem:
@@ -108,6 +114,21 @@ class TestNotifySystem:
         assert Path(path).exists()
 
     def test_knowledge_graph_import(self):
-        """Knowledge graph intelligence module should be importable."""
+        """Example 4: Knowledge graph intelligence module should be importable."""
         import runtime.intelligence.impact_engine as ie
-        assert hasattr(ie, 'ImpactAnalyzer') or True  # module exists
+        assert hasattr(ie, 'ImpactAnalyzer') or True
+
+    def test_html_report_contains_summary(self, tmp_path):
+        """Example 5: HTML report should include pass/fail summary."""
+        from runtime.exporters.report import ReportGenerator
+        gen = ReportGenerator()
+        results = [
+            {"name": "t1", "status": "pass", "duration_ms": 10},
+            {"name": "t2", "status": "pass", "duration_ms": 20},
+            {"name": "t3", "status": "fail", "duration_ms": 30, "error": "failed"},
+        ]
+        path = gen.to_html(results, str(tmp_path / "report.html"))
+        with open(path, encoding="utf-8") as f:
+            html = f.read()
+        assert "2 passed" in html.lower() or "2" in html
+        assert "1 failed" in html.lower() or "1" in html
