@@ -11,6 +11,8 @@ from runtime.sdk.validate import validate_skill, ValidationResult
 from runtime.sdk.package import package_skill
 from runtime.sdk.publish import publish_skill, PublishResult
 from runtime.sdk.discovery import discover_skills
+from runtime.sdk.install import install_skill, InstallResult
+from runtime.sdk.test_runner import run_skill_tests, SkillTestResult
 
 __all__ = [
     "scaffold_skill",
@@ -20,4 +22,8 @@ __all__ = [
     "publish_skill",
     "PublishResult",
     "discover_skills",
+    "install_skill",
+    "InstallResult",
+    "run_skill_tests",
+    "SkillTestResult",
 ]
