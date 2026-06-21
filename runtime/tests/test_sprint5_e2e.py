@@ -57,3 +57,29 @@ class TestCronScheduler:
         count = tick()
         assert isinstance(count, int)
         assert count >= 0
+
+
+class TestVisualExecutor:
+    """Screenshot-based visual regression testing."""
+
+    def test_visual_module_imports(self):
+        """Visual executor should be importable."""
+        from runtime.testing.visual import VisualExecutor, VisualConfig
+        assert VisualExecutor is not None
+        assert VisualConfig is not None
+
+    def test_visual_config_defaults(self):
+        """Visual config should have sensible defaults."""
+        from runtime.testing.visual import VisualConfig
+        cfg = VisualConfig()
+        assert 0 < cfg.threshold < 1.0
+        assert cfg.output_dir == "workspace/visual-tests"
+
+    def test_compare_missing_baseline_fails(self, tmp_path):
+        """Compare without baseline should return error."""
+        from runtime.testing.visual import VisualExecutor, VisualConfig
+        cfg = VisualConfig(output_dir=str(tmp_path))
+        executor = VisualExecutor(cfg)
+        result = executor.compare("https://example.com", "nonexistent")
+        assert result.status == "error"
+        assert "Baseline not found" in (result.error or "")
