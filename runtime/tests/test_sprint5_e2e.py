@@ -135,3 +135,44 @@ class TestPentestSkills:
                 importlib.import_module(mod)
             except ImportError as e:
                 pytest.fail(f"Failed to import {mod}: {e}")
+
+
+class TestCypressExecutor:
+    """Cypress E2E test executor."""
+
+    def test_cypress_module_imports(self):
+        """Cypress executor should be importable."""
+        from runtime.testing.cypress import CypressExecutor, CypressConfig
+        assert CypressExecutor is not None
+
+    def test_cypress_not_installed_graceful(self):
+        """Cypress executor should handle missing Cypress gracefully."""
+        from runtime.testing.cypress import CypressExecutor
+        executor = CypressExecutor()
+        result = executor.run("/nonexistent")
+        assert result.status == "error"
+        assert "not installed" in (result.error or "").lower()
+
+
+class TestMobileExecutor:
+    """Mobile test executor (Appium)."""
+
+    def test_mobile_module_imports(self):
+        """Mobile executor should be importable."""
+        from runtime.testing.mobile import MobileExecutor, MobileConfig
+        assert MobileExecutor is not None
+
+    def test_mobile_appium_check(self):
+        """Mobile executor should handle missing Appium gracefully."""
+        from runtime.testing.mobile import MobileExecutor
+        executor = MobileExecutor()
+        result = executor.check_installed()
+        assert result.status in ("pass", "error")
+
+    def test_mobile_run_test(self):
+        """run_test should work without Appium server."""
+        from runtime.testing.mobile import MobileExecutor
+        executor = MobileExecutor()
+        result = executor.run_test("test_login.py")
+        assert result.status == "pass"
+        assert len(result.checks) >= 2
