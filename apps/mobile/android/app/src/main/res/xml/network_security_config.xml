@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 证书固定 (Certificate Pinning): 仅信任自己的API服务器 -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.test-agent.dev</domain>
+        <pin-set>
+            <!-- SHA-256 hash of the server certificate (replace with actual) -->
+            <pin digest="SHA-256">PLACEHOLDER_CERT_PIN</pin>
+            <!-- Backup pin -->
+            <pin digest="SHA-256">PLACEHOLDER_BACKUP_PIN</pin>
+        </pin-set>
+    </domain-config>
+    <!-- Block all other cleartext traffic -->
+    <base-config cleartextTrafficPermitted="false"/>
+</network-security-config>
