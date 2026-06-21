@@ -13,9 +13,7 @@ COPY runtime/ runtime/
 COPY utils/ utils/
 COPY ai/ ai/
 
-RUN pip install --no-cache-dir -e ".[dev]" && \
-    pip install --no-cache-dir playwright && \
-    playwright install chromium --with-deps
+RUN pip install --no-cache-dir -e ".[dev]"
 
 ENV TAGENT_LLM_PROVIDER=stub
 ENV TAGENT_DEPLOYMENT_MODE=enterprise
