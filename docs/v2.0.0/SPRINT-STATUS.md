@@ -47,6 +47,19 @@
 | 3.6 | 本地marketplace | ✅ | marketplace.py |
 | SDK测试 | 29/29 GREEN | ✅ | test_skill_{sdk,registry,install,marketplace}.py |
 
+## Sprint 4：B端/C端分化 ✅
+
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 4.1 | mode切换 enterprise/community | ✅ | settings.deployment_mode |
+| 4.2 | SSO OIDC集成 | ✅ | SSOConfig+SSOManager (含JWT签名验证) |
+| 4.3 | RBAC权限 (4角色+7权限) | ✅ | RBAC.has_permission 8/8 TDD |
+| 4.4 | 审计日志 | ✅ | log_event→JSONL写入+查询 |
+| 4.5 | C端安装 4/4 | ✅ | brew+pip+npm+scoop |
+| 4.6 | Web Dashboard | ✅ | Playwright真浏览器渲染+截图 |
+| 审查 | CRITICAL修复 | ✅ | SSO JWT签名验证+api_auth_token警告+migration文档 |
+| 👤 | OIDC Provider真机 | ⏸️ | 需Keycloak人工配置 |
+
 ## Sprint 0：地基 (代码层面)
 
 | # | 要求 | 状态 | 证据 |
