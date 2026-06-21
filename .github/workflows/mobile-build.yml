@@ -1,6 +1,9 @@
 name: Mobile Build
 # Sprint 9-10: Android APK/AAB + iOS IPA CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
