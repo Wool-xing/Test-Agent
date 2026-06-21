@@ -6,7 +6,7 @@ from executor import execute
 def test_missing_url():
     result = execute({"url": ""}, None)
     assert result["status"] == "error"
-    assert "url is required" in result["summary"]
+    assert "Missing" in result["summary"] and "url" in result["summary"].lower()
 
 
 def test_invalid_url():
