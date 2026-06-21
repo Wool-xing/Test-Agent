@@ -1,0 +1,48 @@
+# Test-Agent CLI Output
+```
+                                                                               
+ Usage: python -m runtime.cli.main [OPTIONS] COMMAND [ARGS]...                 
+                                                                               
+ Test-Agent Runtime CLI                                                        
+                                                                               
+┌─ Options ───────────────────────────────────────────────────────────────────┐
+│ --version                     Show version and exit                         │
+│ --no-color                    Disable colored output                        │
+│ --debug                       Enable DEBUG log level                        │
+│ --install-completion          Install completion for the current shell.     │
+│ --show-completion             Show completion for the current shell, to     │
+│                               copy it or customize the installation.        │
+│ --help                        Show this message and exit.                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Commands ──────────────────────────────────────────────────────────────────┐
+│ test       Execute tests: e2e, visual, integration, unit                    │
+│ run        Plan + execute a test run. Supports pipeline: echo 'test' |      │
+│            tagent run -                                                     │
+│ plan       Plan only (no execution).                                        │
+│ doctor     Sanity check: settings + catalog + optional DB/MinIO ping +      │
+│            L1/L3 self-check.                                                │
+│ catalog    List experts + skills loaded from markdown.                      │
+│ init       Generate .env + tagent.yml + STARTUP.md in 5 minutes.            │
+│ readiness  Weighted release readiness score (smoke×0.4 + regression×0.3 +   │
+│            perf×0.2 + security×0.1).                                        │
+│ selftest   L3 full self-test. Default tolerant mode: pass if node pass rate │
+│            >= threshold (0.80). --strict disables tolerance.                │
+│ demo       One-command full demo · default 0-config stub · --real-llm for   │
+│            real LLM.                                                        │
+│ bootstrap  One‑command bootstrap: check system → generate config → verify   │
+```
+
+### Quick Start
+```
+$ tagent --version
+Test-Agent Runtime v2.0.0
+$ tagent skill list | head -5
+[32m2026-06-21 15:45:28[0m | [1mINFO   [0m | [36mruntime.registry.registry:build_catalog:175[0m | catalog built: 16 experts, 37 skills
+Name                           Description                                       
+--------------------------------------------------------------------------------
+agent-introspection-debugging  Agent 自省调试 Skill。LLM 决策 / 工具调用 / 上下文 / token / ...
+ai-test                        AI/ML 模型测试 Skill。模型质量 + 数据漂移 + 推理性能 + 公平性 + LLM...
+automotive-adas-scenario       ADAS 场景库测试 Skill。仿真(VTD/CarMaker/CARLA)+ 封闭场地;O...
+automotive-can-bus-test        车载总线测试 Skill。CAN / CAN-FD / LIN / FlexRay / Aut...
+automotive-hil-loop-test       HIL/SIL/MIL/PIL 环路在路 Skill。真 ECU + 仿真外设(传感器/执行器...
+```
