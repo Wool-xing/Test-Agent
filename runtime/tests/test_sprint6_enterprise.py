@@ -63,3 +63,35 @@ class TestReportSystem:
         assert "<?xml" in xml
         assert 'testsuite' in xml
         assert 'test1' in xml
+
+
+class TestNotifySystem:
+    """Slack/Email/Webhook notifications."""
+
+    def test_notify_module_imports(self):
+        """Notify module should be importable."""
+        from runtime.gateway.notify import Notifier, NotifyConfig
+        assert Notifier is not None
+
+    def test_slack_unconfigured_graceful(self):
+        """Slack without config should return ok=False gracefully."""
+        from runtime.gateway.notify import Notifier
+        n = Notifier()
+        result = n.send_slack("test message")
+        assert result.ok is False
+        assert "not configured" in (result.error or "").lower()
+
+    def test_email_unconfigured_graceful(self):
+        """Email without SMTP config should return ok=False gracefully."""
+        from runtime.gateway.notify import Notifier
+        n = Notifier()
+        result = n.send_email("Test Subject", "Test Body")
+        assert result.ok is False
+        assert "not configured" in (result.error or "").lower()
+
+    def test_webhook_basic(self, tmp_path):
+        """Webhook notification should handle unreachable URLs gracefully."""
+        from runtime.gateway.notify import Notifier
+        n = Notifier()
+        result = n.send_webhook("http://127.0.0.1:19999/notfound", {"test": True})
+        assert result.ok is False  # unreachable port
