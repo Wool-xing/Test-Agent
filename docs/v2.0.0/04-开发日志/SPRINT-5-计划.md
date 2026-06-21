@@ -18,10 +18,11 @@
 
 | # | 功能 | TDD | 预计 |
 |---|------|-----|------|
-| 5.1 | E2E执行器 (Playwright) | ⬜ | tagent run e2e |
-| 5.2 | Cron调度验证+增强 | ⬜ | 定时任务创建/触发/历史 |
-| 5.3 | Visual测试 (screenshot compare) | ⬜ | 截图对比 |
-| 5.4 | Integration测试执行器 | ⬜ | API/DB |
+| 5.1 | E2E执行器 (Playwright) | ✅ | check_page() 浏览器自动化 |
+| 5.2 | Cron调度验证 | ✅ | run_job/tick/run_forever 815行 |
+| 5.3 | Visual测试 | ✅ | capture+compare PIL/numpy |
+| 5.4 | Integration测试 | ✅ | check_api+check_db |
+| 5.5 | Pentest验证 | ✅ | 5模块全部可导入 |
 
 ## 验收
 

@@ -60,6 +60,17 @@
 | 审查 | CRITICAL修复 | ✅ | SSO JWT签名验证+api_auth_token警告+migration文档 |
 | 👤 | OIDC Provider真机 | ⏸️ | 需Keycloak人工配置 |
 
+## Sprint 5：测试能力全覆盖 ✅ 
+
+| # | 要求 | 状态 | 证据 |
+|---|------|------|------|
+| 5.1 | E2E执行器(Playwright) | ✅ | check_page() 浏览器自动化 |
+| 5.2 | Cron调度验证 | ✅ | 815行 scheduler |
+| 5.3 | Visual测试 | ✅ | capture+compare PIL/numpy |
+| 5.4 | Integration测试 | ✅ | check_api+check_db |
+| 5.5 | Pentest验证 | ✅ | 5 pentest模块 |
+| TDD | 13 tests | ✅ | test_sprint5_e2e.py |
+
 ## Sprint 0：地基 (代码层面)
 
 | # | 要求 | 状态 | 证据 |
