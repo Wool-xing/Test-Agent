@@ -81,8 +81,21 @@ class IntegrationExecutor:
         )
 
     def check_db(self, connection_string: str, query: str, expected_rows_min: int = 0) -> IntegrationResult:
-        """Execute a database query and verify results."""
+        """Execute a database query and verify results.
+
+        Security: query is validated to be SELECT-only with no statement chaining.
+        """
         import time
+        import re
+
+        # Validate query: SELECT only, no semicolons (prevents statement chaining)
+        q = query.strip().upper()
+        if not q.startswith("SELECT") or ";" in query:
+            return IntegrationResult(
+                status="error",
+                error="Only SELECT queries without semicolons are allowed",
+                duration_ms=0,
+            )
 
         start = time.monotonic()
         try:

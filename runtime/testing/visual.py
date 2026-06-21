@@ -32,10 +32,19 @@ class VisualExecutor:
     def __init__(self, config: VisualConfig | None = None):
         self._config = config or VisualConfig()
 
+    @staticmethod
+    def _safe_name(name: str) -> str:
+        if not name or not name.replace("-", "").replace("_", "").isalnum():
+            raise ValueError(f"Invalid name: {name!r} — use only alphanumeric, hyphens, underscores")
+        if ".." in name or "/" in name or "\\" in name:
+            raise ValueError(f"Invalid name: {name!r} — path separators not allowed")
+        return name
+
     def capture(self, url: str, name: str) -> VisualResult:
         """Capture a screenshot of a URL and save as a baseline or comparison."""
         import time
 
+        name = self._safe_name(name)
         start = time.monotonic()
         out_dir = Path(self._config.output_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -69,6 +78,7 @@ class VisualExecutor:
         """Compare current screenshot against a stored baseline."""
         import time
 
+        baseline_name = self._safe_name(baseline_name)
         start = time.monotonic()
         out_dir = Path(self._config.output_dir)
         baseline_path = out_dir / f"{baseline_name}.png"
