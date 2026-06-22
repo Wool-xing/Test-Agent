@@ -2,7 +2,7 @@
 # 安装: pip install -r requirements/ai.txt
 -r base.txt
 
-numpy==1.26.4
+numpy==2.2.6
 scikit-learn==1.6.1
 scipy==1.13.1
 # alibi-detect==0.12.0      # 漂移高级检测
