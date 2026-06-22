@@ -33,9 +33,9 @@ PyYAML==6.0.3
 # Excel/文档
 openpyxl==3.1.5
 python-docx==1.2.0
-pdfplumber==0.11.9
+pdfplumber==0.11.10
 pypdf==6.13.3
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 
 # 工具
 python-dotenv==1.2.2
@@ -46,7 +46,7 @@ loguru==0.7.3
 jsonschema>=4.23.0
 
 # 报告
-reportlab==4.5.1
+reportlab==5.0.0
 python-pptx==1.0.2
 
 # 安全扫描
