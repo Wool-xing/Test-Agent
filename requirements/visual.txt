@@ -2,7 +2,7 @@
 # 安装: pip install -r requirements/visual.txt
 -r base.txt
 
-opencv-python==4.13.0.92
+opencv-python==5.0.0.93
 scikit-image==0.24.0
 imagehash==4.3.2
 pytesseract==0.3.10
