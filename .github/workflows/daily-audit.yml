@@ -17,7 +17,7 @@ jobs:
         python-version: ['3.11', '3.12', '3.x']
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '${{ matrix.python-version }}' }
       - name: 安装依赖
         run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi factory-boy python-multipart
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.11' }
       - name: 安装依赖
         run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi factory-boy python-multipart
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.11' }
 
       - name: 旧路径重生检测
@@ -181,7 +181,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.11' }
       - name: 安装依赖
         run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi factory-boy python-multipart
@@ -213,7 +213,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.11' }
 
       - name: install.py 语法
@@ -265,7 +265,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with: { python-version: '3.11' }
       - name: 安装依赖
         run: pip install pydantic pydantic-settings typer rich loguru pyyaml httpx defusedxml python-dotenv prompt-toolkit packaging sqlalchemy fastapi factory-boy python-multipart
