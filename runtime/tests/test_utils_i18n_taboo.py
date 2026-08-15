@@ -307,9 +307,11 @@ class TestRunTabooAudit:
         assert result["total_hits"] > 0
 
     def test_minimal_payload(self):
-        result = run_taboo_audit({})
+        # Pin a date with no taboo period (2月3日) — holiday audit defaults to
+        # today's date, which hits お盆 (8月13-16日) etc. and breaks == 0.
+        result = run_taboo_audit({"date": "02-03"})
         assert result["total_hits"] == 0  # no data to scan
-        assert "taboo_holidays" in result  # still runs with today's date
+        assert "taboo_holidays" in result  # holiday audit still runs
 
     def test_text_only_payload(self):
         result = run_taboo_audit({"text": "台独 nigger"})
