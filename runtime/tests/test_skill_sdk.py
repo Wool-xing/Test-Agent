@@ -6,7 +6,6 @@ Sprint 3 requirement: developer can create a Skill → test locally → publish 
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -16,9 +15,12 @@ import pytest
 
 
 @pytest.fixture
-def temp_skill_dir():
+def temp_skill_dir(tmp_path):
     """Create a temporary skill directory with minimal SKILL.md."""
-    d = Path(tempfile.mkdtemp(prefix="test-skill-"))
+    # Fixed name — mkdtemp's random suffix may contain '_', which fails the
+    # kebab-case name validation in publish_skill (flaky test_publish_to_local_registry).
+    d = tmp_path / "test-skill"
+    d.mkdir()
     skill_md = d / "SKILL.md"
     skill_md.write_text("""---
 name: test-skill
