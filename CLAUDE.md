@@ -29,7 +29,7 @@ Two independent paths converge at `utils/`.
 AI agents read skill docs and agent definitions to orchestrate testing.
 
 - `ai/agents/` — 16 agent prompt definitions (.md)
-- `ai/skills/` — 32 skill workflow definitions (.md)
+- `ai/skills/` — 37 skill workflow definitions (.md，另有 README.md)
 - These are READ-ONLY for AI agents. Do NOT modify unless explicitly asked.
 
 **Correct flow:**
@@ -48,7 +48,7 @@ Standalone CLI that works without AI.
 
 tagent run "path/to/prd.md"      # router + orchestrator end-to-end
 tagent plan "path/to/prd.md"     # plan only (no execution)
-tagent catalog                   # list 16 experts + 32 skills
+tagent catalog                   # list 16 experts + 37 skills
 tagent doctor                    # health check
 
 ```text
@@ -88,9 +88,9 @@ Both paths converge at utils/ execution layer.
 | What | Where |
 | ------ | ------- |
 | Agent definitions | `ai/agents/` (16 agents) |
-| Skill workflow docs | `ai/skills/` (32 skills + 3 meta-skill packages) |
+| Skill workflow docs | `ai/skills/` (38 skills + 3 meta-skill packages) |
 | Python runtime engine | `runtime/` (CLI + orchestrator + MCP + API) |
-| Python utilities | `utils/` (79 modules, 12 subdirectories) |
+| Python utilities | `utils/` (13 subdirectories) |
 | Distributable apps | `apps/` (desktop, mobile) |
 | Deploy templates | `deploy/config/` (.env.example, pytest.ini, ...) |
 | Deploy marketplace | `deploy/marketplace/` |
@@ -99,6 +99,7 @@ Both paths converge at utils/ execution layer.
 | CI pipelines | `ci/` |
 | Documentation | `docs/` |
 | Dev scripts | `scripts/` |
+| 其他根目录 | `engine/`、`sdk/`、`specs/`、`examples/`、`prompts/`、`Formula/`、`scoop/` |
 
 ---
 

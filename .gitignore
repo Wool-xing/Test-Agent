@@ -172,3 +172,11 @@ runtime/web/marketplace/dist/
 # ===== Test artifacts =====
 workspace/*.db
 workspace/*.db-journal
+
+# Flutter/Dart build artifacts
+apps/mobile/.dart_tool/
+apps/mobile/build/
+
+# Runtime workspace artifacts (audit.db, gateway sessions, rollback, caches)
+workspace/
+test-audit.db

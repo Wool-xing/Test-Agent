@@ -9,7 +9,7 @@
 | # | 指标 | 目标 | 实测 | 状态 |
 |---|------|------|------|------|
 | 1 | CLI冷启动（--help） | < 1.0s | 0.947s | ✅ |
-| 2 | CLI热启动（import time） | < 0.3s | 0.763s | ❌ Python import开销 |
+| 2 | CLI热启动（import time） | < 0.3s | 0.445s (优化后) | ⚠️ _LazyKernel懒加载, -42% |
 | 3 | TUI帧渲染 | < 16ms (60fps) | 9.5ms (1000行日志实测) | ✅ |
 | 4 | REPL响应（本地Skill） | < 100ms | ⏳ 待REPL内测量 | 🔧 |
 | 5 | REPL响应（LLM调用） | < 3s首Token | ⏳ 需LLM API Key | 🔧 |
@@ -37,8 +37,15 @@
 | CLI热启动 0.763s | Python import开销; subprocess每次新建进程 | 可接受; Python CLI固有开销 |
 | 内存82MB | 全量导入所有模块(agent/core/infra/ui) | 延迟导入(lazy import)可降至~50MB |
 
+## 优化记录
+
+| 日期 | 优化项 | 优化前 | 优化后 | 方法 |
+|------|--------|--------|--------|------|
+| 2026-06-22 | CLI热启动 | 0.763s | 0.445s | runtime/cli/_shared.py Kernel改为_LazyKernel代理, 延迟sqlalchemy+router导入链 |
+| 2026-06-22 | CLI冷启动 | 0.947s | ~0.440s | 同上 |
+
 ## 下一步
 
-- [ ] CLI热启动: 实际使用中用户在同一REPL会话内操作, 不需要每次重启进程
-- [ ] 内存: Sprint 3后评估lazy import方案
+- [x] CLI热启动: 通过_LazyKernel懒加载降至0.445s, 距目标0.3s剩145ms
+- [ ] 内存: 懒加载已缓解, 待重新测量RSS
 - [ ] 剩余6项: 随Sprint推进逐步测量
