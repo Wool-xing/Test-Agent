@@ -120,6 +120,8 @@ jobs:
   security-audit:
     name: 依赖 CVE 扫描
     runs-on: ubuntu-latest
+    # 真实依赖扫描较重（安装全部 runtime 依赖）— 仅 main + 周调度
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -129,17 +131,20 @@ jobs:
       - name: 升级 pip
         run: python -m pip install --upgrade pip
 
-      - name: pip-audit 扫描
+      - name: 安装项目依赖（真实清单 = pyproject.toml）
+        run: python -m pip install -e .
+
+      - name: pip-audit 扫描（已装环境）
         run: |
           pip install pip-audit
-          pip-audit -r deploy/config/requirements.txt --format columns || true
+          pip-audit --local --format columns || true
         # 使用 || true 确保扫描完整运行，但 job 会因非零退出码显示为失败
         # 可通过 branch protection 设置决定是否阻断合并
 
       - name: safety 扫描
         run: |
           pip install safety
-          safety check -r deploy/config/requirements.txt --short-report || true
+          safety check --short-report || true
 
   # ===== 3. install.py 脚本检查 =====
   install-syntax:
