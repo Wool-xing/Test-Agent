@@ -5,10 +5,16 @@ Serves the marketplace web UI with data from registry.json via runtime.marketpla
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
+from runtime.api.auth.rbac import RBAC as _RBAC
+from runtime.api.auth.rbac import Permission as _Perm
 from runtime.marketplace.catalog import load_local
+
+_rbac = _RBAC()
 from runtime.marketplace.catalog import search as catalog_search
+
+_rbac = _RBAC()
 
 router = APIRouter(prefix="/api/marketplace", tags=["marketplace"])
 
@@ -43,7 +49,9 @@ def _enrich(entry) -> dict:
 
 
 @router.get("/plugins")
+@_rbac.require(_Perm.VIEW_RESULTS)
 def list_plugins(
+    request: Request,
     type: str | None = Query(None, description="Filter by plugin type (agent|skill|tool|gate)"),
     q: str | None = Query(None, description="Full-text search query"),
     sort: str = Query("stars", description="Sort order: stars|downloads|newest|name"),
@@ -85,7 +93,8 @@ def list_plugins(
 
 
 @router.get("/plugins/{name}")
-def plugin_detail(name: str):
+@_rbac.require(_Perm.VIEW_RESULTS)
+def plugin_detail(request: Request, name: str):
     """Return detailed info for a single plugin."""
     for e in load_local():
         if e.name == name:
@@ -94,7 +103,8 @@ def plugin_detail(name: str):
 
 
 @router.get("/plugins/{name}/versions")
-def plugin_versions(name: str):
+@_rbac.require(_Perm.VIEW_RESULTS)
+def plugin_versions(request: Request, name: str):
     """Return available versions for a plugin (stub — registry stores single version)."""
     for e in load_local():
         if e.name == name:
@@ -106,7 +116,9 @@ def plugin_versions(name: str):
 
 
 @router.get("/search")
+@_rbac.require(_Perm.VIEW_RESULTS)
 def search_plugins(
+    request: Request,
     q: str = Query(..., min_length=1, description="Search query"),
     limit: int = Query(20, ge=1, le=100),
 ):

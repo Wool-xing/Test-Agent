@@ -6,6 +6,11 @@ import threading
 
 from fastapi import APIRouter, HTTPException
 
+from runtime.api.auth.rbac import RBAC as _RBAC
+from runtime.api.auth.rbac import Permission as _Perm
+
+_rbac = _RBAC()
+
 router = APIRouter(tags=["runs"])
 
 # Shared cancel registry — populated by main.py at startup
@@ -42,7 +47,8 @@ def unregister_run(run_id: str) -> None:
 
 
 @router.post("/run/{run_id}/cancel")
-async def cancel_run(run_id: str):
+@_rbac.require(_Perm.RUN_TESTS)
+async def cancel_run(request, run_id: str):
     """Request cancellation of a running test."""
     if not request_cancel(run_id):
         raise HTTPException(status_code=404, detail=f"run '{run_id}' not found or already completed")

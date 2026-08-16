@@ -17,6 +17,8 @@ from fastapi.responses import JSONResponse as _JSONResponse
 from loguru import logger
 
 from runtime import __version__
+from runtime.api.auth.rbac import RBAC as _RBAC
+from runtime.api.auth.rbac import Permission as _Perm
 from runtime.api.correlation import CorrelationMiddleware
 from runtime.api.deps import Kernel
 from runtime.api.endpoints.cancel import router as cancel_router
@@ -67,11 +69,13 @@ app.add_middleware(
 
 app.add_middleware(CorrelationMiddleware)
 
+
+_rbac = _RBAC()
+
 # Enterprise auth stack (SSO + RBAC + audit) — opt-in via TAGENT_ENTERPRISE_ENABLED=1.
 # When enabled, ALL non-excluded routes require a valid SSO Bearer token (fail-closed).
 if os.environ.get("TAGENT_ENTERPRISE_ENABLED", "").strip() == "1":
     from runtime.api.audit import AuditTrail
-    from runtime.api.auth.rbac import RBAC
     from runtime.api.auth.sso import SSOConfig, SSOManager
     from runtime.api.middleware.enterprise import EnterpriseMiddleware
 
@@ -91,7 +95,7 @@ if os.environ.get("TAGENT_ENTERPRISE_ENABLED", "").strip() == "1":
     app.add_middleware(
         EnterpriseMiddleware,
         sso_manager=SSOManager(sso_cfg),
-        rbac=RBAC(),
+        rbac=_rbac,
         audit=AuditTrail(str(Path("workspace") / "audit.db")),
         # Platform webhooks carry their own per-platform signatures and cannot
         # send SSO Bearer tokens; metrics must stay scrapeable (monitoring).
@@ -180,13 +184,15 @@ def health_deep() -> dict:
 
 
 @app.get("/catalog", response_model=CatalogResponse)
-def catalog() -> CatalogResponse:
+@_rbac.require(_Perm.VIEW_RESULTS)
+def catalog(request: Request) -> CatalogResponse:
     data = _kernel.catalog()
     return CatalogResponse(**data)
 
 
 @app.post("/run/text", response_model=RunCreated)
-def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", lang: str = "zh") -> RunCreated:
+@_rbac.require(_Perm.RUN_TESTS)
+def run_text(request: Request, payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", lang: str = "zh") -> RunCreated:
     # mode+lang per-request; module globals → serialize the set+submit critical
     # section so concurrent /run/text requests cannot interleave
     from runtime.tutor.i18n import set_lang
@@ -232,7 +238,8 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 
 
 @app.post("/run/file", response_model=RunCreated)
-async def run_file(file: UploadFile = File(...), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
+@_rbac.require(_Perm.RUN_TESTS)
+async def run_file(request: Request, file: UploadFile = File(...), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
     suffix = Path(file.filename or "upload").suffix.lower()
     allowed = _allowed_upload_exts()
     if suffix not in allowed:
@@ -284,7 +291,8 @@ async def run_file(file: UploadFile = File(...), bg: BackgroundTasks = None, ext
 
 
 @app.post("/run/url", response_model=RunCreated)
-def run_url(url: str = Form(...), bg: BackgroundTasks = None) -> RunCreated:  # type: ignore[assignment]
+@_rbac.require(_Perm.RUN_TESTS)
+def run_url(request: Request, url: str = Form(...), bg: BackgroundTasks = None) -> RunCreated:  # type: ignore[assignment]
     art = parse_url(url)
     # Fast-path capacity pre-check — avoids paying LLM routing + DB row
     # creation for requests that arrive at capacity.
@@ -312,7 +320,8 @@ def run_url(url: str = Form(...), bg: BackgroundTasks = None) -> RunCreated:  # 
 
 
 @app.get("/status/{run_id}", response_model=RunStatusModel)
-def status(run_id: str) -> RunStatusModel:
+@_rbac.require(_Perm.VIEW_RESULTS)
+def status(request: Request, run_id: str) -> RunStatusModel:
     with _run_lock:
         res = _run_results.get(run_id)
         active = run_id in _run_active
@@ -332,7 +341,8 @@ def status(run_id: str) -> RunStatusModel:
 
 
 @app.get("/report/{run_id}")
-def report(run_id: str) -> JSONResponse:
+@_rbac.require(_Perm.VIEW_RESULTS)
+def report(request: Request, run_id: str) -> JSONResponse:
     res = _run_results.get(run_id)
     if res is None:
         raise HTTPException(status_code=404, detail="run not finished or unknown")
@@ -340,7 +350,8 @@ def report(run_id: str) -> JSONResponse:
 
 
 @app.post("/feedback")
-def submit_feedback(payload: dict) -> dict:
+@_rbac.require(_Perm.VIEW_RESULTS)
+def submit_feedback(request: Request, payload: dict) -> dict:
     """Accept user feedback from desktop/web UI. Logs to workspace/feedback/."""
     import json as _json
     from datetime import datetime, timezone
@@ -359,7 +370,8 @@ def submit_feedback(payload: dict) -> dict:
 
 
 @app.get("/history")
-def list_history() -> dict:
+@_rbac.require(_Perm.VIEW_RESULTS)
+def list_history(request: Request) -> dict:
     """List past test runs from workspace."""
     import json as _json
 
@@ -391,7 +403,8 @@ def list_history() -> dict:
 
 
 @app.get("/dashboard")
-def get_dashboard() -> dict:
+@_rbac.require(_Perm.VIEW_RESULTS)
+def get_dashboard(request: Request) -> dict:
     """Aggregate quality metrics — 3‑row layout: decision → diagnostic → action."""
     from runtime.observability.dashboard import build_dashboard
 

@@ -15,6 +15,7 @@ Usage:
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable
 from enum import Enum
 from functools import wraps
@@ -118,7 +119,9 @@ class RBAC:
             @wraps(func)
             async def wrapper(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-untyped-def]
                 if not self.enabled:
-                    return await func(*args, **kwargs)
+                    if inspect.iscoroutinefunction(func):
+                        return await func(*args, **kwargs)
+                    return func(*args, **kwargs)
 
                 # Extract the Request object
                 request: Request | None = kwargs.get("request")
@@ -138,7 +141,13 @@ class RBAC:
                 role_str: str | None = getattr(request.state, "role", None)
                 if role_str is None:
                     # Try user_roles list (SSO middleware sets this)
-                    user_roles: list[str] = getattr(request.state, "user_roles", [])
+                    user_roles: list[str] | None = getattr(request.state, "user_roles", None)
+                    if user_roles is None:
+                        # No auth middleware mounted (enterprise mode off) — RBAC is
+                        # not enforced; local/dev deployments stay backward compatible.
+                        if inspect.iscoroutinefunction(func):
+                            return await func(*args, **kwargs)
+                        return func(*args, **kwargs)
                     role_str = "viewer"
                     for candidate in ("admin", "manager", "tester"):
                         if candidate in user_roles:
@@ -161,7 +170,9 @@ class RBAC:
                     raise HTTPException(status_code=403, detail=f"Unknown role: {role_str}") from None
 
                 self.check(role, permission)
-                return await func(*args, **kwargs)
+                if inspect.iscoroutinefunction(func):
+                    return await func(*args, **kwargs)
+                return func(*args, **kwargs)
 
             return wrapper
 

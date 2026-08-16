@@ -732,3 +732,87 @@ class TestEnterpriseMountGate:
         r = self._run({"TAGENT_ENTERPRISE_ENABLED": "1"})
         assert r.returncode != 0
         assert "SSO config incomplete" in r.stderr
+
+
+class TestRbacMatrix:
+    """Permission matrix (GitHub repo model): viewer read-only, tester can run."""
+
+    @staticmethod
+    def _make_app_with_role(role: str):
+        from fastapi import FastAPI
+        from starlette.middleware.base import BaseHTTPMiddleware
+
+        from runtime.api.main import catalog, run_text
+
+        class RoleInjector(BaseHTTPMiddleware):
+            async def dispatch(self, request, call_next):
+                request.state.role = role
+                return await call_next(request)
+
+        app = FastAPI()
+        app.add_middleware(RoleInjector)
+        app.add_api_route("/catalog", catalog, methods=["GET"])
+        app.add_api_route("/run/text", run_text, methods=["POST"])
+        return app
+
+    def test_viewer_read_allowed(self):
+        from fastapi.testclient import TestClient
+
+        client = TestClient(self._make_app_with_role("viewer"))
+        resp = client.get("/catalog")
+        assert resp.status_code == 200
+
+    def test_viewer_cannot_run(self):
+        from fastapi.testclient import TestClient
+
+        client = TestClient(self._make_app_with_role("viewer"))
+        resp = client.post("/run/text", json={"text": "run smoke test"})
+        assert resp.status_code == 403
+
+    def test_tester_can_run(self, monkeypatch):
+        from types import SimpleNamespace
+
+        from fastapi.testclient import TestClient
+
+        from runtime.api.main import _kernel
+
+        fake_decision = SimpleNamespace(
+            detected_target_type="web",
+            detected_qualities=[],
+            confidence=0.9,
+            rationale="test",
+            dag=[],
+        )
+        monkeypatch.setattr(
+            _kernel, "submit", lambda art, persist=True: ("fake-run-id", fake_decision)
+        )
+
+        client = TestClient(self._make_app_with_role("tester"))
+        resp = client.post("/run/text", json={"text": "run smoke test"})
+        assert resp.status_code == 200
+
+    def test_no_middleware_passes_through(self, monkeypatch):
+        """Without auth middleware mounted (local mode), RBAC does not enforce."""
+        from types import SimpleNamespace
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.main import _kernel, run_text
+
+        fake_decision = SimpleNamespace(
+            detected_target_type="web",
+            detected_qualities=[],
+            confidence=0.9,
+            rationale="test",
+            dag=[],
+        )
+        monkeypatch.setattr(
+            _kernel, "submit", lambda art, persist=True: ("fake-run-id", fake_decision)
+        )
+
+        app = FastAPI()
+        app.add_api_route("/run/text", run_text, methods=["POST"])
+        client = TestClient(app)
+        resp = client.post("/run/text", json={"text": "run smoke test"})
+        assert resp.status_code == 200
