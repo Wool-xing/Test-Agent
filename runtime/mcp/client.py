@@ -8,14 +8,13 @@ interface for agents and skills to use MCP tools at runtime.
 from __future__ import annotations
 
 import json
-from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from runtime.config.settings import get_settings
-
 from loguru import logger
+
+from runtime.config.settings import get_settings
 
 
 @dataclass
@@ -133,25 +132,24 @@ class McpClient:
     async def list_tools(self, server_name: str) -> list[McpTool]:
         """Discover tools from a specific MCP server."""
         try:
-            from mcp.client.stdio import stdio_client
             from mcp import ClientSession
+            from mcp.client.stdio import stdio_client
         except ImportError as e:
             raise RuntimeError("mcp SDK client not available; pip install mcp") from e
 
         params = self._make_server_params(server_name)
         tools: list[McpTool] = []
 
-        async with stdio_client(params) as (read, write):
-            async with ClientSession(read, write) as session:
-                await session.initialize()
-                result = await session.list_tools()
-                for t in (result.tools if hasattr(result, 'tools') else []):
-                    tools.append(McpTool(
-                        server_name=server_name,
-                        tool_name=t.name,
-                        description=getattr(t, 'description', '') or '',
-                        input_schema=getattr(t, 'inputSchema', {}) or {},
-                    ))
+        async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
+            await session.initialize()
+            result = await session.list_tools()
+            for t in (result.tools if hasattr(result, 'tools') else []):
+                tools.append(McpTool(
+                    server_name=server_name,
+                    tool_name=t.name,
+                    description=getattr(t, 'description', '') or '',
+                    input_schema=getattr(t, 'inputSchema', {}) or {},
+                ))
 
         return tools
 
@@ -160,8 +158,8 @@ class McpClient:
     ) -> McpToolResult:
         """Call a tool on a remote MCP server. Connects, calls, and disconnects per invocation."""
         try:
-            from mcp.client.stdio import stdio_client
             from mcp import ClientSession
+            from mcp.client.stdio import stdio_client
         except ImportError as e:
             raise RuntimeError("mcp SDK client not available; pip install mcp") from e
 
@@ -173,8 +171,7 @@ class McpClient:
             )
 
         try:
-            async with stdio_client(params) as (read, write):
-                async with ClientSession(read, write) as session:
+            async with stdio_client(params) as (read, write), ClientSession(read, write) as session:
                     await session.initialize()
                     result = await session.call_tool(tool_name, arguments or {})
 

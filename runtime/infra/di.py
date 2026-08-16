@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
-
 # ── Injectable interfaces ───────────────────────────────
 
 class LLMProvider(Protocol):

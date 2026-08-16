@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import statistics
 import xml.etree.ElementTree as ET
+from contextlib import suppress
 from typing import Any
 
 
@@ -39,7 +40,7 @@ def parse_jmeter_jtl(csv_text: str) -> dict[str, Any]:
 
     Returns: {samples, failures, avg_ms, p95_ms, min_ms, max_ms, rate}
     """
-    lines = [l.strip() for l in csv_text.strip().split("\n") if l.strip()]
+    lines = [raw_line.strip() for raw_line in csv_text.strip().split("\n") if raw_line.strip()]
     if len(lines) < 2:
         return {"samples": 0, "failures": 0, "avg_ms": 0, "p95_ms": 0, "min_ms": 0, "max_ms": 0, "rate": 0.0}
 
@@ -58,10 +59,8 @@ def parse_jmeter_jtl(csv_text: str) -> dict[str, Any]:
         fields = line.split(",")
         if len(fields) <= max(elapsed_idx, success_idx):
             continue
-        try:
-            elapsed_values.append(int(fields[elapsed_idx]))
-        except ValueError:
-            pass  # corrupt elapsed, still check success below
+        with suppress(ValueError):
+            elapsed_values.append(int(fields[elapsed_idx]))  # corrupt elapsed, still check success below
         if fields[success_idx].strip().lower() != "true":
             failures += 1
 

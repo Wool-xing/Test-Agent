@@ -1,7 +1,7 @@
 """Config panel — key settings overview."""
 
-from textual.widgets import Static
 from textual.containers import Vertical
+from textual.widgets import Static
 
 
 class ConfigPanel(Vertical):
@@ -11,8 +11,8 @@ class ConfigPanel(Vertical):
         yield Static("Configuration", classes="title")
         yield Static("")
         try:
+
             from runtime.config.settings import get_settings
-            import os
             s = get_settings()
             yield Static(f"  Project Root:  {s.project_root}")
             yield Static(f"  Workspace:     {s.workspace_dir}")

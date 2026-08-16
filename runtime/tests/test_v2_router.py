@@ -6,8 +6,7 @@ import pytest
 
 from runtime.router.llm_client import LLMClient
 from runtime.router.schema import DAGNode, RoutingDecision
-from runtime.router.v2_router import IntentRouterV2, RouterV2Error
-
+from runtime.router.v2_router import IntentRouterV2
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 

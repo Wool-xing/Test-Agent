@@ -1,12 +1,16 @@
 """# Config commands: hook/skin/lang/personality + tools/context + cost/sessions/compact + memory — extracted from slash_handlers.py."""
 from __future__ import annotations
-import os, sys, time
-from pathlib import Path
+
 from runtime.cli._shared import console
-from runtime.cli.slash_commands import _PROVIDERS
 from runtime.cli.conversation import ConversationMemory
+from runtime.cli.interactive import (  # cross-sub-file
+    _current_model,
+    _current_provider,
+    _get_memory,
+    _handle_natural_language,
+)
 from runtime.config.settings import get_settings
-from runtime.cli.interactive import _get_memory, _current_provider, _current_model, _handle_natural_language  # cross-sub-file
+
 _SESSION_FILE = get_settings().gateway_dir / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
 # Module-local mutable state
@@ -18,10 +22,15 @@ _start_time = 0.0
 
 def _cmd_hook(args: str) -> None:
     """Manage lifecycle hooks: /hook list | add <phase> <cmd> | remove <id> | prebuilt."""
-    from runtime.orchestrator.user_hooks import (
-        list_hooks, add_hook, remove_hook, PREBUILT_HOOKS, activate_all,
-    )
     from rich.table import Table
+
+    from runtime.orchestrator.user_hooks import (
+        PREBUILT_HOOKS,
+        activate_all,
+        add_hook,
+        list_hooks,
+        remove_hook,
+    )
 
     parts = args.strip().split(maxsplit=1)
     action = parts[0].lower() if parts else "list"
@@ -87,11 +96,10 @@ def _cmd_hook(args: str) -> None:
 
 def _cmd_skin(args: str) -> None:
     """Switch CLI skin/theme. Usage: !skin [name]. No args lists available."""
-    from runtime.cli.skins import list_skins, set_skin, get_current_skin_name
+    from runtime.cli.skins import list_skins, set_skin
 
     name = args.strip().lower()
     if not name:
-        current = get_current_skin_name()
         skins = list_skins()
         console.print(f"[bold]Available skins ({len(skins)}):[/]")
         for s in skins:
@@ -400,7 +408,8 @@ def _cmd_compact(args: str) -> None:
         "[Compacted",  # nested summary preservation
     ]
 
-    _protect = lambda m: any(p in m.content for p in _PROTECT_PATTERNS)
+    def _protect(m):
+        return any(p in m.content for p in _PROTECT_PATTERNS)
 
     # Separate protected from compressible
     protected_msgs = [m for m in mem.messages if _protect(m)]

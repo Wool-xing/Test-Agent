@@ -1,7 +1,7 @@
 """Help panel — interactive tutorial walkthrough."""
 
-from textual.widgets import Static
 from textual.containers import Vertical
+from textual.widgets import Static
 
 
 class HelpPanel(Vertical):

@@ -3,11 +3,7 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 # utils package installed via pip install -e runtime/
-
 from utils.design.taboo_matrix import (  # noqa: E402
     SACRED_CONTEXTS,
     TABOO_COLORS,

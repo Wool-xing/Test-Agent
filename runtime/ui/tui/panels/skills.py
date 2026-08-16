@@ -1,7 +1,7 @@
 """Skill Browser panel — installed skills with categories and search."""
 
-from textual.widgets import Static, Input, ListView, ListItem
 from textual.containers import Vertical
+from textual.widgets import Input, ListItem, Static
 
 
 class SkillBrowserPanel(Vertical):

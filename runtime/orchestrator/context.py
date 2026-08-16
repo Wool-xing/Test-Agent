@@ -11,6 +11,10 @@ from dataclasses import dataclass, field
 from threading import Lock
 from typing import Any
 
+# Module-level lock shared by all contexts. A per-instance Lock field breaks
+# Prefect's task-arg hashing (cannot hash _thread.lock) on every DAG submit.
+_LOCK = Lock()
+
 
 @dataclass
 class ExecutionContext:
@@ -23,23 +27,22 @@ class ExecutionContext:
     run_id: str
     upstream_outputs: dict[str, dict[str, Any]] = field(default_factory=dict)
     upstream_meta: dict[str, dict[str, Any]] = field(default_factory=dict)
-    _lock: Lock = field(default_factory=Lock, repr=False)
 
     def set_output(self, node_id: str, output: dict, meta: dict | None = None) -> None:
         """Store a node's output and optional metadata (thread-safe)."""
-        with self._lock:
+        with _LOCK:
             self.upstream_outputs[node_id] = output
             if meta is not None:
                 self.upstream_meta[node_id] = meta
 
     def get_output(self, node_id: str) -> dict | None:
         """Read a node's output (thread-safe)."""
-        with self._lock:
+        with _LOCK:
             return self.upstream_outputs.get(node_id)
 
     def get_meta(self, node_id: str) -> dict | None:
         """Read a node's metadata (thread-safe)."""
-        with self._lock:
+        with _LOCK:
             return self.upstream_meta.get(node_id)
 
     def is_degraded(self, node_id: str) -> bool:
@@ -49,10 +52,10 @@ class ExecutionContext:
 
     def has_any_degraded(self) -> bool:
         """True if any upstream node ran in degraded mode."""
-        with self._lock:
+        with _LOCK:
             return any(m.get("degraded", False) for m in self.upstream_meta.values())
 
     def snapshot(self) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
         """Return a consistent (outputs, meta) snapshot for RunnerContext."""
-        with self._lock:
+        with _LOCK:
             return dict(self.upstream_outputs), dict(self.upstream_meta)

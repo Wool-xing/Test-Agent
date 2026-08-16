@@ -6,14 +6,10 @@ Each test runs a CLI command via subprocess and checks exit code + output.
 
 from __future__ import annotations
 
-import json
 import os
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
-
-import pytest
 
 
 def _run_cli(args: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -93,7 +89,7 @@ class TestCLITaskSystem:
     """Task CRUD via Python API (integration)."""
 
     def test_task_full_lifecycle(self):
-        from runtime.cli.tasks import add_task, list_tasks, update_task, delete_task
+        from runtime.cli.tasks import add_task, delete_task, list_tasks, update_task
 
         # Create
         t = add_task("Integration test task", criteria=["CI green", "all tests pass"])
@@ -146,7 +142,7 @@ class TestLLMCache:
     """LLM response cache."""
 
     def test_cache_hit_miss_clear(self):
-        from runtime.router.llm_cache import set_cached, get_cached, clear_cache
+        from runtime.router.llm_cache import clear_cache, get_cached, set_cached
 
         clear_cache()
         set_cached("test", "m", "s", "u", 0.1, "response")
@@ -199,7 +195,6 @@ class TestAgentSkillPairing:
     """Agent-skill frontmatter pairing."""
 
     def test_all_agents_have_pairing(self):
-        import re
         agents_dir = Path(__file__).resolve().parents[2] / "ai" / "agents"
         for f in sorted(agents_dir.glob("[0-9]*.md")):
             text = f.read_text(encoding="utf-8")
@@ -210,7 +205,12 @@ class TestPersonalitySystem:
     """Personality switching."""
 
     def test_list_and_load(self):
-        from runtime.cli.conversation import list_personalities, set_personality, get_personality, load_personality
+        from runtime.cli.conversation import (
+            get_personality,
+            list_personalities,
+            load_personality,
+            set_personality,
+        )
         ps = list_personalities()
         assert len(ps) >= 16  # V2 bilingual: 16 EN + 16 ZH agent files
         assert set_personality("test-lead")

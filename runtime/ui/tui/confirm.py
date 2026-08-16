@@ -40,15 +40,14 @@ class ConfirmDialog(ModalScreen[bool]):
         self.detail = detail
 
     def compose(self) -> ComposeResult:
-        with Center():
-            with Vertical():
-                yield Static(f"Allow '{self.operation}'?", classes="question")
-                yield Static(f"Target: {self.target}", classes="detail")
-                if self.detail:
-                    yield Static(self.detail[:200])
-                with Vertical(classes="buttons"):
-                    yield Button("Allow (Y)", variant="primary", id="allow")
-                    yield Button("Deny (N)", variant="error", id="deny")
+        with Center(), Vertical():
+            yield Static(f"Allow '{self.operation}'?", classes="question")
+            yield Static(f"Target: {self.target}", classes="detail")
+            if self.detail:
+                yield Static(self.detail[:200])
+            with Vertical(classes="buttons"):
+                yield Button("Allow (Y)", variant="primary", id="allow")
+                yield Button("Deny (N)", variant="error", id="deny")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "allow":
@@ -60,6 +59,7 @@ class ConfirmDialog(ModalScreen[bool]):
 def tui_confirm(operation: str, target: str) -> bool:
     """Show Textual permission confirmation dialog. Call from async context."""
     import asyncio
+
     from textual.app import App
 
     app = App.get_running_app()

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -24,7 +23,7 @@ def sample_package(tmp_path):
 
 class TestMarketplacePublish:
     def test_publish_adds_to_index(self, sample_package, marketplace_dir):
-        from runtime.sdk.marketplace import publish_to_marketplace, _load_index
+        from runtime.sdk.marketplace import _load_index, publish_to_marketplace
         result = publish_to_marketplace(sample_package, marketplace_dir)
         assert result.ok is True
         data = _load_index(marketplace_dir)
@@ -61,7 +60,7 @@ class TestMarketplaceSearch:
 
 class TestMarketplaceList:
     def test_list_returns_published(self, sample_package, marketplace_dir):
-        from runtime.sdk.marketplace import publish_to_marketplace, list_marketplace
+        from runtime.sdk.marketplace import list_marketplace, publish_to_marketplace
         publish_to_marketplace(sample_package, marketplace_dir)
         result = list_marketplace(marketplace_dir)
         assert result.ok is True

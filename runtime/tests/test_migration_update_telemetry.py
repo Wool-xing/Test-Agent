@@ -3,10 +3,9 @@
 import tempfile
 from pathlib import Path
 
-from runtime.infra.migration import MigrationManager, MigrationReport
-from runtime.infra.auto_update import UpdateChecker, UpdateInfo
-from runtime.infra.telemetry import TelemetryManager, TelemetryConfig, CommandMetric
-
+from runtime.infra.auto_update import UpdateChecker
+from runtime.infra.migration import MigrationManager
+from runtime.infra.telemetry import CommandMetric, TelemetryManager
 
 # ── §补-1 Migration ─────────────────────────────────────
 

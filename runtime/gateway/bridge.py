@@ -59,8 +59,7 @@ def _format_dag_summary(summary: dict[str, Any], max_nodes: int = 10) -> str:
     lines = [f"🎯 Test-Agent · {succ}/{total} ok, {fail} failed"]
 
     results = summary.get("results", {})
-    shown = 0
-    for nid, r in results.items():
+    for shown, (nid, r) in enumerate(results.items()):
         if shown >= max_nodes:
             lines.append(f"  … +{len(results) - max_nodes} more")
             break
@@ -69,7 +68,6 @@ def _format_dag_summary(summary: dict[str, Any], max_nodes: int = 10) -> str:
         dur = r.get("duration_ms", 0)
         dur_str = f" ({dur:.0f}ms)" if dur else ""
         lines.append(f"  {status} {name}{dur_str}")
-        shown += 1
 
     if fail == 0:
         lines.append("\n✓ All checks passed.")

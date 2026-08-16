@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
-
-import pytest
 
 from runtime.plugins import discover_plugins
 
@@ -73,6 +70,7 @@ class TestPluginCLI:
     def test_plugin_command_registered(self):
         """Verify plugin subcommand is accessible."""
         from typer.testing import CliRunner
+
         from runtime.cli.main import app
         runner = CliRunner()
         result = runner.invoke(app, ["plugin", "--help"])

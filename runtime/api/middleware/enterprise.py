@@ -25,7 +25,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from runtime.api.audit import AuditTrail
-from runtime.api.auth.rbac import RBAC, Permission, Role
+from runtime.api.auth.rbac import RBAC, Role
 from runtime.api.auth.sso import SSOManager
 
 
@@ -67,51 +67,69 @@ class EnterpriseMiddleware:
 
         request = Request(scope, receive)
 
-        # Skip excluded paths
-        if request.url.path in self.exclude_paths:
+        # Skip excluded paths (tolerate a trailing slash — platform callbacks
+        # and proxies may append one)
+        if request.url.path in self.exclude_paths or request.url.path.rstrip("/") in self.exclude_paths:
             await self.app(scope, receive, send)
             return
 
-        # Extract and validate SSO token
+        # Extract and validate SSO token — fail-closed: no token = rejected
         auth = request.headers.get("Authorization", "")
         user_id = "anonymous"
         user_role = Role.VIEWER
 
-        if auth.startswith("Bearer "):
-            token = auth[7:]
-            try:
-                claims = await self.sso.validate_token_async(token)
-                user_id = claims.get("sub") or claims.get("email", "unknown")
-                # Resolve role from claims
-                roles = claims.get("roles", [])
-                if "admin" in roles:
-                    user_role = Role.ADMIN
-                elif "manager" in roles:
-                    user_role = Role.MANAGER
-                elif "tester" in roles:
-                    user_role = Role.TESTER
-                else:
-                    user_role = Role.VIEWER
+        if not auth.startswith("Bearer "):
+            self.audit.record(
+                actor="anonymous",
+                action="auth.failed",
+                resource=request.url.path,
+                details={"method": request.method, "reason": "no bearer token"},
+            )
+            response = Response(
+                content='{"detail":"SSO token required"}',
+                status_code=401,
+                media_type="application/json",
+            )
+            await response(scope, receive, send)
+            return
 
-                # Attach to request state
-                request.state.user = claims
-                request.state.user_id = user_id
-                request.state.role = user_role
-            except Exception:
-                # Token invalid — record attempt and reject
-                self.audit.record(
-                    actor="anonymous",
-                    action="auth.failed",
-                    resource=request.url.path,
-                    details={"method": request.method, "ip": request.client.host if request.client else ""},
-                )
-                response = Response(
-                    content='{"detail":"Invalid token"}',
-                    status_code=401,
-                    media_type="application/json",
-                )
-                await response(scope, receive, send)
-                return
+        token = auth[7:]
+        try:
+            claims = await self.sso.validate_token_async(token)
+            user_id = claims.get("sub") or claims.get("email", "unknown")
+            # Resolve role from claims — roles must be a list; "admin" in "administrator"
+            # must not grant ADMIN (substring match on a string claim)
+            roles = claims.get("roles", [])
+            if not isinstance(roles, list):
+                roles = []
+            if "admin" in roles:
+                user_role = Role.ADMIN
+            elif "manager" in roles:
+                user_role = Role.MANAGER
+            elif "tester" in roles:
+                user_role = Role.TESTER
+            else:
+                user_role = Role.VIEWER
+
+            # Attach to request state
+            request.state.user = claims
+            request.state.user_id = user_id
+            request.state.role = user_role
+        except Exception:
+            # Token invalid — record attempt and reject
+            self.audit.record(
+                actor="anonymous",
+                action="auth.failed",
+                resource=request.url.path,
+                details={"method": request.method, "ip": request.client.host if request.client else ""},
+            )
+            response = Response(
+                content='{"detail":"Invalid token"}',
+                status_code=401,
+                media_type="application/json",
+            )
+            await response(scope, receive, send)
+            return
 
         # Record request in audit trail (before processing)
         self.audit.record(

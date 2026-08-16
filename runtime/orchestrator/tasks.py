@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from loguru import logger
+
 try:
     from prefect import task
     from prefect.tasks import exponential_backoff

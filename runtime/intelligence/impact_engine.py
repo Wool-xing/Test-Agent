@@ -158,12 +158,13 @@ class ImpactEngine:
         return blast_radius
 
     def _collect_impacted_tests(self, blast_ids: set, seed_ids: set) -> list[str]:
-        """Find test nodes in blast radius or reaching seeds via reverse BFS."""
+        """Find test nodes in blast radius.
+
+        Forward BFS from all seeds already covers every test node whose
+        reverse-BFS would reach a seed (adj_reverse is the exact inverse of
+        adj_forward), so no per-test BFS is needed.
+        """
         impacted_test_ids = blast_ids & self._test_node_ids
-        for tnid in self._test_node_ids:
-            reachable = self._bfs_reverse({tnid}, max_depth=3)
-            if reachable & seed_ids:
-                impacted_test_ids.add(tnid)
         impacted_tests: list[str] = []
         for tid in impacted_test_ids:
             node = self._nodes_by_id.get(tid, {})

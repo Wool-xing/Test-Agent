@@ -7,7 +7,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query
 
-from runtime.marketplace.catalog import load_local, search as catalog_search
+from runtime.marketplace.catalog import load_local
+from runtime.marketplace.catalog import search as catalog_search
 
 router = APIRouter(prefix="/api/marketplace", tags=["marketplace"])
 

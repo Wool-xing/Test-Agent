@@ -11,9 +11,9 @@ DEPRECATIONS.md tracks all current deprecations.
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
 
 
 class DeprecationLevel(Enum):

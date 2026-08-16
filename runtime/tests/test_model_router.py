@@ -4,14 +4,11 @@ from __future__ import annotations
 
 import os
 
-import pytest
-
 from runtime.router.model_router import (
-    ModelTier,
     TaskTier,
     classify_task,
-    get_model_tier,
     get_current_provider,
+    get_model_tier,
     select_model,
 )
 
@@ -156,3 +153,39 @@ class TestCurrentProvider:
                 os.environ["TAGENT_LLM_PROVIDER"] = old
             else:
                 os.environ.pop("TAGENT_LLM_PROVIDER", None)
+
+
+class TestResponsesApiTimeout:
+    """Responses API path must bound the call with the configured LLM timeout."""
+
+    def test_client_constructed_with_timeout(self, monkeypatch):
+        import sys
+        import types
+
+        from runtime.router import llm_client as m
+
+        captured: dict = {}
+
+        class FakeResponses:
+            def create(self, **kwargs):  # noqa: ARG002
+                class R:
+                    output_text = "ok"
+                return R()
+
+        class FakeClient:
+            def __init__(self, **kwargs):
+                captured.update(kwargs)
+                self.responses = FakeResponses()
+
+            def close(self):
+                pass
+
+        fake_openai = types.ModuleType("openai")
+        fake_openai.OpenAI = FakeClient
+        monkeypatch.setitem(sys.modules, "openai", fake_openai)
+        monkeypatch.setenv("TAGENT_LLM_RESPONSES_API", "1")
+
+        out = m._call_responses_api("deepseek", "test-model", "sys", "usr", 0.1, 256, False)
+        assert out == "ok"
+        assert captured.get("timeout") is not None
+        assert captured["timeout"] > 0

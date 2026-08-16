@@ -25,7 +25,13 @@ def _conn() -> sqlite3.Connection:
     return c
 
 
+_initialized = False
+
+
 def _init_db() -> None:
+    global _initialized
+    if _initialized:
+        return
     with _conn() as c:
         c.executescript(
             """
@@ -47,6 +53,7 @@ def _init_db() -> None:
             );
             """
         )
+    _initialized = True
 
 
 def index_session(session_id: str, run_id: str, target_kind: str, content: str, *, user: str | None = None) -> None:

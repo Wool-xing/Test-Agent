@@ -1,12 +1,12 @@
 """TDD tests for Offline Mode (§补-4)."""
 
 from runtime.infra.offline import (
-    OfflineManager,
     NetworkStatus,
-    get_offline_manager,
-    _check_network_connectivity,
-    _build_offline_message,
+    OfflineManager,
     OfflineStatus,
+    _build_offline_message,
+    _check_network_connectivity,
+    get_offline_manager,
 )
 
 

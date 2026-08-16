@@ -64,10 +64,11 @@ def announce_result(summary: dict[str, Any]) -> str | None:
     if total == 0:
         return None
 
-    if fail == 0:
-        text = f"All {succ} tests passed."
-    else:
-        text = f"{succ} passed, {fail} failed out of {total}."
+    text = (
+        f"All {succ} tests passed."
+        if fail == 0
+        else f"{succ} passed, {fail} failed out of {total}."
+    )
 
     speak(text)
     return text

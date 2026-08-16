@@ -1,12 +1,12 @@
 """# Data commands: data/prioritize/progress/flaky/regression/insights — extracted from slash_handlers.py."""
 from __future__ import annotations
-import os, sys, time
+
 from pathlib import Path
+
 from runtime.cli._shared import console
-from runtime.cli.slash_commands import _PROVIDERS
-from runtime.cli.conversation import ConversationMemory
-from runtime.config.settings import get_settings
 from runtime.cli.interactive import _get_memory  # cross-sub-file
+from runtime.config.settings import get_settings
+
 _SESSION_FILE = get_settings().gateway_dir / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
 # Module-local mutable state
@@ -18,8 +18,9 @@ _start_time = 0.0
 
 def _cmd_clean(args: str) -> None:
     """Clean temporary data. /clean list | run. Delivery artifacts preserved."""
-    from runtime.cli.data_cleaner import get_cleanable, run_cleanup
     from rich.table import Table
+
+    from runtime.cli.data_cleaner import get_cleanable, run_cleanup
 
     action = args.strip().lower()
     if action == "run":
@@ -50,7 +51,6 @@ def _cmd_clean(args: str) -> None:
 
 def _cmd_data(args: str) -> None:
     """Generate test data: /data users <N> | related <N> | product | order | address."""
-    from pathlib import Path
 
     parts = args.strip().split()
     entity = parts[0].lower() if parts else ""
@@ -93,8 +93,9 @@ def _cmd_data(args: str) -> None:
 
 def _cmd_prioritize(args: str) -> None:
     """Show which tests to run first based on git changes."""
-    from runtime.cli.test_prioritizer import prioritize
     from rich.table import Table
+
+    from runtime.cli.test_prioritizer import prioritize
 
     result = prioritize()
     if result["changed_files"] == 0:
@@ -121,8 +122,8 @@ def _cmd_prioritize(args: str) -> None:
 
 def _cmd_progress(args: str) -> None:
     """Show test coverage progress matrix: test types × modules."""
-    from runtime.cli.coverage_progress import get_matrix, get_summary, DEFAULT_MODULES, TEST_TYPES
-    from rich.table import Table
+
+    from runtime.cli.coverage_progress import get_matrix, get_summary
 
     summary = get_summary()
     console.print(
@@ -163,8 +164,9 @@ def _cmd_progress(args: str) -> None:
 
 def _cmd_flaky(args: str) -> None:
     """Show flaky test analysis. /flaky list | quarantine | clear."""
-    from runtime.cli.flaky_manager import get_flaky_list, get_quarantined, clear_tracker
     from rich.table import Table
+
+    from runtime.cli.flaky_manager import clear_tracker, get_flaky_list, get_quarantined
 
     action = args.strip().lower()
     if action == "clear":
@@ -208,8 +210,13 @@ def _cmd_flaky(args: str) -> None:
 
 def _cmd_regression(args: str) -> None:
     """Show regression report: current vs previous run."""
-    from runtime.cli.regression_tracker import _latest_baseline, RunResult, compare_with_baseline, is_regression
-    from rich.table import Table
+
+    from runtime.cli.regression_tracker import (
+        RunResult,
+        _latest_baseline,
+        compare_with_baseline,
+        is_regression,
+    )
 
     baseline = _latest_baseline()
     if baseline is None:

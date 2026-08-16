@@ -8,11 +8,11 @@ import typer
 
 import runtime
 from runtime.cli._shared import console, set_no_color
-from runtime.cli.config import config_app
 from runtime.cli.commands.mcp_commands import app as mcp_app
 from runtime.cli.commands.migrate_cmd import app as migrate_app
 from runtime.cli.commands.skill_commands import app as skill_app
 from runtime.cli.commands.test_exec import app as test_exec_app
+from runtime.cli.config import config_app
 from runtime.infra.trace import set_trace_id as _set_trace_id
 
 app = typer.Typer(add_completion=True, help="Test-Agent Runtime CLI")
@@ -60,7 +60,9 @@ def _version_callback(
 # Auto-discover CLI commands from slash command registry.
 # Commands with cli_module set are exposed as typer CLI commands.
 # Must init REPL handlers first — gateway, cron, etc. have cli_module set.
-from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG, _init_repl_handlers  # noqa: E402
+from runtime.cli.slash_commands import COMMAND_REGISTRY as _REG  # noqa: E402
+from runtime.cli.slash_commands import _init_repl_handlers  # noqa: E402
+
 _init_repl_handlers()
 
 _seen: set[str] = set()
@@ -77,15 +79,18 @@ for _cmd in _REG:
 # Manual registrations — CLI-only or name-collision commands
 import runtime.cli.commands.bootstrap as _reg_bootstrap  # noqa: E402
 import runtime.cli.commands.export as _reg_export  # noqa: E402
+
 _reg_bootstrap.register(app)
 _reg_export.register(app)
 import runtime.cli.commands.impact as _reg_impact  # noqa: E402
 import runtime.cli.commands.market as _reg_market  # noqa: E402
+
 _reg_impact.register(app)
 _reg_market.register(app)
+import runtime.cli.commands.onboard as _reg_onboard  # noqa: E402
 import runtime.cli.commands.plugin as _reg_plugin  # noqa: E402
 import runtime.cli.commands.report as _reg_report  # noqa: E402
-import runtime.cli.commands.onboard as _reg_onboard  # noqa: E402
+
 _reg_plugin.register(app)
 _reg_report.register(app)
 _reg_onboard.register(app)

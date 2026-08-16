@@ -116,6 +116,7 @@ def _validate_cron(expr: str) -> bool:
     """Validate cron expression using croniter."""
     try:
         from datetime import datetime, timezone
+
         from croniter import croniter
         croniter(expr, datetime.now(timezone.utc))
         return True

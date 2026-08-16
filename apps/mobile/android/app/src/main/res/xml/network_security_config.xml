@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 证书固定 (Certificate Pinning): 仅信任自己的API服务器 -->
+<!-- 证书固定 (Certificate Pinning): 仅信任自己的API服务器.
+     注意: pin 必须为真实证书的 SPKI SHA-256 base64。发布前由 Ops 注入真实
+     pin（占位 pin 会导致 network-security-config 解析失败、全部 TLS 被阻断）。
+     当前配置: 系统信任 + 禁 cleartext。 -->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">api.test-agent.dev</domain>
-        <pin-set>
-            <!-- SHA-256 hash of the server certificate (replace with actual) -->
-            <pin digest="SHA-256">PLACEHOLDER_CERT_PIN</pin>
-            <!-- Backup pin -->
-            <pin digest="SHA-256">PLACEHOLDER_BACKUP_PIN</pin>
-        </pin-set>
     </domain-config>
     <!-- Block all other cleartext traffic -->
     <base-config cleartextTrafficPermitted="false"/>

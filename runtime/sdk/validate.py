@@ -63,9 +63,9 @@ def validate_skill(skill_dir: Path) -> ValidationResult:
         return ValidationResult(ok=False, errors=errors)
 
     # Check required fields
-    for field in _REQUIRED_FIELDS:
-        if field not in meta:
-            errors.append(f"Missing required field: {field}")
+    for field_name in _REQUIRED_FIELDS:
+        if field_name not in meta:
+            errors.append(f"Missing required field: {field_name}")
 
     # Check permissions
     if "permissions" in meta:

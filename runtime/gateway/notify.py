@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -36,8 +36,8 @@ class Notifier:
         if not url:
             return NotifyResult(ok=False, channel="slack", error="Slack webhook URL not configured")
         try:
-            import urllib.request
             import json
+            import urllib.request
             data = json.dumps({"text": message}).encode("utf-8")
             req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
             urllib.request.urlopen(req, timeout=10)
@@ -70,8 +70,8 @@ class Notifier:
     def send_webhook(self, url: str, payload: dict) -> NotifyResult:
         """Send a generic webhook notification."""
         try:
-            import urllib.request
             import json
+            import urllib.request
             data = json.dumps(payload).encode("utf-8")
             req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
             urllib.request.urlopen(req, timeout=10)

@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestIMBot:
     """IM Bot message routing and permission control."""
 
     def test_im_bot_imports(self):
         """IM Bot module should be importable."""
-        from runtime.gateway.im_bot import IMBotRouter, IMBotConfig, IMMessage, IMResponse
+        from runtime.gateway.im_bot import IMBotRouter
         assert IMBotRouter is not None
 
     def test_command_whitelist_allows_valid(self):

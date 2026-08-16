@@ -95,6 +95,23 @@ class AgentRunner(abc.ABC):
         degraded = False
         error_msg = ""
 
+        # 法律门禁: pentest-* (expert + skill) 需 pentest_authorized=true 才可执行
+        if self.name.startswith("pentest-"):
+            from runtime.config.settings import get_settings
+
+            if not get_settings().pentest_authorized:
+                return RunnerResult(
+                    name=self.name,
+                    ok=False,
+                    output={},
+                    artifact_path=None,
+                    summary="",
+                    duration_ms=int((time.time() - t0) * 1000),
+                    raw_llm_response="",
+                    error="pentest not authorized — set TAGENT_PENTEST_AUTHORIZED=1 to enable",
+                    degraded=False,
+                )
+
         if ctx.settings_provider == "stub" or ctx.mode == "mock":
             # stub/mock 模式: 输出 mock,标 degraded
             output = self.mock_output(ctx)

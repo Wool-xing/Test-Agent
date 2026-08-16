@@ -52,7 +52,6 @@ def _make_minimal_graph() -> dict:
 class TestKgStatsEndpoint:
     def test_stats_returns_valid_response(self):
         """/api/kg/stats returns graph statistics with expected keys."""
-        from runtime.web.kg_api import _graph_cache
 
         # Clear cache and inject mock
         import runtime.web.kg_api as kg_mod

@@ -1,8 +1,7 @@
 """Skin Selector panel — preview and switch themes."""
 
-from textual.widgets import Static, ListView, ListItem
 from textual.containers import Vertical
-
+from textual.widgets import Static
 
 THEME_LIST = [
     ("dark", "#1a1a2e background, green/cyan accents"),

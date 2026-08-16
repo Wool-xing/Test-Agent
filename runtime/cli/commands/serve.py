@@ -9,7 +9,6 @@ from __future__ import annotations
 import logging
 import signal
 import threading
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ import logging
 from prompt_toolkit.completion import Completer, Completion, PathCompleter
 from prompt_toolkit.document import Document
 
-from runtime.cli.slash_commands import COMMAND_REGISTRY, _PROVIDERS
+from runtime.cli.slash_commands import _PROVIDERS, COMMAND_REGISTRY
 
 logger = logging.getLogger(__name__)
 

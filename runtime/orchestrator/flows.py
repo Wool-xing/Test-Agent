@@ -26,7 +26,6 @@ from runtime.orchestrator.context import ExecutionContext
 from runtime.orchestrator.tasks import execute_dag_node
 from runtime.router.schema import DAGNode, RoutingDecision
 
-
 _flow_kwargs: dict[str, Any] = {"name": "test-agent-run"}
 if ConcurrentTaskRunner is not None:
     _flow_kwargs["task_runner"] = ConcurrentTaskRunner()
@@ -54,6 +53,13 @@ def _cancel_remaining_futures(futures: dict[str, Any], results: dict[str, dict])
                 fut.cancel()
             cancelled += 1
     return cancelled
+
+
+def _mark_unrun_nodes(ordered: list[DAGNode], results: dict[str, dict], skipped: list[str]) -> None:
+    """Nodes never executed (circuit breaker abort) must not count as succeeded."""
+    for node in ordered:
+        if node.id not in results:
+            skipped.append(node.id)
 
 
 @flow(**_flow_kwargs)
@@ -95,13 +101,12 @@ def run_decision_flow(decision_dict: dict[str, Any], run_id: str, on_progress: A
             log.info("DAG progress: {}/{} nodes done", i, total)
             if on_progress and nid in results:
                 on_progress(results[nid])
-        else:
-            # no break — all futures completed normally
-            pass
         # Cancel any remaining in-flight futures after circuit breaker or abort
         cancelled = _cancel_remaining_futures(futures, results)
         if cancelled:
             log.warning("circuit breaker: cancelled {} in-flight task(s)", cancelled)
+        # Nodes never executed due to circuit breaker must not count as succeeded
+        _mark_unrun_nodes(ordered, results, skipped)
 
     # L2-C: 识别 rollout 节点 + on_failure=skip 节点
     rollout_skipped = [

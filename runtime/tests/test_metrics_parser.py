@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 JUNIT_XML_PASSING = """<?xml version="1.0"?>
 <testsuite name="smoke" tests="10" failures="0" errors="0" skipped="0">
   <testcase classname="test_auth" name="test_login" time="0.5"/>

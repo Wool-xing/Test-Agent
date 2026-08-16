@@ -139,14 +139,18 @@ class RBAC:
                 if role_str is None:
                     # Try user_roles list (SSO middleware sets this)
                     user_roles: list[str] = getattr(request.state, "user_roles", [])
-                    if "admin" in user_roles:
-                        role_str = "admin"
-                    elif "manager" in user_roles:
-                        role_str = "manager"
-                    elif "tester" in user_roles:
-                        role_str = "tester"
+                    role_str = "viewer"
+                    for candidate in ("admin", "manager", "tester"):
+                        if candidate in user_roles:
+                            role_str = candidate
+                            break
                     else:
-                        role_str = "viewer"
+                        if user_roles:
+                            # Non-empty role list with no known role — reject, don't
+                            # silently downgrade to viewer.
+                            from fastapi import HTTPException
+
+                            raise HTTPException(status_code=403, detail=f"Unknown roles: {user_roles}")
 
                 try:
                     role = Role(role_str)
@@ -154,7 +158,7 @@ class RBAC:
                     logger.warning("RBAC: unknown role '{}'", role_str)
                     from fastapi import HTTPException
 
-                    raise HTTPException(status_code=403, detail=f"Unknown role: {role_str}")
+                    raise HTTPException(status_code=403, detail=f"Unknown role: {role_str}") from None
 
                 self.check(role, permission)
                 return await func(*args, **kwargs)

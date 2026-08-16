@@ -65,7 +65,6 @@ class TestDetectDirectAgent:
         from runtime.router.intent import detect_direct_agent
 
         targets = detect_direct_agent("用 requirements-analyst 分析，然后 @smoke-test 验证")
-        names = {n for n, _ in targets}
         # At least one should be found
         assert len(targets) >= 1
 

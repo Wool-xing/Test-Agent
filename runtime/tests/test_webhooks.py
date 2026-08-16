@@ -8,8 +8,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 
 class TestPayloadExtraction:
     """Test _extract_text_from_payload for each platform."""
@@ -127,22 +125,24 @@ class TestSenderExtraction:
 class TestDiscordSignatureVerification:
     """Test Ed25519 signature verification for Discord."""
 
-    def test_no_public_key_allows_in_dev(self):
-        from runtime.api.endpoints.webhooks import _verify_discord_signature
+    def test_no_public_key_rejected_even_in_dev(self):
         import os
-        # Ensure no public key set, TAGENT_ENV=dev
+
+        from runtime.api.endpoints.webhooks import _verify_discord_signature
+        # dev mode no longer bypasses verification — fail-closed everywhere
         old_key = os.environ.pop("DISCORD_PUBLIC_KEY", None)
         os.environ["TAGENT_ENV"] = "dev"
         try:
-            assert _verify_discord_signature(b"{}", "bad_sig", "123") is True
+            assert _verify_discord_signature(b"{}", "bad_sig", "123") is False
         finally:
             if old_key:
                 os.environ["DISCORD_PUBLIC_KEY"] = old_key
             os.environ.pop("TAGENT_ENV", None)
 
     def test_invalid_signature_rejected(self):
-        from runtime.api.endpoints.webhooks import _verify_discord_signature
         import os
+
+        from runtime.api.endpoints.webhooks import _verify_discord_signature
 
         # Valid Ed25519 public key (test key — not a real Discord key)
         test_pubkey = "00" * 32  # 32 bytes hex
@@ -159,57 +159,140 @@ class TestFeishuChallenge:
 
     def test_challenge_logic(self):
         """Challenge echo is the core logic; verify without full app."""
+        import os
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
         # Isolated app — avoids cross-test event loop pollution in full suite
-        app = FastAPI()
-        app.include_router(router)
-        client = TestClient(app)
-        response = client.post(
-            "/webhooks/feishu",
-            json={"challenge": "verify_me_abc123", "token": "x"},
-        )
-        assert response.status_code == 200
-        assert response.json()["challenge"] == "verify_me_abc123"
+        os.environ["FEISHU_VERIFICATION_TOKEN"] = "x"
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            response = client.post(
+                "/webhooks/feishu",
+                json={"challenge": "verify_me_abc123", "token": "x"},
+            )
+            assert response.status_code == 200
+            assert response.json()["challenge"] == "verify_me_abc123"
+        finally:
+            os.environ.pop("FEISHU_VERIFICATION_TOKEN", None)
 
 
 class TestTelegramWebhook:
     """Test Telegram webhook endpoint."""
 
     def test_no_text_returns_ignored(self):
+        import os
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
-        app = FastAPI()
-        app.include_router(router)
-        client = TestClient(app)
-        response = client.post("/webhooks/telegram", json={"message": {}})
-        assert response.status_code == 200
-        assert response.json()["status"] == "ignored"
+        os.environ["TELEGRAM_SECRET_TOKEN"] = "tg-secret-123"
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            response = client.post(
+                "/webhooks/telegram",
+                json={"message": {}},
+                headers={"X-Telegram-Bot-Api-Secret-Token": "tg-secret-123"},
+            )
+            assert response.status_code == 200
+            assert response.json()["status"] == "ignored"
+        finally:
+            os.environ.pop("TELEGRAM_SECRET_TOKEN", None)
 
     def test_text_accepted(self):
+        import os
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
+        os.environ["TELEGRAM_SECRET_TOKEN"] = "tg-secret-123"
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            response = client.post(
+                "/webhooks/telegram",
+                json={
+                    "message": {
+                        "text": "hello",
+                        "chat": {"id": 123},
+                        "from": {"username": "tester"},
+                    }
+                },
+                headers={"X-Telegram-Bot-Api-Secret-Token": "tg-secret-123"},
+            )
+            assert response.status_code == 200
+            assert response.json()["status"] == "accepted"
+        finally:
+            os.environ.pop("TELEGRAM_SECRET_TOKEN", None)
+
+    def test_missing_secret_token_rejected(self):
+        """POST without X-Telegram-Bot-Api-Secret-Token must be 401."""
+        import os
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        os.environ["TELEGRAM_SECRET_TOKEN"] = "tg-secret-123"
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            response = client.post("/webhooks/telegram", json={"message": {"text": "hi"}})
+            assert response.status_code == 401
+        finally:
+            os.environ.pop("TELEGRAM_SECRET_TOKEN", None)
+
+    def test_wrong_secret_token_rejected(self):
+        import os
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        os.environ["TELEGRAM_SECRET_TOKEN"] = "tg-secret-123"
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            response = client.post(
+                "/webhooks/telegram",
+                json={"message": {"text": "hi"}},
+                headers={"X-Telegram-Bot-Api-Secret-Token": "wrong"},
+            )
+            assert response.status_code == 401
+        finally:
+            os.environ.pop("TELEGRAM_SECRET_TOKEN", None)
+
+    def test_unconfigured_secret_rejected(self):
+        """Without TELEGRAM_SECRET_TOKEN set, requests are rejected (fail-closed)."""
+        import os
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        os.environ.pop("TELEGRAM_SECRET_TOKEN", None)
         app = FastAPI()
         app.include_router(router)
         client = TestClient(app)
-        response = client.post(
-            "/webhooks/telegram",
-            json={
-                "message": {
-                    "text": "hello",
-                    "chat": {"id": 123},
-                    "from": {"username": "tester"},
-                }
-            },
-        )
-        assert response.status_code == 200
-        assert response.json()["status"] == "accepted"
+        response = client.post("/webhooks/telegram", json={"message": {"text": "hi"}})
+        assert response.status_code == 401
 
 
 class TestBridgeFormatting:
@@ -298,11 +381,13 @@ class TestWeChatCrypto:
 
     def test_decrypt_roundtrip(self):
         """Encrypt a known message, then decrypt it — verify roundtrip."""
-        from runtime.api.endpoints.webhooks import _wechat_decrypt
         import base64
         import os
         import struct
+
         from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+        from runtime.api.endpoints.webhooks import _wechat_decrypt
 
         aes_key = os.urandom(32)
         # EncodingAESKey is 43-char base64 of aes_key
@@ -358,15 +443,17 @@ class TestDingTalkCrypto:
     """Test DingTalk HMAC-SHA256 signature verification."""
 
     def test_valid_signature(self):
-        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
         import base64
-        import hmac
         import hashlib
+        import hmac
         import os
+        import time
+
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
 
         secret = "test_app_secret_123"
         os.environ["DINGTALK_APP_SECRET"] = secret
-        ts = "1680000000000"
+        ts = str(int(time.time() * 1000))
         message = ts + "\n" + secret
         expected = base64.b64encode(
             hmac.new(secret.encode(), message.encode(), hashlib.sha256).digest()
@@ -377,23 +464,59 @@ class TestDingTalkCrypto:
             os.environ.pop("DINGTALK_APP_SECRET", None)
 
     def test_invalid_signature(self):
-        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
         import os
+        import time
+
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
 
         os.environ["DINGTALK_APP_SECRET"] = "secret"
         try:
-            assert _verify_dingtalk_signature("123", "wrong_signature") is False
+            ts = str(int(time.time() * 1000))
+            assert _verify_dingtalk_signature(ts, "wrong_signature") is False
         finally:
             os.environ.pop("DINGTALK_APP_SECRET", None)
 
-    def test_no_secret_allows_dev(self):
-        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
+    def test_stale_timestamp_rejected(self):
+        """Timestamp outside the 5-minute window must be rejected (replay protection)."""
+        import base64
+        import hashlib
+        import hmac
         import os
+
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
+
+        secret = "test_app_secret_123"
+        os.environ["DINGTALK_APP_SECRET"] = secret
+        ts = "1680000000000"  # 2023 — far outside the 5-minute window
+        message = ts + "\n" + secret
+        expected = base64.b64encode(
+            hmac.new(secret.encode(), message.encode(), hashlib.sha256).digest()
+        ).decode()
+        try:
+            assert _verify_dingtalk_signature(ts, expected) is False
+        finally:
+            os.environ.pop("DINGTALK_APP_SECRET", None)
+
+    def test_non_numeric_timestamp_rejected(self):
+        import os
+
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
+
+        os.environ["DINGTALK_APP_SECRET"] = "secret"
+        try:
+            assert _verify_dingtalk_signature("not-a-number", "any") is False
+        finally:
+            os.environ.pop("DINGTALK_APP_SECRET", None)
+
+    def test_no_secret_rejected_even_in_dev(self):
+        import os
+
+        from runtime.api.endpoints.webhooks import _verify_dingtalk_signature
 
         old = os.environ.pop("DINGTALK_APP_SECRET", None)
         os.environ["TAGENT_ENV"] = "dev"
         try:
-            assert _verify_dingtalk_signature("123", "any") is True
+            assert _verify_dingtalk_signature("123", "any") is False
         finally:
             os.environ.pop("TAGENT_ENV", None)
             if old:
@@ -406,22 +529,24 @@ class TestDingTalkCrypto:
 class TestQQBotCrypto:
     """Test QQ Bot Ed25519 signature verification."""
 
-    def test_no_public_key_allows_in_dev(self):
-        from runtime.api.endpoints.webhooks import _verify_qqbot_signature
+    def test_no_public_key_rejected_even_in_dev(self):
         import os
+
+        from runtime.api.endpoints.webhooks import _verify_qqbot_signature
 
         old = os.environ.pop("QQBOT_PUBLIC_KEY", None)
         os.environ["TAGENT_ENV"] = "dev"
         try:
-            assert _verify_qqbot_signature(b"{}", "bad_sig", "123") is True
+            assert _verify_qqbot_signature(b"{}", "bad_sig", "123") is False
         finally:
             os.environ.pop("TAGENT_ENV", None)
             if old:
                 os.environ["QQBOT_PUBLIC_KEY"] = old
 
     def test_invalid_signature_rejected(self):
-        from runtime.api.endpoints.webhooks import _verify_qqbot_signature
         import os
+
+        from runtime.api.endpoints.webhooks import _verify_qqbot_signature
 
         test_pubkey = "00" * 32  # 32 bytes hex
         os.environ["QQBOT_PUBLIC_KEY"] = test_pubkey
@@ -495,6 +620,7 @@ class TestWeChatWebhook:
     def test_get_missing_params_400(self):
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
         app = FastAPI()
@@ -506,6 +632,7 @@ class TestWeChatWebhook:
     def test_post_missing_config_400(self):
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
         app = FastAPI()
@@ -516,14 +643,16 @@ class TestWeChatWebhook:
 
     def test_get_valid_echostr_returns_plaintext(self):
         """Full URL verification flow with known keys."""
-        from fastapi import FastAPI
-        from fastapi.testclient import TestClient
-        from runtime.api.endpoints.webhooks import router
         import base64
         import hashlib
         import os
         import struct
+
         from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
 
         # Setup test keys
         token = "test_wx_token"
@@ -573,47 +702,165 @@ class TestWeChatWebhook:
             os.environ.pop("WECHAT_TOKEN", None)
             os.environ.pop("WECHAT_ENCODING_AES_KEY", None)
 
+    def test_post_stale_timestamp_rejected(self):
+        """Replayed POST callback with valid signature but stale timestamp must be 403."""
+        import base64
+        import hashlib
+        import os
+        import struct
+
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        token = "test_wx_token"
+        aes_key = os.urandom(32)
+        encoding_aes_key = base64.b64encode(aes_key).decode()[:43]
+        msg_bytes = b"<xml><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[hi]]></Content></xml>"
+        random_bytes = os.urandom(16)
+        buffer = random_bytes + struct.pack(">I", len(msg_bytes)) + msg_bytes + b"test_corp_id"
+        block_size = 16
+        pad = block_size - len(buffer) % block_size
+        buffer += bytes([pad]) * pad
+        iv = aes_key[:16]
+        cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv))
+        encryptor = cipher.encryptor()
+        encrypted = base64.b64encode(encryptor.update(buffer) + encryptor.finalize()).decode()
+
+        ts = "1680000000"  # 2023 — stale
+        nonce = "test_nonce"
+        sig = hashlib.sha1(
+            "".join(sorted([token, ts, nonce, encrypted])).encode()
+        ).hexdigest()
+
+        os.environ["WECHAT_TOKEN"] = token
+        os.environ["WECHAT_ENCODING_AES_KEY"] = encoding_aes_key
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            resp = client.post(
+                "/webhooks/wechat",
+                params={"msg_signature": sig, "timestamp": ts, "nonce": nonce},
+                content=f"<xml><Encrypt><![CDATA[{encrypted}]]></Encrypt></xml>",
+                headers={"Content-Type": "application/xml"},
+            )
+            assert resp.status_code == 403
+        finally:
+            os.environ.pop("WECHAT_TOKEN", None)
+            os.environ.pop("WECHAT_ENCODING_AES_KEY", None)
+
 
 class TestDingTalkWebhook:
     """Test 钉钉 webhook endpoint."""
 
-    def test_no_text_returns_ignored(self):
+    @staticmethod
+    def _signed_headers(secret: str, ts: str) -> dict:
+        import base64
+        import hashlib
+        import hmac
+
+        message = ts + "\n" + secret
+        sign = base64.b64encode(
+            hmac.new(secret.encode(), message.encode(), hashlib.sha256).digest()
+        ).decode()
+        return {"timestamp": ts, "sign": sign}
+
+    def test_missing_signature_rejected(self):
+        import os
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
-        app = FastAPI()
-        app.include_router(router)
-        client = TestClient(app)
-        resp = client.post("/webhooks/dingtalk", json={"msg": {}})
-        assert resp.status_code == 200
-        assert resp.json()["status"] == "ignored"
+        old = os.environ.pop("DINGTALK_APP_SECRET", None)
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            # No timestamp/sign headers → fail-closed even if secret unset
+            resp = client.post("/webhooks/dingtalk", json={"msg": {}})
+            assert resp.status_code == 401
+        finally:
+            if old:
+                os.environ["DINGTALK_APP_SECRET"] = old
+
+    def test_no_text_returns_ignored(self):
+        import os
+        import time
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        secret = "test_app_secret_123"
+        os.environ["DINGTALK_APP_SECRET"] = secret
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            resp = client.post(
+                "/webhooks/dingtalk",
+                json={"msg": {}},
+                headers=self._signed_headers(secret, str(int(time.time() * 1000))),
+            )
+            assert resp.status_code == 200
+            assert resp.json()["status"] == "ignored"
+        finally:
+            os.environ.pop("DINGTALK_APP_SECRET", None)
 
     def test_text_accepted(self):
+        import os
+        import time
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
-        app = FastAPI()
-        app.include_router(router)
-        client = TestClient(app)
-        resp = client.post(
-            "/webhooks/dingtalk",
-            json={
-                "msg": {"text": {"content": "run smoke test"}},
-                "senderId": "user001",
-            },
-        )
-        assert resp.status_code == 200
-        assert resp.json()["status"] == "accepted"
+        secret = "test_app_secret_123"
+        os.environ["DINGTALK_APP_SECRET"] = secret
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            resp = client.post(
+                "/webhooks/dingtalk",
+                json={
+                    "msg": {"text": {"content": "run smoke test"}},
+                    "senderId": "user001",
+                },
+                headers=self._signed_headers(secret, str(int(time.time() * 1000))),
+            )
+            assert resp.status_code == 200
+            assert resp.json()["status"] == "accepted"
+        finally:
+            os.environ.pop("DINGTALK_APP_SECRET", None)
 
 
 class TestQQBotWebhook:
     """Test QQ Bot webhook endpoint."""
 
+    @staticmethod
+    def _sign(body: bytes) -> tuple[str, str]:
+        """Return (public_key_hex, (signature, timestamp)) for a signed post."""
+        import time
+
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+        key = Ed25519PrivateKey.generate()
+        ts = str(int(time.time()))
+        sig = key.sign(ts.encode() + body).hex()
+        return key.public_key().public_bytes_raw().hex(), (sig, ts)
+
     def test_heartbeat_ack(self):
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
         app = FastAPI()
@@ -626,6 +873,7 @@ class TestQQBotWebhook:
     def test_hello_ack(self):
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
         app = FastAPI()
@@ -635,39 +883,179 @@ class TestQQBotWebhook:
         assert resp.status_code == 200
         assert resp.json()["op"] == 1
 
-    def test_non_message_event_ignored(self):
+    def test_unsigned_dispatch_rejected(self):
+        import os
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
-        app = FastAPI()
-        app.include_router(router)
-        client = TestClient(app)
-        resp = client.post(
-            "/webhooks/qqbot",
-            json={"op": 0, "t": "GUILD_CREATE", "d": {}},
-        )
-        assert resp.status_code == 200
-        assert resp.json()["status"] == "ignored"
+        old = os.environ.pop("QQBOT_PUBLIC_KEY", None)
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            # op=0 without signature headers → fail-closed 401
+            resp = client.post(
+                "/webhooks/qqbot",
+                json={"op": 0, "t": "GUILD_CREATE", "d": {}},
+            )
+            assert resp.status_code == 401
+        finally:
+            if old:
+                os.environ["QQBOT_PUBLIC_KEY"] = old
+
+    def test_non_message_event_ignored(self):
+        import json as _json
+        import os
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        payload = {"op": 0, "t": "GUILD_CREATE", "d": {}}
+        body = _json.dumps(payload).encode()
+        pubkey, (sig, ts) = self._sign(body)
+        os.environ["QQBOT_PUBLIC_KEY"] = pubkey
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            resp = client.post(
+                "/webhooks/qqbot",
+                content=body,
+                headers={"X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts},
+            )
+            assert resp.status_code == 200
+            assert resp.json()["status"] == "ignored"
+        finally:
+            os.environ.pop("QQBOT_PUBLIC_KEY", None)
 
     def test_c2c_message_accepted(self):
+        import json as _json
+        import os
+
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         from runtime.api.endpoints.webhooks import router
 
+        payload = {
+            "op": 0,
+            "t": "C2C_MESSAGE_CREATE",
+            "d": {
+                "content": "test login",
+                "author": {"id": "openid_abc"},
+            },
+        }
+        body = _json.dumps(payload).encode()
+        pubkey, (sig, ts) = self._sign(body)
+        os.environ["QQBOT_PUBLIC_KEY"] = pubkey
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            resp = client.post(
+                "/webhooks/qqbot",
+                content=body,
+                headers={"X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts},
+            )
+            assert resp.status_code == 200
+            assert resp.json()["status"] == "accepted"
+        finally:
+            os.environ.pop("QQBOT_PUBLIC_KEY", None)
+
+
+class TestFeishuSignatureVerification:
+    """Feishu callback verification — fail-closed like Discord."""
+
+    def test_unconfigured_rejected_outside_dev(self):
+        import os
+
+        from runtime.api.endpoints.webhooks import _verify_feishu
+
+        os.environ.pop("FEISHU_VERIFICATION_TOKEN", None)
+        os.environ.pop("TAGENT_ENV", None)
+        assert _verify_feishu({}) is False
+
+    def test_token_mismatch_rejected(self):
+        import os
+
+        from runtime.api.endpoints.webhooks import _verify_feishu
+
+        os.environ["FEISHU_VERIFICATION_TOKEN"] = "expected-token"
+        os.environ.pop("TAGENT_ENV", None)
+        try:
+            assert _verify_feishu({"token": "wrong"}) is False
+        finally:
+            os.environ.pop("FEISHU_VERIFICATION_TOKEN", None)
+
+    def test_token_match_accepted(self):
+        import os
+
+        from runtime.api.endpoints.webhooks import _verify_feishu
+
+        os.environ["FEISHU_VERIFICATION_TOKEN"] = "expected-token"
+        os.environ.pop("TAGENT_ENV", None)
+        try:
+            assert _verify_feishu({"token": "expected-token"}) is True
+        finally:
+            os.environ.pop("FEISHU_VERIFICATION_TOKEN", None)
+
+    def test_encrypted_payload_decrypted_and_verified(self):
+        """Feishu encrypt-mode payload (no token field) must decrypt, then verify."""
+        import base64
+        import hashlib
+        import os
+
+        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        encrypt_key = "test-encrypt-key"
+        token = "expected-token"
+        inner = {"token": token, "challenge": "challenge-123"}
+        key = hashlib.sha256(encrypt_key.encode()).digest()
+        iv = key[:16]
+        cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
+        encryptor = cipher.encryptor()
+        plain = json.dumps(inner).encode()
+        pad = 16 - len(plain) % 16
+        plain += bytes([pad]) * pad
+        encrypted = base64.b64encode(encryptor.update(plain) + encryptor.finalize()).decode()
+
+        os.environ["FEISHU_VERIFICATION_TOKEN"] = token
+        os.environ["FEISHU_ENCRYPT_KEY"] = encrypt_key
+        try:
+            app = FastAPI()
+            app.include_router(router)
+            client = TestClient(app)
+            resp = client.post("/webhooks/feishu", json={"encrypt": encrypted})
+            assert resp.status_code == 200
+            assert resp.json().get("challenge") == "challenge-123"
+        finally:
+            os.environ.pop("FEISHU_VERIFICATION_TOKEN", None)
+            os.environ.pop("FEISHU_ENCRYPT_KEY", None)
+
+    def test_endpoint_rejects_unverified_message(self):
+        import os
+
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from runtime.api.endpoints.webhooks import router
+
+        os.environ.pop("FEISHU_VERIFICATION_TOKEN", None)
+        os.environ.pop("TAGENT_ENV", None)
         app = FastAPI()
         app.include_router(router)
         client = TestClient(app)
-        resp = client.post(
-            "/webhooks/qqbot",
-            json={
-                "op": 0,
-                "t": "C2C_MESSAGE_CREATE",
-                "d": {
-                    "content": "test login",
-                    "author": {"id": "openid_abc"},
-                },
-            },
+        response = client.post(
+            "/webhooks/feishu",
+            json={"header": {"event_type": "im.message.receive_v1"}, "event": {}},
         )
-        assert resp.status_code == 200
-        assert resp.json()["status"] == "accepted"
+        assert response.status_code == 403

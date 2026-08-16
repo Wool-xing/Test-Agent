@@ -20,9 +20,9 @@ from __future__ import annotations
 import os
 import shutil
 import threading
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
 
 
 class DegradationLevel(Enum):
@@ -130,8 +130,6 @@ def check_network() -> bool:
 def check_llm_available(provider: str) -> bool:
     """Check if LLM provider is reachable."""
     try:
-        from runtime.config.settings import get_settings
-        s = get_settings()
         api_key = os.environ.get(f"TAGENT_LLM_API_KEY_{provider.upper()}", os.environ.get("TAGENT_LLM_API_KEY", ""))
         return bool(api_key)
     except Exception:

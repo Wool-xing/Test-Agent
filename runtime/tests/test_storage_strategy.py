@@ -3,7 +3,7 @@
 import tempfile
 from pathlib import Path
 
-from runtime.infra.storage_strategy import TieredStorage, RetentionPolicy, StorageTier
+from runtime.infra.storage_strategy import RetentionPolicy, TieredStorage
 
 
 class TestTieredStorage:

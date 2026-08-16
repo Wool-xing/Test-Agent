@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+from contextlib import suppress
 from datetime import datetime, timezone
-from pathlib import Path
 
 from loguru import logger
+
 from runtime.config.settings import get_settings
 
 _SEARCH_DB = get_settings().gateway_dir / "search.db"
@@ -47,22 +48,39 @@ def index_message(session_id: str, role: str, content: str, ts: str | None = Non
         logger.warning("FTS index failed: {}", exc)
     finally:
         if conn is not None:
-            try:
+            with suppress(Exception):
                 conn.close()
-            except Exception:
-                pass
 
 
 def index_session(session_id: str, messages: list[dict]) -> int:
-    """Index all messages in a session. Returns count indexed."""
+    """Index all messages in a session. Returns count indexed.
+
+    One connection + one commit per session (was: one per message).
+    """
+    conn = None
     count = 0
-    for m in messages:
-        role = m.get("role", "user")
-        content = m.get("content", "")
-        ts = m.get("ts", "")
-        if content.strip():
-            index_message(session_id, role, content, str(ts))
-            count += 1
+    try:
+        with _lock:
+            conn = _ensure_db()
+            for m in messages:
+                content = m.get("content", "")
+                if not content.strip():
+                    continue
+                try:
+                    conn.execute(
+                        "INSERT INTO messages_fts (session_id, role, content, ts) VALUES (?, ?, ?, ?)",
+                        (session_id, m.get("role", "user"), content[:2000], str(m.get("ts", ""))),
+                    )
+                    count += 1
+                except Exception as exc:  # noqa: BLE001 — one bad row must not drop the rest
+                    logger.warning("FTS index row failed: {}", exc)
+            conn.commit()
+    except Exception as exc:
+        logger.warning("FTS index failed: {}", exc)
+    finally:
+        if conn is not None:
+            with suppress(Exception):
+                conn.close()
     return count
 
 

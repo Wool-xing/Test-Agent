@@ -9,8 +9,26 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-from runtime.api.deps import Kernel
 from runtime.api.parsers import parse_path, parse_text, parse_url
+
+
+class _LazyKernel:
+    """Proxy that defers Kernel + its heavy import chain (sqlalchemy, router, registry)
+    until the first attribute access.  Saves ~0.5s CLI cold-start and ~30 MB RSS.
+    """
+
+    def __init__(self) -> None:
+        self._instance: object = None
+
+    def __getattr__(self, name: str):
+        if self._instance is None:
+            from runtime.api.deps import Kernel  # <-- heavy import deferred
+
+            self._instance = Kernel()
+        return getattr(self._instance, name)
+
+
+_kernel = _LazyKernel()
 
 # Fix Unicode on Windows; SSL warning suppression gated behind env opt-in
 if sys.platform == "win32":
@@ -23,7 +41,6 @@ if sys.platform == "win32":
 
 _no_color = os.environ.get("NO_COLOR", "").strip() != ""
 console = Console(force_terminal=True, color_system=None if _no_color else "auto")
-_kernel = Kernel()
 
 
 def set_no_color() -> None:
@@ -127,12 +144,18 @@ def print_dag(decision):
 
 def ping_db():
     try:
-        from sqlalchemy import text
+        from sqlalchemy import inspect, text
 
         from runtime.storage.db import get_engine
-        with get_engine().connect() as c:
+        engine = get_engine()
+        with engine.connect() as c:
             c.execute(text("SELECT 1"))
-        console.print("[green]DB    OK[/]")
+        tables = set(inspect(engine).get_table_names())
+        missing = {"runs", "cases", "defects", "evidence", "feedback", "embeddings"} - tables
+        if missing:
+            console.print(f"[red]DB    schema incomplete (missing: {', '.join(sorted(missing))})[/]")
+        else:
+            console.print(f"[green]DB    OK ({len(tables)} tables)[/]")
     except Exception:  # noqa: BLE001
         console.print("[yellow]DB    skip (unavailable)[/]")
 

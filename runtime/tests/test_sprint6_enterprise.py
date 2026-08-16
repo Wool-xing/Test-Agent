@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import pytest
+from pathlib import Path
 
 
 class TestMultiLLM:
@@ -54,7 +54,7 @@ class TestReportSystem:
         gen = ReportGenerator()
         results = [{"name": "test1", "status": "pass"}]
         path = gen.to_json(results, str(tmp_path / "report.json"))
-        data = json.loads(open(path).read())
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
         assert data["summary"]["total"] == 1
         assert data["results"][0]["name"] == "test1"
 
@@ -76,7 +76,7 @@ class TestNotifySystem:
 
     def test_notify_module_imports(self):
         """Notify module should be importable."""
-        from runtime.gateway.notify import Notifier, NotifyConfig
+        from runtime.gateway.notify import Notifier
         assert Notifier is not None
 
     def test_slack_unconfigured_graceful(self):

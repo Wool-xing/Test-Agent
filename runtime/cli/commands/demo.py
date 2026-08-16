@@ -63,7 +63,6 @@ def _demo_doctor_step() -> None:
 
 def _demo_selftest_step(demo_kernel, real_llm: bool) -> None:
     """Step 3: run DAG selftest."""
-    from runtime.api.parsers import parse_path
     step3_label = "real LLM · ~$1-3" if real_llm else "stub LLM · 0 cost"
     console.print(f"\n[bold]Step 3/4 · tagent selftest --e2e (16 agent DAG · {step3_label})[/]")
     fixture_path = Path("examples/_smoke_prd.md")

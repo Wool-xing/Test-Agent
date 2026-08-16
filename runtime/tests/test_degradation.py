@@ -1,8 +1,8 @@
 """TDD tests for Graceful Degradation (§补-10)."""
 
 from runtime.infra.degradation import (
-    DegradationManager,
     DegradationLevel,
+    DegradationManager,
     check_disk_space,
     get_degradation_manager,
 )

@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from runtime.api.main import app
 from runtime.config.settings import get_settings
-from runtime.marketplace.catalog import Entry, save_local
+from runtime.marketplace.catalog import Entry
 
 _settings = get_settings()
 _auth_headers = {}
@@ -21,8 +21,8 @@ client = TestClient(app, headers=_auth_headers)
 
 def _seed_registry(entries: list[Entry], monkeypatch) -> None:
     """Seed registry.json with test entries for the duration of the test."""
-    from pathlib import Path
     import tempfile
+    from pathlib import Path
 
     data = {
         "_comment": "test seed",

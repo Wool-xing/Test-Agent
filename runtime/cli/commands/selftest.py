@@ -21,15 +21,21 @@ def register(app: typer.Typer) -> None:
     ):
         """L3 full self-test. Default tolerant mode: pass if node pass rate >= threshold (0.80). --strict disables tolerance."""
         if not e2e:
-            console.print("[yellow]nothing to do; pass --e2e[/]")
-            raise typer.Exit(0)
+            # L2: stub-LLM 端到端自检 (CI 默认路径, 无外部调用)
+            from runtime.config.settings import get_settings as _gs
+
+            _gs().llm_provider = "stub"
+            _gs().llm_provider_fallback = "stub"
+            console.print("[bold]L2 selftest[/] (stub LLM)")
+        else:
+            console.print("[bold]L3 E2E selftest[/] (real LLM)")
 
         fixture_path = Path(fixture)
         if not fixture_path.exists():
             console.print(f"[red]fixture not found:[/] {fixture}")
             raise typer.Exit(2)
 
-        console.print(f"[bold]L3 E2E selftest[/]  fixture={fixture}  mode={'strict' if strict else f'tolerant ≥{pass_threshold:.0%}'}")
+        console.print(f"  fixture={fixture}  mode={'strict' if strict else f'tolerant ≥{pass_threshold:.0%}'}")
         art = parse_path(fixture_path)
         run_id, decision = _kernel.submit(art, persist=persist)
         console.print(f"  run_id      = {run_id}")

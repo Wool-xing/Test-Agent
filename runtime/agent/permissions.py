@@ -5,9 +5,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
 
 
 class PermissionLevel(Enum):

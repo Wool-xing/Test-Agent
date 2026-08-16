@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from dataclasses import dataclass, field
-from pathlib import Path
+from dataclasses import dataclass
 
 
 @dataclass
@@ -36,8 +35,8 @@ class UnitTestExecutor:
 
     def run(self, test_paths: list[str]) -> UnitTestResult:
         """Run pytest on specified test files or directories."""
-        import time
         import re
+        import time
 
         start = time.monotonic()
         args = [sys.executable, "-m", "pytest", "-q", "--no-header", "--tb=short"]

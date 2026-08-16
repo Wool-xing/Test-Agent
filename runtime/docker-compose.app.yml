@@ -16,8 +16,10 @@ services:
       TAGENT_MINIO_SECRET_KEY: ${TAGENT_MINIO_SECRET_KEY:-tagent-secret}
       TAGENT_LLM_PROVIDER: ${TAGENT_LLM_PROVIDER:-stub}
       TAGENT_LOG_LEVEL: ${TAGENT_LOG_LEVEL:-INFO}
+      TAGENT_API_AUTH_TOKEN: ${TAGENT_API_AUTH_TOKEN:-}
     ports:
-      - "8800:8800"
+      # loopback only — public exposure requires explicit reverse-proxy + auth setup
+      - "127.0.0.1:8800:8800"
     volumes:
       - tagent-workspace:/app/workspace
     restart: unless-stopped

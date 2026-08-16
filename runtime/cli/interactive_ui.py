@@ -18,7 +18,6 @@ from rich.text import Text as RichText
 
 from runtime.cli._shared import console
 
-
 # ── Key bindings ─────────────────────────────────────────────────────
 
 
@@ -329,8 +328,8 @@ def diagnose_error(exc: Exception, current_provider: str) -> str | None:
     # Connection / network errors
     if any(k in _msg for k in ("connection", "timeout", "refused", "unreachable", "ssl", "dns", "resolve")):
         return (
-            f"Cannot reach the LLM service. Check your network, proxy settings, "
-            f"or [cyan]TAGENT_LLM_API_BASE[/] in [cyan].env[/]."
+            "Cannot reach the LLM service. Check your network, proxy settings, "
+            "or [cyan]TAGENT_LLM_API_BASE[/] in [cyan].env[/]."
         )
 
     return None

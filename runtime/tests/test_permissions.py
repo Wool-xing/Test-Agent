@@ -1,11 +1,9 @@
 """TDD tests for Permission Manager (Sprint 2 P1-004)."""
 
-import pytest
 
 from runtime.agent.permissions import (
-    PermissionManager,
     PermissionLevel,
-    PermissionDecision,
+    PermissionManager,
     get_permission_manager,
 )
 

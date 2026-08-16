@@ -10,7 +10,6 @@ Analyzes sessions to detect reusable patterns:
 from __future__ import annotations
 
 from collections import Counter
-from pathlib import Path
 
 from runtime.learning.session_store import SessionRecord
 

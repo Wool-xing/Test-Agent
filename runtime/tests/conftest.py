@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+
 @pytest.fixture(autouse=True)
 def _env_isolation(tmp_path: Path, monkeypatch):
     """Isolate each test from real DB/MinIO/Prefect + reset shared state."""

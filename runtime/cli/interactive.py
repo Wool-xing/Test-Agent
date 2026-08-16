@@ -11,39 +11,34 @@ Bare `tagent` enters interactive session:
 from __future__ import annotations
 
 import os
-import re
-import shutil
 import sys
 import time
-from pathlib import Path as _Path
 
 from prompt_toolkit import PromptSession
-from prompt_toolkit.formatted_text import FormattedText
+from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.history import FileHistory
-# Rich Markup → prompt_toolkit FormattedText converter
-from rich.text import Text as RichText
 
+# Rich Markup → prompt_toolkit FormattedText converter
 from runtime.cli._shared import console
-from runtime.cli.completer import _PROVIDERS, SlashCompleter
+from runtime.cli.completer import SlashCompleter
 from runtime.cli.conversation import ConversationMemory
 from runtime.cli.interactive_ui import (
-    _context_pct,
+    _context_pct as _ui_context_pct,
+)
+from runtime.cli.interactive_ui import (
     _fit_line,
     _git_branch,
     _icon,
     _set_terminal_title,
     _term_width,
     diagnose_error,
-    get_prompt_style,
     make_keybindings,
     print_banner,
     print_banner_transcript,
     print_help,
-    repl_print,
-    rich_to_pt,
 )
+from runtime.cli.slash_commands import _PROVIDERS  # noqa: F401  # re-export (tests/backcompat)
 from runtime.config.settings import get_settings
-
 
 _SESSION_DIR = get_settings().gateway_dir
 _SESSION_FILE = _SESSION_DIR / "active_session.json"
@@ -73,7 +68,7 @@ def _sanitize_error(raw: str, max_len: int = 300) -> str:
 
 def _context_pct() -> int:
     """Estimate context window usage (delegates to interactive_ui)."""
-    return _context_pct(_get_memory())
+    return _ui_context_pct(_get_memory())
 
 
 def _print_banner() -> None:
@@ -183,9 +178,7 @@ def _is_multiline_candidate(text: str) -> bool:
         return False
     if any(text.startswith(m) for m in _ML_START_MARKERS):
         return True
-    if "\n" in text:
-        return True
-    return False
+    return "\n" in text
 
 
 def _get_memory() -> ConversationMemory:
@@ -250,9 +243,8 @@ def _render_prompt_message() -> list[tuple[str, str]]:
     return [("class:prompt", "❯ ")]
 
 
-def _render_bottom_toolbar() -> "HTML":
+def _render_bottom_toolbar() -> HTML:
     """Bottom separator + 4-line status bar (CC density). Returns HTML for PromptSession."""
-    from prompt_toolkit.formatted_text import HTML
     w = _term_width()
     sep = "─" * w
     p = _current_provider()
@@ -280,7 +272,6 @@ def _render_bottom_toolbar() -> "HTML":
         p1.append(f"<ansigreen>git:{b}</ansigreen>")
     # Show last test result if available
     try:
-        from pathlib import Path as _P
         _rf = get_settings().workspace_dir / "测试报告" / "last_run.json"
         if _rf.exists():
             import json as _json
@@ -397,7 +388,12 @@ def _run_regression(summary: dict, run_id: str, elapsed: float, rate: float) -> 
     if rate < 0.5:
         return
     try:
-        from runtime.cli.regression_tracker import RunResult, save_baseline, compare_with_baseline, is_regression
+        from runtime.cli.regression_tracker import (
+            RunResult,
+            compare_with_baseline,
+            is_regression,
+            save_baseline,
+        )
         current = RunResult(
             run_id=run_id, total=summary["total"], succeeded=summary["succeeded"],
             failed=summary.get("failed", 0), skipped=summary.get("skipped", 0),
@@ -525,7 +521,7 @@ def _handle_slash(text: str) -> None:
         console.print(f"[dim]First use of /{name} — trusted for future.[/]")
         trust_command(name)
 
-    from runtime.cli.slash_commands import resolve, closest
+    from runtime.cli.slash_commands import closest, resolve
 
     cmd = resolve(name)
     if cmd is None:
@@ -588,7 +584,7 @@ def _render_rprompt() -> list[tuple[str, str]]:
     m = _current_model()
     pct = _context_pct()
     short = m[:14] + ".." if len(m) > 14 else m
-    return [("class:prompt.dim", f"{short}  ")]
+    return [("class:prompt.dim", f"{short} · {pct}%  ")]
 
 
 
@@ -597,6 +593,21 @@ def _render_rprompt() -> list[tuple[str, str]]:
 
 
 
+
+
+def _get_prompt_style():
+    """Build a prompt_toolkit Style from the active skin (delegates to interactive_ui)."""
+    from runtime.cli.interactive_ui import get_prompt_style
+
+    return get_prompt_style()
+
+
+def _repl_print(markup: str = "", **kwargs: object) -> None:
+    """Print rich markup through the live prompt session (delegates to interactive_ui —
+    converts rich markup, never prints raw [tags])."""
+    from runtime.cli.interactive_ui import repl_print
+
+    repl_print(markup, **kwargs)
 
 
 def _create_session() -> PromptSession | None:

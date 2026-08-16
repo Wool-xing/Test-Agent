@@ -56,3 +56,30 @@ def test_help_per_command():
         result = runner.invoke(app, [cmd, "--help"])
         assert result.exit_code == 0, f"{cmd} --help failed"
         assert result.stdout.strip(), f"{cmd} --help produced no output"
+
+
+def test_run_exits_nonzero_when_tests_fail(monkeypatch):
+    """`tagent run` must exit 1 when the run summary reports failures."""
+    from types import SimpleNamespace
+
+    from runtime.cli import _shared
+    from runtime.cli.commands import run as run_mod
+
+    def fake_submit(art, persist=True):
+        decision = SimpleNamespace(
+            detected_target_type="web-system",
+            confidence=0.5,
+            rationale="fake",
+            dag=[],
+        )
+        return "fake-run-id", decision
+
+    def fake_execute_sync(run_id, decision):
+        return {"total": 3, "succeeded": 2, "failed": 1, "skipped": 0}
+
+    monkeypatch.setattr(run_mod._kernel, "submit", fake_submit)
+    monkeypatch.setattr(run_mod._kernel, "execute_sync", fake_execute_sync)
+    monkeypatch.setattr(_shared, "print_dag", lambda decision: None)
+
+    result = runner.invoke(app, ["run", "login page test"])
+    assert result.exit_code == 1, f"expected exit 1 on failures, got {result.exit_code}"

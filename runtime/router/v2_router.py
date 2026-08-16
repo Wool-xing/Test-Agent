@@ -6,17 +6,15 @@ Produces RoutingDecision (same type as V1) for both modes.
 
 from __future__ import annotations
 
-import json
 import os
-import re
 from pathlib import Path
 from typing import Any
 
 from loguru import logger
-from runtime.config.settings import get_settings
 
+from runtime.config.settings import get_settings
 from runtime.router.llm_client import LLMClient, LLMError
-from runtime.router.schema import DAGNode, RoutingDecision, TargetArtifact
+from runtime.router.schema import DAGNode, RoutingDecision
 from runtime.router.v2_prompt import (
     SYSTEM_PROMPT_V2,
     SYSTEM_PROMPT_V2_AI,
@@ -183,12 +181,12 @@ class IntentRouterV2:
         try:
             raw = client.complete_json(system, user)
         except LLMError:
-            raise RouterV2Error("LLM unavailable for V2 routing")
+            raise RouterV2Error("LLM unavailable for V2 routing") from None
 
         try:
             decision = RoutingDecision.model_validate(raw)
         except Exception as e:
-            raise RouterV2Error(f"LLM output invalid: {e}")
+            raise RouterV2Error(f"LLM output invalid: {e}") from None
 
         # Validate against manifest catalog
         issues = self._validate_decision(decision)
@@ -206,17 +204,17 @@ class IntentRouterV2:
         target_lower = target.lower()
 
         # Check if target is a PRD file path (sanitized: only read within CWD)
-        if target.endswith((".md", ".pdf", ".docx", ".xlsx", ".txt")):
-            # String-level sanitization before any filesystem access
-            if "\0" not in target and ".." not in target and not target.startswith("~"):
-                try:
-                    safe = os.path.abspath(target)
-                    cwd = os.path.abspath(os.getcwd()) + os.sep
-                    if safe.startswith(cwd) and os.path.isfile(safe):
-                        with open(safe, encoding="utf-8", errors="ignore") as _f:
-                            target_lower += " " + _f.read()[:2000].lower()
-                except Exception:
-                    pass
+        if target.endswith((".md", ".pdf", ".docx", ".xlsx", ".txt")) and (
+            "\0" not in target and ".." not in target and not target.startswith("~")
+        ):
+            try:
+                safe = os.path.abspath(target)
+                cwd = os.path.abspath(os.getcwd()) + os.sep
+                if safe.startswith(cwd) and os.path.isfile(safe):
+                    with open(safe, encoding="utf-8", errors="ignore") as _f:
+                        target_lower += " " + _f.read()[:2000].lower()
+            except Exception:
+                pass
 
         # Match against keyword tables
         detected_type, expert_names, skill_names = _DEFAULT_KEYWORD

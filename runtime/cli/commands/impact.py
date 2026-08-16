@@ -30,7 +30,7 @@ def register(app: typer.Typer) -> None:
 @_app.command()
 def analyze(
     file: str = typer.Option(..., "--file", "-f", help="File path to analyze impact for"),
-    graph: str = typer.Option(_DEFAULT_GRAPH, "--graph", help="Path to graph.json"),
+    graph: str = typer.Option(_DEFAULT_GRAPH, "--graph", help="Path to graph.json"),  # noqa: B008
 ):
     """Analyze impact of changing a file — shows blast radius and risk."""
     engine = ImpactEngine(graph_path=_resolve_graph(graph))
@@ -78,7 +78,7 @@ def analyze(
 
 @_app.command()
 def recommend(
-    files: list[str] = typer.Argument(..., help="Changed file paths"),
+    files: list[str] = typer.Argument(..., help="Changed file paths"),  # noqa: B008
     graph: str = typer.Option(_DEFAULT_GRAPH, "--graph", help="Path to graph.json"),
 ):
     """Recommend which tests to run for a set of changed files."""

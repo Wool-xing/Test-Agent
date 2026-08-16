@@ -7,7 +7,12 @@ import 'package:http/http.dart' as http;
 /// Stores API keys securely using FlutterSecureStorage.
 class ApiService extends ChangeNotifier {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  String _baseUrl = 'https://api.test-agent.dev';
+  // Override at build time: flutter run --dart-define=API_BASE_URL=https://...
+  static const String _defaultBaseUrl = 'https://api.test-agent.dev';
+  String _baseUrl = const String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: _defaultBaseUrl,
+  );
   bool _isConfigured = false;
 
   String get baseUrl => _baseUrl;
@@ -41,7 +46,11 @@ class ApiService extends ChangeNotifier {
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        try {
+          return jsonDecode(response.body) as Map<String, dynamic>;
+        } on FormatException {
+          return {'status': 'error', 'summary': 'Invalid response from server'};
+        }
       }
       return {'status': 'error', 'summary': 'Server error: ${response.statusCode}'};
     } catch (e) {
@@ -60,7 +69,11 @@ class ApiService extends ChangeNotifier {
         headers: {'Authorization': 'Bearer $apiKey'},
       ).timeout(const Duration(seconds: 10));
 
-      return jsonDecode(response.body);
+      try {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } on FormatException {
+        return {'status': 'error', 'summary': 'Invalid response from server'};
+      }
     } catch (e) {
       return {'status': 'error', 'summary': '$e'};
     }

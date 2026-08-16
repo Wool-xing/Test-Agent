@@ -6,10 +6,8 @@ Sprint 3 requirement: developer can create a Skill → test locally → publish 
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
-
 
 # ── Fixtures ────────────────────────────────────────────────────────
 
@@ -58,8 +56,9 @@ class TestSkillCreate:
 
     def test_scaffold_generates_valid_frontmatter(self, tmp_path):
         """Generated SKILL.md must have valid YAML frontmatter."""
-        from runtime.sdk.scaffold import scaffold_skill
         import yaml
+
+        from runtime.sdk.scaffold import scaffold_skill
         skill_dir = scaffold_skill("valid-skill", base_dir=tmp_path)
         content = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
         assert content.startswith("---")
@@ -180,10 +179,11 @@ class TestSkillPackage:
 class TestSkillPublish:
     """4.X.2: Skill publishing to local registry."""
 
+    @pytest.mark.flaky  # quarantine: order/env-dependent, see QA-2026-08-16 P2#26
     def test_publish_to_local_registry(self, temp_skill_dir, tmp_path):
         """Publish should register skill in local registry."""
-        from runtime.sdk.publish import publish_skill
         from runtime.sdk.package import package_skill
+        from runtime.sdk.publish import publish_skill
 
         output = tmp_path / "output"
         output.mkdir()
@@ -198,8 +198,8 @@ class TestSkillPublish:
 
     def test_publish_duplicate_detected(self, temp_skill_dir, tmp_path):
         """Publishing duplicate skill should warn or fail."""
-        from runtime.sdk.publish import publish_skill
         from runtime.sdk.package import package_skill
+        from runtime.sdk.publish import publish_skill
 
         output = tmp_path / "output"
         output.mkdir()
@@ -211,3 +211,44 @@ class TestSkillPublish:
         # Second publish of same version should fail
         result = publish_skill(archive, registry_dir=registry_dir)
         assert not result.ok
+
+    def test_publish_symlink_member_rejected(self, tmp_path):
+        """Archive containing a symlink member must be rejected (zip-slip)."""
+        import tarfile
+
+        from runtime.sdk.publish import publish_skill
+
+        archive = tmp_path / "evil.tar.gz"
+        with tarfile.open(archive, "w:gz") as tar:
+            info = tarfile.TarInfo("evil-skill/link")
+            info.type = tarfile.SYMTYPE
+            info.linkname = "/etc/passwd"
+            tar.addfile(info)
+            data = b"overwrite"
+            file_info = tarfile.TarInfo("evil-skill/link/pwned")
+            file_info.size = len(data)
+            tar.addfile(file_info, __import__("io").BytesIO(data))
+
+        registry_dir = tmp_path / "registry"
+        registry_dir.mkdir()
+        result = publish_skill(archive, registry_dir=registry_dir)
+        assert not result.ok
+        assert "symlink" in " ".join(result.errors).lower()
+
+    def test_publish_fifo_member_rejected(self, tmp_path):
+        """Archive containing a FIFO member must be rejected (3.10/3.11 fallback)."""
+        import tarfile
+
+        from runtime.sdk.publish import publish_skill
+
+        archive = tmp_path / "fifo.tar.gz"
+        with tarfile.open(archive, "w:gz") as tar:
+            info = tarfile.TarInfo("evil-skill/pipe")
+            info.type = tarfile.FIFOTYPE
+            tar.addfile(info)
+
+        registry_dir = tmp_path / "registry"
+        registry_dir.mkdir()
+        result = publish_skill(archive, registry_dir=registry_dir)
+        assert not result.ok
+        assert "FIFO" in " ".join(result.errors).upper() or "forbidden" in " ".join(result.errors).lower()

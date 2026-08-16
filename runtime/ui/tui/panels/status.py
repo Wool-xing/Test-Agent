@@ -1,7 +1,7 @@
 """Agent Status panel — live runtime + token usage tracking."""
 
-from textual.widgets import Static
 from textual.containers import Vertical
+from textual.widgets import Static
 
 
 class AgentStatusPanel(Vertical):
@@ -11,8 +11,9 @@ class AgentStatusPanel(Vertical):
         yield Static("Agent Status", classes="title")
         yield Static("")
         try:
-            from runtime.config.settings import get_settings
             import os
+
+            from runtime.config.settings import get_settings
             s = get_settings()
             model = os.environ.get("TAGENT_LLM_MODEL", "default")
             yield Static(f"  Provider:     {s.llm_provider}")
@@ -38,8 +39,9 @@ class AgentStatusPanel(Vertical):
         yield Static("")
         yield Static("Session:")
         try:
+            import json
+            import time
             from pathlib import Path
-            import json, time
             sf = Path("workspace/gateway/active_session.json")
             if sf.exists():
                 data = json.loads(sf.read_text(encoding="utf-8"))

@@ -49,12 +49,16 @@ def _call_responses_api(provider: str, model: str, system: str, user: str,
     try:
         import openai
     except ImportError:
-        raise LLMError("openai SDK not installed; pip install openai")
+        raise LLMError("openai SDK not installed; pip install openai") from None
 
     api_key = os.environ.get("TAGENT_LLM_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
     api_base = os.environ.get("TAGENT_LLM_API_BASE") or "https://api.openai.com/v1"
 
-    client = openai.OpenAI(api_key=api_key, base_url=api_base)
+    # SDK default is 600s — use the configured LLM timeout so a hung provider
+    # cannot stall the runner/DAG (P2#34).
+    client = openai.OpenAI(
+        api_key=api_key, base_url=api_base, timeout=get_settings().llm_timeout_seconds
+    )
     try:
         input_msgs = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         kwargs: dict[str, Any] = {"model": model, "input": input_msgs, "temperature": temperature}

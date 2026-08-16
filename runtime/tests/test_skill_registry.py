@@ -5,9 +5,6 @@ Sprint 3: Skill registration and discovery mechanism.
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
 import pytest
 
 

@@ -14,7 +14,7 @@ def test_e2e(
     headless: bool = typer.Option(True, help="Run headless"),
 ) -> None:
     """Run E2E browser test against a URL."""
-    from runtime.testing.e2e import E2EExecutor, E2EConfig
+    from runtime.testing.e2e import E2EConfig, E2EExecutor
     cfg = E2EConfig(browser=browser, headless=headless)
     executor = E2EExecutor(cfg)
     result = executor.check_page(url)
@@ -37,7 +37,7 @@ def test_visual(
     compare: bool = typer.Option(False, help="Compare against baseline"),
 ) -> None:
     """Capture or compare screenshots for visual regression testing."""
-    from runtime.testing.visual import VisualExecutor, VisualConfig
+    from runtime.testing.visual import VisualConfig, VisualExecutor
     cfg = VisualConfig()
     executor = VisualExecutor(cfg)
     if compare:
@@ -59,7 +59,7 @@ def test_integration(
     expected_status: int = typer.Option(200, help="Expected HTTP status"),
 ) -> None:
     """Run API integration test."""
-    from runtime.testing.integration import IntegrationExecutor, ApiCheck
+    from runtime.testing.integration import ApiCheck, IntegrationExecutor
     executor = IntegrationExecutor()
     checks = [ApiCheck(method=method, path=path, expected_status=expected_status)]
     result = executor.check_api(base_url, checks)
@@ -78,7 +78,7 @@ def test_unit(
     coverage: bool = typer.Option(False, "--cov", help="Measure coverage"),
 ) -> None:
     """Run unit tests with pytest."""
-    from runtime.testing.unit import UnitTestExecutor, UnitTestConfig
+    from runtime.testing.unit import UnitTestConfig, UnitTestExecutor
     cfg = UnitTestConfig(coverage=coverage)
     executor = UnitTestExecutor(cfg)
     result = executor.run([path])

@@ -1,7 +1,7 @@
 """Test Execution Panel — real-time progress, pass/fail counts, recent runs."""
 
-from textual.widgets import Static
 from textual.containers import Vertical
+from textual.widgets import Static
 
 
 class ExecutionPanel(Vertical):
@@ -12,8 +12,8 @@ class ExecutionPanel(Vertical):
         yield Static("")
         # Last run summary
         try:
-            from pathlib import Path
             import json
+            from pathlib import Path
             sf = Path("workspace/gateway/active_session.json")
             if sf.exists():
                 data = json.loads(sf.read_text(encoding="utf-8"))

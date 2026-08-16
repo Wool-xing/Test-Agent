@@ -32,7 +32,7 @@ def test_auth_middleware_blocks_when_token_set(monkeypatch):
     """When TAGENT_API_AUTH_TOKEN is set, protected endpoints return 401."""
     monkeypatch.setenv("TAGENT_API_AUTH_TOKEN", "test-token-123")
     from runtime.api.main import _settings
-    _settings.api_auth_token = "test-token-123"
+    monkeypatch.setattr(_settings, "api_auth_token", "test-token-123")
 
     resp = client.get("/catalog")
     assert resp.status_code == 401
@@ -43,7 +43,7 @@ def test_auth_middleware_allows_with_correct_token(monkeypatch):
     """With correct Bearer token, protected endpoints work."""
     monkeypatch.setenv("TAGENT_API_AUTH_TOKEN", "test-token-123")
     from runtime.api.main import _settings
-    _settings.api_auth_token = "test-token-123"
+    monkeypatch.setattr(_settings, "api_auth_token", "test-token-123")
 
     resp = client.get("/catalog", headers={"Authorization": "Bearer test-token-123"})
     assert resp.status_code == 200
@@ -53,10 +53,20 @@ def test_health_always_accessible_even_with_token(monkeypatch):
     """Health is excluded from auth check."""
     monkeypatch.setenv("TAGENT_API_AUTH_TOKEN", "test-token-123")
     from runtime.api.main import _settings
-    _settings.api_auth_token = "test-token-123"
+    monkeypatch.setattr(_settings, "api_auth_token", "test-token-123")
 
     resp = client.get("/health")
     assert resp.status_code == 200
+
+
+def test_marketplace_requires_token_when_set(monkeypatch):
+    """Marketplace must NOT be exempt from auth when a token is configured."""
+    monkeypatch.setenv("TAGENT_API_AUTH_TOKEN", "test-token-123")
+    from runtime.api.main import _settings
+    monkeypatch.setattr(_settings, "api_auth_token", "test-token-123")
+
+    resp = client.get("/api/marketplace/plugins")
+    assert resp.status_code == 401
 
 
 def test_cors_headers_present():

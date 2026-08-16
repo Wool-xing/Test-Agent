@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
-
 from runtime.orchestrator.workflows.gates import (
     GateResult,
-    check_smoke_gate,
-    check_regression_gate,
     check_perf_gate,
+    check_regression_gate,
+    check_smoke_gate,
 )
 
 

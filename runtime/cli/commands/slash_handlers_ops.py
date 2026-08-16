@@ -1,12 +1,13 @@
 """# Operations: MCP + cron/task/model/search + API/plugins/alias/ws/gateway/cross/clean — extracted from slash_handlers.py."""
 from __future__ import annotations
-import os, re, sys, time
-from pathlib import Path
+
+import os
+import re
+
 from runtime.cli._shared import console
-from runtime.cli.slash_commands import _PROVIDERS
-from runtime.cli.conversation import ConversationMemory
-from runtime.config.settings import get_settings
 from runtime.cli.interactive import _get_memory  # cross-sub-file
+from runtime.config.settings import get_settings
+
 _SESSION_FILE = get_settings().gateway_dir / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
 # Module-local mutable state
@@ -398,7 +399,7 @@ def _cmd_api(args: str) -> None:
             console.print("[dim]Usage: !api gen <spec_path_or_url> <base_url>[/]")
             return
         try:
-            from utils.design.openapi_test_gen import load_openapi_spec, generate_test_cases
+            from utils.design.openapi_test_gen import generate_test_cases, load_openapi_spec
             spec = load_openapi_spec(sub[0])
             path = generate_test_cases(spec, sub[1])
             endpoints = len(spec.get("paths", {}))
@@ -464,8 +465,9 @@ def _cmd_plugins_list(args: str) -> None:
 
 def _cmd_alias(args: str) -> None:
     """Manage command aliases: /alias list | add <name> <cmd> | remove <name>."""
-    from runtime.cli.aliases import list_aliases, add_alias, remove_alias
     from rich.table import Table
+
+    from runtime.cli.aliases import add_alias, list_aliases, remove_alias
 
     parts = args.strip().split(maxsplit=1)
     action = parts[0].lower() if parts else "list"
@@ -510,10 +512,16 @@ def _cmd_alias(args: str) -> None:
 
 def _cmd_ws(args: str) -> None:
     """Manage workspaces: /ws list | add <name> [path] | switch <name> | auto."""
-    from runtime.cli.workspaces import (
-        list_workspaces, add_workspace, remove_workspace, switch_to, auto_discover, get_current,
-    )
     from rich.table import Table
+
+    from runtime.cli.workspaces import (
+        add_workspace,
+        auto_discover,
+        get_current,
+        list_workspaces,
+        remove_workspace,
+        switch_to,
+    )
 
     parts = args.strip().split(maxsplit=1)
     action = parts[0].lower() if parts else "list"
@@ -642,6 +650,7 @@ def _task_add(rest: str) -> None:
 def _task_list(rest: str) -> None:
     """Handle /task list [status_filter]."""
     from rich.table import Table
+
     from runtime.cli.tasks import list_tasks, stats
 
     status_filter = rest if rest else None
@@ -760,8 +769,9 @@ def _cmd_task(args: str) -> None:
 
 def _cmd_cross(args: str) -> None:
     """Run tests across environments: /cross env test staging <prompt>."""
-    from runtime.cli.cross_env import run_cross_env
     from rich.table import Table
+
+    from runtime.cli.cross_env import run_cross_env
 
     parts = args.strip().split(None, 1)
     if len(parts) < 2 or parts[0] != "env":

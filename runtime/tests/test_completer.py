@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestEditDistance:
     def test_identical(self):
@@ -89,8 +87,9 @@ class TestSlashCommandCompletion:
 
     @staticmethod
     def _completions(text: str) -> list[str]:
-        from runtime.cli.completer import SlashCompleter
         from prompt_toolkit.document import Document
+
+        from runtime.cli.completer import SlashCompleter
         c = SlashCompleter()
         doc = Document(text, len(text))
         return [comp.text for comp in c.get_completions(doc, None)]
@@ -111,7 +110,7 @@ class TestSlashCommandCompletion:
         comps = self._completions("!")
         # All commands should match empty prefix
         assert len(comps) > 5  # multiple commands available
-        assert "help" in comps or any("help" == c for c in comps)
+        assert "help" in comps or any(c == "help" for c in comps)
 
 
 class TestModelProviderCompletion:
@@ -119,8 +118,9 @@ class TestModelProviderCompletion:
 
     @staticmethod
     def _completions(text: str) -> list[str]:
-        from runtime.cli.completer import SlashCompleter
         from prompt_toolkit.document import Document
+
+        from runtime.cli.completer import SlashCompleter
         c = SlashCompleter()
         doc = Document(text, len(text))
         return [comp.text for comp in c.get_completions(doc, None)]
@@ -157,8 +157,9 @@ class TestAgentSkillCompletion:
 
     @staticmethod
     def _completions(text: str) -> list[str]:
-        from runtime.cli.completer import SlashCompleter
         from prompt_toolkit.document import Document
+
+        from runtime.cli.completer import SlashCompleter
         c = SlashCompleter()
         doc = Document(text, len(text))
         return [comp.text for comp in c.get_completions(doc, None)]
@@ -191,8 +192,9 @@ class TestCompletionDedup:
 
     @staticmethod
     def _completions(text: str) -> list[str]:
-        from runtime.cli.completer import SlashCompleter
         from prompt_toolkit.document import Document
+
+        from runtime.cli.completer import SlashCompleter
         c = SlashCompleter()
         doc = Document(text, len(text))
         return [comp.text for comp in c.get_completions(doc, None)]

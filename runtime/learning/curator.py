@@ -181,8 +181,8 @@ class Curator:
         ]
 
         if target:
-            lines.append(f"## Target Context")
-            lines.append(f"")
+            lines.append("## Target Context")
+            lines.append("")
             lines.append(f"Target: {target}")
             lines.append("")
 

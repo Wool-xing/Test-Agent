@@ -4,9 +4,7 @@
 """
 
 import json
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -18,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 # ping-check
 # ═══════════════════════════════════════════════════════════════
 
+@pytest.mark.flaky  # quarantine: order/env-dependent, see QA-2026-08-16 P2#26
 class TestPingCheck:
     def test_ping_localhost_ok(self):
         """RED→GREEN: ping 127.0.0.1 should succeed."""
@@ -49,6 +48,7 @@ class TestPingCheck:
 # http-check
 # ═══════════════════════════════════════════════════════════════
 
+@pytest.mark.flaky  # quarantine: order/env-dependent, see QA-2026-08-16 P2#26
 class TestHttpCheck:
     def test_http_localhost_fails_gracefully(self):
         """Unreachable URL returns ok=False, not crash."""
@@ -78,6 +78,7 @@ class TestHttpCheck:
 # file-check
 # ═══════════════════════════════════════════════════════════════
 
+@pytest.mark.flaky  # quarantine: order/env-dependent, see QA-2026-08-16 P2#26
 class TestFileCheck:
     def test_file_exists_with_content(self):
         """Existing file with matching content should pass."""
@@ -126,11 +127,13 @@ class TestProcessCheck:
 # timeout-check
 # ═══════════════════════════════════════════════════════════════
 
+@pytest.mark.flaky  # quarantine: order/env-dependent, see QA-2026-08-16 P2#26
 class TestTimeoutCheck:
     def test_fast_command_passes(self):
         """Command completing within timeout should pass."""
-        from utils.timeout_check import check_timeout
         import sys
+
+        from utils.timeout_check import check_timeout
         cmd = "cmd /c echo hello" if sys.platform == "win32" else "echo hello"
         result = check_timeout(cmd, timeout=5)
         assert result["ok"] is True

@@ -8,7 +8,7 @@ readme = "INDEX.md"
 
 dependencies = [
     "mcp>=1.0.0",
-    "litellm>=1.55.0",
+    "litellm>=1.55.0,<2.0.0",
     "prefect>=2.20.0",
     "factory-boy>=3.3.0",
     "faker>=30.0.0",
@@ -25,7 +25,7 @@ dependencies = [
     "opentelemetry-api>=1.27.0",
     "opentelemetry-sdk>=1.27.0",
     "opentelemetry-exporter-otlp>=1.27.0",
-    "opentelemetry-instrumentation-fastapi>=0.48b0",
+    "opentelemetry-instrumentation-fastapi>=0.48b0,<0.66b0",
     "loguru>=0.7.2",
     "python-multipart>=0.0.12",
     "httpx>=0.27.0",
@@ -66,6 +66,9 @@ target-version = "py310"
 select = ["E", "F", "I", "B", "UP", "SIM"]
 ignore = ["E501"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["runtime", "utils", "specs"]
+
 [tool.ruff.lint.per-file-ignores]
 
 [tool.pytest.ini_options]
@@ -84,6 +87,18 @@ markers = [
     "portability: portability / co-existence / replaceability test (ISO 25010)",
     "slow: slow test (>30s)",
     "smoke: fast smoke / sanity check",
+    "unit: unit test",
+    "fuzzing: fuzz / property-based test",
+    "a11y: accessibility test",
+    "api: API endpoint test",
+    "ui: UI / frontend test",
+    "regression: regression test",
+    "performance: performance / benchmark test",
+    "security: security test",
+    "p0: priority-0 critical-path test",
+    "p1: priority-1 test",
+    "p2: priority-2 test",
+    "p3: priority-3 test",
 ]
 
 [tool.pylint.main]

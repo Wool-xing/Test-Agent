@@ -149,9 +149,6 @@ class TestCoordinatorPipeline:
     def _preflight(self, platform_hints: list[str] | None = None) -> list[str]:
         """Step 0: Pre-flight checklist per test-coordinator.md."""
         missing = []
-        import sys
-        if sys.version_info < (3, 10):
-            missing.append("Python 3.10+ required")
         if not _WORKSPACE.is_dir():
             missing.append(f"workspace directory not found: {_WORKSPACE}")
 
@@ -164,12 +161,10 @@ class TestCoordinatorPipeline:
                 import pyautogui  # noqa: F401
             except ImportError:
                 missing.append("pip install pyautogui (desktop test)")
-        if "mobile_android" in hints or "mobile_ios" in hints:
-            if not os.environ.get("ANDROID_HOME") and "android" in str(hints):
-                missing.append("ANDROID_HOME (.env)")
-        if "api" in hints or "web" in hints:
-            if not os.environ.get("TEST_APP_URL"):
-                missing.append("TEST_APP_URL (.env)")
+        if ("mobile_android" in hints or "mobile_ios" in hints) and not os.environ.get("ANDROID_HOME") and "android" in str(hints):
+            missing.append("ANDROID_HOME (.env)")
+        if ("api" in hints or "web" in hints) and not os.environ.get("TEST_APP_URL"):
+            missing.append("TEST_APP_URL (.env)")
         return missing
 
     def _detect_platform(self, target: str) -> list[str]:

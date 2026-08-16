@@ -1,12 +1,26 @@
 """Slash command handlers — extracted from interactive.py."""
 from __future__ import annotations
-import os, sys, time
-from pathlib import Path
+
+import os
+import sys
+import time
+
 from runtime.cli._shared import console
+from runtime.cli.interactive import (
+    _current_model as _ui_current_model,
+)
+from runtime.cli.interactive import (
+    _current_provider as _ui_current_provider,
+)
+from runtime.cli.interactive import (
+    _get_memory as _ui_get_memory,
+)
+from runtime.cli.interactive import (
+    _handle_natural_language,
+)
 from runtime.cli.slash_commands import _PROVIDERS
-from runtime.cli.conversation import ConversationMemory
 from runtime.config.settings import get_settings
-from runtime.cli.interactive import _get_memory, _current_provider, _current_model, _handle_natural_language
+
 _SESSION_FILE = get_settings().gateway_dir / "active_session.json"
 _SESSION_DIR = _SESSION_FILE.parent
 # Module-local mutable state (independent from interactive.py copies)
@@ -17,18 +31,15 @@ _start_time = 0.0
 
 
 def _get_memory():
-    from runtime.cli.interactive import _get_memory as _m
-    return _m()
+    return _ui_get_memory()
 
 
 def _current_provider():
-    from runtime.cli.interactive import _current_provider as _f
-    return _f()
+    return _ui_current_provider()
 
 
 def _current_model():
-    from runtime.cli.interactive import _current_model as _f
-    return _f()
+    return _ui_current_model()
 
 
 def _closest_command(name: str) -> str | None:
@@ -58,6 +69,8 @@ def _edit_distance(a: str, b: str) -> int:
 
 
 def _do_quit() -> None:
+    from runtime.cli.interactive import _save_session
+
     _save_session()
     console.print("[dim]Session saved. Goodbye.[/]")
     raise SystemExit(0)
@@ -242,8 +255,9 @@ def _cmd_fc(args: str) -> None:
 
 def _cmd_ready(args: str) -> None:
     """Multi-dimensional release readiness check. Usage: !ready [--fast]."""
-    from runtime.cli.readiness import run_readiness
     from rich.table import Table
+
+    from runtime.cli.readiness import run_readiness
 
     fast = "--fast" in args
     with console.status("[bold]Checking readiness...", spinner="dots"):
@@ -274,7 +288,7 @@ def _cmd_ready(args: str) -> None:
 def _cmd_update(args: str) -> None:
     """Check GitHub for newer version. Thin wrapper around deploy/config/check_version.py."""
     import subprocess
-    import sys
+
     from runtime.config.settings import get_settings
     checker = get_settings().config_dir / "check_version.py"
     if not checker.is_file():

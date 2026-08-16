@@ -6,11 +6,9 @@ All OIDC-compliant providers share the same code path; SAML uses a separate flow
 
 from __future__ import annotations
 
-import json
-import secrets
 import time
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlencode
 
 import jwt
@@ -41,6 +39,10 @@ _KNOWN_ISSUERS: dict[str, str] = {
     "azure": "https://login.microsoftonline.com/{tenant}/v2.0",
     "keycloak": "https://{domain}/realms/{realm}",
 }
+
+# Signature algorithms accepted from token headers. Anything else (none, HS*, custom)
+# is rejected — the header is attacker-controlled.
+_ALLOWED_ALGS: set[str] = {"RS256", "RS384", "RS512", "ES256", "ES384", "ES512", "PS256", "PS384", "PS512", "EdDSA"}
 
 
 class SSOManager:
@@ -167,73 +169,108 @@ class SSOManager:
 
     # ── Token Validation ────────────────────────────────────────
 
+    def _check_claims(self, unverified: dict[str, Any], alg: str | None) -> None:
+        """Validate structural claims (iss/exp/aud) + header alg on an unverified token."""
+        issuer = self.config.issuer_url.rstrip("/")
+        if unverified.get("iss") != issuer:
+            raise HTTPException(status_code=401, detail="Token issuer mismatch")
+
+        exp = unverified.get("exp")
+        if not exp:
+            raise HTTPException(status_code=401, detail="Token missing exp")
+        if not isinstance(exp, (int, float)):
+            raise HTTPException(status_code=401, detail="Token exp must be numeric")
+        if exp < time.time() - 30:
+            raise HTTPException(status_code=401, detail="Token expired")
+
+        aud = unverified.get("aud", "")
+        aud_ok = self.config.client_id in aud if isinstance(aud, list) else aud == self.config.client_id
+        if aud and not aud_ok and self.config.provider not in ("azure",):
+            raise HTTPException(status_code=401, detail="Token audience mismatch")
+
+        if alg not in _ALLOWED_ALGS:
+            raise HTTPException(status_code=401, detail=f"Unsupported token algorithm: {alg}")
+
+    @staticmethod
+    def _header_alg(token: str) -> str | None:
+        """alg lives in the JOSE header, not the claims payload."""
+        try:
+            return jwt.get_unverified_header(token).get("alg")
+        except jwt.DecodeError:
+            return None
+
     def validate_token(self, token: str) -> dict:
         """Validate a JWT access token (sync, requires pre-warmed JWKS for signature).
 
-        Without JWKS, structural claims (iss/exp/aud) are still validated.
-        For full signature verification, call preload_jwks() first or use
+        Fail-closed: without JWKS, the token is rejected — structural claims
+        alone are never sufficient. Call preload_jwks() first or use
         validate_token_async().
         """
 
         # Decode WITHOUT verifying signature first to extract kid
         try:
             unverified = jwt.decode(token, options={"verify_signature": False})
-        except jwt.DecodeError as e:
-            raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
+        except (jwt.PyJWTError, ValueError) as e:
+            # PyJWTError covers DecodeError + non-dict payloads; ValueError covers
+            # malformed base64 — all must be 401, never 500
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from None
 
-        # Validate standard claims
-        issuer = self.config.issuer_url.rstrip("/")
-        if unverified.get("iss") != issuer:
-            raise HTTPException(status_code=401, detail="Token issuer mismatch")
+        alg = self._header_alg(token)
+        self._check_claims(unverified, alg)
 
-        exp = unverified.get("exp", 0)
-        if exp and exp < time.time() - 30:
-            raise HTTPException(status_code=401, detail="Token expired")
+        if self._jwks_client is None:
+            raise HTTPException(status_code=401, detail="JWKS not available — token rejected")
 
-        aud = unverified.get("aud", "")
-        if aud and aud != self.config.client_id:
-            if self.config.provider not in ("azure",):
-                raise HTTPException(status_code=401, detail="Token audience mismatch")
-
-        # Verify cryptographic signature using pre-warmed JWKS (if available)
-        if self._jwks_client is not None:
+        try:
             signing_key = self._jwks_client.get_signing_key_from_jwt(token)
-            try:
-                claims = jwt.decode(
-                    token,
-                    key=signing_key.key,
-                    algorithms=[unverified.get("alg", "RS256")],
-                    audience=self.config.client_id,
-                    issuer=issuer,
-                    options={"verify_exp": True},
-                )
-            except jwt.InvalidSignatureError:
-                raise HTTPException(status_code=401, detail="Invalid token signature")
-            except jwt.ExpiredSignatureError:
-                raise HTTPException(status_code=401, detail="Token expired")
-            return claims
-
-        # No JWKS available — structural validation only (dev/test)
-        return unverified
+            claims = jwt.decode(
+                token,
+                key=signing_key.key,
+                algorithms=[alg],
+                audience=self.config.client_id,
+                issuer=self.config.issuer_url.rstrip("/"),
+                options={"verify_exp": True},
+            )
+        except HTTPException:
+            raise
+        except jwt.PyJWTError as e:
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from None
+        return claims
 
     async def validate_token_async(self, token: str) -> dict:
         """Validate a JWT with async JWKS key fetching."""
         try:
             unverified = jwt.decode(token, options={"verify_signature": False})
-        except jwt.DecodeError as e:
-            raise HTTPException(status_code=401, detail=f"Invalid token: {e}")
+        except (jwt.PyJWTError, ValueError) as e:
+            # PyJWTError covers DecodeError + non-dict payloads; ValueError covers
+            # malformed base64 — all must be 401, never 500
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from None
 
-        jwks_client = await self._get_jwks_client()
-        signing_key = jwks_client.get_signing_key_from_jwt(token)
+        alg = self._header_alg(token)
+        self._check_claims(unverified, alg)
 
-        claims = jwt.decode(
-            token,
-            key=signing_key.key,
-            algorithms=[unverified.get("alg", "RS256")],
-            audience=self.config.client_id,
-            issuer=self.config.issuer_url.rstrip("/"),
-            options={"verify_exp": True},
-        )
+        try:
+            jwks_client = await self._get_jwks_client()
+            signing_key = jwks_client.get_signing_key_from_jwt(token)
+
+            claims = jwt.decode(
+                token,
+                key=signing_key.key,
+                algorithms=[alg],
+                audience=self.config.client_id,
+                issuer=self.config.issuer_url.rstrip("/"),
+                options={"verify_exp": True},
+            )
+        except HTTPException:
+            raise
+        except jwt.PyJWTError as e:
+            raise HTTPException(status_code=401, detail=f"Invalid token: {e}") from None
+        except Exception as e:  # noqa: BLE001 — IdP network failure must not 500 the middleware
+            import httpx
+
+            if isinstance(e, httpx.HTTPError):
+                raise HTTPException(status_code=503, detail="Identity provider unreachable") from None
+            raise
         return claims
 
     # ── User Info ───────────────────────────────────────────────
@@ -245,11 +282,10 @@ class SSOManager:
         oidc = await self._discover_oidc()
         userinfo_endpoint = oidc.get("userinfo_endpoint", "")
         if not userinfo_endpoint:
-            # Some providers omit userinfo; extract claims from access token
-            try:
-                return jwt.decode(access_token, options={"verify_signature": False})
-            except jwt.DecodeError:
-                return {"error": "No userinfo endpoint available"}
+            # Fail-closed: never return unverified claims
+            raise HTTPException(
+                status_code=502, detail="IdP has no userinfo endpoint — cannot fetch verified claims"
+            )
 
         async with httpx.AsyncClient() as client:
             resp = await client.get(

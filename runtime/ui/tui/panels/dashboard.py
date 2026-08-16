@@ -1,7 +1,7 @@
 """Dashboard panel — live overview with trend indicator."""
 
-from textual.widgets import Static
 from textual.containers import Vertical
+from textual.widgets import Static
 
 
 class DashboardPanel(Vertical):

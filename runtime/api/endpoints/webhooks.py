@@ -7,7 +7,6 @@ to the kernel via bridge.process_im_message(), and replies via the platform adap
 
 from __future__ import annotations
 
-import asyncio
 import base64
 import hashlib
 import hmac
@@ -15,18 +14,16 @@ import json
 import os
 import struct
 import time
-from typing import Any
 
 import defusedxml.ElementTree as ET
-
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from loguru import logger
 
+from runtime.gateway.bridge import process_im_message
+
 # ── Constants ──────────────────────────────────────────────────────────
 _DISCORD_WEBHOOK_BASE = "https://discord.com/api/v10/webhooks"
-
-from runtime.gateway.bridge import process_im_message
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -38,9 +35,6 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
     """Verify Discord interaction signature (Ed25519). Returns True if valid."""
     public_key = os.getenv("DISCORD_PUBLIC_KEY", "")
     if not public_key:
-        if os.getenv("TAGENT_ENV", "") == "dev":
-            logger.warning("DISCORD_PUBLIC_KEY not set — allowing in dev mode")
-            return True
         logger.error("DISCORD_PUBLIC_KEY not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
 
@@ -54,8 +48,8 @@ def _verify_discord_signature(body: bytes, signature: str, timestamp: str) -> bo
         return False
 
     try:
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         from cryptography.exceptions import InvalidSignature
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
         key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(public_key))
         message = timestamp.encode() + body
@@ -159,7 +153,7 @@ def _wechat_verify_signature(token: str, timestamp: str, nonce: str,
     """Verify WeChat Work callback signature: SHA1(sort(token, ts, nonce, encrypt))."""
     params = sorted([token, str(timestamp), str(nonce), encrypt])
     sign = hashlib.sha1("".join(params).encode()).hexdigest()
-    return sign == signature
+    return hmac.compare_digest(sign.encode(), signature.encode())
 
 
 def _wechat_decrypt(encrypted: str, encoding_aes_key: str) -> str:
@@ -204,15 +198,24 @@ def _verify_dingtalk_signature(timestamp: str, sign: str) -> bool:
     """Verify DingTalk callback signature (HMAC-SHA256)."""
     app_secret = os.getenv("DINGTALK_APP_SECRET", "")
     if not app_secret:
-        if os.getenv("TAGENT_ENV", "") == "dev":
-            return True
         logger.error("DINGTALK_APP_SECRET not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
+
+    # Replay protection: reject timestamps outside 1-hour window (DingTalk ts = ms;
+    # platform docs tolerate up to 1h, and redelivery/clock drift must not drop events)
+    try:
+        ts = int(timestamp)
+        if abs(int(time.time() * 1000) - ts) > 3_600_000:
+            logger.warning("DingTalk request outside 1h window — possible replay")
+            return False
+    except (ValueError, TypeError):
+        return False
+
     message = timestamp + "\n" + app_secret
     expected = base64.b64encode(
         hmac.new(app_secret.encode(), message.encode(), hashlib.sha256).digest()
     ).decode()
-    return hmac.compare_digest(sign, expected)
+    return hmac.compare_digest(sign.encode(), expected.encode())
 
 
 # ── QQ Bot signature helper ───────────────────────────────────────────
@@ -222,8 +225,6 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
     """Verify QQ Bot Ed25519 signature. Same algorithm as Discord."""
     public_key = os.getenv("QQBOT_PUBLIC_KEY", "")
     if not public_key:
-        if os.getenv("TAGENT_ENV", "") == "dev":
-            return True
         logger.error("QQBOT_PUBLIC_KEY not set — rejecting request (fail-closed)")
         return False  # fail-closed: unconfigured = untrusted
 
@@ -237,8 +238,8 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
         return False
 
     try:
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         from cryptography.exceptions import InvalidSignature
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
         key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(public_key))
         message = timestamp.encode() + body
@@ -258,10 +259,21 @@ def _verify_qqbot_signature(body: bytes, signature: str, timestamp: str) -> bool
 @router.post("/telegram")
 async def telegram_webhook(request: Request, bg: BackgroundTasks) -> JSONResponse:
     """Receive Telegram bot updates. Processes text messages through the test kernel."""
+    # Verify X-Telegram-Bot-Api-Secret-Token (fail-closed, like other platforms)
+    secret = os.getenv("TELEGRAM_SECRET_TOKEN", "")
+    if not secret:
+        logger.error("TELEGRAM_SECRET_TOKEN not set — rejecting request (fail-closed)")
+        raise HTTPException(status_code=401, detail="invalid signature")
+    provided = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
+    # compare bytes — compare_digest on str raises TypeError for non-ASCII
+    if not provided or not hmac.compare_digest(provided.encode(), secret.encode()):
+        logger.warning("Telegram secret token mismatch — rejecting request")
+        raise HTTPException(status_code=401, detail="invalid signature")
+
     try:
         data: dict = await request.json()
     except Exception:
-        raise HTTPException(status_code=400, detail="invalid JSON")
+        raise HTTPException(status_code=400, detail="invalid JSON") from None
 
     text = _extract_text_from_payload("telegram", data)
     if not text:
@@ -290,7 +302,7 @@ async def discord_webhook(request: Request, bg: BackgroundTasks):
     try:
         data: dict = json.loads(body)
     except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="invalid JSON")
+        raise HTTPException(status_code=400, detail="invalid JSON") from None
 
     # Discord PING/PONG for endpoint verification
     if data.get("type") == 1:
@@ -307,7 +319,6 @@ async def discord_webhook(request: Request, bg: BackgroundTasks):
 
         token = data.get("token", "")
         app_id = data.get("application_id", "")
-        interaction_id = data.get("id", "")
 
         # Acknowledge immediately, then process
         bg.add_task(_process_discord_followup, text, token, app_id)
@@ -338,13 +349,56 @@ async def _process_discord_followup(text: str, token: str, app_id: str) -> None:
 # ── 飞书 (Feishu / Lark) ─────────────────────────────────────────────
 
 
+def _verify_feishu(data: dict) -> bool:
+    """Verify Feishu callback via body verification token. Fail-closed."""
+    expected = os.getenv("FEISHU_VERIFICATION_TOKEN", "")
+    if expected:
+        return hmac.compare_digest(str(data.get("token", "")).encode(), expected.encode())
+    logger.error("FEISHU_VERIFICATION_TOKEN not set — rejecting request (fail-closed)")
+    return False
+
+
+def _decrypt_feishu(encrypted: str) -> dict:
+    """Feishu event encryption: AES-256-CBC, key=SHA256(encrypt_key), iv=key[:16]."""
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+    key_material = os.getenv("FEISHU_ENCRYPT_KEY", "")
+    if not key_material:
+        # Fail-closed: an empty-string key is deterministic and publicly known
+        logger.error("FEISHU_ENCRYPT_KEY not set — rejecting encrypt-mode payload")
+        raise ValueError("FEISHU_ENCRYPT_KEY not configured")
+    key = hashlib.sha256(key_material.encode()).digest()
+    cipher = Cipher(algorithms.AES(key), modes.CBC(key[:16]))
+    decryptor = cipher.decryptor()
+    plain = decryptor.update(base64.b64decode(encrypted)) + decryptor.finalize()
+    # Strip PKCS#7 padding (validated)
+    pad = plain[-1]
+    if pad < 1 or pad > 16 or pad > len(plain):
+        raise ValueError(f"invalid PKCS#7 padding: {pad}")
+    plain = plain[:-pad]
+    return json.loads(plain.decode("utf-8"))
+
+
 @router.post("/feishu")
 async def feishu_webhook(request: Request, bg: BackgroundTasks):
     """Receive 飞书 event callbacks. Handles URL verification and text messages."""
     try:
         data: dict = await request.json()
     except Exception:
-        raise HTTPException(status_code=400, detail="invalid JSON")
+        raise HTTPException(status_code=400, detail="invalid JSON") from None
+
+    # Encrypt mode: payload carries {"encrypt": ...} — decrypt first, then verify
+    # the inner token. Mixed payloads (encrypt + outer token) still decrypt: the
+    # inner token is the one that must verify.
+    if "encrypt" in data:
+        try:
+            data = _decrypt_feishu(data["encrypt"])
+        except Exception:
+            logger.warning("Feishu decrypt failed")
+            raise HTTPException(status_code=400, detail="decrypt failed") from None
+
+    if not _verify_feishu(data):
+        raise HTTPException(status_code=403, detail="signature verification failed")
 
     # URL verification challenge (飞书 sets up webhook)
     challenge = data.get("challenge")
@@ -396,19 +450,19 @@ async def wechat_webhook(request: Request, bg: BackgroundTasks):
                     plain = _wechat_decrypt(echostr.replace(" ", "+"), aes_key)
                 except Exception as e:
                     logger.warning("WeChat echostr decrypt failed: {}", e)
-                    raise HTTPException(status_code=400, detail="decrypt failed")
+                    raise HTTPException(status_code=400, detail="decrypt failed") from None
             else:
-                raise HTTPException(status_code=400, detail="decrypt failed")
+                raise HTTPException(status_code=400, detail="decrypt failed") from None
         return PlainTextResponse(content=plain)
 
     # POST: message callback
     try:
         body_xml = (await request.body()).decode("utf-8")
     except Exception:
-        raise HTTPException(status_code=400, detail="invalid body")
+        raise HTTPException(status_code=400, detail="invalid body") from None
 
     if not all([token, aes_key]):
-        raise HTTPException(status_code=400, detail="WECHAT_TOKEN/WECHAT_ENCODING_AES_KEY not set")
+        raise HTTPException(status_code=400, detail="WECHAT_TOKEN/WECHAT_ENCODING_AES_KEY not set") from None
 
     # Extract encrypted content from XML
     try:
@@ -417,10 +471,19 @@ async def wechat_webhook(request: Request, bg: BackgroundTasks):
         encrypted = (encrypt_el.text or "") if encrypt_el is not None else ""
     except ET.ParseError as e:
         logger.warning("WeChat XML parse failed: {}", e)
-        raise HTTPException(status_code=400, detail="invalid XML")
+        raise HTTPException(status_code=400, detail="invalid XML") from None
 
     if not encrypted:
         raise HTTPException(status_code=400, detail="missing Encrypt")
+
+    # Replay protection: reject timestamps outside 5-minute window (seconds)
+    try:
+        ts = int(timestamp)
+        if abs(int(time.time()) - ts) > 300:
+            logger.warning("WeChat callback outside 5min window — possible replay")
+            raise HTTPException(status_code=403, detail="stale timestamp")
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=403, detail="invalid timestamp") from None
 
     # Verify signature
     if not _wechat_verify_signature(token, timestamp, nonce, encrypted, msg_signature):
@@ -431,7 +494,7 @@ async def wechat_webhook(request: Request, bg: BackgroundTasks):
         plain_xml = _wechat_decrypt(encrypted, aes_key)
     except Exception as e:
         logger.warning("WeChat message decrypt failed: {}", e)
-        raise HTTPException(status_code=400, detail="decrypt failed")
+        raise HTTPException(status_code=400, detail="decrypt failed") from None
 
     parsed = _parse_wechat_xml(plain_xml)
 
@@ -481,14 +544,13 @@ async def dingtalk_webhook(request: Request, bg: BackgroundTasks):
     # Verify signature
     timestamp = request.headers.get("timestamp", "")
     sign = request.headers.get("sign", "")
-    if timestamp and sign:
-        if not _verify_dingtalk_signature(timestamp, sign):
-            raise HTTPException(status_code=401, detail="invalid signature")
+    if not _verify_dingtalk_signature(timestamp, sign):
+        raise HTTPException(status_code=401, detail="invalid signature")
 
     try:
         data: dict = await request.json()
     except Exception:
-        raise HTTPException(status_code=400, detail="invalid JSON")
+        raise HTTPException(status_code=400, detail="invalid JSON") from None
 
     # DingTalk callback types: check_for_url (verification) or event
     # URL verification challenge
@@ -537,17 +599,18 @@ async def qqbot_webhook(request: Request, bg: BackgroundTasks):
     signature = request.headers.get("X-Signature-Ed25519", "")
     timestamp = request.headers.get("X-Signature-Timestamp", "")
 
-    # Verify signature
-    if signature and timestamp:
-        if not _verify_qqbot_signature(body, signature, timestamp):
-            raise HTTPException(status_code=401, detail="invalid signature")
-
     try:
         data: dict = json.loads(body)
     except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="invalid JSON")
+        raise HTTPException(status_code=400, detail="invalid JSON") from None
 
     op = data.get("op", -1)
+
+    # op=0 (event dispatch) and op=13 (HTTP callback validation) must be
+    # signed — fail-closed. op=1/10 are heartbeat ACKs carrying no payload;
+    # nothing is dispatched from them, so no signature required.
+    if op in (0, 13) and not _verify_qqbot_signature(body, signature, timestamp):
+        raise HTTPException(status_code=401, detail="invalid signature")
 
     # Heartbeat / Hello — respond with heartbeat ACK
     if op == 1:  # HELLO

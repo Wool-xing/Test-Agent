@@ -119,7 +119,7 @@ def forget_memory_fact(keyword: str) -> int:
         except OSError as e:
             logger.warning("MEMORY.md read error: {}", e)
             return 0
-        kept = [l for l in lines if keyword.lower() not in l.lower()]
+        kept = [line for line in lines if keyword.lower() not in line.lower()]
         removed = len(lines) - len(kept)
         if removed > 0:
             try:
@@ -238,11 +238,13 @@ class ConversationMemory:
     def dump(self, path: Path) -> None:
         """Persist to JSON file. Also indexes in FTS5 for full-text search."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        # Index messages for full-text search (P3 #16)
+        # Index messages for full-text search (P3 #16) — batched, one connection
         try:
-            from runtime.cli.search import index_message
-            for m in self._messages:
-                index_message(self.session_id, m.role, m.content, str(m.ts))
+            from runtime.cli.search import index_session
+            index_session(
+                self.session_id,
+                [{"role": m.role, "content": m.content, "ts": str(m.ts)} for m in self._messages],
+            )
         except Exception:
             pass  # search indexing is best-effort
         data = {

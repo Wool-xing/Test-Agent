@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import os
+import os as _os
 import secrets
 import tempfile
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -27,13 +30,12 @@ from runtime.api.result_store import ResultStore
 from runtime.config.settings import get_settings
 from runtime.observability.prometheus_metrics import create_metrics_router
 
-import os as _os
-
 _DEFAULT_UPLOAD_EXTS: set[str] = {
     ".md", ".txt", ".pdf", ".docx", ".xlsx", ".zip",
     ".png", ".jpg", ".jpeg", ".html", ".json", ".yml", ".yaml",
     ".py", ".js", ".ts", ".apk", ".ipa",
 }
+_MAX_UPLOAD_BYTES = 50_000_000  # 50MB — enforced in the endpoint (File max_length does not apply to UploadFile)
 
 
 def _allowed_upload_exts() -> set[str]:
@@ -65,6 +67,41 @@ app.add_middleware(
 
 app.add_middleware(CorrelationMiddleware)
 
+# Enterprise auth stack (SSO + RBAC + audit) — opt-in via TAGENT_ENTERPRISE_ENABLED=1.
+# When enabled, ALL non-excluded routes require a valid SSO Bearer token (fail-closed).
+if os.environ.get("TAGENT_ENTERPRISE_ENABLED", "").strip() == "1":
+    from runtime.api.audit import AuditTrail
+    from runtime.api.auth.rbac import RBAC
+    from runtime.api.auth.sso import SSOConfig, SSOManager
+    from runtime.api.middleware.enterprise import EnterpriseMiddleware
+
+    sso_cfg = SSOConfig(
+        provider=os.environ.get("TAGENT_SSO_PROVIDER", "oidc"),
+        client_id=os.environ.get("TAGENT_SSO_CLIENT_ID", ""),
+        client_secret=os.environ.get("TAGENT_SSO_CLIENT_SECRET", ""),
+        issuer_url=os.environ.get("TAGENT_SSO_ISSUER_URL", ""),
+        redirect_uri=os.environ.get("TAGENT_SSO_REDIRECT_URI", ""),
+    )
+    if not (sso_cfg.client_id and sso_cfg.issuer_url and sso_cfg.client_secret):
+        raise RuntimeError(
+            "TAGENT_ENTERPRISE_ENABLED=1 but SSO config incomplete — "
+            "set TAGENT_SSO_CLIENT_ID / TAGENT_SSO_CLIENT_SECRET / TAGENT_SSO_ISSUER_URL "
+            "(refusing to boot with auth half-configured)"
+        )
+    app.add_middleware(
+        EnterpriseMiddleware,
+        sso_manager=SSOManager(sso_cfg),
+        rbac=RBAC(),
+        audit=AuditTrail(str(Path("workspace") / "audit.db")),
+        # Platform webhooks carry their own per-platform signatures and cannot
+        # send SSO Bearer tokens; metrics must stay scrapeable (monitoring).
+        exclude_paths=["/health", "/health/deep", "/docs", "/openapi.json",
+                       "/metrics", "/metrics/json",
+                       "/webhooks/discord", "/webhooks/feishu", "/webhooks/dingtalk",
+                       "/webhooks/qqbot", "/webhooks/telegram", "/webhooks/wechat"],
+    )
+    logger.info("enterprise auth stack mounted (SSO + RBAC + audit)")
+
 # Prometheus metrics (zero-config)
 _metrics_router = create_metrics_router()
 if _metrics_router is not None:
@@ -75,11 +112,21 @@ app.include_router(webhooks_router)
 app.include_router(marketplace_router)
 
 # Bearer token auth middleware — enforced only when TAGENT_API_AUTH_TOKEN is set
+if not _settings.api_auth_token and os.environ.get("TAGENT_ENV", "") != "dev":
+    logger.warning(
+        "TAGENT_API_AUTH_TOKEN not set — API is UNAUTHENTICATED. "
+        "Set it (or TAGENT_ENV=dev to silence) before exposing port 8800 beyond localhost."
+    )
+
+
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next: Any) -> Any:
     token = _settings.api_auth_token
     _public_paths = ("/health", "/health/deep", "/docs", "/openapi.json")
-    if token and not request.url.path.startswith("/api/marketplace") and request.url.path not in _public_paths:
+    # Platform webhooks verify their own per-platform signatures and cannot send
+    # a Bearer token — must match the enterprise exclude list below.
+    _webhook_prefix = "/webhooks/"
+    if token and request.url.path not in _public_paths and not request.url.path.startswith(_webhook_prefix):
         auth = request.headers.get("Authorization", "")
         if not auth or not secrets.compare_digest(auth.removeprefix("Bearer "), token):
             return JSONResponse(status_code=401, content={"detail": "unauthorized"})
@@ -87,7 +134,18 @@ async def auth_middleware(request: Request, call_next: Any) -> Any:
 
 _kernel = Kernel()
 _run_results = ResultStore(max_entries=1000, ttl_seconds=86400)
+_run_active: dict[str, float] = {}  # run_id → reserved_at (epoch s); TTL-swept
 _run_lock = threading.Lock()
+_mode_lang_lock = threading.Lock()
+_ACTIVE_TTL_SECONDS = 1800  # abandon a reservation older than this (crash/kill recovery)
+
+
+def _sweep_active() -> None:
+    """Drop abandoned reservations (process kill between reserve and execute)."""
+    now = time.time()
+    stale = [rid for rid, ts in _run_active.items() if now - ts > _ACTIVE_TTL_SECONDS]
+    for rid in stale:
+        del _run_active[rid]
 
 
 @app.get("/health")
@@ -129,14 +187,36 @@ def catalog() -> CatalogResponse:
 
 @app.post("/run/text", response_model=RunCreated)
 def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", lang: str = "zh") -> RunCreated:
-    # mode+lang per-request
+    # mode+lang per-request; module globals → serialize the set+submit critical
+    # section so concurrent /run/text requests cannot interleave
     from runtime.tutor.i18n import set_lang
     from runtime.tutor.verbosity import set_mode
 
-    set_mode(mode)
-    set_lang(lang)
-    art = parse_text(payload.text)
+    with _mode_lang_lock:
+        # Lock only the module-global writes — submit() below does LLM routing
+        # and must NOT run under this lock (it would serialize all /run/text).
+        set_mode(mode)
+        set_lang(lang)
+    # Prompt-injection defense at the API boundary (flag, never silently drop)
+    from runtime.agent.prompt_guard import sanitize_input
+
+    san = sanitize_input(payload.text)
+    for w in san.warnings:
+        logger.warning("prompt guard: {}", w)
+    art = parse_text(san.cleaned)
+    # Fast-path capacity pre-check — avoids paying LLM routing + DB row
+    # creation for requests that arrive at capacity.
+    with _run_lock:
+        _sweep_active()
+        if len(_run_active) >= _settings.max_concurrent_runs:
+            raise HTTPException(status_code=429, detail="too many concurrent runs")
     run_id, decision = _kernel.submit(art)
+    # Atomic re-check + reservation (narrow race window after the pre-check)
+    with _run_lock:
+        _sweep_active()
+        if len(_run_active) >= _settings.max_concurrent_runs:
+            raise HTTPException(status_code=429, detail="too many concurrent runs")
+        _run_active[run_id] = time.time()
     bg.add_task(_run_in_background, run_id, decision)
     return RunCreated(
         run_id=run_id,
@@ -152,18 +232,43 @@ def run_text(payload: RunCreateText, bg: BackgroundTasks, mode: str = "exec", la
 
 
 @app.post("/run/file", response_model=RunCreated)
-async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
+async def run_file(file: UploadFile = File(...), bg: BackgroundTasks = None, extra: str = Form("")) -> RunCreated:  # type: ignore[assignment]  # noqa: B008
     suffix = Path(file.filename or "upload").suffix.lower()
     allowed = _allowed_upload_exts()
     if suffix not in allowed:
+        await file.close()
         raise HTTPException(status_code=400, detail=f"file type not supported: {suffix}")
+    if len(extra) > 10_000:
+        await file.close()
+        raise HTTPException(status_code=413, detail="extra note too large (max 10000 chars)")
+    # Stream with cumulative cap — reject before buffering a multi-GB upload
+    data = bytearray()
+    try:
+        while chunk := await file.read(1024 * 1024):
+            if len(data) + len(chunk) > _MAX_UPLOAD_BYTES:
+                raise HTTPException(status_code=413, detail=f"file too large (max {_MAX_UPLOAD_BYTES // 1_000_000}MB)")
+            data.extend(chunk)
+    finally:
+        await file.close()
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(await file.read())
+        tmp.write(data)
         tmp_path = Path(tmp.name)
     art = parse_path(tmp_path)
     if extra:
         art.text = (art.text or "") + "\n\n# User note:\n" + extra
+    # Fast-path capacity pre-check — avoids paying LLM routing + DB row
+    # creation for requests that arrive at capacity.
+    with _run_lock:
+        _sweep_active()
+        if len(_run_active) >= _settings.max_concurrent_runs:
+            raise HTTPException(status_code=429, detail="too many concurrent runs")
     run_id, decision = _kernel.submit(art)
+    # Atomic re-check + reservation (narrow race window after the pre-check)
+    with _run_lock:
+        _sweep_active()
+        if len(_run_active) >= _settings.max_concurrent_runs:
+            raise HTTPException(status_code=429, detail="too many concurrent runs")
+        _run_active[run_id] = time.time()
     bg.add_task(_run_in_background, run_id, decision)
     return RunCreated(
         run_id=run_id,
@@ -181,7 +286,19 @@ async def run_file(file: UploadFile = File(..., max_length=50_000_000), bg: Back
 @app.post("/run/url", response_model=RunCreated)
 def run_url(url: str = Form(...), bg: BackgroundTasks = None) -> RunCreated:  # type: ignore[assignment]
     art = parse_url(url)
+    # Fast-path capacity pre-check — avoids paying LLM routing + DB row
+    # creation for requests that arrive at capacity.
+    with _run_lock:
+        _sweep_active()
+        if len(_run_active) >= _settings.max_concurrent_runs:
+            raise HTTPException(status_code=429, detail="too many concurrent runs")
     run_id, decision = _kernel.submit(art)
+    # Atomic re-check + reservation (narrow race window after the pre-check)
+    with _run_lock:
+        _sweep_active()
+        if len(_run_active) >= _settings.max_concurrent_runs:
+            raise HTTPException(status_code=429, detail="too many concurrent runs")
+        _run_active[run_id] = time.time()
     bg.add_task(_run_in_background, run_id, decision)
     return RunCreated(
         run_id=run_id,
@@ -196,8 +313,12 @@ def run_url(url: str = Form(...), bg: BackgroundTasks = None) -> RunCreated:  # 
 
 @app.get("/status/{run_id}", response_model=RunStatusModel)
 def status(run_id: str) -> RunStatusModel:
-    res = _run_results.get(run_id)
+    with _run_lock:
+        res = _run_results.get(run_id)
+        active = run_id in _run_active
     if res is None:
+        if not active:
+            raise HTTPException(status_code=404, detail="run not found")
         return RunStatusModel(run_id=run_id, status="running", total=0)
     status_str = "succeeded" if res.get("failed", 0) == 0 else "failed"
     return RunStatusModel(
@@ -283,6 +404,7 @@ def _run_in_background(run_id: str, decision) -> None:
         summary = _kernel.execute_sync(run_id, decision)
         with _run_lock:
             _run_results.put(run_id, summary)
+            _run_active.pop(run_id, None)
     except Exception:  # noqa: BLE001
         logger.exception("background run {} failed", run_id)
         with _run_lock:
@@ -291,3 +413,4 @@ def _run_in_background(run_id: str, decision) -> None:
                 "run_id": run_id,
                 "failed": 1, "succeeded": 0, "total": 0, "status": "error",
             })
+            _run_active.pop(run_id, None)

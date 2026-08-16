@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000"
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost http://localhost:8000"
     }
   },
   "bundle": {

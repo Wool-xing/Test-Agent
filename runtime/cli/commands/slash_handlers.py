@@ -7,6 +7,27 @@ Sub-modules (each ≤800 lines):
 - slash_handlers_data.py:   data/prioritize/progress/flaky/regression/insights + doctor/nudge
 """
 
+from runtime.cli.commands.slash_handlers_config import (  # noqa: F401
+    _PRICE_PER_1K,
+    _cmd_clear,
+    _cmd_compact,
+    _cmd_context,
+    _cmd_cost,
+    _cmd_export,
+    _cmd_forget,
+    _cmd_hook,
+    _cmd_lang,
+    _cmd_memory,
+    _cmd_personality,
+    _cmd_remember,
+    _cmd_resume,
+    _cmd_retry,
+    _cmd_sessions,
+    _cmd_skin,
+    _cmd_tools,
+    _cmd_undo,
+    _estimate_cost,
+)
 from runtime.cli.commands.slash_handlers_core import (  # noqa: F401
     _apply_fc_rules,
     _closest_command,
@@ -24,29 +45,17 @@ from runtime.cli.commands.slash_handlers_core import (  # noqa: F401
     _get_memory,
     _rerun_history,
 )
-
-from runtime.cli.commands.slash_handlers_config import (  # noqa: F401
-    _cmd_clear,
-    _cmd_compact,
-    _cmd_context,
-    _cmd_cost,
-    _cmd_export,
-    _cmd_forget,
-    _cmd_hook,
-    _cmd_lang,
-    _cmd_memory,
-    _cmd_personality,
-    _cmd_remember,
-    _cmd_resume,
-    _cmd_sessions,
-    _cmd_skin,
-    _cmd_tools,
-    _cmd_undo,
-    _cmd_retry,
-    _estimate_cost,
-    _PRICE_PER_1K,
+from runtime.cli.commands.slash_handlers_data import (  # noqa: F401
+    _cmd_clean,
+    _cmd_data,
+    _cmd_doctor,
+    _cmd_flaky,
+    _cmd_insights,
+    _cmd_nudge,
+    _cmd_prioritize,
+    _cmd_progress,
+    _cmd_regression,
 )
-
 from runtime.cli.commands.slash_handlers_ops import (  # noqa: F401
     _cmd_alias,
     _cmd_api,
@@ -64,16 +73,4 @@ from runtime.cli.commands.slash_handlers_ops import (  # noqa: F401
     _cmd_speak,
     _cmd_task,
     _cmd_ws,
-)
-
-from runtime.cli.commands.slash_handlers_data import (  # noqa: F401
-    _cmd_clean,
-    _cmd_data,
-    _cmd_doctor,
-    _cmd_flaky,
-    _cmd_insights,
-    _cmd_nudge,
-    _cmd_prioritize,
-    _cmd_progress,
-    _cmd_regression,
 )

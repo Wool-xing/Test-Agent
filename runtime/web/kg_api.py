@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
-from collections import Counter
+from collections import Counter, deque
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query
@@ -37,7 +37,7 @@ def _load_graph() -> dict:
         logger.warning("graph not found at %s", gp)
         _graph_cache = {}
         return _graph_cache
-    with open(gp, "r", encoding="utf-8") as f:
+    with open(gp, encoding="utf-8") as f:
         _graph_cache = json.load(f)
     return _graph_cache
 
@@ -149,10 +149,10 @@ def _bfs_shortest_path(
     if from_id not in adj or to_id not in adj:
         return None
 
-    queue = [[from_id]]
+    queue = deque([[from_id]])
     visited = {from_id}
     while queue:
-        path = queue.pop(0)
+        path = queue.popleft()
         current = path[-1]
         if current == to_id:
             return path
@@ -164,22 +164,23 @@ def _bfs_shortest_path(
 
 
 def _resolve_node_id(query: str, graph: dict) -> str | None:
-    """Resolve a fuzzy query to a node ID. Tries exact ID match, then label search."""
+    """Resolve a fuzzy query to a node ID. Tries exact ID match, then label search.
+
+    Single pass over nodes (was: three full scans).
+    """
     nodes = graph.get("nodes", [])
-    # Try exact ID match
+    query_lower = query.lower()
+    partial = None
     for n in nodes:
         if n.get("id") == query:
             return query
-    # Try label match
-    query_lower = query.lower()
-    for n in nodes:
-        if n.get("label", "").lower() == query_lower or n.get("norm_label", "") == query_lower:
+        label = n.get("label", "").lower()
+        norm = n.get("norm_label", "")
+        if label == query_lower or norm == query_lower:
             return n["id"]
-    # Try partial match
-    for n in nodes:
-        if query_lower in n.get("norm_label", "") or query_lower in n.get("label", "").lower():
-            return n["id"]
-    return None
+        if partial is None and (query_lower in norm or query_lower in label):
+            partial = n["id"]
+    return partial
 
 
 @router.get("/path")

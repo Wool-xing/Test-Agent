@@ -287,11 +287,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: 文件大小基线
         run: |
-          large=$(find runtime/ utils/ -name "*.py" -exec wc -l {} + | awk '$1>800{print $1,$2}' | sort -rn)
+          large=$(find runtime/ utils/ -name "*.py" -exec wc -l {} + | awk '$2!="total" && $1>800{print $1,$2}' | sort -rn)
           [ -n "$large" ] && echo "WARN: files >800 lines" && echo "$large" | head -10 || echo "OK"
       - name: 关键文档存在
         run: |
-          for f in CLAUDE.md CONTRIBUTING.md ai/CLAUDE.md ai/INDEX.md apps/INDEX.md deploy/INDEX.md workspace/INDEX.md; do
+          for f in CLAUDE.md CONTRIBUTING.md ai/CLAUDE.md ai/INDEX.md apps/INDEX.md deploy/INDEX.md; do
             [ -f "$f" ] || { echo "FAIL: $f"; exit 1; }; echo "  OK $f"
           done; echo "OK"
       - name: 无 .gitkeep

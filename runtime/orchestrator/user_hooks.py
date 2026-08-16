@@ -13,7 +13,7 @@ import subprocess
 import sys
 import time
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -105,8 +105,6 @@ def _activate_hook(hook: UserHook) -> None:
     """Register hook with the global HookRegistry."""
     from runtime.orchestrator.hooks import get_hook_registry
     registry = get_hook_registry()
-
-    ctx_str = json.dumps  # will be called with ctx dict
 
     def _hook_fn(node_id: str, ctx: dict[str, Any]) -> None:
         try:

@@ -4,7 +4,7 @@ use tauri::Manager;
 
 #[tauri::command]
 fn get_version() -> String {
-    "2.0.0".to_string()
+    env!("CARGO_PKG_VERSION").to_string() // from tauri.conf.json / Cargo.toml — no hardcoded version
 }
 
 #[tauri::command]

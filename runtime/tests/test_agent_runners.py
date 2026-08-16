@@ -162,3 +162,97 @@ def test_all_runners_covers_agent_runners_registry() -> None:
         f"ALL_RUNNERS 含但 AGENT_RUNNERS 缺: {extra_in_test} "
         f"— 已删除 runner 残留, 应同步清掉"
     )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# report summary — no fabricated results
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestReportSummaryTruthfulness:
+    """_build_report_summary_from_upstream must not invent pass counts."""
+
+    def _build(self, outputs, meta=None):
+        from runtime.orchestrator.adapters.experts import _build_report_summary_from_upstream
+
+        return _build_report_summary_from_upstream(outputs, meta or {})
+
+    def test_bugs_do_not_imply_passed_tests(self):
+        summary = self._build({
+            "bug-manager": {"bugs": [{"severity": 1, "title": "critical bug"}]},
+        })
+        assert summary is not None
+        assert summary["results"]["passed"] == 0
+        assert summary["results"]["total"] == 0
+        assert summary["results"]["pass_rate"] == 0.0
+
+    def test_p0_bugs_set_fail_verdict(self):
+        summary = self._build({
+            "bug-manager": {"bugs": [{"severity": 1, "title": "critical bug"}]},
+        })
+        assert summary["verdict"] == "不通过"
+
+    def test_bug_counts_still_aggregated(self):
+        summary = self._build({
+            "bug-manager": {"bugs": [{"severity": 1}, {"severity": 3}]},
+        })
+        assert summary["bugs"]["p0"] == 1
+        assert summary["bugs"]["p2"] == 1
+
+    def test_no_bug_data_no_fabrication(self):
+        summary = self._build({"requirements-analyst": {"features": ["f1"]}})
+        assert summary["results"] == {"total": 0, "passed": 0, "failed": 0, "pass_rate": 0.0}
+
+    def test_degraded_agent_does_not_override_fail_verdict(self):
+        """P0 bugs + degraded agent must stay '不通过', not become '有条件通过'."""
+        summary = self._build(
+            {"bug-manager": {"bugs": [{"severity": 1, "title": "critical"}]}},
+            {"visual-tester": {"degraded": True}},
+        )
+        assert summary["verdict"] == "不通过"
+
+    def test_degraded_agent_without_bugs_is_conditional(self):
+        """Degraded agent without P0/P1 bugs still reports '有条件通过'."""
+        summary = self._build(
+            {"requirements-analyst": {"features": ["f1"]}},
+            {"visual-tester": {"degraded": True}},
+        )
+        assert summary["verdict"] == "有条件通过"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# pentest legal gate — no authorization, no execution
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestPentestLegalGate:
+    """pentest-* runners must refuse to run unless pentest_authorized=true."""
+
+    def _ctx(self):
+        from runtime.orchestrator.agents.base import RunnerContext
+
+        return RunnerContext(artifact_text="prd", settings_provider="stub")
+
+    def test_pentest_runner_refused_by_default(self):
+        from runtime.orchestrator.skills import get_skill_runner
+
+        runner = get_skill_runner("pentest-recon")
+        result = runner.run(self._ctx())
+        assert result.ok is False
+        assert "authorized" in result.error.lower()
+
+    def test_pentest_runner_allowed_when_authorized(self, monkeypatch):
+        from runtime.config.settings import get_settings
+        from runtime.orchestrator.skills import get_skill_runner
+
+        monkeypatch.setattr(get_settings(), "pentest_authorized", True)
+        runner = get_skill_runner("pentest-recon")
+        result = runner.run(self._ctx())
+        assert result.ok is True  # stub mode → mock output path
+
+    def test_non_pentest_runner_unaffected(self):
+        from runtime.orchestrator.skills import get_skill_runner
+
+        runner = get_skill_runner("mobile-test")
+        result = runner.run(self._ctx())
+        assert result.ok is True  # stub mode, no gate applies

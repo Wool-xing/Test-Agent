@@ -1,7 +1,7 @@
 """Task Scheduler panel — cron jobs, countdown, manual trigger."""
 
-from textual.widgets import Static
 from textual.containers import Vertical
+from textual.widgets import Static
 
 
 class SchedulerPanel(Vertical):
@@ -11,7 +11,7 @@ class SchedulerPanel(Vertical):
         yield Static("Task Scheduler", classes="title")
         yield Static("")
         try:
-            from runtime.scheduler.nl_cron import parse, examples
+            from runtime.scheduler.nl_cron import examples
             # Active cron jobs
             yield Static("  Active Jobs:")
             yield Static("  (none scheduled — use !cron add)")

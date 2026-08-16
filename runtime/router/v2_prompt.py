@@ -11,7 +11,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from specs.manifest import Kind
 from runtime.config.settings import get_settings
 
 # ── System prompt ────────────────────────────────────────────────────────────
@@ -149,15 +148,28 @@ def build_catalog_summary(specs_root: Path | None = None) -> dict[str, Any]:
 # ── KG context ───────────────────────────────────────────────────────────────
 
 
+# (mtime_ns, parsed graph) — parse once per file version, not per request
+_kg_cache: tuple[int, dict[str, Any]] | None = None
+
+
 def _load_kg_context(graph_path: Path, target_text: str, top_k: int = 5) -> dict[str, Any] | None:
     """Query the knowledge graph for relevant historical patterns.
 
     Uses a lightweight keyword-based search over node labels in graph.json.
+    The parsed graph is cached and reloaded only when the file's mtime changes.
     """
+    global _kg_cache
+
     try:
-        graph = json.loads(graph_path.read_text(encoding="utf-8"))
-    except Exception:
+        mtime = graph_path.stat().st_mtime_ns
+    except OSError:
         return None
+    if _kg_cache is None or _kg_cache[0] != mtime:
+        try:
+            _kg_cache = (mtime, json.loads(graph_path.read_text(encoding="utf-8")))
+        except Exception:
+            return None
+    graph = _kg_cache[1]
 
     nodes = graph.get("nodes", [])
     if not nodes or not target_text:
@@ -169,7 +181,6 @@ def _load_kg_context(graph_path: Path, target_text: str, top_k: int = 5) -> dict
     for node in nodes:
         label = (node.get("label") or "").lower()
         norm = (node.get("norm_label") or "").lower()
-        community = node.get("community", -1)
         source_file = node.get("source_file", "")
 
         # Simple relevance: count keyword overlap

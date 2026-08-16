@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -100,8 +100,8 @@ class VisualExecutor:
 
         # Simple pixel comparison via PIL
         try:
-            from PIL import Image
             import numpy as np
+            from PIL import Image
 
             baseline = np.array(Image.open(baseline_path))
             current = np.array(Image.open(current_path))

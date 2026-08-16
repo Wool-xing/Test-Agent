@@ -1,12 +1,12 @@
 """TDD tests for Prompt Injection Defense (§补-15)."""
 
 from runtime.agent.prompt_guard import (
-    sanitize_input,
+    SanitizationResult,
+    get_audit_log,
     is_destructive_operation,
     record_audit,
+    sanitize_input,
     should_throttle,
-    get_audit_log,
-    SanitizationResult,
 )
 
 

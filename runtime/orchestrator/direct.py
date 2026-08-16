@@ -16,7 +16,7 @@ from typing import Any
 
 from runtime.observability.logging import bind_run, configure_logging
 from runtime.observability.otel import init_tracing, span
-from runtime.orchestrator.adapters.experts import execute_node, reset_upstream_cache
+from runtime.orchestrator.adapters.experts import execute_node
 from runtime.orchestrator.context import ExecutionContext
 from runtime.router.schema import DAGNode, RoutingDecision
 from runtime.self_healing.retry import with_retry

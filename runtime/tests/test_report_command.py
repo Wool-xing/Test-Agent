@@ -2,9 +2,6 @@
 
 import subprocess
 import sys
-from pathlib import Path
-
-import pytest
 
 
 def _run_report(*args: str) -> subprocess.CompletedProcess:

@@ -3,11 +3,7 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 # utils package installed via pip install -e runtime/
-
 from utils.a11y_i18n.i18n_checker import (  # noqa: E402
     audit_sacred_contexts,
     audit_taboo_colors,
@@ -293,6 +289,7 @@ class TestRunTabooAudit:
             "numbers": [4, 13],
             "context": "宗教场所",
             "locales": ["zh-CN", "en-US", "ar-SA"],
+            "date": "02-03",  # holiday audit runs only when date provided
         }
         result = run_taboo_audit(payload)
         assert "taboo_words" in result
@@ -323,6 +320,7 @@ class TestRunTabooAudit:
             "colors": ["white"],
             "numbers": [4],
             "locales": ["zh-CN", "hi-IN"],
+            "date": "02-03",
         }
         result = run_taboo_audit(payload)
         expected = (
@@ -357,3 +355,13 @@ class TestRunTabooAudit:
         result = run_taboo_audit(payload)
         assert result["sacred_contexts"]["hits"] >= 1
         assert result["sacred_contexts"]["locale_filter"] == "zh-CN"
+
+
+def test_empty_payload_date_independent():
+    """run_taboo_audit({}) must return 0 hits on ANY date (no implicit today-scan)."""
+    from datetime import date as _date
+
+    result = run_taboo_audit({})
+    assert result["total_hits"] == 0, (
+        f"date-dependent result on {_date.today()}: {result.get('taboo_holidays', {}).get('hits')}"
+    )

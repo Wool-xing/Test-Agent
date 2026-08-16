@@ -39,9 +39,8 @@ class IntegrationExecutor:
     def check_api(self, base_url: str, checks: list[ApiCheck]) -> IntegrationResult:
         """Run a series of API endpoint checks."""
         import time
-        import urllib.request
         import urllib.error
-        import json
+        import urllib.request
 
         start = time.monotonic()
         results = []
@@ -86,7 +85,6 @@ class IntegrationExecutor:
         Security: query is validated to be SELECT-only with no statement chaining.
         """
         import time
-        import re
 
         # Validate query: SELECT only, no semicolons (prevents statement chaining)
         q = query.strip().upper()

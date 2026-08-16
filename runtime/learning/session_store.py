@@ -196,7 +196,11 @@ class SessionStore:
     # ── stats ─────────────────────────────────────────────────────
 
     def get_stats(self, days: int = 30) -> dict:
-        """Aggregate stats for the last N days."""
+        """Aggregate stats for the last N days.
+
+        Outcomes are aggregated in SQL (json_extract) so session count does
+        not dictate memory — no full-table load into Python.
+        """
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
         with self._conn() as c:
             row = c.execute(
@@ -204,30 +208,18 @@ class SessionStore:
                      COUNT(*) AS total_sessions,
                      COUNT(DISTINCT target) AS unique_targets,
                      MIN(created_at) AS earliest,
-                     MAX(created_at) AS latest
+                     MAX(created_at) AS latest,
+                     COALESCE(SUM(CAST(json_extract(outcomes, '$.passed') AS INTEGER)), 0) AS total_passed,
+                     COALESCE(SUM(CAST(json_extract(outcomes, '$.failed') AS INTEGER)), 0) AS total_failed,
+                     COALESCE(SUM(CAST(json_extract(outcomes, '$.skipped') AS INTEGER)), 0) AS total_skipped
                    FROM sessions
                    WHERE created_at >= ?""",
                 (cutoff,),
             ).fetchone()
 
-            # Aggregate outcomes across sessions
-            outcome_rows = c.execute(
-                "SELECT outcomes FROM sessions WHERE created_at >= ?",
-                (cutoff,),
-            ).fetchall()
-
-        total_passed = 0
-        total_failed = 0
-        total_skipped = 0
-        for orow in outcome_rows:
-            try:
-                o = json.loads(orow["outcomes"])
-                total_passed += o.get("passed", 0)
-                total_failed += o.get("failed", 0)
-                total_skipped += o.get("skipped", 0)
-            except (json.JSONDecodeError, TypeError):
-                pass
-
+        total_passed = row["total_passed"]
+        total_failed = row["total_failed"]
+        total_skipped = row["total_skipped"]
         total_cases = total_passed + total_failed + total_skipped
         pass_rate = (total_passed / total_cases * 100) if total_cases > 0 else 0.0
 

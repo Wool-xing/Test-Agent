@@ -82,9 +82,7 @@ class RollbackManager:
             return True
         if install_success_rate < 0.95:
             return True
-        if critical_bug_count >= 3:
-            return True
-        return False
+        return critical_bug_count >= 3
 
     def list_points(self) -> list[RollbackPoint]:
         return list(self._points)

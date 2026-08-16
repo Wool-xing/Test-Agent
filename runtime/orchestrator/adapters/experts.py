@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import os
 import warnings
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -172,18 +173,20 @@ def _build_report_summary_from_upstream(
     bugs = outputs.get("bug-manager", {})
     if isinstance(bugs, dict) and "bugs" in bugs:
         bug_list = bugs.get("bugs", [])
-        summary["results"]["total"] = len(bug_list) or 1
-        summary["results"]["passed"] = len(bug_list) or 1
-        summary["results"]["pass_rate"] = 1.0
         sev_to_key = {1: "p0", 2: "p1", 3: "p2", 4: "p3"}
         for b in bug_list:
             key = sev_to_key.get(b.get("severity", 3), "p3")
             summary["bugs"][key] = summary["bugs"].get(key, 0) + 1
+        # test result counts are unknown here — do not fabricate pass numbers
+        if summary["bugs"]["p0"] or summary["bugs"]["p1"]:
+            summary["verdict"] = "不通过"
         has_data = True
-    # Check if any agent is degraded
+    # Check if any agent is degraded — must not soften a fail verdict
     degraded = [k for k, v in meta.items() if v.get("degraded")]
-    if degraded:
+    if degraded and summary["verdict"] != "不通过":
         summary["verdict"] = "有条件通过"
+        summary["risks"].append({"level": "中", "desc": f"degraded agents: {degraded}"})
+    elif degraded:
         summary["risks"].append({"level": "中", "desc": f"degraded agents: {degraded}"})
     return summary if has_data else None
 
@@ -345,10 +348,11 @@ def _run_script_fallback(name: str, kind: str, inputs: dict, timeout: int,
     defaults = SCRIPT_DEFAULT_ARGS.get(script, {})
     upstream_outputs, upstream_meta = _get_upstream_state(ctx)
     if script == "generate_report.py" and upstream_outputs:
-        import tempfile as _tmp, json as _json
+        import json as _json
+        import tempfile as _tmp
         summary = _build_report_summary_from_upstream(upstream_outputs, upstream_meta)
         if summary:
-            _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8")
+            _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8")  # noqa: SIM115
             try:
                 _json.dump(summary, _tf, ensure_ascii=False)
                 _tf.close()
@@ -365,10 +369,8 @@ def _run_script_fallback(name: str, kind: str, inputs: dict, timeout: int,
     args = [f"--{k}={v}" for k, v in merged.items() if k not in _CLI_EXCLUDE]
     res: ScriptResult = run_script(script, args=args, timeout=timeout)
     if defaults.get("data") and "data" in defaults:
-        try:
+        with suppress(OSError):
             os.unlink(defaults["data"])
-        except OSError:
-            pass
     return StepOutcome(
         name=name, kind=kind, executed_script=script,
         returncode=res.returncode, stdout=res.stdout, stderr=res.stderr,

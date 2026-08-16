@@ -10,10 +10,11 @@ import json
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from utils.paths import get_output_dir
 from typing import Any
 
 from loguru import logger
+
+from utils.paths import get_output_dir
 
 _DEFAULT_DIR = get_output_dir("audit")
 _lock = threading.Lock()

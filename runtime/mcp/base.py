@@ -13,7 +13,13 @@ import json
 import os
 import uuid
 from collections.abc import Awaitable, Callable
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
+
+from loguru import logger
+
+from runtime.config.settings import get_settings
 
 
 def _get_project_version() -> str:
@@ -26,12 +32,6 @@ def _get_project_version() -> str:
         return ver.lstrip("Vv")
     except (OSError, UnicodeDecodeError):
         return "0.1.0"
-from datetime import datetime, timezone
-from typing import Any
-
-from loguru import logger
-
-from runtime.config.settings import get_settings
 
 
 def new_run_id(prefix: str = "mcp") -> str:
@@ -70,14 +70,23 @@ def tool_decision_logged(tool_name: str) -> Callable:
 
     决策可追溯: every call (success or failure) writes a record.
     Logging failures must not mask the original handler exception/result.
+    Sensitive kwargs (keys/secret/token/password...) are redacted before logging.
     """
+
+    def _redact(kwargs: dict) -> dict:
+        redacted = {}
+        for k, v in kwargs.items():
+            redacted[k] = "<redacted>" if any(
+                p in str(k).lower() for p in ("key", "secret", "token", "password", "credential", "auth")
+            ) else v
+        return redacted
 
     def deco(fn: Callable[..., Awaitable[Any]]) -> Callable[..., Awaitable[Any]]:
         @functools.wraps(fn)
         async def wrapper(*args, **kwargs):
             run_id = kwargs.pop("_run_id", None) or new_run_id(tool_name)
             log_args = list(args)
-            log_kwargs = {k: v for k, v in kwargs.items()}
+            log_kwargs = _redact(kwargs)
             log_kwargs["_run_id"] = run_id
             try:
                 result = await fn(*args, **kwargs)

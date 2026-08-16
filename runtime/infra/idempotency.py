@@ -11,9 +11,10 @@ import hashlib
 import json
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 
 class TaskStatus(Enum):
@@ -98,9 +99,7 @@ class IdempotencyStore:
             expired = []
             for key, rec in self._store.items():
                 age = now - (rec.completed_at or rec.created_at)
-                if rec.status == TaskStatus.SUCCESS and age > self._success_ttl:
-                    expired.append(key)
-                elif rec.status in (TaskStatus.FAILED, TaskStatus.DEAD) and age > self._failed_ttl:
+                if rec.status == TaskStatus.SUCCESS and age > self._success_ttl or rec.status in (TaskStatus.FAILED, TaskStatus.DEAD) and age > self._failed_ttl:
                     expired.append(key)
             for key in expired:
                 del self._store[key]

@@ -3,10 +3,10 @@
 import uuid
 
 from runtime.infra.trace import (
-    get_trace_id,
-    set_trace_id,
     clear_trace_id,
     generate_trace_id,
+    get_trace_id,
+    set_trace_id,
     trace_context,
 )
 
@@ -22,7 +22,7 @@ class TestTraceId:
 
     def test_set_and_get(self):
         """set_trace_id should be retrievable via get_trace_id."""
-        tid = set_trace_id("test-trace-001")
+        set_trace_id("test-trace-001")
         assert get_trace_id() == "test-trace-001"
 
     def test_auto_generate(self):

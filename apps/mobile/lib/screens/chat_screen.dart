@@ -28,6 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final api = context.read<ApiService>();
     final result = await api.runTest(text);
 
+    if (!mounted) return; // async gap — widget may be disposed mid-flight
     setState(() {
       _isLoading = false;
       _messages.add(ChatMessage(
@@ -109,7 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-    );
+    ).whenComplete(keyCtrl.dispose);
   }
 
   @override

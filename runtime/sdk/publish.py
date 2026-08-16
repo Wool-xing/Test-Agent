@@ -20,7 +20,9 @@ class PublishResult:
 def _validate_tar_members(members: list[tarfile.TarInfo]) -> None:
     """CRITICAL: Block path traversal (zip slip) in tar entries.
 
-    Validates that no entry contains absolute paths or '..' components.
+    Validates that no entry contains absolute paths or '..' components,
+    and that no symlink/hardlink members exist (they allow writes through
+    links to arbitrary paths on Python <3.12 without filter="data").
     Raises ValueError on unsafe entries.
     """
     for member in members:
@@ -29,6 +31,16 @@ def _validate_tar_members(members: list[tarfile.TarInfo]) -> None:
             raise ValueError(
                 f"Unsafe tar entry '{member.name}': "
                 f"absolute paths and '..' components are forbidden."
+            )
+        if member.issym() or member.islnk():
+            raise ValueError(
+                f"Unsafe tar entry '{member.name}': "
+                f"symlink/hardlink members are forbidden."
+            )
+        if member.isfifo() or member.ischr() or member.isblk():
+            raise ValueError(
+                f"Unsafe tar entry '{member.name}': "
+                f"FIFO/device members are forbidden."
             )
 
 
@@ -54,7 +66,10 @@ def publish_skill(
 
     with tarfile.open(archive_path, "r:gz") as tar:
         members = tar.getmembers()
-        _validate_tar_members(members)
+        try:
+            _validate_tar_members(members)
+        except ValueError as e:
+            return PublishResult(ok=False, errors=[str(e)])
 
         # Detect skill name from first non-dot component in archive
         skill_name = None

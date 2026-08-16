@@ -2,11 +2,8 @@
 
 import time
 
-import pytest
-
 from runtime.infra.timeout import (
     TimeoutConfig,
-    TimeoutResult,
     get_timeout_config,
     run_with_timeout,
     set_timeout_config,

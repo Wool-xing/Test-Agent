@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-from runtime.learning.session_store import SessionRecord, SessionStore
-from runtime.learning.pattern_extractor import PatternExtractor
 from runtime.learning.curator import Curator
-
+from runtime.learning.pattern_extractor import PatternExtractor
+from runtime.learning.session_store import SessionRecord, SessionStore
 
 # ── helpers ───────────────────────────────────────────────────────
 

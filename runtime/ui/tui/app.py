@@ -9,19 +9,18 @@ Hotkeys:
 from __future__ import annotations
 
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, TabbedContent, TabPane
 from textual.binding import Binding
+from textual.widgets import Footer, Header, TabbedContent, TabPane
 
-from runtime.ui.tui.panels.dashboard import DashboardPanel
-from runtime.ui.tui.panels.skills import SkillBrowserPanel
-from runtime.ui.tui.panels.status import AgentStatusPanel
-from runtime.ui.tui.panels.logs import LogViewerPanel
 from runtime.ui.tui.panels.config import ConfigPanel
-from runtime.ui.tui.panels.help import HelpPanel
-from runtime.ui.tui.panels.scheduler_panel import SchedulerPanel
+from runtime.ui.tui.panels.dashboard import DashboardPanel
 from runtime.ui.tui.panels.execution import ExecutionPanel
+from runtime.ui.tui.panels.help import HelpPanel
+from runtime.ui.tui.panels.logs import LogViewerPanel
+from runtime.ui.tui.panels.scheduler_panel import SchedulerPanel
+from runtime.ui.tui.panels.skills import SkillBrowserPanel
 from runtime.ui.tui.panels.skins import SkinSelectorPanel
-
+from runtime.ui.tui.panels.status import AgentStatusPanel
 
 THEMES = {
     "dark": """

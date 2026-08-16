@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-import sys
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestDeploymentMode:
     """Mode switching between community and enterprise."""
@@ -37,7 +35,7 @@ class TestRBAC:
 
     def test_rbac_roles_defined(self):
         """RBAC module should define admin/viewer roles and RBAC manager."""
-        from runtime.api.auth.rbac import Role, Permission, RBAC
+        from runtime.api.auth.rbac import RBAC, Permission, Role
         assert Role.ADMIN.value == "admin"
         assert Role.VIEWER.value == "viewer"
         assert Permission.VIEW_RESULTS.value == "view:results"
@@ -45,7 +43,7 @@ class TestRBAC:
 
     def test_rbac_admin_has_full_access(self):
         """Admin role should have all permissions (default mode: disabled passes all)."""
-        from runtime.api.auth.rbac import RBAC, Role, Permission
+        from runtime.api.auth.rbac import RBAC, Permission, Role
         rbac = RBAC()
         # In default mode (disabled), all checks pass
         assert rbac.has_permission(Role.ADMIN, Permission.VIEW_RESULTS)

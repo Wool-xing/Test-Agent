@@ -7,6 +7,8 @@ import { BACKEND_PORT } from "./version";
 
 let backendProcess: ChildProcess | null = null;
 let mainWindow: BrowserWindow | null = null;
+let restartCount = 0; // module scope — closure-local reset caused unbounded restarts
+const MAX_RESTARTS = 3;
 
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 
@@ -67,14 +69,12 @@ function startBackend(): Promise<void> {
         reject(err);
       });
 
-      let restartCount = 0;
-      const maxRestarts = 3;
       backendProcess.on("exit", (code: number | null) => {
         console.log(`Backend exited with code ${code}`);
         backendProcess = null;
-        if (code !== 0 && restartCount < maxRestarts) {
+        if (code !== 0 && restartCount < MAX_RESTARTS) {
           restartCount++;
-          console.log(`Restarting backend (attempt ${restartCount}/${maxRestarts})...`);
+          console.log(`Restarting backend (attempt ${restartCount}/${MAX_RESTARTS})...`);
           startBackend().catch((err) => console.error("Backend restart failed:", err));
         }
       });
@@ -143,15 +143,30 @@ function createWindow(): void {
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // https only — renderer-supplied URLs must not open arbitrary protocols
     try {
       const parsed = new URL(url);
-      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      if (parsed.protocol === "https:") {
         shell.openExternal(url);
+      } else {
+        console.warn("Blocked external URL (non-https):", url);
       }
     } catch {
-      // Invalid URL — silently ignore
+      console.warn("Blocked external URL (invalid):", url);
     }
     return { action: "deny" };
+  });
+
+  // Block navigation away from the app origin — prevents preload/IPC exposure
+  // to remote pages after window.location changes.
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    const allowed = isDev
+      ? url.startsWith("http://localhost:5173")
+      : url.startsWith("file://");
+    if (!allowed) {
+      console.warn("Blocked navigation to:", url);
+      event.preventDefault();
+    }
   });
 }
 

@@ -85,7 +85,6 @@ td,th{{padding:8px;border:1px solid #ddd}}</style></head>
 
     def to_junit(self, results: list[dict], output_path: str) -> str:
         """Generate a JUnit XML report for CI integration."""
-        passed = sum(1 for r in results if r.get("status") == "pass")
         failed = sum(1 for r in results if r.get("status") == "fail")
 
         cases = ""

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestPipelineStructure:
     def test_sequence_has_11_steps(self):
@@ -156,8 +154,9 @@ class TestPipelineRun:
 
     def test_run_aborted_preflight(self):
         """Simulate preflight failure by checking workspace."""
-        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
         from unittest.mock import patch
+
+        from runtime.orchestrator.workflows.test_coordinator import TestCoordinatorPipeline
         p = TestCoordinatorPipeline()
         with patch.object(p, '_preflight', return_value=["missing dep"]):
             result = p.run("test")

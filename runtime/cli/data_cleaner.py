@@ -42,9 +42,7 @@ def _should_preserve(path: Path) -> bool:
         if part in PRESERVE_DIRS:
             return True
     # Preserve specific files
-    for pat in PRESERVE_FILES:
-        if path.match(pat):
-            return True
+    return any(path.match(pat) for pat in PRESERVE_FILES)
     return False
 
 

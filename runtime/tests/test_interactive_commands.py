@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestSlashHelp:
     def test_help_function_imports(self):
@@ -46,19 +44,22 @@ class TestSlashCost:
         assert callable(_cmd_cost)
 
     def test_estimate_cost_returns_tuple(self):
-        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         tokens, cost = _estimate_cost(mem)
         assert isinstance(tokens, int)
         assert isinstance(cost, float)
 
     def test_price_table_has_all_providers(self):
-        from runtime.cli.commands.slash_handlers import _PRICE_PER_1K; from runtime.cli.interactive import _PROVIDERS
+        from runtime.cli.commands.slash_handlers import _PRICE_PER_1K
+        from runtime.cli.interactive import _PROVIDERS
         for p in _PROVIDERS:
             assert p in _PRICE_PER_1K, f"Missing pricing for {p}"
 
     def test_cost_formats_currency(self):
-        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.add("user", "test")
         mem.add("assistant", "done")
@@ -68,7 +69,8 @@ class TestSlashCost:
 
 class TestSlashClear:
     def test_clear_resets_memory(self):
-        from runtime.cli.commands.slash_handlers import _cmd_clear; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_clear
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.add("user", "hello")
         _cmd_clear("")
@@ -99,7 +101,8 @@ class TestSlashCompact:
         assert callable(_cmd_compact)
 
     def test_compact_too_few_turns(self):
-        from runtime.cli.commands.slash_handlers import _cmd_compact; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_compact
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         _cmd_compact("")  # should not crash with 0 messages
@@ -154,7 +157,8 @@ class TestFuzzyMatching:
 
 class TestCostEstimation:
     def test_empty_memory_minimal_tokens(self):
-        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         tokens, cost = _estimate_cost(mem)
@@ -162,7 +166,8 @@ class TestCostEstimation:
         assert cost >= 0.0
 
     def test_cost_scales_with_messages(self):
-        from runtime.cli.commands.slash_handlers import _estimate_cost; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _estimate_cost
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         mem.add("user", "x" * 400)
@@ -186,7 +191,8 @@ class TestCostEstimation:
 
 class TestCompact:
     def test_compact_too_few_messages(self):
-        from runtime.cli.commands.slash_handlers import _cmd_compact; from runtime.cli.interactive import _get_memory
+        from runtime.cli.commands.slash_handlers import _cmd_compact
+        from runtime.cli.interactive import _get_memory
         mem = _get_memory()
         mem.clear()
         mem.add("user", "a")
@@ -234,7 +240,7 @@ class TestMemoryCommands:
         assert result is None
 
     def test_remember_and_forget(self):
-        from runtime.cli.commands.slash_handlers import _cmd_remember, _cmd_forget
+        from runtime.cli.commands.slash_handlers import _cmd_forget, _cmd_remember
         from runtime.cli.conversation import load_memory_md
         _cmd_remember("Test fact: project uses Python")
         mem = load_memory_md()

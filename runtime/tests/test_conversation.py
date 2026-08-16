@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import tempfile
 from pathlib import Path
 
-import pytest
-
-from runtime.cli.conversation import ConversationMemory, Message, save_memory_fact, load_memory_md, forget_memory_fact
+from runtime.cli.conversation import (
+    ConversationMemory,
+    Message,
+    forget_memory_fact,
+    load_memory_md,
+    save_memory_fact,
+)
 
 
 class TestConversationMemory:

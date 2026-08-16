@@ -5,8 +5,8 @@ Single registry drives CLI + REPL autocomplete, help output, command dispatch.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
 
 @dataclass
@@ -133,7 +133,8 @@ def all_commands() -> list[CommandDef]:
 
 def _exec_cli(command: str, args: str) -> None:
     """Run a tagent CLI command via subprocess."""
-    import subprocess, sys
+    import subprocess
+    import sys
     cmd = [sys.executable, "-m", "runtime.cli.main", command]
     if args.strip():
         cmd.extend(args.split())
@@ -160,9 +161,9 @@ def _run_with_argv(cmd: list[str], fn) -> None:
           description_zh="显示帮助，列出所有命令",
           aliases=["h", "?"], nl_triggers=["帮助", "怎么用", "命令列表", "有啥命令", "help"])
 def _cmd_help(args: str) -> None:
-    from runtime.cli._shared import console
     from rich.table import Table
-    from rich.text import Text
+
+    from runtime.cli._shared import console
 
     table = Table(title="Commands", show_header=True)
     table.add_column("Command", style="cyan", no_wrap=True)
@@ -285,17 +286,54 @@ def _cmd_demo(args: str) -> None:
 def _init_repl_handlers() -> None:
     """Register REPL-only slash commands. Deferred to avoid circular import."""
     from runtime.cli.commands.slash_handlers import (
-        _cmd_status, _cmd_model, _cmd_cache, _rerun_history, _cmd_history,
-        _cmd_fc, _cmd_update, _cmd_hook, _cmd_skin, _cmd_lang,
-        _cmd_personality, _cmd_tools, _cmd_context, _cmd_clear, _cmd_undo,
-        _cmd_retry, _cmd_cost, _cmd_sessions, _cmd_resume, _cmd_export,
-        _cmd_compact, _cmd_remember, _cmd_forget, _cmd_memory,
-        _cmd_mcp_tools, _cmd_mcp_call, _cmd_cron, _cmd_cron_health,
-        _cmd_model_router, _cmd_search, _cmd_skill_score, _cmd_speak,
-        _cmd_distill, _cmd_api, _cmd_plugins_list, _cmd_alias, _cmd_ws,
-        _cmd_gateway, _cmd_task, _cmd_cross, _cmd_clean, _cmd_data,
-        _cmd_prioritize, _cmd_progress, _cmd_flaky, _cmd_regression,
-        _cmd_insights, _cmd_nudge,
+        _cmd_alias,
+        _cmd_api,
+        _cmd_cache,
+        _cmd_clean,
+        _cmd_clear,
+        _cmd_compact,
+        _cmd_context,
+        _cmd_cost,
+        _cmd_cron,
+        _cmd_cron_health,
+        _cmd_cross,
+        _cmd_data,
+        _cmd_distill,
+        _cmd_export,
+        _cmd_fc,
+        _cmd_flaky,
+        _cmd_forget,
+        _cmd_gateway,
+        _cmd_history,
+        _cmd_hook,
+        _cmd_insights,
+        _cmd_lang,
+        _cmd_mcp_call,
+        _cmd_mcp_tools,
+        _cmd_memory,
+        _cmd_model,
+        _cmd_model_router,
+        _cmd_nudge,
+        _cmd_personality,
+        _cmd_plugins_list,
+        _cmd_prioritize,
+        _cmd_progress,
+        _cmd_regression,
+        _cmd_remember,
+        _cmd_resume,
+        _cmd_retry,
+        _cmd_search,
+        _cmd_sessions,
+        _cmd_skill_score,
+        _cmd_skin,
+        _cmd_speak,
+        _cmd_status,
+        _cmd_task,
+        _cmd_tools,
+        _cmd_undo,
+        _cmd_update,
+        _cmd_ws,
+        _rerun_history,
     )
 
     @register("status", "Session status + stats", description_zh="会话状态统计", nl_triggers=["状态", "会话", "当前状态", "怎么样"])

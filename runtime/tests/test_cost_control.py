@@ -1,11 +1,10 @@
 """TDD tests for LLM Cost Control (§补-9)."""
 
 from runtime.infra.cost_control import (
-    TokenBudget,
     CostTracker,
+    TokenBudget,
     estimate_tokens,
     get_cost_tracker,
-    _DOWNGRADE_CHAIN,
 )
 
 

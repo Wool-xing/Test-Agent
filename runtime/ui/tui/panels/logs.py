@@ -1,7 +1,7 @@
 """Log Viewer panel — real-time log stream with filtering."""
 
-from textual.widgets import Static, RichLog
 from textual.containers import Vertical
+from textual.widgets import RichLog, Static
 
 
 class LogViewerPanel(Vertical):

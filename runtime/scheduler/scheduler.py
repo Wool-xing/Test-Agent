@@ -45,7 +45,7 @@ def _acquire_lock(lock_path: Path):
             f.seek(0)  # lock from byte 0 so all processes conflict on same region
             msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
         return f, True
-    except (OSError, IOError):
+    except OSError:
         f.close()
         return None, False
 

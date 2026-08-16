@@ -33,7 +33,7 @@ def new(
         plugin_dir = scaffold_plugin(name, plugin_type, out, description=description, author=author)
     except ValueError as e:
         console.print(f"[red]Error:[/] {e}")
-        raise typer.Exit(2)
+        raise typer.Exit(2) from None
 
     console.print(f"[green]Plugin scaffolded[/] → {plugin_dir}")
     console.print(f"  manifest: {plugin_dir / 'tagent-plugin.yaml'}")
@@ -50,10 +50,7 @@ def validate(
     from sdk.plugin_schema import PluginManifest
 
     p = Path(path).resolve()
-    if p.is_dir():
-        manifest_path = p / "tagent-plugin.yaml"
-    else:
-        manifest_path = p
+    manifest_path = p / "tagent-plugin.yaml" if p.is_dir() else p
 
     if not manifest_path.exists():
         console.print(f"[red]Manifest not found:[/] {manifest_path}")
@@ -64,7 +61,7 @@ def validate(
         raw = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
     except yaml.YAMLError as e:
         console.print(f"[red]YAML parse error:[/] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     if raw is None:
         console.print(f"[red]Empty manifest:[/] {manifest_path}")
@@ -74,7 +71,7 @@ def validate(
         manifest = PluginManifest(**raw)
     except Exception as e:
         console.print(f"[red]Validation failed:[/] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     console.print(f"[green]Valid[/] {manifest.name} v{manifest.version} ({manifest.plugin_type.value})")
     for field in ("description", "author", "license", "min_tagent_version"):

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestMultilineDetection:
     """Test _is_multiline_candidate()."""

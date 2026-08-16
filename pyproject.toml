@@ -24,15 +24,37 @@ classifiers = [
 keywords = ["testing", "ai", "automation", "cli", "tui", "agent"]
 
 dependencies = [
-    "typer>=0.9",
-    "rich>=13.0",
-    "pydantic>=2.0",
-    "pydantic-settings>=2.0",
-    "loguru>=0.7",
+    "typer>=0.16.0,<0.26.0",
+    "rich>=13.9.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "loguru>=0.7.2",
     "prompt-toolkit>=3.0",
     "textual>=0.50",
-    "pyyaml>=6.0",
+    "pyyaml>=6.0.1",
     "python-dotenv>=1.0",
+    "mcp>=1.0,<2.0.0",
+    "litellm>=1.55.0,<2.0.0",
+    "prefect>=2.20.0",
+    "factory-boy>=3.3.0",
+    "faker>=30.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.13.0",
+    "psycopg[binary]>=3.2.0",
+    "pgvector>=0.3.0",
+    "minio>=7.2.0",
+    "opentelemetry-api>=1.27.0",
+    "opentelemetry-sdk>=1.27.0",
+    "opentelemetry-exporter-otlp>=1.27.0",
+    "opentelemetry-instrumentation-fastapi>=0.48b0,<0.66b0",
+    "python-multipart>=0.0.12",
+    "httpx>=0.27.0",
+    "openpyxl>=3.1.0",
+    "pypdf>=6.13.3",
+    "python-docx>=1.1.0",
+    "defusedxml>=0.7.1",
 ]
 
 [project.optional-dependencies]
@@ -43,13 +65,8 @@ dev = [
     "ruff>=0.5",
 ]
 all = [
-    "litellm>=1.50",
-    "prefect>=2.20",
-    "sqlalchemy>=2.0",
     "playwright>=1.60",
     "requests>=2.32",
-    "mcp>=1.0,<2.0.0",
-    "httpx>=0.28",
 ]
 
 [project.scripts]
@@ -73,3 +90,10 @@ python_files = ["test_*.py"]
 line-length = 120
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["runtime", "utils", "specs"]
+
+[tool.ruff.lint.per-file-ignores]
+# 函数内 import 块排序与 runtime/pyproject.toml 配置互斥（CI 用 runtime 配置）
+"runtime/mcp/client.py" = ["I001"]

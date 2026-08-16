@@ -10,7 +10,7 @@ class TestE2EExecutor:
 
     def test_e2e_module_imports(self):
         """E2E executor should be importable."""
-        from runtime.testing.e2e import E2EExecutor, E2EConfig
+        from runtime.testing.e2e import E2EConfig, E2EExecutor
         assert E2EExecutor is not None
         assert E2EConfig is not None
 
@@ -24,7 +24,7 @@ class TestE2EExecutor:
 
     def test_e2e_simple_check(self):
         """Example 1: Simple page load check (skips if Playwright unavailable)."""
-        from runtime.testing.e2e import E2EExecutor, E2EConfig
+        from runtime.testing.e2e import E2EConfig, E2EExecutor
         cfg = E2EConfig(headless=True, timeout_seconds=10)
         executor = E2EExecutor(cfg)
         result = executor.check_page("https://example.com")
@@ -35,7 +35,7 @@ class TestE2EExecutor:
 
     def test_e2e_checks_format(self):
         """Example 2: E2E result should have properly formatted checks."""
-        from runtime.testing.e2e import E2EExecutor, E2EConfig
+        from runtime.testing.e2e import E2EConfig, E2EExecutor
         executor = E2EExecutor(E2EConfig(timeout_seconds=5))
         result = executor.check_page("https://httpbin.org/get")
         if result.status == "error" and any(kw in (result.error or "") for kw in ("not installed", "not available")):
@@ -47,7 +47,7 @@ class TestE2EExecutor:
 
     def test_e2e_handle_unreachable(self):
         """Example 3: Unreachable URL should return error status."""
-        from runtime.testing.e2e import E2EExecutor, E2EConfig
+        from runtime.testing.e2e import E2EConfig, E2EExecutor
         executor = E2EExecutor(E2EConfig(timeout_seconds=3))
         result = executor.check_page("https://192.0.2.1")
         if result.status == "error" and any(kw in (result.error or "") for kw in ("not installed", "not available")):
@@ -60,7 +60,7 @@ class TestCronScheduler:
 
     def test_scheduler_imports(self):
         """Cron scheduler should be importable with run/tick functions."""
-        from runtime.scheduler.scheduler import run_job, tick, run_forever, start_background
+        from runtime.scheduler.scheduler import run_forever, run_job, start_background, tick
         assert callable(run_job)
         assert callable(tick)
         assert callable(run_forever)
@@ -87,7 +87,7 @@ class TestVisualExecutor:
 
     def test_visual_module_imports(self):
         """Visual executor should be importable."""
-        from runtime.testing.visual import VisualExecutor, VisualConfig
+        from runtime.testing.visual import VisualConfig, VisualExecutor
         assert VisualExecutor is not None
         assert VisualConfig is not None
 
@@ -100,7 +100,7 @@ class TestVisualExecutor:
 
     def test_compare_missing_baseline_fails(self, tmp_path):
         """Compare without baseline should return error."""
-        from runtime.testing.visual import VisualExecutor, VisualConfig
+        from runtime.testing.visual import VisualConfig, VisualExecutor
         cfg = VisualConfig(output_dir=str(tmp_path))
         executor = VisualExecutor(cfg)
         result = executor.compare("https://example.com", "nonexistent")
@@ -113,12 +113,12 @@ class TestIntegrationExecutor:
 
     def test_integration_module_imports(self):
         """Integration executor should be importable."""
-        from runtime.testing.integration import IntegrationExecutor, IntegrationConfig, ApiCheck
+        from runtime.testing.integration import IntegrationExecutor
         assert IntegrationExecutor is not None
 
     def test_api_check_basic(self):
         """Basic API check against a test endpoint."""
-        from runtime.testing.integration import IntegrationExecutor, ApiCheck
+        from runtime.testing.integration import ApiCheck, IntegrationExecutor
         executor = IntegrationExecutor()
         checks = [ApiCheck(method="GET", path="/get", expected_status=200)]
         result = executor.check_api("https://httpbin.org", checks)
@@ -175,7 +175,7 @@ class TestCypressExecutor:
 
     def test_cypress_module_imports(self):
         """Example 1: Cypress executor should be importable."""
-        from runtime.testing.cypress import CypressExecutor, CypressConfig
+        from runtime.testing.cypress import CypressExecutor
         assert CypressExecutor is not None
 
     def test_cypress_not_installed_graceful(self):
@@ -200,7 +200,7 @@ class TestMobileExecutor:
 
     def test_mobile_module_imports(self):
         """Mobile executor should be importable."""
-        from runtime.testing.mobile import MobileExecutor, MobileConfig
+        from runtime.testing.mobile import MobileExecutor
         assert MobileExecutor is not None
 
     def test_mobile_appium_check(self):

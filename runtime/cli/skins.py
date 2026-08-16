@@ -7,7 +7,6 @@ Switch with /skin <name>, persists via user profile.
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
 from typing import Any
 
 # Built-in skins

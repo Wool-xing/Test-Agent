@@ -73,6 +73,10 @@ jobs:
           pip install ruff
           ruff check utils/ --config utils/.ruff.toml
 
+      - name: Ruff 检查 runtime/（根 scope 门禁，QA-2026-08-16 战役 536→0）
+        run: |
+          ruff check runtime/ --config runtime/pyproject.toml
+
       - name: 语法检查（py_compile）
         run: |
           python -m compileall utils/ -q
@@ -417,6 +421,7 @@ jobs:
             --ignore=runtime/tests/test_router_real.py \
             --ignore=runtime/tests/test_smoke_e2e.py \
             --cov=runtime --cov=utils \
+            --cov-fail-under=30 \
             --cov-report=term --cov-report=html \
             -p no:cacheprovider \
             -v --tb=short

@@ -15,12 +15,10 @@ Naming: {round}-{feature}-{platform}-{type}.{png|gif|txt}
 from __future__ import annotations
 
 import hashlib
-import json
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any
 
 
 class EvidenceType(Enum):
@@ -67,10 +65,7 @@ class EvidenceStore:
         filename = f"{round_num}-{feature}-{platform}-{etype.value}.{etype.value}"
         filepath = rd / filename
 
-        if isinstance(content, str):
-            data = content.encode("utf-8")
-        else:
-            data = content
+        data = content.encode("utf-8") if isinstance(content, str) else content
 
         filepath.write_bytes(data)
         checksum = hashlib.sha256(data).hexdigest()[:16]

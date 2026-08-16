@@ -19,20 +19,8 @@
                 <false/>
                 <key>NSIncludesSubdomains</key>
                 <true/>
-                <!-- 证书固定 (SSL Pinning) -->
-                <key>NSPinnedDomains</key>
-                <dict>
-                    <key>api.test-agent.dev</key>
-                    <dict>
-                        <key>NSPinnedLeafIdentities</key>
-                        <array>
-                            <dict>
-                                <key>SPKI-SHA256-BASE64</key>
-                                <string>PLACEHOLDER_CERT_PIN</string>
-                            </dict>
-                        </array>
-                    </dict>
-                </dict>
+                <!-- 证书固定 (SSL Pinning): 发布前由 Ops 注入真实 SPKI-SHA256-BASE64
+                     （占位 pin 会导致 iOS 拒绝全部到该域名的 TLS 连接） -->
             </dict>
         </dict>
     </dict>

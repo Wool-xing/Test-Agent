@@ -1,11 +1,10 @@
 """TDD tests for Deprecation Policy (§补-24)."""
 
-import pytest
 
 from runtime.infra.deprecation import (
-    DeprecationRegistry,
     DeprecationEntry,
     DeprecationLevel,
+    DeprecationRegistry,
     get_deprecation_registry,
 )
 

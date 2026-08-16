@@ -17,10 +17,10 @@ def register(app: typer.Typer) -> None:
     def run(
         target: str = typer.Argument(None, help="path / url / free-form text (use - for stdin)"),
         note: str = typer.Option("", "--note", help="extra hint to the router"),
-        task: str = typer.Option("", "--task", help="read target from file (e.g. @tasks/daily.txt)"),
+        task: str = typer.Option("", "--task", help="read target from file (e.g. @tasks/daily.txt)"),  # noqa: B008
         no_persist: bool = typer.Option(False, "--no-persist", help="skip DB write"),
         json_only: bool = typer.Option(False, "--json", help="print full result JSON only"),
-        mode: Mode | None = typer.Option(None, "--mode", help="exec | learn | silent"),
+        mode: Mode | None = typer.Option(None, "--mode", help="exec | learn | silent"),  # noqa: B008
         lang: str | None = typer.Option(None, "--lang", help="zh | en | zh-en"),
     ):
         """Plan + execute a test run. Supports pipeline: echo 'test' | tagent run -"""
@@ -56,6 +56,8 @@ def register(app: typer.Typer) -> None:
             typer.echo(json.dumps(summary, ensure_ascii=False, indent=2))
         else:
             console.print(f"[bold]done[/]: {summary['succeeded']}/{summary['total']} ok, {summary['failed']} failed")
+        if summary.get("failed"):
+            raise typer.Exit(1)
 
     @app.command()
     def plan(
