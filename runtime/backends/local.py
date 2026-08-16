@@ -19,9 +19,14 @@ class LocalBackend(BaseExecutionEnv):
 
     async def exec(self, cmd: str, *, timeout: float = 60.0, cwd: str | None = None, env: dict | None = None) -> ExecResult:
         start = time.monotonic()
-        proc = await asyncio.create_subprocess_exec(
-            *shlex.split(cmd), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd, env=env
-        )
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *shlex.split(cmd), stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd, env=env
+            )
+        except FileNotFoundError:
+            # Missing command must be a failed ExecResult, not an exception
+            return ExecResult(ok=False, stdout="", stderr=f"command not found: {cmd}", returncode=127,
+                              elapsed_ms=int((time.monotonic() - start) * 1000))
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
         except asyncio.TimeoutError:
