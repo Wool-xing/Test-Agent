@@ -166,8 +166,10 @@ def compare_apis(api_a: str, api_b: str, endpoints: list[dict],
                 try:
                     diff = compare_outputs(resp_a.json(), resp_b.json())
                     diff.input_data = {"path": ep["path"], "method": method}
-                except Exception:
-                    pass
+                except Exception as e:  # noqa: BLE001 — parse failure must NOT read as identical
+                    diff.identical = False
+                    diff.divergence_type = "json_parse_error"
+                    diff.normalized_diff = {"error": f"JSON parse failed: {str(e)[:200]}"}
             results.append(diff)
         except Exception as e:
             results.append(DiffResult(

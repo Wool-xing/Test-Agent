@@ -358,7 +358,8 @@ def run_taboo_audit(payload: Dict) -> Dict:
         results["taboo_numbers"] = audit_taboo_numbers(numbers, locales)
 
     date_str = payload.get("date")
-    results["taboo_holidays"] = audit_taboo_holidays(date_str, locales)
+    if date_str:
+        results["taboo_holidays"] = audit_taboo_holidays(date_str, locales)
 
     context = payload.get("context", "")
     if context:

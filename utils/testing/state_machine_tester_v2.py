@@ -63,13 +63,10 @@ class Transition:
     def execute_action(self, ctx: dict) -> None:
         if self.action:
             Transition._validate_code(self.action, "action")
-            try:
-                # exec not allowed for actions — only safe assignment via ctx dict
-                _locals = {}
-                exec(self.action, {"__builtins__": self._SAFE_BUILTINS}, {**ctx, "_out": _locals})
-                ctx.update(_locals)
-            except Exception:
-                pass
+            # exec not allowed for actions — only safe assignment via ctx dict
+            _locals = {}
+            exec(self.action, {"__builtins__": self._SAFE_BUILTINS}, {**ctx, "_out": _locals})
+            ctx.update(_locals)
 
 
 @dataclass
@@ -112,7 +109,11 @@ class FSM:
         candidates = [t for t in self.out_transitions(state) if t.event == event]
         for t in candidates:
             if t.evaluate_guard(ctx):
-                t.execute_action(ctx)
+                try:
+                    t.execute_action(ctx)
+                except Exception:
+                    # Action raised — transition did NOT happen; reject the event.
+                    return None
                 return t.to_state
         return None
 
@@ -189,11 +190,15 @@ def weighted_random_walk(fsm: FSM, max_steps: int = 50, ctx: dict | None = None)
                 chosen = t
                 break
 
-        chosen.execute_action(ctx)
-        trace.append({
+        entry = {
             "from": state, "event": chosen.event, "to": chosen.to_state,
             "guard_evaluated": chosen.guard,
-        })
+        }
+        try:
+            chosen.execute_action(ctx)
+        except Exception as e:
+            entry["action_error"] = str(e)
+        trace.append(entry)
         state = chosen.to_state
 
     return trace

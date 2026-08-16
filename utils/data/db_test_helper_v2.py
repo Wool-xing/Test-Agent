@@ -107,14 +107,19 @@ def test_foreign_key_integrity(db_url: str, table: str, fk_column: str,
     try:
         # Try to insert row with invalid FK
         invalid_fk = str(uuid.uuid4().int)[:10]
+        from sqlalchemy.exc import IntegrityError
+
         try:
             conn.execute(text(f"INSERT INTO {table} ({fk_column}) VALUES (:val)"),
                         {"val": int(invalid_fk)})
             conn.commit()
             return {"passed": False, "error": f"FK constraint not enforced on {table}.{fk_column}"}
-        except Exception as e:
+        except IntegrityError as e:
             conn.rollback()
             return {"passed": True, "evidence": f"FK constraint enforced: {str(e)[:200]}"}
+        except Exception as e:  # noqa: BLE001 — DB down / wrong table: NOT a constraint pass
+            conn.rollback()
+            return {"passed": False, "error": f"unexpected error — not a constraint violation: {str(e)[:200]}"}
     finally:
         conn.close()
 
@@ -129,13 +134,18 @@ def test_unique_constraint(db_url: str, table: str, column: str, value: str = "t
         conn.execute(text(f"INSERT INTO {table} ({column}) VALUES (:val)"), {"val": value})
         conn.commit()
         # Try duplicate
+        from sqlalchemy.exc import IntegrityError
+
         try:
             conn.execute(text(f"INSERT INTO {table} ({column}) VALUES (:val)"), {"val": value})
             conn.commit()
             return {"passed": False, "error": f"Unique constraint not enforced on {table}.{column}"}
-        except Exception:
+        except IntegrityError:
             conn.rollback()
             return {"passed": True, "evidence": "Unique constraint enforced"}
+        except Exception as e:  # noqa: BLE001 — DB down / wrong table: NOT a constraint pass
+            conn.rollback()
+            return {"passed": False, "error": f"unexpected error — not a constraint violation: {str(e)[:200]}"}
     finally:
         conn.close()
 
@@ -147,6 +157,8 @@ def test_check_constraint(db_url: str, table: str, column: str,
     conn = _get_connection(db_url)
     from sqlalchemy import text
 
+    from sqlalchemy.exc import IntegrityError
+
     try:
         # Valid value should work
         conn.execute(text(f"INSERT INTO {table} ({column}) VALUES (:val)"), {"val": valid_value})
@@ -156,9 +168,15 @@ def test_check_constraint(db_url: str, table: str, column: str,
             conn.execute(text(f"INSERT INTO {table} ({column}) VALUES (:val)"), {"val": invalid_value})
             conn.commit()
             return {"passed": False, "error": "CHECK constraint not enforced"}
-        except Exception:
+        except IntegrityError:
             conn.rollback()
             return {"passed": True, "evidence": "CHECK constraint enforced"}
+    except IntegrityError:
+        conn.rollback()
+        return {"passed": False, "error": f"valid value rejected by CHECK constraint on {table}.{column}"}
+    except Exception as e:  # noqa: BLE001 — DB down / wrong table: NOT a constraint pass
+        conn.rollback()
+        return {"passed": False, "error": f"unexpected error — not a constraint violation: {str(e)[:200]}"}
     finally:
         conn.close()
 

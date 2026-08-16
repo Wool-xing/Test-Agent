@@ -50,6 +50,7 @@ def check_excessive_data(base_url: str, endpoints: list[dict],
     """Check if endpoints return more fields than needed.
     Compares: user vs admin token responses, list vs single-item responses."""
     findings = []
+    failures = 0
     for ep in endpoints:
         path = ep.get("path", "")
         method = ep.get("method", "GET")
@@ -76,7 +77,12 @@ def check_excessive_data(base_url: str, endpoints: list[dict],
                         "evidence": f"{len(item_keys)} fields in list response, sensitive fields found",
                     })
         except Exception:
-            continue
+            failures += 1
+    if not findings and failures:
+        findings.append({
+            "api": "scan", "severity": "WARN",
+            "finding": f"unable to scan {failures}/{len(endpoints)} endpoints — zero findings may be a scan failure, not a clean API",
+        })
     return findings
 
 
@@ -126,6 +132,7 @@ def check_mass_assignment(base_url: str, endpoints: list[dict],
                            user_token: str = "") -> list[dict]:
     """Probe for mass assignment vulnerabilities on POST/PUT/PATCH endpoints."""
     findings = []
+    failures = 0
     for ep in endpoints:
         method = ep.get("method", "").upper()
         if method not in ("POST", "PUT", "PATCH"):
@@ -153,7 +160,12 @@ def check_mass_assignment(base_url: str, endpoints: list[dict],
                         })
                         break  # One finding per endpoint
             except Exception:
-                continue
+                failures += 1
+    if not findings and failures:
+        findings.append({
+            "api": "scan", "severity": "WARN",
+            "finding": f"unable to scan ({failures} request failures) — zero findings may be a scan failure, not a clean API",
+        })
     return findings
 
 
