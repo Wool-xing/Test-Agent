@@ -2,5 +2,5 @@
 # 安装: pip install -r requirements/mobile.txt
 -r base.txt
 
-Appium-Python-Client==5.3.1
-selenium==4.45.0
+Appium-Python-Client==6.0.0
+selenium==4.47.0
