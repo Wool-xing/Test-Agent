@@ -38,7 +38,7 @@ pypdf==6.13.3
 beautifulsoup4==4.14.3
 
 # 工具
-python-dotenv==1.2.2
+python-dotenv==1.2.3
 tenacity==8.2.3
 loguru==0.7.3
 
