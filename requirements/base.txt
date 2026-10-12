@@ -39,7 +39,7 @@ beautifulsoup4==4.14.3
 
 # 工具
 python-dotenv==1.2.2
-tenacity==8.2.3
+tenacity==9.2.1
 loguru==0.7.3
 
 # 契约测试
